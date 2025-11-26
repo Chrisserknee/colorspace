@@ -86,33 +86,33 @@ export default function Hero({ onUploadClick }: HeroProps) {
         </p>
 
         {/* Sample portraits */}
-        <div className="flex justify-center gap-4 sm:gap-6 mb-10 animate-fade-in-up delay-300">
+        <div className="flex justify-center gap-6 sm:gap-8 mb-12 animate-fade-in-up delay-300">
           <div 
-            className="w-28 h-36 sm:w-36 sm:h-48 rounded-lg overflow-hidden shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-300"
+            className="w-40 h-52 sm:w-52 sm:h-68 md:w-60 md:h-80 rounded-xl overflow-hidden shadow-2xl transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300"
             style={{ 
               background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)',
-              padding: '4px',
-              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(197, 165, 114, 0.2)'
+              padding: '5px',
+              boxShadow: '0 15px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(197, 165, 114, 0.25)'
             }}
           >
             <img 
               src="/samples/chihuahua.png" 
               alt="Renaissance Chihuahua portrait"
-              className="w-full h-full object-cover rounded"
+              className="w-full h-full object-cover rounded-lg"
             />
           </div>
           <div 
-            className="w-28 h-36 sm:w-36 sm:h-48 rounded-lg overflow-hidden shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300"
+            className="w-40 h-52 sm:w-52 sm:h-68 md:w-60 md:h-80 rounded-xl overflow-hidden shadow-2xl transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300"
             style={{ 
               background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)',
-              padding: '4px',
-              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(197, 165, 114, 0.2)'
+              padding: '5px',
+              boxShadow: '0 15px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(197, 165, 114, 0.25)'
             }}
           >
             <img 
               src="/samples/golden.png" 
               alt="Renaissance Golden Retriever portrait"
-              className="w-full h-full object-cover rounded"
+              className="w-full h-full object-cover rounded-lg"
             />
           </div>
         </div>
