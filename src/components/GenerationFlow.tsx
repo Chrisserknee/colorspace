@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
 type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired";
+type Gender = "male" | "female" | null;
 
 interface GenerationFlowProps {
   file: File | null;
@@ -39,6 +40,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   const [timeRemaining, setTimeRemaining] = useState<string>("15:00");
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [gender, setGender] = useState<Gender>(null);
 
   // Set preview URL when file is provided
   useEffect(() => {
@@ -154,6 +156,9 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       
       const formData = new FormData();
       formData.append("image", fileToUpload);
+      if (gender) {
+        formData.append("gender", gender);
+      }
 
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -252,6 +257,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     setRetryUsed(false);
     setExpirationTime(null);
     setEmail("");
+    setGender(null);
     onReset();
   };
 
@@ -335,8 +341,51 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               </div>
             )}
 
+            {/* Gender Selection */}
+            <div className="mb-6">
+              <p className="text-center mb-3 text-sm" style={{ color: '#B8B2A8' }}>
+                Select your pet&apos;s gender for more accurate results:
+              </p>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => setGender("male")}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    gender === "male"
+                      ? "scale-105 shadow-lg"
+                      : "opacity-70 hover:opacity-100"
+                  }`}
+                  style={{
+                    backgroundColor: gender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
+                    color: gender === "male" ? '#1A1A1A' : '#C5A572',
+                    border: `2px solid ${gender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
+                  }}
+                >
+                  ♂ Male
+                </button>
+                <button
+                  onClick={() => setGender("female")}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    gender === "female"
+                      ? "scale-105 shadow-lg"
+                      : "opacity-70 hover:opacity-100"
+                  }`}
+                  style={{
+                    backgroundColor: gender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
+                    color: gender === "female" ? '#1A1A1A' : '#C5A572',
+                    border: `2px solid ${gender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
+                  }}
+                >
+                  ♀ Female
+                </button>
+              </div>
+            </div>
+
             <div className="text-center">
-              <button onClick={handleGenerate} className="btn-primary text-lg px-8 py-4">
+              <button 
+                onClick={handleGenerate} 
+                disabled={!gender}
+                className={`btn-primary text-lg px-8 py-4 ${!gender ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
                 </svg>

@@ -78,6 +78,7 @@ export async function POST(request: NextRequest) {
     // Parse form data
     const formData = await request.formData();
     const imageFile = formData.get("image") as File | null;
+    const gender = formData.get("gender") as string | null;
 
     if (!imageFile) {
       return NextResponse.json(
@@ -290,10 +291,12 @@ Format your response as: "[SPECIES] UNIQUE FEATURES: [list the 3-5 most distinct
     const lighting = lightingDirections[Math.floor(Math.random() * lightingDirections.length)];
 
     // Step 2: Generate Renaissance royal portrait - SPECIES AND PET ACCURACY ARE #1 PRIORITY
+    const genderInfo = gender ? `\n=== GENDER ===\nThis is a ${gender === "male" ? "male" : "female"} ${species}.` : "";
+    
     const generationPrompt = `THIS IS A ${species}. Generate a ${species}. ${notSpecies}
 
 === THE ${species} - MUST MATCH EXACTLY ===
-${petDescription}
+${petDescription}${genderInfo}
 
 This ${species} portrait must look like THIS EXACT ${species}. ${notSpecies}
 
