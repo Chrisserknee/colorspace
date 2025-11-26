@@ -332,8 +332,8 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
 
             {/* Price */}
             <div className="text-center mb-2">
-              <span className="text-lg line-through mr-2" style={{ color: '#7A756D' }}>$19</span>
-              <span className="text-4xl font-bold" style={{ color: '#F0EDE8' }}>$9</span>
+              <span className="text-lg line-through mr-2" style={{ color: '#7A756D' }}>$9</span>
+              <span className="text-4xl font-bold" style={{ color: '#F0EDE8' }}>$0.50</span>
             </div>
 
             {/* Expiration Timer */}

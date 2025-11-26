@@ -73,4 +73,39 @@ export async function getMetadata(imageId: string) {
   return data;
 }
 
+// Helper to save email to emails table
+export async function saveEmail(email: string, imageId?: string, source: string = "checkout") {
+  const { error } = await supabase
+    .from("emails")
+    .upsert({
+      email: email.toLowerCase().trim(),
+      image_id: imageId || null,
+      source,
+      created_at: new Date().toISOString(),
+    }, {
+      onConflict: "email",
+    });
+
+  if (error) {
+    console.error("Failed to save email:", error);
+    return false;
+  }
+  return true;
+}
+
+// Helper to get all emails (for export)
+export async function getAllEmails() {
+  const { data, error } = await supabase
+    .from("emails")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Failed to get emails:", error);
+    return [];
+  }
+
+  return data;
+}
+
 

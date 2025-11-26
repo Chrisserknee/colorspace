@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { CONFIG } from "@/lib/config";
-import { getMetadata } from "@/lib/supabase";
+import { getMetadata, saveEmail } from "@/lib/supabase";
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,6 +43,9 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Save email to emails table for marketing
+    await saveEmail(email, imageId, "checkout");
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
