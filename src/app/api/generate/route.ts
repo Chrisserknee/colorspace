@@ -206,33 +206,35 @@ Format your response as a single detailed paragraph that can be used as an art p
   } catch (error) {
     console.error("Generation error:", error);
 
-    // Handle specific OpenAI errors
+    // Get detailed error message
+    let errorMessage = "Failed to generate portrait. Please try again.";
+    let statusCode = 500;
+
     if (error instanceof OpenAI.APIError) {
-      console.error("OpenAI API Error:", error.message, error.status);
+      console.error("OpenAI API Error:", error.message, error.status, error.code);
       
       if (error.status === 401) {
-        return NextResponse.json(
-          { error: "Invalid API key. Please check your configuration." },
-          { status: 500 }
-        );
+        errorMessage = "Invalid API key. Please check your configuration.";
+      } else if (error.status === 429) {
+        errorMessage = "Too many requests. Please try again in a moment.";
+        statusCode = 429;
+      } else if (error.status === 400) {
+        errorMessage = `Invalid request: ${error.message}`;
+        statusCode = 400;
+      } else if (error.message.includes("content_policy")) {
+        errorMessage = "Image couldn't be generated due to content policy. Please try a different photo.";
+        statusCode = 400;
+      } else {
+        errorMessage = `OpenAI Error: ${error.message}`;
       }
-      if (error.status === 429) {
-        return NextResponse.json(
-          { error: "Too many requests. Please try again in a moment." },
-          { status: 429 }
-        );
-      }
-      if (error.status === 400) {
-        return NextResponse.json(
-          { error: "Invalid request. Please try a different image." },
-          { status: 400 }
-        );
-      }
+    } else if (error instanceof Error) {
+      errorMessage = `Error: ${error.message}`;
+      console.error("Error details:", error.stack);
     }
 
     return NextResponse.json(
-      { error: "Failed to generate portrait. Please try again." },
-      { status: 500 }
+      { error: errorMessage },
+      { status: statusCode }
     );
   }
 }
