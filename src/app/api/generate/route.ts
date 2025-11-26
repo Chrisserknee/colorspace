@@ -195,47 +195,47 @@ The description must be accurate enough that the owner instantly recognizes thei
 
     // Randomize elements for unique paintings
     const cushions = [
-      "BRIGHT EMERALD GREEN plush velvet cushion with luxurious deep pile, gold floral embroidery, and silk tassels",
-      "VIVID RUBY RED thick velvet cushion with sumptuous velvety texture, silver damask pattern, and braided trim",
-      "BRILLIANT ROYAL BLUE rich velvet cushion with lustrous sheen, gold leaf scrollwork, and pearl beading",
-      "DEEP AMETHYST PURPLE plush velvet cushion with luxurious nap, gold heraldic embroidery, and silk fringe",
-      "BRIGHT SCARLET crushed velvet cushion with rich texture, intricate gold brocade, and corner rosettes",
-      "VIVID TEAL GREEN thick pile velvet ottoman with deep luxurious texture and antique gold filigree trim",
-      "RICH SAPPHIRE BLUE plush velvet cushion with velvety sheen, silver arabesques, and gold tassels",
-      "DEEP MAGENTA velvet cushion with sumptuous pile, gold crest embroidery, and silk piping"
+      "soft SAGE GREEN velvet cushion with delicate gold vine and pink rose embroidery, silk tassels at corners",
+      "muted DUSTY ROSE velvet cushion with gold floral scrollwork embroidery and braided gold trim",
+      "elegant FOREST GREEN plush velvet cushion with gold leaf embroidery and antique gold tassels",
+      "soft SLATE GRAY velvet cushion with gold and rose floral embroidery, silk fringe trim",
+      "muted OLIVE GREEN velvet cushion with delicate pink flower embroidery and gold piping",
+      "dusty TEAL velvet cushion with gold botanical embroidery and corner rosettes",
+      "soft BURGUNDY velvet cushion with cream and gold floral pattern, silk tassels",
+      "muted NAVY velvet cushion with gold vine embroidery and antique brass trim"
     ];
     
     const robes = [
-      "magnificent BRIGHT CRIMSON RED thick plush velvet royal robe with deep luxurious pile, white ermine fur collar, and gold clasps",
-      "opulent VIBRANT ROYAL PURPLE rich velvet coronation cape with sumptuous velvety texture, pristine ermine trim, and pearl buttons",
-      "regal VIVID SAPPHIRE BLUE deep-pile velvet emperor's mantle with lustrous sheen, silver fox fur lining, and diamond epaulettes",
-      "sumptuous RICH SCARLET RED crushed velvet king's coat with plush texture, gold thread embroidery, and ermine cuffs",
-      "majestic BRIGHT EMERALD GREEN thick velvet monarch's cloak with luxurious nap, sable fur trim, and jeweled brooch",
-      "lavish DEEP MAGENTA plush velvet ceremonial robe with rich velvety sheen, ermine collar, and trailing cape",
-      "stately VIVID VIOLET thick pile velvet duchess cape with sumptuous texture, chinchilla fur trim, and ruby clasp",
-      "resplendent BRIGHT COBALT BLUE luxurious velvet imperial robe with deep lustrous pile, ermine lapels, and gold insignia"
+      "elegant IVORY CREAM silk robe with delicate gold and pink floral embroidery, white ermine fur trim with black spots, and lace collar",
+      "soft DUSTY BLUE satin cape with gold thread rose embroidery, pristine ermine trim with spots, and delicate lace ruff",
+      "refined CHAMPAGNE GOLD brocade mantle with floral patterns, white ermine lining with black spots, and pearl buttons",
+      "graceful SOFT GRAY velvet robe with silver floral embroidery, ermine collar with spots, and antique lace trim",
+      "delicate BLUSH PINK silk cloak with gold botanical embroidery, ermine fur trim, and layered lace collar",
+      "classic DEEP BURGUNDY velvet cape with gold rose embroidery, spotted ermine collar, and cream lace ruff",
+      "sophisticated SLATE BLUE velvet robe with silver and gold floral details, ermine trim, and delicate lace accents",
+      "timeless ANTIQUE WHITE damask robe with gold vine embroidery, spotted ermine lapels, and fine lace collar"
     ];
     
     const jewelry = [
-      "magnificent heavy gold chain of office with enormous ruby-studded royal medallion and hanging pearls",
-      "stunning triple-strand pearl necklace with large pear-shaped emerald pendant surrounded by diamonds",
-      "ornate gold ceremonial collar with brilliant sapphire centerpiece and cascading diamond drops",
-      "exquisite platinum and diamond crown necklace with teardrop sapphire and filigree detailing",
-      "opulent gold rope chain with carved imperial jade medallion encircled by rubies",
-      "breathtaking jeweled gold torque with amethyst clusters and pearl accents fit for royalty",
-      "elegant multi-strand pearl and gold choker with antique cameo pendant framed in diamonds",
-      "regal layered gold chains bearing the royal family crest medallion with gemstone inlays"
+      "layered gold chains with delicate pearl strands and small ruby pendant, elegant and refined",
+      "multiple pearl necklaces layered together with a gold floral centerpiece and teardrop gem",
+      "delicate gold filigree collar with rose-pink gems and small pearl drops",
+      "layered antique gold necklaces with cameo pendant and pearl accents",
+      "elegant triple-strand pearl choker with gold flower clasp and small gemstone",
+      "refined gold chain with floral gem clusters in pink and gold, layered with pearls",
+      "multiple delicate chains - pearls, gold links, and a small ornate pendant",
+      "layered jewelry: pearl strand, gold chain with pendant, and delicate gem necklace"
     ];
     
     const backgrounds = [
-      "grand palace throne room with soft gray marble walls, dusty blue velvet drapes, and towering white Corinthian columns",
-      "elegant royal chamber with cream silk wallcovering, sage damask curtains, ornate gilded mirror, and crystal sconces",
-      "majestic palace gallery with pale stone walls, flowing ivory silk drapes, classical Greek sculpture, and parquet floors",
-      "stately drawing room with soft blue-gray paneled walls, white silk curtains, fine porcelain collection, and gold leaf moldings",
-      "refined aristocratic library with light taupe walls, cool gray velvet drapery, leather-bound books, and brass telescope",
-      "opulent palace salon with silver-gray walls, pale blue silk accents, magnificent crystal chandelier, and French windows",
-      "grand ballroom corner with creamy ivory walls, muted teal velvet curtains, enormous gilded frame, and marble fireplace",
-      "regal portrait gallery with cool neutral walls, blush pink silk drapery, classical marble busts, and heraldic tapestry"
+      "DARK rich brown/black old master background with subtle burgundy velvet drape visible on one side",
+      "DEEP shadowy background in warm umber tones with a hint of dark teal curtain",
+      "DARK atmospheric backdrop fading to black with subtle crimson drapery accent",
+      "MOODY dark brown classical background with soft dusty rose velvet drape",
+      "SHADOWY rich black/brown backdrop with glimpse of deep green velvet curtain",
+      "DARK old master style background with subtle gold-brown tones and burgundy fabric",
+      "DEEP umber/black atmospheric backdrop with hint of dusty blue silk drape",
+      "CLASSIC dark portrait background in rich browns with muted plum velvet accent"
     ];
     
     const lightingDirections = [
@@ -285,28 +285,31 @@ ${petDescription}
 - JEWELRY: ${jewelryItem}
 - SETTING: ${background}
 
-===== LIGHTING & COLOR (BRIGHT, NEUTRAL, HIGH WHITE BALANCE) =====
+===== LIGHTING (CLASSICAL OLD MASTER STYLE) =====
 - ${lighting}
-- HIGH WHITE BALANCE - NO orange cast, NO sepia tones, NO yellowed colors
-- Clean, bright color palette with TRUE-TO-LIFE colors
-- Soft shadows, well-illuminated scene - the ${species}'s features clearly visible
-- Cool to neutral color temperature - like a professional photograph
-- AVOID: warm/orange tint, grungy look, muddy colors, aged appearance
+- Classic Rembrandt/old master lighting - dark background with the subject beautifully illuminated
+- The ${species}'s face and features should be WELL-LIT and clearly visible
+- Soft, flattering light that brings out fur texture and fabric details
+- Rich but not overly saturated colors - elegant and refined
+- NO harsh orange/sepia cast, but warm golden highlights are fine
+- Dark atmospheric background contrasting with the well-lit subject
 
-===== ARTISTIC STYLE (MAJESTIC & BEAUTIFUL) =====
-- Breathtaking museum-quality oil painting with masterful brushwork and rich canvas texture
-- Grand royal portraiture style inspired by court painters like Van Dyck and Velázquez
-- The ${species} should look MAJESTIC, REGAL, and NOBLE - like true royalty
-- Proud, dignified posture with head held high, exuding confidence and grace
+===== ARTISTIC STYLE (CLASSICAL OLD MASTER PORTRAIT) =====
+- Museum-quality oil painting in the style of classical European court portraiture
+- Inspired by old masters - soft, refined, elegant brushwork with visible texture
+- The ${species} should look NOBLE, DIGNIFIED, and REFINED - quiet elegance, not flashy
+- Gentle, regal posture - poised and graceful
 
-VELVET & COLOR EMPHASIS:
-- Render velvet fabric with RICH, LUXURIOUS, PLUSH texture - show the deep pile and lustrous sheen
-- Colors should be BRIGHT, VIBRANT, and SATURATED - not muted or dull
-- Reds should be VIVID CRIMSON/SCARLET, blues should be BRILLIANT SAPPHIRE/COBALT, purples should be RICH VIOLET/MAGENTA
-- Show how light plays across the velvet surface - highlighting the nap and creating depth
-- Jewels and gold should SPARKLE and GLEAM with lifelike brilliance
-- Overall feeling: magnificent, stately, elegant, fit for a palace
-- This is a BEAUTIFUL portrait worthy of hanging in a royal gallery
+AESTHETIC DETAILS:
+- DARK moody background contrasting with the illuminated subject - classic portrait style
+- Soft, muted color palette - dusty blues, sage greens, ivory, blush pink, soft burgundy
+- Delicate floral embroidery on fabrics - roses, vines, botanical patterns
+- White ermine fur with distinctive BLACK SPOTS - a hallmark of royal portraits
+- Delicate LACE collars and ruffs - intricate and refined
+- LAYERED jewelry - multiple delicate necklaces, pearls with gold
+- Velvet textures rendered with softness and depth
+- Overall feeling: ELEGANT, REFINED, TIMELESS - like a treasured antique portrait
+- Classical beauty - the kind of painting you'd find in a European palace collection
 
 !!!!! FINAL CHECK: This portrait MUST show a ${species}. ${notSpecies} !!!!!`;
 
