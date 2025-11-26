@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Use GPT-4o to analyze the pet
+    // Step 1: Use GPT-4o to analyze pet - focus on UNIQUE distinguishing features
     console.log("Analyzing pet with GPT-4o...");
     
     const visionResponse = await openai.chat.completions.create({
@@ -124,22 +124,54 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: `Analyze this pet photo. Start with [DOG] or [CAT] or [RABBIT] etc.
+              text: `FIRST: What animal is this? Start your response with EXACTLY one of these: [CAT] or [DOG] or [RABBIT]
 
-Describe: 1) Species and breed, 2) Exact fur color (if black say "jet black", if white say "pure white"), 3) Patterns/markings, 4) Eye color, 5) Ear shape, 6) Any unique features.
+This is CRITICAL - identify the species correctly:
+- If it has whiskers, pointed ears, and a small nose = [CAT]
+- If it has a snout/muzzle and floppy or pointed dog ears = [DOG]
 
-Format: "[SPECIES] This is a [breed] with [color] fur. [Details...]"`,
+Start with [CAT] or [DOG] in brackets, then describe:
+
+SECTION 1 - WHAT MAKES THIS PET UNIQUE (most important):
+List 3-5 distinctive features that set THIS pet apart from others of the same breed. Focus on:
+- Any asymmetrical features or unusual markings
+- Unique color patterns or patches (describe exact location)
+- Distinctive facial expression or "look"
+- Anything that makes this pet special/recognizable
+
+SECTION 2 - FACE (critical for recognition):
+- Face shape: Is it round like a circle, long/narrow, wedge-shaped, or square?
+- Eye spacing: Are eyes close together, wide apart, or normal?
+- Eye color: Use comparisons (like amber honey, dark chocolate, bright emerald, sky blue)
+- Nose: Color (pink, black, brown, spotted) and size
+- Muzzle: Short/medium/long, width
+
+SECTION 3 - EARS:
+- Shape and size RELATIVE to the head (large ears? small ears?)
+- Position: High on head, low, wide apart?
+- Pointed, rounded, floppy, or folded?
+
+SECTION 4 - COLORING:
+- Main fur color using comparisons (honey gold, charcoal gray, snow white, midnight black, caramel brown)
+- Any color gradients (darker on back, lighter underneath?)
+- Specific markings and their EXACT locations
+
+SECTION 5 - FUR TYPE:
+- Length and texture (short sleek, medium fluffy, long silky, wiry)
+
+Format your response as: "[SPECIES] UNIQUE FEATURES: [list the 3-5 most distinctive things]. FACE: [face details]. EARS: [ear details]. COLORING: [color details]. FUR: [texture]."`,
             },
             {
               type: "image_url",
               image_url: {
                 url: `data:image/jpeg;base64,${base64Image}`,
+                detail: "high",
               },
             },
           ],
         },
       ],
-      max_tokens: 500,
+      max_tokens: 600,
     });
 
     const petDescription = visionResponse.choices[0]?.message?.content || "a beloved pet";
@@ -178,25 +210,25 @@ Format: "[SPECIES] This is a [breed] with [color] fur. [Details...]"`,
 
     // Randomize elements for unique paintings
     const cushions = [
-      "soft SAGE GREEN velvet cushion with delicate gold vine and pink rose embroidery, silk tassels at corners",
-      "muted DUSTY ROSE velvet cushion with gold floral scrollwork embroidery and braided gold trim",
-      "elegant FOREST GREEN plush velvet cushion with gold leaf embroidery and antique gold tassels",
-      "soft SLATE GRAY velvet cushion with gold and rose floral embroidery, silk fringe trim",
-      "muted OLIVE GREEN velvet cushion with delicate pink flower embroidery and gold piping",
-      "dusty TEAL velvet cushion with gold botanical embroidery and corner rosettes",
-      "soft BURGUNDY velvet cushion with cream and gold floral pattern, silk tassels",
-      "muted NAVY velvet cushion with gold vine embroidery and antique brass trim"
+      "BRIGHT EMERALD GREEN silk velvet cushion with gold scrollwork embroidery and golden tassels",
+      "RICH JADE GREEN plush velvet cushion with pink rose and gold vine embroidery, silk tassels",
+      "VIBRANT TEAL satin cushion with gold floral embroidery and corner rosettes",
+      "DEEP FOREST GREEN velvet cushion with delicate pink flowers and gold leaf trim",
+      "BRIGHT SAGE GREEN silk cushion with gold botanical embroidery and golden fringe",
+      "RICH OLIVE GREEN velvet cushion with pink and gold floral pattern, silk tassels",
+      "JEWEL-TONE GREEN plush cushion with ornate gold scrollwork and corner tassels",
+      "SATURATED HUNTER GREEN velvet cushion with gold embroidery and silk trim"
     ];
     
     const robes = [
-      "elegant IVORY CREAM silk robe with delicate gold and pink floral embroidery, white ermine fur trim with black spots, and lace collar",
-      "soft DUSTY BLUE satin cape with gold thread rose embroidery, pristine ermine trim with spots, and delicate lace ruff",
-      "refined CHAMPAGNE GOLD brocade mantle with floral patterns, white ermine lining with black spots, and pearl buttons",
-      "graceful SOFT GRAY velvet robe with silver floral embroidery, ermine collar with spots, and antique lace trim",
-      "delicate BLUSH PINK silk cloak with gold botanical embroidery, ermine fur trim, and layered lace collar",
-      "classic DEEP BURGUNDY velvet cape with gold rose embroidery, spotted ermine collar, and cream lace ruff",
-      "sophisticated SLATE BLUE velvet robe with silver and gold floral details, ermine trim, and delicate lace accents",
-      "timeless ANTIQUE WHITE damask robe with gold vine embroidery, spotted ermine lapels, and fine lace collar"
+      "BRIGHT IVORY CREAM silk robe with colorful floral embroidery (pink roses, green leaves, gold accents), white ermine fur trim with black spots, delicate lace collar",
+      "SHIMMERING SKY BLUE satin cape with pink and gold rose embroidery, pristine ermine trim with spots, ornate lace ruff",
+      "LUMINOUS CHAMPAGNE GOLD brocade mantle with colorful floral patterns (pink, green, gold), white ermine lining with black spots",
+      "RICH CHARCOAL GRAY velvet robe with gold and pink floral embroidery, spotted ermine collar, cream lace trim",
+      "SILKY BLUSH PINK satin cloak with gold and green botanical embroidery, ermine fur trim, layered lace collar",
+      "DEEP BURGUNDY velvet cape with bright gold rose embroidery and pink accents, spotted ermine collar, cream lace ruff",
+      "BRIGHT PERIWINKLE BLUE satin robe with gold and pink floral details, ermine trim, delicate lace accents",
+      "LUMINOUS ANTIQUE WHITE silk damask robe with colorful embroidery (gold vines, pink flowers, green leaves), spotted ermine lapels"
     ];
     
     const jewelry = [
@@ -211,14 +243,14 @@ Format: "[SPECIES] This is a [breed] with [color] fur. [Details...]"`,
     ];
     
     const backgrounds = [
-      "DARK rich brown/black old master background with subtle burgundy velvet drape visible on one side",
-      "DEEP shadowy background in warm umber tones with a hint of dark teal curtain",
-      "DARK atmospheric backdrop fading to black with subtle crimson drapery accent",
-      "MOODY dark brown classical background with soft dusty rose velvet drape",
-      "SHADOWY rich black/brown backdrop with glimpse of deep green velvet curtain",
-      "DARK old master style background with subtle gold-brown tones and burgundy fabric",
-      "DEEP umber/black atmospheric backdrop with hint of dusty blue silk drape",
-      "CLASSIC dark portrait background in rich browns with muted plum velvet accent"
+      "DARK background with RICH BURGUNDY velvet drape on one side and golden accent on the other",
+      "DEEP shadowy background with VIBRANT TEAL silk curtain and warm gold column",
+      "DARK atmospheric backdrop with BRIGHT CRIMSON velvet drapery cascading on the side",
+      "MOODY dark background with RICH MAGENTA velvet drape and gold architectural detail",
+      "SHADOWY backdrop with DEEP EMERALD GREEN velvet curtain and warm candlelight glow",
+      "DARK old master background with SATURATED BURGUNDY and GOLD silk drapes",
+      "DEEP black backdrop with BRIGHT ROYAL BLUE silk drape and gilded frame edge",
+      "CLASSIC dark background with RICH PLUM velvet and TEAL accents visible"
     ];
     
     const lightingDirections = [
@@ -235,134 +267,64 @@ Format: "[SPECIES] This is a [breed] with [color] fur. [Details...]"`,
     const background = backgrounds[Math.floor(Math.random() * backgrounds.length)];
     const lighting = lightingDirections[Math.floor(Math.random() * lightingDirections.length)];
 
-    // Step 2: Generate Renaissance royal portrait
-    const generationPrompt = `!!!!! CRITICAL - THIS IS A ${species} !!!!!
-Generate a portrait of a ${species}. ${notSpecies}
+    // Step 2: Generate Renaissance royal portrait - SPECIES AND PET ACCURACY ARE #1 PRIORITY
+    const generationPrompt = `THIS IS A ${species}. Generate a ${species}. ${notSpecies}
 
-===== SPECIES VERIFICATION =====
-Animal type: ${species}
-${notSpecies}
-The subject is a ${species}. Only generate a ${species}.
-
-===== THE SUBJECT (${species}) =====
+=== THE ${species} - MUST MATCH EXACTLY ===
 ${petDescription}
 
-===== CRITICAL: PET ACCURACY REQUIREMENTS =====
-THIS IS A SPECIFIC ${species}, NOT A GENERIC ONE. The portrait must look like THIS EXACT PET.
+This ${species} portrait must look like THIS EXACT ${species}. ${notSpecies}
 
-1. SPECIES: This is a ${species}. Generate ONLY a ${species}. ${notSpecies}
+=== STYLE: BRIGHT, COLORFUL, SILKY OIL PAINTING ===
+Classical oil painting with BRIGHT, SATURATED colors and SILKY luminous textures.
 
-2. PHYSICAL ACCURACY - MUST MATCH EXACTLY:
-   - Face shape, muzzle length, and proportions as described
-   - Ear shape, size, and position as described
-   - Eye color and shape as described
-   - ALL markings and patterns in the correct locations
-   - Body proportions and build as described
+KEY QUALITIES:
+- BRIGHT, VIBRANT colors - rich greens, warm golds, colorful embroidery
+- SILKY, LUMINOUS fabric textures - shimmering satin, plush velvet
+- Well-lit subject against dark background - the pet GLOWS with light
+- Colorful floral embroidery details on fabrics (pink roses, gold, green leaves)
+- Soft, smooth brushwork with luminous glazing technique
+- Rich jewel tones throughout
 
-3. COLOR ACCURACY: 
-   - BLACK fur = TRUE BLACK/JET BLACK (never gray or dark brown)
-   - WHITE fur = PURE BRIGHT WHITE (never gray or cream)
-   - Match ALL colors EXACTLY as described
+The ${species} wears ${robe}, sits on ${cushion}, adorned with ${jewelryItem}. ${background}. Bright, flattering light illuminating the subject beautifully. Museum-quality fine art with rich, saturated colors.`;
 
-4. THIS IS A SPECIFIC PET: The owner must instantly recognize their pet. Replicate the EXACT features described - this is not a generic ${species}, it's THEIR ${species}.
-
-===== COMPOSITION (WIDE SHOT - PULL BACK) =====
-- Frame from a DISTANCE showing the ${species}'s FULL BODY with generous space around
-- The ${species} should occupy only 40-50% of the frame height
-- Show LOTS of background and environment around the subject
-- Include the complete cushion, visible floor, and architectural elements
-- The scene should feel like a full room portrait, not a close-up
-
-===== UNIQUE ELEMENTS FOR THIS PAINTING =====
-- CUSHION: ${cushion}
-- ATTIRE: ${robe}
-- JEWELRY: ${jewelryItem}
-- SETTING: ${background}
-
-===== LIGHTING (LUMINOUS OLD MASTER STYLE) =====
-- ${lighting}
-- Classic Rembrandt/old master lighting - dark background with the subject BEAUTIFULLY ILLUMINATED
-- The ${species}'s face and features should be BRIGHT, WELL-LIT, and clearly visible
-- Soft, flattering light that brings out fur texture and fabric details
-
-BRIGHT WHITES - VERY IMPORTANT:
-- WHITES must be BRIGHT, CLEAN, PURE WHITE - never muted, grayish, or dingy
-- White ermine fur should be LUMINOUS, GLOWING WHITE with crisp black spots
-- Lace collars and white fabrics should be BRIGHT and RADIANT
-- Pearls should gleam with bright white highlights
-- Any white fur on the pet should be TRUE BRIGHT WHITE
-
-- Rich, elegant colors - not washed out, not overly saturated
-- NO harsh orange/sepia cast
-- Dark atmospheric background making the bright subject POP
-
-===== ARTISTIC STYLE (LUMINOUS OLD MASTER OIL PAINTING) =====
-- Museum-quality oil painting with LUMINOUS, GLOWING quality
-- Rich oil painting GLAZING technique - layers of translucent color creating depth and inner glow
-- SILKY, LUMINOUS quality to fur and fabrics - like soft light emanating from within
-- Vermeer-like luminosity - that magical soft glow that makes old master paintings so captivating
-- Visible brushwork with smooth, refined blending
-- The ${species} should look NOBLE, DIGNIFIED, and beautifully lit
-
-OIL PAINTING GLOW EFFECTS:
-- Soft ETHEREAL GLOW on highlights - especially on fur, fabrics, and jewelry
-- Silky, lustrous sheen on velvet and satin
-- Pearls and gems should have inner luminosity
-- Fur should look soft and touchable with subtle highlights
-- Overall painting should have a RADIANT, LUMINOUS quality - not flat or matte
-
-AESTHETIC DETAILS:
-- DARK moody background contrasting with the GLOWING, well-lit subject
-- Soft, elegant color palette - dusty blues, sage greens, ivory, blush pink, soft burgundy
-- Delicate floral embroidery on fabrics - roses, vines, botanical patterns
-- White ermine fur with distinctive BLACK SPOTS - should GLOW with brightness
-- Delicate LACE collars and ruffs - intricate, refined, and luminous
-- LAYERED jewelry - pearls and gold with beautiful light reflections
-- Velvet textures with rich depth and silky sheen
-- Overall feeling: LUMINOUS, ELEGANT, GLOWING - like a treasured masterpiece
-
-!!!!! FINAL ACCURACY CHECK !!!!!
-- This MUST be a ${species}. ${notSpecies}
-- The ${species} MUST look like the SPECIFIC pet described - same face, same markings, same proportions
-- The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
-!!!!!`;
-
-    // Generate image with DALL-E 3
-    console.log("Generating image with DALL-E 3...");
+    // Generate image with GPT-Image-1 (OpenAI's newest image model)
+    console.log("Generating image with gpt-image-1...");
     
-    // DALL-E 3 has a 4000 character limit - truncate if needed
-    const maxPromptLength = 3900; // Leave some buffer
-    const finalPrompt = generationPrompt.length > maxPromptLength 
-      ? generationPrompt.substring(0, maxPromptLength) + "..."
-      : generationPrompt;
-    
-    console.log("Prompt length:", finalPrompt.length);
+    // gpt-image-1 supports longer prompts than DALL-E 3
+    console.log("Prompt length:", generationPrompt.length);
     
     const imageResponse = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: finalPrompt,
+      model: "gpt-image-1",
+      prompt: generationPrompt,
       n: 1,
       size: "1024x1024",
-      quality: "hd",
-      style: "vivid",
+      quality: "high",
     });
 
     const imageData = imageResponse.data?.[0];
 
-    if (!imageData || !imageData.url) {
+    if (!imageData) {
       throw new Error("No image generated");
     }
 
-    // Download the generated image
-    console.log("Downloading image from DALL-E...");
-    const downloadResponse = await fetch(imageData.url);
+    // Handle both base64 (gpt-image-1) and URL (dall-e-3) responses
+    let generatedBuffer: Buffer;
     
-    if (!downloadResponse.ok) {
-      throw new Error(`Failed to download image: ${downloadResponse.status}`);
+    if (imageData.b64_json) {
+      console.log("Processing base64 image from gpt-image-1...");
+      generatedBuffer = Buffer.from(imageData.b64_json, "base64");
+    } else if (imageData.url) {
+      console.log("Downloading image from URL...");
+      const downloadResponse = await fetch(imageData.url);
+      if (!downloadResponse.ok) {
+        throw new Error(`Failed to download image: ${downloadResponse.status}`);
+      }
+      const arrayBuffer = await downloadResponse.arrayBuffer();
+      generatedBuffer = Buffer.from(arrayBuffer);
+    } else {
+      throw new Error("No image data in response");
     }
-    
-    const arrayBuffer = await downloadResponse.arrayBuffer();
-    const generatedBuffer = Buffer.from(arrayBuffer);
 
     // Create watermarked preview
     const watermarkedBuffer = await createWatermarkedImage(generatedBuffer);

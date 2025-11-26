@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
-type Stage = "preview" | "generating" | "result" | "checkout";
+type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired";
 
 interface GenerationFlowProps {
   file: File | null;
@@ -15,21 +15,83 @@ interface GeneratedResult {
   previewUrl: string;
 }
 
+// Victorian-era elegant phrases for generation animation
+const VICTORIAN_PHRASES = [
+  "Preparing the canvas...",
+  "Selecting the finest oils...",
+  "The master begins their work...",
+  "Capturing noble elegance...",
+  "Adding regal flourishes...",
+  "Perfecting each brushstroke...",
+  "Bestowing royal grandeur...",
+  "A masterpiece takes form...",
+];
+
 export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   const [stage, setStage] = useState<Stage>("preview");
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [retryUsed, setRetryUsed] = useState(false);
+  const [currentPhrase, setCurrentPhrase] = useState(0);
+  const [phraseVisible, setPhraseVisible] = useState(true);
+  const [expirationTime, setExpirationTime] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>("15:00");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
 
-  if (file && !previewUrl) {
-    setPreviewUrl(URL.createObjectURL(file));
-  }
+  // Set preview URL when file is provided
+  useEffect(() => {
+    if (file && !previewUrl) {
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  }, [file, previewUrl]);
+
+  // Phrase cycling animation during generation
+  useEffect(() => {
+    if (stage !== "generating") return;
+
+    const cycleInterval = setInterval(() => {
+      setPhraseVisible(false);
+      setTimeout(() => {
+        setCurrentPhrase((prev) => (prev + 1) % VICTORIAN_PHRASES.length);
+        setPhraseVisible(true);
+      }, 500);
+    }, 3000);
+
+    return () => clearInterval(cycleInterval);
+  }, [stage]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!expirationTime || stage === "expired") return;
+
+    const timerInterval = setInterval(() => {
+      const now = Date.now();
+      const remaining = expirationTime - now;
+
+      if (remaining <= 0) {
+        setStage("expired");
+        setTimeRemaining("00:00");
+        clearInterval(timerInterval);
+        return;
+      }
+
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      setTimeRemaining(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
+    }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, [expirationTime, stage]);
 
   const handleGenerate = async () => {
     if (!file) return;
     
     setStage("generating");
     setError(null);
+    setCurrentPhrase(0);
+    setPhraseVisible(true);
 
     try {
       const formData = new FormData();
@@ -47,6 +109,8 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       }
 
       setResult(data);
+      // Set 15-minute expiration timer
+      setExpirationTime(Date.now() + 15 * 60 * 1000);
       setStage("result");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -54,7 +118,30 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleRetry = useCallback(() => {
+    if (retryUsed) return;
+    setRetryUsed(true);
+    setResult(null);
+    setExpirationTime(null);
+    handleGenerate();
+  }, [retryUsed, file]);
+
+  const handlePurchaseClick = () => {
+    setStage("email");
+    setEmailError(null);
+  };
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
     if (!result) return;
     
     setStage("checkout");
@@ -65,7 +152,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ imageId: result.imageId }),
+        body: JSON.stringify({ imageId: result.imageId, email }),
       });
 
       const data = await response.json();
@@ -89,6 +176,9 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     setResult(null);
     setStage("preview");
     setError(null);
+    setRetryUsed(false);
+    setExpirationTime(null);
+    setEmail("");
     onReset();
   };
 
@@ -114,7 +204,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
         {/* Close button */}
         <button
           onClick={handleReset}
-          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-colors"
+          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-colors hover:bg-white/20"
           style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#B8B2A8' }}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -176,78 +266,84 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
           </div>
         )}
 
-        {/* Generating Stage */}
+        {/* Generating Stage - Elegant Victorian Animation */}
         {stage === "generating" && (
-          <div className="p-8 text-center">
-            <div className="mb-8">
-              <div className="w-20 h-20 mx-auto mb-6 relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg 
-                    className="w-12 h-12 animate-pulse" 
-                    style={{ color: '#C5A572' }} 
-                    fill="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/>
-                  </svg>
-                </div>
-                <div 
-                  className="absolute inset-0 border-4 rounded-full" 
-                  style={{ borderColor: 'rgba(197, 165, 114, 0.2)' }} 
-                />
-                <div 
-                  className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" 
-                  style={{ borderTopColor: '#C5A572' }} 
-                />
-              </div>
-              
-              <h3 
-                className="text-2xl font-semibold mb-2"
-                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+          <div className="p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
+            {/* Simple elegant spinner */}
+            <div className="w-16 h-16 mb-8 relative">
+              <div 
+                className="absolute inset-0 border-2 rounded-full"
+                style={{ borderColor: 'rgba(197, 165, 114, 0.2)' }}
+              />
+              <div 
+                className="absolute inset-0 border-2 border-transparent rounded-full animate-spin"
+                style={{ borderTopColor: '#C5A572', animationDuration: '1.5s' }}
+              />
+            </div>
+            
+            {/* Fading Victorian phrase */}
+            <div className="h-20 flex items-center justify-center">
+              <p 
+                className={`text-xl italic transition-opacity duration-500 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
+                style={{ 
+                  fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                  color: '#C5A572',
+                  letterSpacing: '0.05em'
+                }}
               >
-                Painting Your Pet...
-              </h3>
-              <p style={{ color: '#B8B2A8' }}>
-                Our master painters are carefully crafting your Renaissance masterpiece.
+                {VICTORIAN_PHRASES[currentPhrase]}
               </p>
             </div>
 
-            <div className="space-y-2 text-sm" style={{ color: '#7A756D' }}>
-              <p className="animate-fade-in">🎨 Mixing oil paints...</p>
-              <p className="animate-fade-in delay-200">🖼️ Preparing the canvas...</p>
-              <p className="animate-fade-in delay-400">👑 Adding royal details...</p>
-            </div>
-
-            <div 
-              className="mt-6 p-3 rounded-xl text-sm"
-              style={{ 
-                backgroundColor: 'rgba(197, 165, 114, 0.1)',
-                border: '1px solid rgba(197, 165, 114, 0.2)',
-                color: '#C5A572'
-              }}
-            >
-              ⏱️ This may take up to 60 seconds — great art takes time!
-            </div>
+            <p className="text-sm mt-4" style={{ color: '#7A756D' }}>
+              This may take up to 60 seconds
+            </p>
           </div>
         )}
 
-        {/* Result Stage */}
+        {/* Result Stage - Purchase Modal */}
         {stage === "result" && result && (
           <div className="p-8">
-            <div className="text-center mb-6">
-              <h3 
-                className="text-2xl font-semibold mb-2"
-                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            {/* Most Popular badge */}
+            <div className="flex justify-center -mt-4 mb-4">
+              <span 
+                className="px-4 py-1 text-xs font-semibold uppercase tracking-wider rounded-full"
+                style={{ backgroundColor: '#10B981', color: 'white' }}
               >
-                Your Masterpiece Awaits
-              </h3>
-              <p style={{ color: '#B8B2A8' }}>
-                Behold! Your pet has been immortalized in the classical tradition.
-              </p>
+                Most Popular
+              </span>
             </div>
 
-            <div className="ornate-frame max-w-md mx-auto mb-6">
-              <div className="relative aspect-square rounded overflow-hidden">
+            {/* Download icon */}
+            <div className="flex justify-center mb-4">
+              <svg className="w-8 h-8" style={{ color: '#B8B2A8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </div>
+
+            {/* Title */}
+            <h3 
+              className="text-3xl font-semibold text-center mb-4"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            >
+              Instant Masterpiece
+            </h3>
+
+            {/* Price */}
+            <div className="text-center mb-2">
+              <span className="text-lg line-through mr-2" style={{ color: '#7A756D' }}>$19</span>
+              <span className="text-4xl font-bold" style={{ color: '#F0EDE8' }}>$9</span>
+            </div>
+
+            {/* Expiration Timer */}
+            <div className="text-center mb-6">
+              <span style={{ color: '#B8B2A8' }}>Expires in </span>
+              <span className="font-mono font-bold" style={{ color: '#F0EDE8' }}>{timeRemaining}</span>
+            </div>
+
+            {/* Preview Image */}
+            <div className="relative max-w-xs mx-auto mb-6 rounded-xl overflow-hidden shadow-lg">
+              <div className="relative aspect-square">
                 <Image
                   src={result.previewUrl}
                   alt="Renaissance portrait preview"
@@ -255,27 +351,52 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                   className="object-cover"
                   unoptimized
                 />
-                <div className="watermark-overlay">
-                  <div className="watermark-text">PET RENAISSANCE • PREVIEW ONLY</div>
-                </div>
               </div>
             </div>
 
-            <div className="text-center mb-6">
-              <p className="mb-4" style={{ color: '#B8B2A8' }}>
-                Love it? Unlock the full-resolution, watermark-free version.
-              </p>
-              <button onClick={handleCheckout} className="btn-secondary text-lg px-8 py-4">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            {/* Description */}
+            <p className="text-center mb-6" style={{ color: '#B8B2A8' }}>
+              Instant high-resolution download —<br />
+              perfect for sharing or saving.
+            </p>
+
+            {/* Features list */}
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-3" style={{ color: '#B8B2A8' }}>
+                <svg className="w-5 h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Buy HD Portrait – $0.50
-              </button>
+                <span>No Watermark</span>
+              </div>
+              <div className="flex items-center gap-3" style={{ color: '#B8B2A8' }}>
+                <svg className="w-5 h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Instant Download</span>
+              </div>
+              <div className="flex items-center gap-3" style={{ color: '#B8B2A8' }}>
+                <svg className="w-5 h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>High-Resolution (3200×4000px)</span>
+              </div>
             </div>
+
+            {/* Download button */}
+            <button 
+              onClick={handlePurchaseClick}
+              className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
+              style={{ 
+                backgroundColor: '#F0EDE8', 
+                color: '#1A1A1A',
+              }}
+            >
+              Download Now
+            </button>
 
             {error && (
               <div 
-                className="mb-4 p-4 rounded-xl text-center text-sm"
+                className="mt-4 p-3 rounded-xl text-center text-sm"
                 style={{ 
                   backgroundColor: 'rgba(239, 68, 68, 0.1)',
                   border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -286,15 +407,111 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               </div>
             )}
 
-            <div className="text-center">
+            {/* Retry button */}
+            <div className="mt-6 pt-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+              {!retryUsed ? (
+                <button 
+                  onClick={handleRetry}
+                  className="w-full text-center text-sm py-2 transition-colors hover:text-[#C5A572]"
+                  style={{ color: '#7A756D' }}
+                >
+                  🔄 Try Again (1 free retry)
+                </button>
+              ) : (
+                <p className="text-center text-sm" style={{ color: '#7A756D' }}>
+                  You&apos;ve used your free retry
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Email Capture Stage */}
+        {stage === "email" && (
+          <div className="p-8">
+            <div className="text-center mb-6">
+              <h3 
+                className="text-2xl font-semibold mb-2"
+                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+              >
+                Almost There!
+              </h3>
+              <p style={{ color: '#B8B2A8' }}>
+                Enter your email to receive your masterpiece
+              </p>
+            </div>
+
+            <div className="max-w-sm mx-auto">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError(null);
+                }}
+                placeholder="your@email.com"
+                className="w-full px-4 py-3 rounded-xl text-center text-lg mb-4 outline-none transition-all"
+                style={{ 
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  border: emailError ? '2px solid #F87171' : '2px solid rgba(197, 165, 114, 0.3)',
+                  color: '#F0EDE8'
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && handleEmailSubmit()}
+              />
+              
+              {emailError && (
+                <p className="text-center text-sm mb-4" style={{ color: '#F87171' }}>
+                  {emailError}
+                </p>
+              )}
+
               <button 
-                onClick={handleReset}
-                className="text-sm transition-colors hover:text-[#C5A572]"
+                onClick={handleEmailSubmit}
+                className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
+                style={{ 
+                  backgroundColor: '#C5A572', 
+                  color: '#1A1A1A',
+                }}
+              >
+                Continue to Payment
+              </button>
+
+              <button 
+                onClick={() => setStage("result")}
+                className="w-full text-center text-sm py-3 mt-3 transition-colors hover:text-[#C5A572]"
                 style={{ color: '#7A756D' }}
               >
-                ← Try a different photo
+                ← Go back
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Expired Stage */}
+        {stage === "expired" && (
+          <div className="p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
+              <svg className="w-8 h-8" style={{ color: '#F87171' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            
+            <h3 
+              className="text-2xl font-semibold mb-2"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            >
+              Offer Expired
+            </h3>
+            <p className="mb-6" style={{ color: '#B8B2A8' }}>
+              This masterpiece has expired. Generate a new portrait to continue.
+            </p>
+
+            <button 
+              onClick={handleReset}
+              className="btn-primary text-lg px-8 py-4"
+            >
+              Generate New Portrait
+            </button>
           </div>
         )}
 

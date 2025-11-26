@@ -1,8 +1,8 @@
 // Configuration constants
 export const CONFIG = {
   // Price for HD portrait in dollars
-  PRICE_DISPLAY: "$0.50",
-  PRICE_AMOUNT: parseInt(process.env.PRICE_AMOUNT || "50", 10), // in cents
+  PRICE_DISPLAY: "$9",
+  PRICE_AMOUNT: parseInt(process.env.PRICE_AMOUNT || "900", 10), // in cents ($9)
   
   // Product details
   PRODUCT_NAME: "Royal Renaissance Pet Portrait",

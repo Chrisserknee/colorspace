@@ -18,11 +18,18 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { imageId } = body;
+    const { imageId, email } = body;
 
     if (!imageId) {
       return NextResponse.json(
         { error: "Image ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!email) {
+      return NextResponse.json(
+        { error: "Email is required" },
         { status: 400 }
       );
     }
@@ -40,6 +47,7 @@ export async function POST(request: NextRequest) {
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
+      customer_email: email,
       line_items: [
         {
           price_data: {
@@ -59,6 +67,7 @@ export async function POST(request: NextRequest) {
       cancel_url: CONFIG.BASE_URL,
       metadata: {
         imageId,
+        customerEmail: email,
       },
     });
 
