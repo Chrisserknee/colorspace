@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { captureEvent } from "@/lib/posthog";
 
 interface HeroProps {
   onUploadClick: () => void;
@@ -122,7 +123,12 @@ export default function Hero({ onUploadClick }: HeroProps) {
         {/* CTA Button */}
         <div className="animate-fade-in-up delay-400">
           <button
-            onClick={onUploadClick}
+            onClick={() => {
+              captureEvent("upload_button_clicked", {
+                source: "hero",
+              });
+              onUploadClick();
+            }}
             className="btn-primary text-lg px-8 py-4 group"
           >
             <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">

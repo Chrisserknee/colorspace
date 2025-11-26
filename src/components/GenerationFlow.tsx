@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { CONFIG } from "@/lib/config";
+import { captureEvent } from "@/lib/posthog";
 
 type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired";
 type Gender = "male" | "female" | null;
@@ -275,6 +276,13 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     setCurrentPhrase(0);
     setPhraseVisible(true);
 
+    // Track generation started
+    captureEvent("generation_started", {
+      is_retry: isRetry,
+      has_pack_credits: limits.packCredits > 0,
+      gender: gender || "not_selected",
+    });
+
     try {
       // Compress image if it's too large (over 3.5MB)
       let fileToUpload = file;
@@ -323,7 +331,8 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       
       // Handle pack credit usage or increment generation count
       const currentLimits = getLimits();
-      if (currentLimits.packCredits > 0) {
+      const usedPackCredit = currentLimits.packCredits > 0;
+      if (usedPackCredit) {
         // Use pack credit (un-watermarked)
         const updatedLimits = usePackCredit();
         setGenerationLimits(updatedLimits);
@@ -334,6 +343,14 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       }
       const newCheck = canGenerate(getLimits());
       setLimitCheck(newCheck);
+      
+      // Track generation completed
+      captureEvent("generation_completed", {
+        image_id: data.imageId,
+        is_retry: isRetry,
+        used_pack_credit: usedPackCredit,
+        gender: gender || "not_selected",
+      });
       
       // Set 15-minute expiration timer
       setExpirationTime(Date.now() + 15 * 60 * 1000);
@@ -374,6 +391,11 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   };
 
   const handlePurchaseClick = () => {
+    // Track purchase button clicked
+    captureEvent("purchase_button_clicked", {
+      image_id: result?.imageId,
+      stage: "result",
+    });
     setStage("email");
     setEmailError(null);
   };
@@ -390,6 +412,14 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     }
 
     if (!result) return;
+    
+    // Track email submitted
+    const isPackPurchase = result.imageId === "pack";
+    captureEvent("email_submitted", {
+      is_pack_purchase: isPackPurchase,
+      pack_type: isPackPurchase ? "2-pack" : null,
+      image_id: isPackPurchase ? null : result.imageId,
+    });
     
     setStage("checkout");
 
@@ -581,6 +611,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Purchase a pack to get un-watermarked generations</p>
                       <button
                         onClick={() => {
+                          captureEvent("pack_purchase_button_clicked", {
+                            pack_type: "2-pack",
+                            source: "preview_limit_reached",
+                          });
                           setStage("email");
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
@@ -866,6 +900,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       </p>
                       <button
                         onClick={() => {
+                          captureEvent("pack_purchase_button_clicked", {
+                            pack_type: "2-pack",
+                            source: "limit_reached",
+                          });
                           setStage("email");
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
@@ -888,6 +926,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       </p>
                       <button
                         onClick={() => {
+                          captureEvent("pack_purchase_button_clicked", {
+                            pack_type: "2-pack",
+                            source: "retry_used",
+                          });
                           setStage("email");
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
