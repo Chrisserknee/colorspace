@@ -217,6 +217,17 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               <p className="animate-fade-in delay-200">🖼️ Preparing the canvas...</p>
               <p className="animate-fade-in delay-400">👑 Adding royal details...</p>
             </div>
+
+            <div 
+              className="mt-6 p-3 rounded-xl text-sm"
+              style={{ 
+                backgroundColor: 'rgba(197, 165, 114, 0.1)',
+                border: '1px solid rgba(197, 165, 114, 0.2)',
+                color: '#C5A572'
+              }}
+            >
+              ⏱️ This may take up to 60 seconds — great art takes time!
+            </div>
           </div>
         )}
 
@@ -258,7 +269,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                Buy HD Portrait – $9
+                Buy HD Portrait – $0.50
               </button>
             </div>
 
