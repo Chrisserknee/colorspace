@@ -526,7 +526,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
 
             <div className="text-center">
               <button 
-                onClick={handleGenerate} 
+                onClick={() => handleGenerate(false)} 
                 disabled={!gender || (limitCheck ? !limitCheck.allowed : false)}
                 className={`btn-primary text-lg px-8 py-4 ${!gender || (limitCheck && !limitCheck.allowed) ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
