@@ -118,33 +118,54 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: `You are an expert pet portrait artist. Analyze this pet photo with EXTREME PRECISION.
+              text: `You are an expert pet portrait artist. Analyze this pet photo with EXTREME PRECISION to capture THIS EXACT pet - not a generic version of the breed.
 
-CRITICAL: Start your response with the EXACT species in caps, like this:
+CRITICAL: Start your response with the EXACT species in caps:
 "[DOG] This is a..." or "[CAT] This is a..." or "[RABBIT] This is a..."
 
-Then describe in meticulous detail:
+Describe THIS SPECIFIC PET in meticulous detail:
 
-1. SPECIES & BREED: Exact animal type (DOG, CAT, RABBIT, etc.) and specific breed. Be very precise.
+1. SPECIES & BREED: Exact animal type and specific breed or mix.
 
 2. COAT COLOR - BE EXTREMELY PRECISE:
-   - If the fur is BLACK, say "JET BLACK" or "SOLID BLACK" - do NOT say dark gray or charcoal
-   - If the fur is WHITE, say "PURE WHITE" 
-   - For other colors, be specific: "golden blonde", "chocolate brown", "ginger orange"
-   - Note any patterns: tabby stripes, spots, patches, etc.
+   - BLACK fur = "JET BLACK" or "SOLID BLACK" (never say gray/charcoal)
+   - WHITE fur = "PURE WHITE" or "SNOW WHITE"
+   - Other colors: be very specific ("golden honey blonde", "rich chocolate brown", "warm ginger orange")
+   - Describe ANY patterns: tabby stripes, spots, patches, brindle, ticking
 
-3. FACE: Head shape, muzzle length, nose color, ear shape (pointed/floppy/folded)
+3. FACE STRUCTURE & PROPORTIONS:
+   - Head shape (round, wedge, square, dome-shaped)
+   - Muzzle: length (short/medium/long), width, shape
+   - Nose: color, size, shape
+   - Distance between eyes (close-set, wide-set, normal)
 
-4. EYES: Exact color (green, amber, blue, brown), shape, expression
+4. EARS - VERY IMPORTANT:
+   - Shape (pointed, rounded, folded, floppy, erect, semi-erect)
+   - Size relative to head (large, small, proportionate)
+   - Position (high-set, low-set, wide apart)
+   - Inner ear color
 
-5. DISTINCTIVE MARKINGS: Any unique features - white patches, facial markings, etc.
+5. EYES:
+   - EXACT color (emerald green, copper amber, ice blue, warm brown, heterochromia)
+   - Shape (round, almond, oval)
+   - Size and expression
 
-6. FUR TEXTURE: Short, medium, long, fluffy, sleek, wiry
+6. UNIQUE IDENTIFIERS - What makes THIS pet unique:
+   - Specific markings (white blaze, chest patch, sock feet, facial mask)
+   - Any asymmetry or distinctive features
+   - Whisker patterns, eyebrow markings
+   - Scars, spots, or color variations
 
-FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
-"[SPECIES] This is a [breed] with [exact coat color] fur..."
+7. BODY PROPORTIONS:
+   - Build (slender, stocky, muscular, petite)
+   - Leg length relative to body
+   - Overall size impression
 
-The description must be accurate enough that the owner instantly recognizes their specific pet.`,
+8. FUR TEXTURE: Length (short/medium/long), texture (silky, fluffy, wiry, sleek, plush)
+
+FORMAT: "[SPECIES] This is a [breed] with [exact coat color] fur. [Detailed description...]"
+
+IMPORTANT: This description must capture what makes THIS SPECIFIC PET unique and recognizable to their owner - not just a generic breed description.`,
             },
             {
               type: "image_url",
@@ -156,7 +177,7 @@ The description must be accurate enough that the owner instantly recognizes thei
           ],
         },
       ],
-      max_tokens: 600,
+      max_tokens: 800,
     });
 
     const petDescription = visionResponse.choices[0]?.message?.content || "a beloved pet";
@@ -264,13 +285,24 @@ The subject is a ${species}. Only generate a ${species}.
 ===== THE SUBJECT (${species}) =====
 ${petDescription}
 
-===== REQUIREMENTS =====
+===== CRITICAL: PET ACCURACY REQUIREMENTS =====
+THIS IS A SPECIFIC ${species}, NOT A GENERIC ONE. The portrait must look like THIS EXACT PET.
+
 1. SPECIES: This is a ${species}. Generate ONLY a ${species}. ${notSpecies}
-2. COLOR ACCURACY: 
-   - If described as BLACK fur, paint it TRUE BLACK/JET BLACK (not gray, not dark brown)
-   - If described as WHITE fur, paint it PURE WHITE
-   - Match the EXACT colors described above
-3. The ${species} must be recognizable as the specific animal described
+
+2. PHYSICAL ACCURACY - MUST MATCH EXACTLY:
+   - Face shape, muzzle length, and proportions as described
+   - Ear shape, size, and position as described
+   - Eye color and shape as described
+   - ALL markings and patterns in the correct locations
+   - Body proportions and build as described
+
+3. COLOR ACCURACY: 
+   - BLACK fur = TRUE BLACK/JET BLACK (never gray or dark brown)
+   - WHITE fur = PURE BRIGHT WHITE (never gray or cream)
+   - Match ALL colors EXACTLY as described
+
+4. THIS IS A SPECIFIC PET: The owner must instantly recognize their pet. Replicate the EXACT features described - this is not a generic ${species}, it's THEIR ${species}.
 
 ===== COMPOSITION (WIDE SHOT - PULL BACK) =====
 - Frame from a DISTANCE showing the ${species}'s FULL BODY with generous space around
@@ -285,33 +317,53 @@ ${petDescription}
 - JEWELRY: ${jewelryItem}
 - SETTING: ${background}
 
-===== LIGHTING (CLASSICAL OLD MASTER STYLE) =====
+===== LIGHTING (LUMINOUS OLD MASTER STYLE) =====
 - ${lighting}
-- Classic Rembrandt/old master lighting - dark background with the subject beautifully illuminated
-- The ${species}'s face and features should be WELL-LIT and clearly visible
+- Classic Rembrandt/old master lighting - dark background with the subject BEAUTIFULLY ILLUMINATED
+- The ${species}'s face and features should be BRIGHT, WELL-LIT, and clearly visible
 - Soft, flattering light that brings out fur texture and fabric details
-- Rich but not overly saturated colors - elegant and refined
-- NO harsh orange/sepia cast, but warm golden highlights are fine
-- Dark atmospheric background contrasting with the well-lit subject
 
-===== ARTISTIC STYLE (CLASSICAL OLD MASTER PORTRAIT) =====
-- Museum-quality oil painting in the style of classical European court portraiture
-- Inspired by old masters - soft, refined, elegant brushwork with visible texture
-- The ${species} should look NOBLE, DIGNIFIED, and REFINED - quiet elegance, not flashy
-- Gentle, regal posture - poised and graceful
+BRIGHT WHITES - VERY IMPORTANT:
+- WHITES must be BRIGHT, CLEAN, PURE WHITE - never muted, grayish, or dingy
+- White ermine fur should be LUMINOUS, GLOWING WHITE with crisp black spots
+- Lace collars and white fabrics should be BRIGHT and RADIANT
+- Pearls should gleam with bright white highlights
+- Any white fur on the pet should be TRUE BRIGHT WHITE
+
+- Rich, elegant colors - not washed out, not overly saturated
+- NO harsh orange/sepia cast
+- Dark atmospheric background making the bright subject POP
+
+===== ARTISTIC STYLE (LUMINOUS OLD MASTER OIL PAINTING) =====
+- Museum-quality oil painting with LUMINOUS, GLOWING quality
+- Rich oil painting GLAZING technique - layers of translucent color creating depth and inner glow
+- SILKY, LUMINOUS quality to fur and fabrics - like soft light emanating from within
+- Vermeer-like luminosity - that magical soft glow that makes old master paintings so captivating
+- Visible brushwork with smooth, refined blending
+- The ${species} should look NOBLE, DIGNIFIED, and beautifully lit
+
+OIL PAINTING GLOW EFFECTS:
+- Soft ETHEREAL GLOW on highlights - especially on fur, fabrics, and jewelry
+- Silky, lustrous sheen on velvet and satin
+- Pearls and gems should have inner luminosity
+- Fur should look soft and touchable with subtle highlights
+- Overall painting should have a RADIANT, LUMINOUS quality - not flat or matte
 
 AESTHETIC DETAILS:
-- DARK moody background contrasting with the illuminated subject - classic portrait style
-- Soft, muted color palette - dusty blues, sage greens, ivory, blush pink, soft burgundy
+- DARK moody background contrasting with the GLOWING, well-lit subject
+- Soft, elegant color palette - dusty blues, sage greens, ivory, blush pink, soft burgundy
 - Delicate floral embroidery on fabrics - roses, vines, botanical patterns
-- White ermine fur with distinctive BLACK SPOTS - a hallmark of royal portraits
-- Delicate LACE collars and ruffs - intricate and refined
-- LAYERED jewelry - multiple delicate necklaces, pearls with gold
-- Velvet textures rendered with softness and depth
-- Overall feeling: ELEGANT, REFINED, TIMELESS - like a treasured antique portrait
-- Classical beauty - the kind of painting you'd find in a European palace collection
+- White ermine fur with distinctive BLACK SPOTS - should GLOW with brightness
+- Delicate LACE collars and ruffs - intricate, refined, and luminous
+- LAYERED jewelry - pearls and gold with beautiful light reflections
+- Velvet textures with rich depth and silky sheen
+- Overall feeling: LUMINOUS, ELEGANT, GLOWING - like a treasured masterpiece
 
-!!!!! FINAL CHECK: This portrait MUST show a ${species}. ${notSpecies} !!!!!`;
+!!!!! FINAL ACCURACY CHECK !!!!!
+- This MUST be a ${species}. ${notSpecies}
+- The ${species} MUST look like the SPECIFIC pet described - same face, same markings, same proportions
+- The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
+!!!!!`;
 
     const imageResponse = await openai.images.generate({
       model: "gpt-image-1",
