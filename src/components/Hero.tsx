@@ -18,24 +18,6 @@ export default function Hero({ onUploadClick }: HeroProps) {
         className="absolute bottom-20 right-10 w-48 h-48 rounded-full blur-3xl" 
         style={{ backgroundColor: 'rgba(139, 58, 66, 0.08)' }} 
       />
-      
-      {/* Ornate corner decorations */}
-      <div 
-        className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 rounded-tl-lg" 
-        style={{ borderColor: 'rgba(197, 165, 114, 0.3)' }} 
-      />
-      <div 
-        className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 rounded-tr-lg" 
-        style={{ borderColor: 'rgba(197, 165, 114, 0.3)' }} 
-      />
-      <div 
-        className="absolute bottom-8 left-8 w-16 h-16 border-l-2 border-b-2 rounded-bl-lg" 
-        style={{ borderColor: 'rgba(197, 165, 114, 0.3)' }} 
-      />
-      <div 
-        className="absolute bottom-8 right-8 w-16 h-16 border-r-2 border-b-2 rounded-br-lg" 
-        style={{ borderColor: 'rgba(197, 165, 114, 0.3)' }} 
-      />
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
         {/* LumePet Logo */}
