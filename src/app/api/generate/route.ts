@@ -380,46 +380,50 @@ AESTHETIC DETAILS:
 - The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
 !!!!!`;
 
-    // Generate image with Replicate (SDXL)
-    console.log("Generating image with Replicate SDXL...");
-    console.log("Prompt length:", generationPrompt.length);
+    // Generate image with Replicate
+    console.log("Generating image with Replicate...");
     
-    // Truncate prompt if too long (SDXL has limits)
-    const maxPromptLength = 2000;
-    const truncatedPrompt = generationPrompt.length > maxPromptLength 
-      ? generationPrompt.substring(0, maxPromptLength) 
-      : generationPrompt;
+    // Create a shorter, focused prompt for Stable Diffusion
+    const sdPrompt = `Royal Renaissance oil painting portrait of a ${species}. ${petDescription.substring(0, 500)}
+
+Style: Classical Dutch Golden Age painting, Rembrandt lighting, dark moody background, ornate velvet robe with ermine fur trim, sitting on luxurious velvet cushion with gold tassels, wearing gold jewelry with gems, luminous oil painting with glowing highlights, museum quality masterpiece, noble dignified pose.`;
+
+    console.log("SD Prompt length:", sdPrompt.length);
     
-    let output;
+    let imageUrl: string;
     try {
-      output = await replicate.run(
-        "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+      // Using Flux Schnell - fast and reliable
+      const output = await replicate.run(
+        "black-forest-labs/flux-schnell",
         {
           input: {
-            prompt: truncatedPrompt,
-            negative_prompt: "ugly, blurry, low quality, distorted, deformed, disfigured, bad anatomy, wrong species, cartoon, anime, 3d render",
-            width: 1024,
-            height: 1024,
+            prompt: sdPrompt,
             num_outputs: 1,
-            scheduler: "K_EULER",
-            num_inference_steps: 30,
-            guidance_scale: 7.5,
+            aspect_ratio: "1:1",
+            output_format: "webp",
+            output_quality: 90,
           }
         }
       );
+
+      console.log("Replicate output type:", typeof output);
+      console.log("Replicate output:", JSON.stringify(output).substring(0, 200));
+
+      // Handle different output formats
+      if (Array.isArray(output) && output.length > 0) {
+        imageUrl = output[0];
+      } else if (typeof output === 'string') {
+        imageUrl = output;
+      } else {
+        console.error("Unexpected output format:", output);
+        throw new Error("Unexpected output format from Replicate");
+      }
     } catch (replicateError) {
       console.error("Replicate error:", replicateError);
       throw new Error(`Replicate API error: ${replicateError instanceof Error ? replicateError.message : 'Unknown error'}`);
     }
 
-    console.log("Replicate output:", output);
-
-    // Replicate returns an array of URLs
-    const outputArray = output as string[];
-    const imageUrl = outputArray?.[0];
-
     if (!imageUrl) {
-      console.error("No image URL in output:", output);
       throw new Error("No image generated from Replicate");
     }
 
