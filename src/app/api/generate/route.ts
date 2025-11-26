@@ -386,12 +386,13 @@ AESTHETIC DETAILS:
     // Prioritize Grok if available
     const imageModel = grok ? "grok-2-image" : "gpt-image-1";
     
+    // Grok and OpenAI have different supported parameters
     const imageResponse = await imageClient.images.generate({
       model: imageModel,
       prompt: generationPrompt,
       n: 1,
-      size: "1024x1024",
-      ...(!grok ? { quality: "high" } : {}), // quality param only for OpenAI
+      // Size and quality params only for OpenAI - Grok doesn't support them
+      ...(!grok ? { size: "1024x1024", quality: "high" } : {}),
     });
 
     const imageData = imageResponse.data?.[0];
