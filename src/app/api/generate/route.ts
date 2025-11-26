@@ -343,14 +343,37 @@ The ${species} wears ${robe}, sits on ${cushion}, adorned with ${jewelryItem}. $
       "image/png"
     );
 
+    // Validate URLs before saving
+    try {
+      new URL(hdUrl);
+      new URL(previewUrl);
+    } catch (urlError) {
+      console.error("Invalid URL format:", urlError);
+      throw new Error("Failed to generate valid image URLs");
+    }
+
     // Save metadata to Supabase database
-    await saveMetadata(imageId, {
-      created_at: new Date().toISOString(),
-      paid: false,
-      pet_description: petDescription,
-      hd_url: hdUrl,
-      preview_url: previewUrl,
-    });
+    // Truncate pet_description if too long (some databases have length limits)
+    const maxDescriptionLength = 2000; // Safe limit
+    const truncatedDescription = petDescription.length > maxDescriptionLength 
+      ? petDescription.substring(0, maxDescriptionLength) 
+      : petDescription;
+    
+    try {
+      await saveMetadata(imageId, {
+        created_at: new Date().toISOString(),
+        paid: false,
+        pet_description: truncatedDescription,
+        hd_url: hdUrl,
+        preview_url: previewUrl,
+      });
+    } catch (metadataError) {
+      console.error("Metadata save error:", metadataError);
+      const errorMsg = metadataError instanceof Error ? metadataError.message : String(metadataError);
+      console.error("Full error:", errorMsg);
+      // Continue anyway - the images are uploaded, just metadata failed
+      // This allows the user to still get their image, but log the error for debugging
+    }
 
     // Return watermarked preview - HD version only available after purchase
     return NextResponse.json({
