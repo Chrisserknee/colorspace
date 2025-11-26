@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Use GPT-4o Vision to analyze the pet
+    // Step 1: Use GPT-4o Vision to analyze the pet with extreme detail for accuracy
     const visionResponse = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -118,31 +118,68 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: `Analyze this pet photo and provide a detailed description for creating a Renaissance oil painting portrait. Include:
-1. Type of animal (dog, cat, etc.) and breed if identifiable
-2. Fur/coat color and pattern
-3. Eye color
-4. Distinctive features (ear shape, markings, expression)
-5. The pet's apparent personality/demeanor
+              text: `You are an expert pet portrait artist. Analyze this pet photo with EXTREME PRECISION to capture every unique physical detail. The goal is to create a portrait that the owner will instantly recognize as THEIR specific pet.
 
-Format your response as a single detailed paragraph that can be used as an art prompt.`,
+Describe in meticulous detail:
+
+1. SPECIES & BREED: Exact animal type and specific breed (or mix). Be precise - don't just say "dog", say "Golden Retriever" or "cream-colored Chihuahua with deer-head features"
+
+2. FACE STRUCTURE: Head shape (round, wedge, square), muzzle length and shape, nose color and size, jaw structure
+
+3. EARS: Shape (pointed, floppy, folded, erect), size relative to head, positioning (high-set, wide-set), any asymmetry, inner ear color
+
+4. EYES: Exact color (honey brown, amber, golden yellow, ice blue, etc.), shape (round, almond, oval), size, expression, any unique markings around eyes
+
+5. COAT/FUR: 
+   - Primary color with exact shade (not just "orange" but "deep ginger orange with golden undertones")
+   - Secondary colors and their locations
+   - Pattern type (solid, tabby stripes, spots, patches, ticking)
+   - Fur length and texture (short sleek, long flowing, wiry, fluffy)
+   - Any distinctive markings (white chest patch, facial mask, sock feet, etc.)
+
+6. DISTINCTIVE FEATURES: Any unique identifying marks - scars, spots, color variations, whisker patterns, facial expressions, head tilt
+
+7. PERSONALITY VISIBLE: The expression and demeanor - regal, playful, curious, sassy, gentle, alert
+
+Format as a single detailed paragraph focusing on physical accuracy. This description must be specific enough that ONLY this exact pet could match it.`,
             },
             {
               type: "image_url",
               image_url: {
                 url: `data:image/jpeg;base64,${base64Image}`,
+                detail: "high",
               },
             },
           ],
         },
       ],
-      max_tokens: 500,
+      max_tokens: 800,
     });
 
     const petDescription = visionResponse.choices[0]?.message?.content || "a beloved pet";
 
-    // Step 2: Generate Renaissance portrait with DALL-E 3
-    const generationPrompt = `A museum-quality fine art oil painting of a majestic ${petDescription}, portrayed with rich texture and expressive brushstrokes. The subject is set within a natural environment that softly complements its habitat. Dramatic yet elegant lighting, painterly depth, and subtle color variations create a timeless, classical atmosphere. The image features unique pose, expression, lighting direction, background composition, and brushstroke style to ensure the result feels uniquely handcrafted. Ultra-detailed, gallery-worthy, classical oil painting, refined realism with artistic interpretation, gentle stylistic randomness for individuality.`;
+    // Step 2: Generate Renaissance royal portrait with DALL-E
+    const generationPrompt = `Create a masterpiece oil painting in the style of Rembrandt and classical Dutch Golden Age portraiture.
+
+THE SUBJECT: ${petDescription}
+
+CRITICAL - PHYSICAL ACCURACY: The pet's physical features described above MUST be rendered with photographic accuracy - exact fur colors, patterns, markings, eye color, ear shape, and facial structure. The viewer must instantly recognize their specific pet.
+
+ROYAL PORTRAIT STYLE:
+- The pet is posed regally on an ornate velvet cushion (deep emerald green or teal) with elaborate gold embroidered scrollwork and corner tassels
+- Wearing luxurious royal attire: a sumptuous velvet robe or cape (rich burgundy, deep crimson, or royal purple) with ermine fur trim (white with black spots)
+- Adorned with elegant jewelry: a gold chain necklace with an ornate medallion or pendant with precious gems (emerald, ruby, or pearl)
+- Optional: lace ruff collar, gold brocade details on clothing
+
+ARTISTIC TECHNIQUE:
+- Rembrandt-style dramatic chiaroscuro lighting from upper left
+- Rich, deep shadows with warm golden highlights on fur and fabric
+- Dark umber/brown atmospheric background with subtle velvet drapery
+- Visible oil painting brushstrokes and canvas texture
+- Classical composition with the pet as dignified nobility
+- Museum-quality fine art execution
+
+The pet should have a noble, dignified expression befitting royalty. Portrait orientation, three-quarter view pose with front paws resting elegantly on the cushion.`;
 
     const imageResponse = await openai.images.generate({
       model: "gpt-image-1",
