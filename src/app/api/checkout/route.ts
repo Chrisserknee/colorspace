@@ -51,6 +51,35 @@ export async function POST(request: NextRequest) {
     const priceAmount = 50; // 50 cents for testing
     console.log(`Creating checkout session with price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
 
+    // Get the base URL from the request (works for both localhost and production)
+    // Try origin header first, then referer, then extract from request URL
+    let baseUrl = CONFIG.BASE_URL;
+    const origin = request.headers.get("origin");
+    const referer = request.headers.get("referer");
+    
+    if (origin) {
+      baseUrl = origin;
+    } else if (referer) {
+      // Extract origin from referer URL
+      try {
+        const refererUrl = new URL(referer);
+        baseUrl = `${refererUrl.protocol}//${refererUrl.host}`;
+      } catch (e) {
+        // Fallback to CONFIG.BASE_URL
+      }
+    } else {
+      // Extract from request URL as last resort
+      try {
+        const requestUrl = new URL(request.url);
+        baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
+      } catch (e) {
+        // Use CONFIG.BASE_URL
+      }
+    }
+    
+    baseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+    console.log(`Using base URL: ${baseUrl}`);
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -70,8 +99,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${CONFIG.BASE_URL}/success?imageId=${imageId}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: CONFIG.BASE_URL,
+      success_url: `${baseUrl}/success?imageId=${imageId}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: baseUrl,
       metadata: {
         imageId,
         customerEmail: email,
