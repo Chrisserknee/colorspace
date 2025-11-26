@@ -52,33 +52,63 @@ export async function POST(request: NextRequest) {
     console.log(`Creating checkout session with price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
 
     // Get the base URL from the request (works for both localhost and production)
-    // Try origin header first, then referer, then extract from request URL
+    // Stripe requires absolute URLs, so we need to ensure we have a valid URL
     let baseUrl = CONFIG.BASE_URL;
     const origin = request.headers.get("origin");
     const referer = request.headers.get("referer");
     
+    // Try to get a valid absolute URL
     if (origin) {
-      baseUrl = origin;
+      try {
+        const originUrl = new URL(origin);
+        baseUrl = `${originUrl.protocol}//${originUrl.host}`;
+      } catch (e) {
+        console.error("Invalid origin URL:", origin);
+      }
     } else if (referer) {
       // Extract origin from referer URL
       try {
         const refererUrl = new URL(referer);
         baseUrl = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
-        // Fallback to CONFIG.BASE_URL
+        console.error("Invalid referer URL:", referer);
       }
-    } else {
-      // Extract from request URL as last resort
+    }
+    
+    // Validate the baseUrl is a proper absolute URL
+    try {
+      const testUrl = new URL(baseUrl);
+      baseUrl = `${testUrl.protocol}//${testUrl.host}`;
+    } catch (e) {
+      console.error("Invalid base URL, using CONFIG.BASE_URL:", baseUrl);
+      baseUrl = CONFIG.BASE_URL;
+      // Final validation
       try {
-        const requestUrl = new URL(request.url);
-        baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
-      } catch (e) {
-        // Use CONFIG.BASE_URL
+        new URL(baseUrl);
+      } catch (e2) {
+        console.error("CONFIG.BASE_URL is also invalid:", baseUrl);
+        throw new Error("Invalid base URL configuration");
       }
     }
     
     baseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
     console.log(`Using base URL: ${baseUrl}`);
+    
+    // Validate URLs before passing to Stripe
+    const successUrl = `${baseUrl}/success?imageId=${imageId}&session_id={CHECKOUT_SESSION_ID}`;
+    try {
+      new URL(successUrl);
+    } catch (e) {
+      console.error("Invalid success URL:", successUrl);
+      throw new Error("Failed to create valid success URL");
+    }
+    
+    try {
+      new URL(baseUrl);
+    } catch (e) {
+      console.error("Invalid cancel URL:", baseUrl);
+      throw new Error("Failed to create valid cancel URL");
+    }
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -99,7 +129,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${baseUrl}/success?imageId=${imageId}&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: successUrl,
       cancel_url: baseUrl,
       metadata: {
         imageId,
@@ -116,14 +146,17 @@ export async function POST(request: NextRequest) {
     console.error("Checkout error:", error);
 
     if (error instanceof Stripe.errors.StripeError) {
+      console.error("Stripe error details:", error.message, error.type);
       return NextResponse.json(
-        { error: "Payment service error. Please try again." },
+        { error: error.message || "Payment service error. Please try again." },
         { status: 500 }
       );
     }
 
+    const errorMessage = error instanceof Error ? error.message : "Failed to create checkout session. Please try again.";
+    console.error("Error message:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to create checkout session. Please try again." },
+      { error: errorMessage },
       { status: 500 }
     );
   }
