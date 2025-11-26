@@ -47,17 +47,18 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     }
   }, [file, previewUrl]);
 
-  // Phrase cycling animation during generation
+  // Phrase cycling animation during generation - slow and elegant
   useEffect(() => {
     if (stage !== "generating") return;
 
     const cycleInterval = setInterval(() => {
       setPhraseVisible(false);
+      // Longer fade out, then switch phrase, then fade in
       setTimeout(() => {
         setCurrentPhrase((prev) => (prev + 1) % VICTORIAN_PHRASES.length);
         setPhraseVisible(true);
-      }, 500);
-    }, 3000);
+      }, 1000); // 1 second to fade out before switching
+    }, 5000); // 5 seconds per phrase
 
     return () => clearInterval(cycleInterval);
   }, [stage]);
@@ -281,14 +282,14 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               />
             </div>
             
-            {/* Fading Victorian phrase */}
-            <div className="h-20 flex items-center justify-center">
+            {/* Fading Victorian phrase - slow elegant fade */}
+            <div className="h-24 flex items-center justify-center">
               <p 
-                className={`text-xl italic transition-opacity duration-500 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
+                className={`text-xl italic transition-all duration-1000 ease-in-out ${phraseVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
                 style={{ 
                   fontFamily: "'Cormorant Garamond', Georgia, serif", 
                   color: '#C5A572',
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.08em'
                 }}
               >
                 {VICTORIAN_PHRASES[currentPhrase]}

@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if paid (optional - you might want to enforce this)
-    // if (!metadata.paid) {
-    //   return NextResponse.json(
-    //     { error: "Payment required" },
-    //     { status: 402 }
-    //   );
-    // }
+    // Check if paid - only allow download of HD version after payment
+    if (!metadata.paid) {
+      return NextResponse.json(
+        { error: "Payment required to download HD version" },
+        { status: 402 }
+      );
+    }
 
     // Fetch the HD image from Supabase Storage
     const imageResponse = await fetch(metadata.hd_url);

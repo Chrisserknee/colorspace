@@ -352,10 +352,10 @@ The ${species} wears ${robe}, sits on ${cushion}, adorned with ${jewelryItem}. $
       preview_url: previewUrl,
     });
 
-    // TODO: Change back to previewUrl for production (watermarked version)
+    // Return watermarked preview - HD version only available after purchase
     return NextResponse.json({
       imageId,
-      previewUrl: hdUrl, // Using HD URL for testing - no watermark
+      previewUrl: previewUrl, // Watermarked version for preview
     });
   } catch (error) {
     console.error("Generation error:", error);
