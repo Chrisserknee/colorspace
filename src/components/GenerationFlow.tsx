@@ -121,7 +121,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       setExpirationTime(Date.now() + 15 * 60 * 1000);
       setStage("result");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      console.error("Generation error:", err);
+      console.error("Error message:", errorMessage);
+      setError(errorMessage);
       setStage("preview");
     }
   };
@@ -259,7 +262,14 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                 }}
               >
                 <p className="font-medium mb-1">Oops!</p>
-                <p className="text-sm">{error}</p>
+                <p className="text-sm break-words">{error}</p>
+                {/* Debug: Show full error details on mobile */}
+                <details className="mt-2 text-left">
+                  <summary className="text-xs cursor-pointer opacity-70">Debug Details</summary>
+                  <pre className="text-xs mt-2 p-2 bg-black/20 rounded overflow-auto max-h-40">
+                    {JSON.stringify({ error, timestamp: new Date().toISOString() }, null, 2)}
+                  </pre>
+                </details>
               </div>
             )}
 
