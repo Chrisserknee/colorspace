@@ -463,8 +463,8 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               </div>
             )}
 
-            {/* Generation Limit Display */}
-            {limitCheck && (
+            {/* Generation Limit Display - Only show after first generation */}
+            {limitCheck && generationLimits.freeGenerations > 0 && (
               <div className="mb-4 p-3 rounded-xl text-center text-sm" style={{ 
                 backgroundColor: limitCheck.allowed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                 border: `1px solid ${limitCheck.allowed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
