@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -10,14 +12,18 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo/Brand */}
           <div className="flex items-center gap-3">
-            <svg className="w-8 h-8" style={{ color: '#C5A572' }} viewBox="0 0 24 24" fill="currentColor">
-              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
-            </svg>
+            <Image
+              src="/samples/lumepet.png"
+              alt="LumePet Logo"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
             <span 
-              className="text-xl"
+              className="text-xl font-semibold"
               style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
             >
-              Pet Renaissance
+              LumePet
             </span>
           </div>
 
@@ -36,7 +42,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-sm" style={{ color: '#7A756D' }}>
-            © {currentYear} Pet Renaissance
+            © {currentYear} LumePet
           </p>
         </div>
 

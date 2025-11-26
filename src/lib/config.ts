@@ -5,7 +5,7 @@ export const CONFIG = {
   PRICE_AMOUNT: parseInt(process.env.PRICE_AMOUNT || "50", 10), // in cents (50¢ for testing)
   
   // Product details
-  PRODUCT_NAME: "Royal Renaissance Pet Portrait",
+  PRODUCT_NAME: "LumePet Royal Portrait",
   PRODUCT_DESCRIPTION: "Full-resolution, watermark-free royal Renaissance portrait of your beloved pet as nobility",
   
   // API URLs

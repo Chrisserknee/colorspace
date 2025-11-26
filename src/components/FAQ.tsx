@@ -117,7 +117,7 @@ export default function FAQ() {
           <p style={{ color: '#7A756D' }}>
             Still have questions?{" "}
             <a 
-              href="mailto:hello@petrenaissance.com" 
+              href="mailto:hello@lumepet.com" 
               className="hover:underline"
               style={{ color: '#C5A572' }}
             >

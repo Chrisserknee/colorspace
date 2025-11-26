@@ -23,7 +23,7 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
                 font-weight="bold"
                 fill="rgba(255,255,255,0.4)"
                 text-anchor="start">
-            PET RENAISSANCE – PREVIEW ONLY
+            LUMEPET – PREVIEW ONLY
           </text>
         </pattern>
       </defs>
