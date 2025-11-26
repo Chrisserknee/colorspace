@@ -86,6 +86,55 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     return () => clearInterval(timerInterval);
   }, [expirationTime, stage]);
 
+  // Compress image before upload to avoid Vercel 413 errors
+  const compressImage = async (file: File, maxSizeMB: number = 3.5): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Calculate new dimensions (max 2000px on longest side)
+          const maxDimension = 2000;
+          if (width > height && width > maxDimension) {
+            height = (height / width) * maxDimension;
+            width = maxDimension;
+          } else if (height > maxDimension) {
+            width = (width / height) * maxDimension;
+            height = maxDimension;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Convert to blob with compression
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file); // Fallback to original
+              }
+            },
+            'image/jpeg',
+            0.85 // 85% quality
+          );
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleGenerate = async () => {
     if (!file) return;
     
@@ -95,13 +144,26 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     setPhraseVisible(true);
 
     try {
+      // Compress image if it's too large (over 3.5MB)
+      let fileToUpload = file;
+      if (file.size > 3.5 * 1024 * 1024) {
+        console.log(`Compressing image from ${(file.size / 1024 / 1024).toFixed(2)}MB...`);
+        fileToUpload = await compressImage(file, 3.5);
+        console.log(`Compressed to ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
+      }
+      
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", fileToUpload);
 
       const response = await fetch("/api/generate", {
         method: "POST",
         body: formData,
       });
+
+      // Handle 413 Payload Too Large error specifically
+      if (response.status === 413) {
+        throw new Error("Image file is too large. Please use an image smaller than 4MB, or try compressing it first.");
+      }
 
       const data = await response.json();
 

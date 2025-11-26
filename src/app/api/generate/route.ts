@@ -94,10 +94,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size
+    // Validate file size (Vercel has 4.5MB body limit)
     if (imageFile.size > CONFIG.MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 10MB." },
+        { error: `File too large. Maximum size is ${CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB. Please compress your image or use a smaller file.` },
         { status: 400 }
       );
     }

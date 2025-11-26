@@ -12,7 +12,8 @@ export const CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
   
   // Image settings
-  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
+  // Vercel has a 4.5MB body size limit, so we limit to 4MB to be safe
+  MAX_FILE_SIZE: 4 * 1024 * 1024, // 4MB (Vercel limit is 4.5MB)
   ACCEPTED_TYPES: ["image/jpeg", "image/png", "image/webp"],
   
   // Style description for UI
