@@ -130,6 +130,12 @@ export default function Hero({ onUploadClick }: HeroProps) {
             </svg>
             Upload your pet photo
           </button>
+          <p 
+            className="text-sm mt-3 animate-fade-in-up delay-500"
+            style={{ color: '#7A756D', fontStyle: 'italic' }}
+          >
+            No sign up required
+          </p>
         </div>
       </div>
     </section>
