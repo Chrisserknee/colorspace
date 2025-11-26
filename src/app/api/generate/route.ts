@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import Replicate from "replicate";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
@@ -46,10 +47,17 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check for OpenAI API key
+    // Check for API keys
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
         { error: "OpenAI API key not configured" },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.REPLICATE_API_TOKEN) {
+      return NextResponse.json(
+        { error: "Replicate API token not configured" },
         { status: 500 }
       );
     }
@@ -62,10 +70,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize OpenAI client
+    // Initialize clients
+    // OpenAI for vision analysis, Replicate for image generation
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
+
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
+    });
+    
+    console.log("Using OpenAI for vision analysis, Replicate (SDXL) for image generation");
 
     // Parse form data
     const formData = await request.formData();
@@ -365,36 +380,39 @@ AESTHETIC DETAILS:
 - The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
 !!!!!`;
 
-    // Generate image with DALL-E 3
-    const imageResponse = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: generationPrompt,
-      n: 1,
-      size: "1024x1024",
-      quality: "hd",
-      style: "vivid",
-    });
+    // Generate image with Replicate (SDXL)
+    console.log("Generating image with Replicate SDXL...");
+    
+    const output = await replicate.run(
+      "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
+      {
+        input: {
+          prompt: generationPrompt,
+          negative_prompt: "ugly, blurry, low quality, distorted, deformed, disfigured, bad anatomy, wrong species, cartoon, anime, 3d render, photograph, photo",
+          width: 1024,
+          height: 1024,
+          num_outputs: 1,
+          scheduler: "K_EULER",
+          num_inference_steps: 50,
+          guidance_scale: 7.5,
+          refine: "expert_ensemble_refiner",
+          high_noise_frac: 0.8,
+        }
+      }
+    );
 
-    const imageData = imageResponse.data?.[0];
+    // Replicate returns an array of URLs
+    const outputArray = output as string[];
+    const imageUrl = outputArray?.[0];
 
-    if (!imageData) {
+    if (!imageUrl) {
       throw new Error("No image generated");
     }
 
-    let generatedBuffer: Buffer;
-
-    // Handle both base64 and URL responses
-    if (imageData.b64_json) {
-      // gpt-image-1 and grok return base64
-      generatedBuffer = Buffer.from(imageData.b64_json, "base64");
-    } else if (imageData.url) {
-      // Some models return URL
-      const downloadResponse = await fetch(imageData.url);
-      const arrayBuffer = await downloadResponse.arrayBuffer();
-      generatedBuffer = Buffer.from(arrayBuffer);
-    } else {
-      throw new Error("Invalid image response format");
-    }
+    // Download the generated image
+    const downloadResponse = await fetch(imageUrl);
+    const arrayBuffer = await downloadResponse.arrayBuffer();
+    const generatedBuffer = Buffer.from(arrayBuffer);
 
     // Create watermarked preview
     const watermarkedBuffer = await createWatermarkedImage(generatedBuffer);
