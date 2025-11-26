@@ -46,12 +46,10 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check for API keys - need either OpenAI or xAI
-    const useGrok = !!process.env.XAI_API_KEY;
-    
-    if (!process.env.OPENAI_API_KEY && !process.env.XAI_API_KEY) {
+    // Check for OpenAI API key
+    if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
-        { error: "No API key configured (need OPENAI_API_KEY or XAI_API_KEY)" },
+        { error: "OpenAI API key not configured" },
         { status: 500 }
       );
     }
@@ -64,23 +62,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize API clients
-    const grok = useGrok ? new OpenAI({
-      apiKey: process.env.XAI_API_KEY,
-      baseURL: "https://api.x.ai/v1",
-    }) : null;
-    
-    const openai = process.env.OPENAI_API_KEY ? new OpenAI({
+    // Initialize OpenAI client
+    const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-    }) : null;
-    
-    // Currently using OpenAI for BOTH to avoid Grok billing issues
-    // To re-enable Grok for vision: change visionClient to (grok || openai!)
-    const visionClient = openai || grok!;
-    const imageClient = openai || grok!;
-    
-    console.log(`Using ${openai ? 'OpenAI' : 'Grok'} for vision analysis`);
-    console.log(`Using ${openai ? 'OpenAI' : 'Grok'} for image generation`);
+    });
 
     // Parse form data
     const formData = await request.formData();
@@ -124,11 +109,9 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Use vision model to analyze the pet with extreme detail for accuracy
-    // Grok uses grok-2-vision, OpenAI uses gpt-4o
-    const visionModel = grok ? "grok-2-vision-1212" : "gpt-4o";
-    const visionResponse = await visionClient.chat.completions.create({
-      model: visionModel,
+    // Step 1: Use GPT-4o to analyze the pet with extreme detail for accuracy
+    const visionResponse = await openai.chat.completions.create({
+      model: "gpt-4o",
       messages: [
         {
           role: "user",
@@ -291,18 +274,7 @@ IMPORTANT: This description must capture what makes THIS SPECIFIC PET unique and
     const lighting = lightingDirections[Math.floor(Math.random() * lightingDirections.length)];
 
     // Step 2: Generate Renaissance royal portrait
-    // Grok has a 1024 char limit, so we need a condensed prompt for it
-    
-    // Extract key details from pet description (first 300 chars for Grok)
-    const shortPetDesc = petDescription.substring(0, 300);
-    
-    // Condensed prompt for Grok (under 1024 chars)
-    const grokPrompt = `Royal Renaissance oil painting portrait of a ${species}. ${shortPetDesc}
-
-Style: Classical Dutch Golden Age, Rembrandt lighting, dark moody background. Pet wearing ${robe.split(' with ')[0]}, on ${cushion.split(' with ')[0]}. Luminous oil painting with glowing highlights, bright whites, silky fur texture. Noble, dignified pose. Museum quality masterpiece.`;
-
-    // Full detailed prompt for OpenAI
-    const openaiPrompt = `!!!!! CRITICAL - THIS IS A ${species} !!!!!
+    const generationPrompt = `!!!!! CRITICAL - THIS IS A ${species} !!!!!
 Generate a portrait of a ${species}. ${notSpecies}
 
 ===== SPECIES VERIFICATION =====
@@ -393,22 +365,13 @@ AESTHETIC DETAILS:
 - The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
 !!!!!`;
 
-    // Use appropriate prompt based on which API we're using for image generation
-    // OpenAI gets the full prompt, Grok gets the condensed one
-    const generationPrompt = openai ? openaiPrompt : grokPrompt;
-
-    // Use appropriate image generation model
-    // Prioritize OpenAI for image generation if available
-    const useOpenAIForImages = !!openai;
-    const imageModel = useOpenAIForImages ? "gpt-image-1" : "grok-2-image";
-    
-    // Grok and OpenAI have different supported parameters
-    const imageResponse = await imageClient.images.generate({
-      model: imageModel,
+    // Generate image with OpenAI
+    const imageResponse = await openai.images.generate({
+      model: "gpt-image-1",
       prompt: generationPrompt,
       n: 1,
-      // Size and quality params only for OpenAI - Grok doesn't support them
-      ...(useOpenAIForImages ? { size: "1024x1024", quality: "high" } : {}),
+      size: "1024x1024",
+      quality: "high",
     });
 
     const imageData = imageResponse.data?.[0];
