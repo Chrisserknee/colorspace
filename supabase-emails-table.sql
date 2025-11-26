@@ -1,32 +1,50 @@
 -- SQL to create emails table in Supabase
--- Run this in your Supabase SQL Editor (Dashboard > SQL Editor > New Query)
+-- Copy and paste ONLY the SQL below into Supabase SQL Editor
 
--- Create emails table
+-- Step 1: Create emails table
 CREATE TABLE IF NOT EXISTS emails (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
-  image_id UUID REFERENCES portraits(id) ON DELETE SET NULL,
+  image_id UUID,
   source TEXT DEFAULT 'checkout',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Create index for faster email lookups
-CREATE INDEX IF NOT EXISTS idx_emails_email ON emails(email);
+-- Step 2: Add foreign key constraint (only if portraits table exists)
+DO $$ 
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'portraits') THEN
+    ALTER TABLE emails ADD CONSTRAINT fk_emails_image_id 
+      FOREIGN KEY (image_id) REFERENCES portraits(id) ON DELETE SET NULL;
+  END IF;
+END $$;
 
--- Create index for faster date-based queries
+-- Step 3: Create indexes
+CREATE INDEX IF NOT EXISTS idx_emails_email ON emails(email);
 CREATE INDEX IF NOT EXISTS idx_emails_created_at ON emails(created_at DESC);
 
--- Enable Row Level Security (RLS)
+-- Step 4: Enable Row Level Security (RLS)
 ALTER TABLE emails ENABLE ROW LEVEL SECURITY;
 
--- Create policy to allow service role to insert/update/select
-CREATE POLICY "Service role can manage emails" ON emails
-  FOR ALL
-  USING (true)
-  WITH CHECK (true);
+-- Step 5: Drop existing policy if it exists, then create new one
+DROP POLICY IF EXISTS "Service role can manage emails" ON emails;
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON emails;
+DROP POLICY IF EXISTS "Enable all operations for service role" ON emails;
 
--- Create updated_at trigger
+-- Policy: Allow service_role (used by API) to do everything
+CREATE POLICY "Enable all operations for service role" ON emails
+  FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Policy: Block all public/anonymous access (security)
+CREATE POLICY "Block public access" ON emails
+  FOR ALL
+  USING (false)
+  WITH CHECK (false);
+
+-- Step 6: Create updated_at trigger function (if it doesn't exist)
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -35,12 +53,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Step 7: Create trigger
+DROP TRIGGER IF EXISTS update_emails_updated_at ON emails;
 CREATE TRIGGER update_emails_updated_at
   BEFORE UPDATE ON emails
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- Grant permissions to service role
+-- Step 8: Grant permissions to service_role
 GRANT ALL ON emails TO service_role;
 GRANT USAGE ON SCHEMA public TO service_role;
-

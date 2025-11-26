@@ -304,11 +304,11 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
 
         {/* Result Stage - Purchase Modal */}
         {stage === "result" && result && (
-          <div className="p-8">
+          <div className="p-4 sm:p-8 max-h-[90vh] overflow-y-auto">
             {/* Most Popular badge */}
-            <div className="flex justify-center -mt-4 mb-4">
+            <div className="flex justify-center -mt-2 sm:-mt-4 mb-2 sm:mb-4">
               <span 
-                className="px-4 py-1 text-xs font-semibold uppercase tracking-wider rounded-full"
+                className="px-3 sm:px-4 py-1 text-xs font-semibold uppercase tracking-wider rounded-full"
                 style={{ backgroundColor: '#10B981', color: 'white' }}
               >
                 Most Popular
@@ -316,34 +316,34 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
             </div>
 
             {/* Download icon */}
-            <div className="flex justify-center mb-4">
-              <svg className="w-8 h-8" style={{ color: '#B8B2A8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex justify-center mb-2 sm:mb-4">
+              <svg className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#B8B2A8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
             </div>
 
-            {/* Title */}
+            {/* Title - Larger and more visible on mobile */}
             <h3 
-              className="text-3xl font-semibold text-center mb-4"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+              className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-2 sm:mb-4"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
             >
               Instant Masterpiece
             </h3>
 
             {/* Price */}
             <div className="text-center mb-2">
-              <span className="text-lg line-through mr-2" style={{ color: '#7A756D' }}>$9</span>
-              <span className="text-4xl font-bold" style={{ color: '#F0EDE8' }}>$0.50</span>
+              <span className="text-base sm:text-lg line-through mr-2" style={{ color: '#7A756D' }}>$9</span>
+              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#F0EDE8' }}>$0.50</span>
             </div>
 
             {/* Expiration Timer */}
-            <div className="text-center mb-6">
-              <span style={{ color: '#B8B2A8' }}>Expires in </span>
-              <span className="font-mono font-bold" style={{ color: '#F0EDE8' }}>{timeRemaining}</span>
+            <div className="text-center mb-3 sm:mb-4">
+              <span className="text-sm sm:text-base" style={{ color: '#B8B2A8' }}>Expires in </span>
+              <span className="font-mono font-bold text-sm sm:text-base" style={{ color: '#F0EDE8' }}>{timeRemaining}</span>
             </div>
 
-            {/* Preview Image */}
-            <div className="relative max-w-xs mx-auto mb-6 rounded-xl overflow-hidden shadow-lg">
+            {/* Preview Image - Smaller on mobile */}
+            <div className="relative max-w-[200px] sm:max-w-xs mx-auto mb-4 sm:mb-6 rounded-xl overflow-hidden shadow-lg">
               <div className="relative aspect-square">
                 <Image
                   src={result.previewUrl}
@@ -355,38 +355,39 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               </div>
             </div>
 
-            {/* Description */}
-            <p className="text-center mb-6" style={{ color: '#B8B2A8' }}>
-              Instant high-resolution download —<br />
-              perfect for sharing or saving.
+            {/* Description - Compact on mobile */}
+            <p className="text-center mb-3 sm:mb-4 text-sm sm:text-base" style={{ color: '#B8B2A8' }}>
+              Instant high-resolution download —<br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>perfect for sharing or saving.
             </p>
 
-            {/* Features list */}
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center gap-3" style={{ color: '#B8B2A8' }}>
-                <svg className="w-5 h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {/* Features list - Compact on mobile */}
+            <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base" style={{ color: '#B8B2A8' }}>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span>No Watermark</span>
               </div>
-              <div className="flex items-center gap-3" style={{ color: '#B8B2A8' }}>
-                <svg className="w-5 h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base" style={{ color: '#B8B2A8' }}>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span>Instant Download</span>
               </div>
-              <div className="flex items-center gap-3" style={{ color: '#B8B2A8' }}>
-                <svg className="w-5 h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base" style={{ color: '#B8B2A8' }}>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>High-Resolution (3200×4000px)</span>
+                <span className="hidden sm:inline">High-Resolution (3200×4000px)</span>
+                <span className="sm:hidden">High-Resolution</span>
               </div>
             </div>
 
-            {/* Download button */}
+            {/* Download button - Prominent and always visible */}
             <button 
               onClick={handlePurchaseClick}
-              className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
+              className="w-full py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all hover:scale-[1.02] shadow-lg"
               style={{ 
                 backgroundColor: '#F0EDE8', 
                 color: '#1A1A1A',
