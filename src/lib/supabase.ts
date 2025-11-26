@@ -121,4 +121,63 @@ export async function getAllEmails() {
   return data;
 }
 
+// Server-side generation limit check
+// This provides a backup to client-side limits and prevents bypass
+export async function checkServerGenerationLimit(
+  ipAddress: string,
+  maxFreeGenerations: number = 2,
+  resetHours: number = 24
+): Promise<{ allowed: boolean; currentCount: number; remaining: number; resetAt: Date | null }> {
+  try {
+    const { data, error } = await supabase.rpc("check_generation_limit", {
+      p_ip_address: ipAddress,
+      p_max_free_generations: maxFreeGenerations,
+      p_reset_hours: resetHours,
+    });
+
+    if (error) {
+      // If the function doesn't exist, allow the request but log warning
+      console.warn("Server-side limit check failed (function may not exist):", error.message);
+      return { allowed: true, currentCount: 0, remaining: maxFreeGenerations, resetAt: null };
+    }
+
+    if (data && data.length > 0) {
+      const result = data[0];
+      return {
+        allowed: result.allowed,
+        currentCount: result.current_count,
+        remaining: result.remaining,
+        resetAt: result.reset_at ? new Date(result.reset_at) : null,
+      };
+    }
+
+    return { allowed: true, currentCount: 0, remaining: maxFreeGenerations, resetAt: null };
+  } catch (err) {
+    console.error("Server generation limit check error:", err);
+    // Fail open to not block legitimate users
+    return { allowed: true, currentCount: 0, remaining: maxFreeGenerations, resetAt: null };
+  }
+}
+
+// Helper to check if an IP has made a purchase (for server-side verification)
+export async function hasIPMadePurchase(ipAddress: string): Promise<boolean> {
+  try {
+    const { count, error } = await supabase
+      .from("portraits")
+      .select("*", { count: "exact", head: true })
+      .eq("paid", true)
+      .ilike("customer_ip", ipAddress);
+
+    if (error) {
+      console.warn("Purchase check failed:", error.message);
+      return false;
+    }
+
+    return (count || 0) > 0;
+  } catch (err) {
+    console.error("Purchase check error:", err);
+    return false;
+  }
+}
+
 

@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMetadata } from "@/lib/supabase";
+import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
+  const clientIP = getClientIP(request);
+  
+  // Rate limiting
+  const rateLimit = checkRateLimit(`image-info:${clientIP}`, RATE_LIMITS.imageInfo);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString() } }
+    );
+  }
+  
   try {
     const { searchParams } = new URL(request.url);
     const imageId = searchParams.get("imageId");
@@ -32,9 +44,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // SECURITY: Only return HD URL if payment is confirmed
+    // This prevents unauthorized access to the full-resolution image
     return NextResponse.json({
       imageId: metadata.id,
-      hdUrl: metadata.hd_url,
+      hdUrl: metadata.paid ? metadata.hd_url : null, // Only expose HD URL after payment
       previewUrl: metadata.preview_url,
       paid: metadata.paid,
       createdAt: metadata.created_at,

@@ -4,6 +4,8 @@ import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
 import { uploadImage, saveMetadata } from "@/lib/supabase";
+import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
+import { validateImageMagicBytes } from "@/lib/validation";
 
 // Create watermarked version of image with LumePet logo
 async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
@@ -171,9 +173,28 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
 export async function POST(request: NextRequest) {
   const userAgent = request.headers.get("user-agent") || "unknown";
   const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent);
+  const clientIP = getClientIP(request);
+  
   console.log("=== Generate API called ===");
+  console.log("Client IP:", clientIP);
   console.log("User agent:", userAgent);
   console.log("Is mobile:", isMobile);
+  
+  // Rate limiting - prevent abuse
+  const rateLimit = checkRateLimit(`generate:${clientIP}`, RATE_LIMITS.generate);
+  if (!rateLimit.allowed) {
+    console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment before trying again." },
+      { 
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString(),
+          "X-RateLimit-Remaining": "0",
+        }
+      }
+    );
+  }
   
   try {
     // Check for API keys
@@ -231,6 +252,17 @@ export async function POST(request: NextRequest) {
     // Convert file to buffer
     const bytes = await imageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    
+    // SECURITY: Validate file is actually an image by checking magic bytes
+    // This prevents uploading malicious files with fake MIME types
+    const isValidImage = await validateImageMagicBytes(bytes);
+    if (!isValidImage) {
+      console.warn(`Invalid image magic bytes from IP: ${clientIP}`);
+      return NextResponse.json(
+        { error: "Invalid image file. Please upload a valid JPEG, PNG, or WebP image." },
+        { status: 400 }
+      );
+    }
 
     // Generate unique ID for this generation
     const imageId = uuidv4();

@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMetadata } from "@/lib/supabase";
+import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
+  const clientIP = getClientIP(request);
+  
+  // Rate limiting
+  const rateLimit = checkRateLimit(`download:${clientIP}`, RATE_LIMITS.download);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many download attempts. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString() } }
+    );
+  }
+  
   try {
     // Get imageId from query params
     const { searchParams } = new URL(request.url);

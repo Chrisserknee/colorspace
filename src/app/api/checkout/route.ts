@@ -2,8 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { CONFIG } from "@/lib/config";
 import { getMetadata, saveEmail } from "@/lib/supabase";
+import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
+import { isValidEmail, isValidUUID, sanitizeString } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
+  const clientIP = getClientIP(request);
+  
+  // Rate limiting
+  const rateLimit = checkRateLimit(`checkout:${clientIP}`, RATE_LIMITS.checkout);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment before trying again." },
+      { status: 429, headers: { "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString() } }
+    );
+  }
+  
   try {
     // Check for Stripe key
     if (!process.env.STRIPE_SECRET_KEY) {
@@ -20,21 +33,34 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { imageId, email, type, packType } = body;
 
-    if (!email) {
+    // Validate email with strict validation
+    if (!email || !isValidEmail(email)) {
       return NextResponse.json(
-        { error: "Email is required" },
+        { error: "Please provide a valid email address" },
         { status: 400 }
       );
     }
+    
+    // Sanitize email
+    const sanitizedEmail = sanitizeString(email.toLowerCase().trim(), 254);
 
     // Check if this is a pack purchase
     const isPackPurchase = type === "pack";
     
-    if (!isPackPurchase && !imageId) {
-      return NextResponse.json(
-        { error: "Image ID is required" },
-        { status: 400 }
-      );
+    // Validate imageId format for non-pack purchases
+    if (!isPackPurchase) {
+      if (!imageId) {
+        return NextResponse.json(
+          { error: "Image ID is required" },
+          { status: 400 }
+        );
+      }
+      if (!isValidUUID(imageId)) {
+        return NextResponse.json(
+          { error: "Invalid image ID format" },
+          { status: 400 }
+        );
+      }
     }
 
     let metadata = null;
@@ -67,8 +93,8 @@ export async function POST(request: NextRequest) {
       console.log(`Creating checkout session with price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
     }
 
-    // Save email to emails table for marketing
-    await saveEmail(email, imageId || null, isPackPurchase ? "pack-checkout" : "checkout");
+    // Save email to emails table for marketing (using sanitized email)
+    await saveEmail(sanitizedEmail, imageId || null, isPackPurchase ? "pack-checkout" : "checkout");
 
     // Get the base URL from the request (works for both localhost and production)
     // Stripe requires absolute URLs, so we need to ensure we have a valid URL
@@ -132,7 +158,7 @@ export async function POST(request: NextRequest) {
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      customer_email: email,
+      customer_email: sanitizedEmail,
       line_items: [
         {
           price_data: {
@@ -154,8 +180,8 @@ export async function POST(request: NextRequest) {
       cancel_url: baseUrl,
       metadata: {
         ...(imageId ? { imageId } : {}),
-        customerEmail: email,
-        ...(isPackPurchase ? { type: "pack", packType } : {}),
+        customerEmail: sanitizedEmail,
+        ...(isPackPurchase ? { type: "pack", packType: sanitizeString(packType || "", 20) } : {}),
       },
     });
 
