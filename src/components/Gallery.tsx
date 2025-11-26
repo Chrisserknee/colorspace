@@ -46,7 +46,7 @@ export default function Gallery() {
       ref={sectionRef} 
       className="py-24 px-6" 
       id="gallery"
-      style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+      style={{ backgroundColor: 'rgba(20, 20, 20, 0.5)' }}
     >
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
@@ -59,11 +59,11 @@ export default function Gallery() {
           </span>
           <h2 
             className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
             Royal Pet Portraits
           </h2>
-          <p className="max-w-xl mx-auto" style={{ color: '#4A4A4A' }}>
+          <p className="max-w-xl mx-auto" style={{ color: '#B8B2A8' }}>
             Behold the noble creatures who have been immortalized in the classical tradition. 
             Your pet could be next.
           </p>
@@ -82,19 +82,19 @@ export default function Gallery() {
                 <div className="ornate-frame">
                   <div 
                     className="relative aspect-[3/4] overflow-hidden rounded"
-                    style={{ backgroundColor: '#F5EFE6' }}
+                    style={{ backgroundColor: '#1A1A1A' }}
                   >
                     {/* Placeholder */}
                     <div 
                       className="absolute inset-0 flex items-center justify-center"
                       style={{ 
-                        background: 'linear-gradient(135deg, rgba(114, 47, 55, 0.2) 0%, rgba(197, 165, 114, 0.2) 100%)' 
+                        background: 'linear-gradient(135deg, rgba(139, 58, 66, 0.2) 0%, rgba(197, 165, 114, 0.1) 100%)' 
                       }}
                     >
                       <div className="text-center p-4">
                         <svg 
                           className="w-16 h-16 mx-auto mb-2" 
-                          style={{ color: 'rgba(197, 165, 114, 0.4)' }} 
+                          style={{ color: 'rgba(197, 165, 114, 0.3)' }} 
                           fill="currentColor" 
                           viewBox="0 0 24 24"
                         >
@@ -104,7 +104,7 @@ export default function Gallery() {
                           className="text-sm italic"
                           style={{ 
                             fontFamily: "'Cormorant Garamond', Georgia, serif",
-                            color: 'rgba(197, 165, 114, 0.6)' 
+                            color: 'rgba(197, 165, 114, 0.5)' 
                           }}
                         >
                           Sample Portrait
@@ -115,7 +115,7 @@ export default function Gallery() {
                     {/* Hover overlay */}
                     <div 
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
-                      style={{ backgroundColor: 'rgba(44, 44, 44, 0.6)' }}
+                      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
                     >
                       <div className="text-center text-white p-4">
                         <p 
@@ -124,7 +124,7 @@ export default function Gallery() {
                         >
                           {sample.title}
                         </p>
-                        <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                           {sample.pet}
                         </p>
                       </div>
@@ -135,12 +135,12 @@ export default function Gallery() {
                 {/* Caption */}
                 <div className="mt-4 text-center">
                   <h3 
-                    className="text-xl group-hover:text-[#722F37] transition-colors"
-                    style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+                    className="text-xl group-hover:text-[#C5A572] transition-colors"
+                    style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
                   >
                     {sample.title}
                   </h3>
-                  <p className="text-sm" style={{ color: '#8B7355' }}>{sample.pet}</p>
+                  <p className="text-sm" style={{ color: '#7A756D' }}>{sample.pet}</p>
                 </div>
               </div>
             </div>

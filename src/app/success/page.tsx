@@ -14,7 +14,6 @@ function SuccessContent() {
   const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
-    // Fetch the image metadata to get the HD URL
     if (imageId) {
       fetch(`/api/image-info?imageId=${imageId}`)
         .then((res) => res.json())
@@ -75,12 +74,12 @@ function SuccessContent() {
               style={{ 
                 borderWidth: '4px',
                 borderStyle: 'solid',
-                borderColor: '#C5A572',
-                borderTopColor: '#722F37'
+                borderColor: 'rgba(197, 165, 114, 0.2)',
+                borderTopColor: '#C5A572'
               }}
             />
           </div>
-          <p style={{ color: '#4A4A4A' }}>Loading your masterpiece...</p>
+          <p style={{ color: '#B8B2A8' }}>Loading your masterpiece...</p>
         </div>
       </div>
     );
@@ -93,19 +92,19 @@ function SuccessContent() {
         <div className="max-w-md w-full text-center">
           <div 
             className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: '#FEF2F2' }}
+            style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
           >
-            <svg className="w-10 h-10" style={{ color: '#EF4444' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-10 h-10" style={{ color: '#F87171' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
           <h1 
             className="text-3xl font-semibold mb-4"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
             Something Went Wrong
           </h1>
-          <p className="mb-8" style={{ color: '#4A4A4A' }}>
+          <p className="mb-8" style={{ color: '#B8B2A8' }}>
             We couldn&apos;t find your portrait. The link may be invalid or expired.
           </p>
           <Link href="/" className="btn-primary inline-flex">
@@ -127,19 +126,19 @@ function SuccessContent() {
         <div className="text-center mb-10 animate-fade-in-up">
           <div 
             className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: '#DCFCE7' }}
+            style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)' }}
           >
-            <svg className="w-10 h-10" style={{ color: '#16A34A' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-10 h-10" style={{ color: '#4ADE80' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <h1 
             className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
             Your Renaissance Portrait is Ready
           </h1>
-          <p className="text-lg" style={{ color: '#4A4A4A' }}>
+          <p className="text-lg" style={{ color: '#B8B2A8' }}>
             Thank you for your purchase! Your pet has been immortalized.
           </p>
         </div>
@@ -192,7 +191,7 @@ function SuccessContent() {
             )}
           </button>
 
-          <p className="text-sm mb-8" style={{ color: '#8B7355' }}>
+          <p className="text-sm mb-8" style={{ color: '#7A756D' }}>
             High-resolution PNG • Watermark-free • Perfect for printing
           </p>
         </div>
@@ -201,11 +200,11 @@ function SuccessContent() {
         <div className="card animate-fade-in-up delay-400">
           <h3 
             className="text-xl mb-4 text-center"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
             ✨ Ideas for Your Portrait
           </h3>
-          <div className="grid sm:grid-cols-2 gap-4 text-sm" style={{ color: '#4A4A4A' }}>
+          <div className="grid sm:grid-cols-2 gap-4 text-sm" style={{ color: '#B8B2A8' }}>
             <div className="flex items-start gap-3">
               <span className="text-lg">🖼️</span>
               <span>Print and frame it for an elegant wall display</span>
@@ -229,8 +228,8 @@ function SuccessContent() {
         <div className="text-center mt-10 animate-fade-in-up delay-500">
           <Link 
             href="/" 
-            className="inline-flex items-center gap-2 transition-colors hover:text-[#5A252C]"
-            style={{ color: '#722F37' }}
+            className="inline-flex items-center gap-2 transition-colors hover:text-[#C5A572]"
+            style={{ color: '#7A756D' }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -254,12 +253,12 @@ export default function SuccessPage() {
               style={{ 
                 borderWidth: '4px',
                 borderStyle: 'solid',
-                borderColor: '#C5A572',
-                borderTopColor: '#722F37'
+                borderColor: 'rgba(197, 165, 114, 0.2)',
+                borderTopColor: '#C5A572'
               }}
             />
           </div>
-          <p style={{ color: '#4A4A4A' }}>Loading your masterpiece...</p>
+          <p style={{ color: '#B8B2A8' }}>Loading your masterpiece...</p>
         </div>
       </div>
     }>

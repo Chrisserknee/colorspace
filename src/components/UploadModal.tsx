@@ -16,14 +16,12 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
   const validateFile = (file: File): boolean => {
     setError(null);
     
-    // Check file type
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
       setError("Please upload a JPEG, PNG, or WebP image.");
       return false;
     }
     
-    // Check file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
       setError("Image must be under 10MB.");
       return false;
@@ -66,17 +64,24 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
       {/* Backdrop */}
       <div 
         className="absolute inset-0 backdrop-blur-sm animate-fade-in"
-        style={{ backgroundColor: 'rgba(44, 44, 44, 0.6)' }}
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
         onClick={onClose}
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl animate-fade-in-up p-8">
+      <div 
+        className="relative w-full max-w-lg rounded-3xl shadow-2xl animate-fade-in-up p-8"
+        style={{ 
+          backgroundColor: '#1A1A1A',
+          border: '1px solid rgba(197, 165, 114, 0.2)',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 100px rgba(197, 165, 114, 0.1)'
+        }}
+      >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors hover:bg-[#FAF7F2]"
-          style={{ backgroundColor: '#F5EFE6', color: '#4A4A4A' }}
+          className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: '#B8B2A8' }}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -87,7 +92,7 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}
+            style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.2)' }}
           >
             <svg className="w-8 h-8" style={{ color: '#C5A572' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -95,11 +100,11 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
           </div>
           <h3 
             className="text-2xl font-semibold mb-2"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
             Choose Your Pet Photo
           </h3>
-          <p style={{ color: '#4A4A4A' }}>
+          <p style={{ color: '#B8B2A8' }}>
             Select a clear, well-lit photo of your pet
           </p>
         </div>
@@ -111,8 +116,8 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
           onDrop={handleDrop}
           className="relative border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer"
           style={{
-            borderColor: isDragging ? '#722F37' : 'rgba(197, 165, 114, 0.3)',
-            backgroundColor: isDragging ? 'rgba(114, 47, 55, 0.05)' : 'transparent'
+            borderColor: isDragging ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
+            backgroundColor: isDragging ? 'rgba(197, 165, 114, 0.05)' : 'rgba(255, 255, 255, 0.02)'
           }}
           onClick={() => inputRef.current?.click()}
         >
@@ -128,8 +133,8 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
             <div 
               className="w-12 h-12 rounded-full flex items-center justify-center transition-colors"
               style={{ 
-                backgroundColor: isDragging ? 'rgba(114, 47, 55, 0.1)' : '#F5EFE6',
-                color: isDragging ? '#722F37' : '#8B7355'
+                backgroundColor: isDragging ? 'rgba(197, 165, 114, 0.15)' : 'rgba(197, 165, 114, 0.1)',
+                color: '#C5A572'
               }}
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,15 +143,15 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
             </div>
             
             <div>
-              <p className="font-medium" style={{ color: '#2C2C2C' }}>
+              <p className="font-medium" style={{ color: '#F0EDE8' }}>
                 {isDragging ? "Drop your photo here" : "Drag & drop your photo here"}
               </p>
-              <p className="text-sm mt-1" style={{ color: '#8B7355' }}>
+              <p className="text-sm mt-1" style={{ color: '#7A756D' }}>
                 or click to browse
               </p>
             </div>
             
-            <p className="text-xs" style={{ color: '#8B7355' }}>
+            <p className="text-xs" style={{ color: '#7A756D' }}>
               JPEG, PNG, or WebP • Max 10MB
             </p>
           </div>
@@ -157,9 +162,9 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
           <div 
             className="mt-4 p-3 rounded-lg text-sm text-center"
             style={{ 
-              backgroundColor: '#FEF2F2',
-              border: '1px solid #FECACA',
-              color: '#B91C1C'
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: '#F87171'
             }}
           >
             {error}
@@ -169,10 +174,10 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
         {/* Tips */}
         <div 
           className="mt-6 p-4 rounded-xl"
-          style={{ backgroundColor: 'rgba(245, 239, 230, 0.5)' }}
+          style={{ backgroundColor: 'rgba(197, 165, 114, 0.05)', border: '1px solid rgba(197, 165, 114, 0.1)' }}
         >
-          <p className="text-sm" style={{ color: '#4A4A4A' }}>
-            <span className="font-medium" style={{ color: '#2C2C2C' }}>💡 Tip:</span>{" "}
+          <p className="text-sm" style={{ color: '#B8B2A8' }}>
+            <span className="font-medium" style={{ color: '#C5A572' }}>💡 Tip:</span>{" "}
             Front-facing photos with good lighting produce the most majestic Renaissance portraits!
           </p>
         </div>

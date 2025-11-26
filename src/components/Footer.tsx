@@ -15,27 +15,27 @@ export default function Footer() {
             </svg>
             <span 
               className="text-xl"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
             >
               Pet Renaissance
             </span>
           </div>
 
           {/* Links */}
-          <nav className="flex items-center gap-6 text-sm" style={{ color: '#8B7355' }}>
-            <a href="#how-it-works" className="hover:text-[#2C2C2C] transition-colors">
+          <nav className="flex items-center gap-6 text-sm" style={{ color: '#7A756D' }}>
+            <a href="#how-it-works" className="hover:text-[#C5A572] transition-colors">
               How it Works
             </a>
-            <a href="#gallery" className="hover:text-[#2C2C2C] transition-colors">
+            <a href="#gallery" className="hover:text-[#C5A572] transition-colors">
               Gallery
             </a>
-            <a href="#faq" className="hover:text-[#2C2C2C] transition-colors">
+            <a href="#faq" className="hover:text-[#C5A572] transition-colors">
               FAQ
             </a>
           </nav>
 
           {/* Copyright */}
-          <p className="text-sm" style={{ color: '#8B7355' }}>
+          <p className="text-sm" style={{ color: '#7A756D' }}>
             © {currentYear} Pet Renaissance
           </p>
         </div>
@@ -45,7 +45,7 @@ export default function Footer() {
           className="mt-8 pt-6 text-center"
           style={{ borderTop: '1px solid rgba(197, 165, 114, 0.1)' }}
         >
-          <p className="text-xs" style={{ color: 'rgba(139, 115, 85, 0.7)' }}>
+          <p className="text-xs" style={{ color: 'rgba(122, 117, 109, 0.6)' }}>
             Made with ♥ for pet lovers everywhere.
           </p>
         </div>

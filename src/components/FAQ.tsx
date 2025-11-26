@@ -60,7 +60,7 @@ export default function FAQ() {
           </span>
           <h2 
             className="text-3xl sm:text-4xl md:text-5xl font-semibold"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
             Frequently Asked
           </h2>
@@ -77,19 +77,20 @@ export default function FAQ() {
               <div className="card !p-0 overflow-hidden">
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 transition-colors hover:bg-[#F5EFE6]/30"
+                  className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 transition-colors"
+                  style={{ backgroundColor: openIndex === index ? 'rgba(197, 165, 114, 0.05)' : 'transparent' }}
                 >
                   <span 
                     className="text-lg font-medium"
-                    style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+                    style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
                   >
                     {faq.question}
                   </span>
                   <span 
                     className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`}
-                    style={{ backgroundColor: '#F5EFE6' }}
+                    style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}
                   >
-                    <svg className="w-4 h-4" style={{ color: '#722F37' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4" style={{ color: '#C5A572' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </span>
@@ -99,8 +100,8 @@ export default function FAQ() {
                   <div 
                     className="px-6 pb-5 leading-relaxed pt-4"
                     style={{ 
-                      color: '#4A4A4A',
-                      borderTop: '1px solid rgba(245, 239, 230, 0.5)'
+                      color: '#B8B2A8',
+                      borderTop: '1px solid rgba(197, 165, 114, 0.1)'
                     }}
                   >
                     {faq.answer}
@@ -113,12 +114,12 @@ export default function FAQ() {
 
         {/* Contact note */}
         <div className="text-center mt-12 reveal" style={{ transitionDelay: '500ms' }}>
-          <p style={{ color: '#8B7355' }}>
+          <p style={{ color: '#7A756D' }}>
             Still have questions?{" "}
             <a 
               href="mailto:hello@petrenaissance.com" 
               className="hover:underline"
-              style={{ color: '#722F37' }}
+              style={{ color: '#C5A572' }}
             >
               Contact us
             </a>

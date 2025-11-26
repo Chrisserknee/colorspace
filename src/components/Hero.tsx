@@ -10,11 +10,11 @@ export default function Hero({ onUploadClick }: HeroProps) {
       {/* Decorative elements */}
       <div 
         className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl" 
-        style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }} 
+        style={{ backgroundColor: 'rgba(197, 165, 114, 0.08)' }} 
       />
       <div 
         className="absolute bottom-20 right-10 w-48 h-48 rounded-full blur-3xl" 
-        style={{ backgroundColor: 'rgba(114, 47, 55, 0.1)' }} 
+        style={{ backgroundColor: 'rgba(139, 58, 66, 0.08)' }} 
       />
       
       {/* Ornate corner decorations */}
@@ -59,14 +59,14 @@ export default function Hero({ onUploadClick }: HeroProps) {
         {/* Main headline */}
         <h1 
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 animate-fade-in-up delay-100 leading-tight"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
         >
           Turn your pet into a{" "}
-          <span className="relative" style={{ color: '#722F37' }}>
+          <span className="relative" style={{ color: '#C5A572' }}>
             Renaissance
             <svg 
               className="absolute -bottom-2 left-0 w-full h-3" 
-              style={{ color: 'rgba(197, 165, 114, 0.4)' }} 
+              style={{ color: 'rgba(139, 58, 66, 0.6)' }} 
               viewBox="0 0 200 12" 
               preserveAspectRatio="none"
             >
@@ -79,7 +79,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
         {/* Subheadline */}
         <p 
           className="text-lg sm:text-xl mb-8 animate-fade-in-up delay-200 max-w-xl mx-auto"
-          style={{ color: '#4A4A4A' }}
+          style={{ color: '#B8B2A8' }}
         >
           Upload a photo. We&apos;ll paint them like a royal oil portrait — 
           worthy of hanging in the finest galleries of Europe.
@@ -88,10 +88,11 @@ export default function Hero({ onUploadClick }: HeroProps) {
         {/* Sample portraits */}
         <div className="flex justify-center gap-4 sm:gap-6 mb-10 animate-fade-in-up delay-300">
           <div 
-            className="w-28 h-36 sm:w-36 sm:h-48 rounded-lg overflow-hidden shadow-xl transform -rotate-3 hover:rotate-0 transition-transform duration-300"
+            className="w-28 h-36 sm:w-36 sm:h-48 rounded-lg overflow-hidden shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-300"
             style={{ 
               background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)',
-              padding: '4px'
+              padding: '4px',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(197, 165, 114, 0.2)'
             }}
           >
             <img 
@@ -101,10 +102,11 @@ export default function Hero({ onUploadClick }: HeroProps) {
             />
           </div>
           <div 
-            className="w-28 h-36 sm:w-36 sm:h-48 rounded-lg overflow-hidden shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300"
+            className="w-28 h-36 sm:w-36 sm:h-48 rounded-lg overflow-hidden shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300"
             style={{ 
               background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)',
-              padding: '4px'
+              padding: '4px',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(197, 165, 114, 0.2)'
             }}
           >
             <img 
@@ -133,7 +135,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-fade-in delay-500">
         <div 
           className="flex flex-col items-center gap-2"
-          style={{ color: 'rgba(197, 165, 114, 0.6)' }}
+          style={{ color: 'rgba(197, 165, 114, 0.5)' }}
         >
           <span className="text-xs uppercase tracking-widest">Scroll</span>
           <svg className="w-5 h-5 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">

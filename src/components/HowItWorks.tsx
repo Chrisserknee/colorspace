@@ -69,7 +69,7 @@ export default function HowItWorks() {
           </span>
           <h2 
             className="text-3xl sm:text-4xl md:text-5xl font-semibold"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
             How it works
           </h2>
@@ -89,7 +89,7 @@ export default function HowItWorks() {
                   className="text-6xl font-bold mb-4 transition-colors"
                   style={{ 
                     fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    color: 'rgba(197, 165, 114, 0.3)' 
+                    color: 'rgba(197, 165, 114, 0.2)' 
                   }}
                 >
                   {step.number}
@@ -97,10 +97,11 @@ export default function HowItWorks() {
                 
                 {/* Icon */}
                 <div 
-                  className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center transition-all duration-300 group-hover:text-white"
+                  className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
                   style={{ 
-                    backgroundColor: '#F5EFE6',
-                    color: '#722F37'
+                    backgroundColor: 'rgba(197, 165, 114, 0.1)',
+                    color: '#C5A572',
+                    border: '1px solid rgba(197, 165, 114, 0.2)'
                   }}
                 >
                   {step.icon}
@@ -109,13 +110,13 @@ export default function HowItWorks() {
                 {/* Title */}
                 <h3 
                   className="text-2xl font-semibold mb-3"
-                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#2C2C2C' }}
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
                 >
                   {step.title}
                 </h3>
                 
                 {/* Description */}
-                <p style={{ color: '#4A4A4A', lineHeight: 1.7 }}>
+                <p style={{ color: '#B8B2A8', lineHeight: 1.7 }}>
                   {step.description}
                 </p>
               </div>
