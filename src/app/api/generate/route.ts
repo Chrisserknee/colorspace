@@ -74,11 +74,12 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     }) : null;
     
-    // Use Grok for vision analysis, OpenAI for image generation
-    const visionClient = grok || openai!;
+    // Currently using OpenAI for BOTH to avoid Grok billing issues
+    // To re-enable Grok for vision: change visionClient to (grok || openai!)
+    const visionClient = openai || grok!;
     const imageClient = openai || grok!;
     
-    console.log(`Using ${grok ? 'Grok' : 'OpenAI'} for vision analysis`);
+    console.log(`Using ${openai ? 'OpenAI' : 'Grok'} for vision analysis`);
     console.log(`Using ${openai ? 'OpenAI' : 'Grok'} for image generation`);
 
     // Parse form data
