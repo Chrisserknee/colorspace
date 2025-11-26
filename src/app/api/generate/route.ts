@@ -65,7 +65,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize API clients
-    // Use Grok (xAI) for everything if available, otherwise fall back to OpenAI
     const grok = useGrok ? new OpenAI({
       apiKey: process.env.XAI_API_KEY,
       baseURL: "https://api.x.ai/v1",
@@ -75,12 +74,12 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     }) : null;
     
-    // Use Grok for BOTH vision and image generation if available
+    // Use Grok for vision analysis, OpenAI for image generation
     const visionClient = grok || openai!;
-    const imageClient = grok || openai!;
+    const imageClient = openai || grok!;
     
     console.log(`Using ${grok ? 'Grok' : 'OpenAI'} for vision analysis`);
-    console.log(`Using ${grok ? 'Grok' : 'OpenAI'} for image generation`);
+    console.log(`Using ${openai ? 'OpenAI' : 'Grok'} for image generation`);
 
     // Parse form data
     const formData = await request.formData();
@@ -393,12 +392,14 @@ AESTHETIC DETAILS:
 - The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
 !!!!!`;
 
-    // Use appropriate prompt based on which API we're using
-    const generationPrompt = grok ? grokPrompt : openaiPrompt;
+    // Use appropriate prompt based on which API we're using for image generation
+    // OpenAI gets the full prompt, Grok gets the condensed one
+    const generationPrompt = openai ? openaiPrompt : grokPrompt;
 
     // Use appropriate image generation model
-    // Prioritize Grok if available
-    const imageModel = grok ? "grok-2-image" : "gpt-image-1";
+    // Prioritize OpenAI for image generation if available
+    const useOpenAIForImages = !!openai;
+    const imageModel = useOpenAIForImages ? "gpt-image-1" : "grok-2-image";
     
     // Grok and OpenAI have different supported parameters
     const imageResponse = await imageClient.images.generate({
@@ -406,7 +407,7 @@ AESTHETIC DETAILS:
       prompt: generationPrompt,
       n: 1,
       // Size and quality params only for OpenAI - Grok doesn't support them
-      ...(!grok ? { size: "1024x1024", quality: "high" } : {}),
+      ...(useOpenAIForImages ? { size: "1024x1024", quality: "high" } : {}),
     });
 
     const imageData = imageResponse.data?.[0];
