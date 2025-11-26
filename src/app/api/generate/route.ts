@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Replicate from "replicate";
+import OpenAI from "openai";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
@@ -46,14 +46,12 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
 
 export async function POST(request: NextRequest) {
   console.log("=== Generate API called ===");
-  console.log("REPLICATE_API_TOKEN exists:", !!process.env.REPLICATE_API_TOKEN);
   
   try {
     // Check for API keys
-    if (!process.env.REPLICATE_API_TOKEN) {
-      console.log("ERROR: No Replicate API token");
+    if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
-        { error: "Replicate API token not configured" },
+        { error: "OpenAI API key not configured" },
         { status: 500 }
       );
     }
@@ -66,12 +64,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize Replicate client - using for BOTH vision and image generation
-    const replicate = new Replicate({
-      auth: process.env.REPLICATE_API_TOKEN,
+    // Initialize OpenAI client
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
     });
     
-    console.log("Using Replicate for both vision analysis (LLaVA) and image generation (Flux)");
+    console.log("Using OpenAI for vision (GPT-4o) and image generation (DALL-E 3)");
 
     // Parse form data
     const formData = await request.formData();
@@ -115,40 +113,36 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Use Replicate LLaVA to analyze the pet
-    console.log("Analyzing pet with LLaVA...");
+    // Step 1: Use GPT-4o to analyze the pet
+    console.log("Analyzing pet with GPT-4o...");
     
-    const visionPrompt = `Analyze this pet photo. Start with [DOG] or [CAT] or [RABBIT] etc.
+    const visionResponse = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Analyze this pet photo. Start with [DOG] or [CAT] or [RABBIT] etc.
 
 Describe: 1) Species and breed, 2) Exact fur color (if black say "jet black", if white say "pure white"), 3) Patterns/markings, 4) Eye color, 5) Ear shape, 6) Any unique features.
 
-Format: "[SPECIES] This is a [breed] with [color] fur. [Details...]"`;
+Format: "[SPECIES] This is a [breed] with [color] fur. [Details...]"`,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${base64Image}`,
+              },
+            },
+          ],
+        },
+      ],
+      max_tokens: 500,
+    });
 
-    let petDescription: string;
-    try {
-      const visionOutput = await replicate.run(
-        "yorickvp/llava-13b:80537f9eead1a5bfa72d5ac6ea6414379be41d4d4f6679fd776e9535d1eb58bb",
-        {
-          input: {
-            image: `data:image/jpeg;base64,${base64Image}`,
-            prompt: visionPrompt,
-            max_tokens: 500,
-          }
-        }
-      );
-      
-      // LLaVA returns a string or array
-      if (Array.isArray(visionOutput)) {
-        petDescription = visionOutput.join("");
-      } else if (typeof visionOutput === "string") {
-        petDescription = visionOutput;
-      } else {
-        petDescription = "a beloved pet";
-      }
-    } catch (visionError) {
-      console.error("Vision analysis error:", visionError);
-      petDescription = "a beloved pet";
-    }
+    const petDescription = visionResponse.choices[0]?.message?.content || "a beloved pet";
 
     // Log for debugging
     console.log("Pet description from vision:", petDescription);
@@ -333,56 +327,27 @@ AESTHETIC DETAILS:
 - The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
 !!!!!`;
 
-    // Generate image with Replicate
-    console.log("Generating image with Replicate...");
+    // Generate image with DALL-E 3
+    console.log("Generating image with DALL-E 3...");
     
-    // Create a shorter, focused prompt for Stable Diffusion
-    const sdPrompt = `Royal Renaissance oil painting portrait of a ${species}. ${petDescription.substring(0, 500)}
+    const imageResponse = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: generationPrompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "hd",
+      style: "vivid",
+    });
 
-Style: Classical Dutch Golden Age painting, Rembrandt lighting, dark moody background, ornate velvet robe with ermine fur trim, sitting on luxurious velvet cushion with gold tassels, wearing gold jewelry with gems, luminous oil painting with glowing highlights, museum quality masterpiece, noble dignified pose.`;
+    const imageData = imageResponse.data?.[0];
 
-    console.log("SD Prompt length:", sdPrompt.length);
-    
-    let imageUrl: string;
-    try {
-      // Using Flux Schnell - fast and reliable
-      const output = await replicate.run(
-        "black-forest-labs/flux-schnell",
-        {
-          input: {
-            prompt: sdPrompt,
-            num_outputs: 1,
-            aspect_ratio: "1:1",
-            output_format: "webp",
-            output_quality: 90,
-          }
-        }
-      );
-
-      console.log("Replicate output type:", typeof output);
-      console.log("Replicate output:", JSON.stringify(output).substring(0, 200));
-
-      // Handle different output formats
-      if (Array.isArray(output) && output.length > 0) {
-        imageUrl = output[0];
-      } else if (typeof output === 'string') {
-        imageUrl = output;
-      } else {
-        console.error("Unexpected output format:", output);
-        throw new Error("Unexpected output format from Replicate");
-      }
-    } catch (replicateError) {
-      console.error("Replicate error:", replicateError);
-      throw new Error(`Replicate API error: ${replicateError instanceof Error ? replicateError.message : 'Unknown error'}`);
-    }
-
-    if (!imageUrl) {
-      throw new Error("No image generated from Replicate");
+    if (!imageData || !imageData.url) {
+      throw new Error("No image generated");
     }
 
     // Download the generated image
-    console.log("Downloading image from:", imageUrl);
-    const downloadResponse = await fetch(imageUrl);
+    console.log("Downloading image from DALL-E...");
+    const downloadResponse = await fetch(imageData.url);
     
     if (!downloadResponse.ok) {
       throw new Error(`Failed to download image: ${downloadResponse.status}`);
