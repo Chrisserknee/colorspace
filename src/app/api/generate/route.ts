@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 import Replicate from "replicate";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
@@ -46,16 +45,13 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("=== Generate API called ===");
+  console.log("REPLICATE_API_TOKEN exists:", !!process.env.REPLICATE_API_TOKEN);
+  
   try {
     // Check for API keys
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: "OpenAI API key not configured" },
-        { status: 500 }
-      );
-    }
-
     if (!process.env.REPLICATE_API_TOKEN) {
+      console.log("ERROR: No Replicate API token");
       return NextResponse.json(
         { error: "Replicate API token not configured" },
         { status: 500 }
@@ -70,17 +66,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize clients
-    // OpenAI for vision analysis, Replicate for image generation
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
+    // Initialize Replicate client - using for BOTH vision and image generation
     const replicate = new Replicate({
       auth: process.env.REPLICATE_API_TOKEN,
     });
     
-    console.log("Using OpenAI for vision analysis, Replicate (SDXL) for image generation");
+    console.log("Using Replicate for both vision analysis (LLaVA) and image generation (Flux)");
 
     // Parse form data
     const formData = await request.formData();
@@ -124,78 +115,40 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Use GPT-4o to analyze the pet with extreme detail for accuracy
-    const visionResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
+    // Step 1: Use Replicate LLaVA to analyze the pet
+    console.log("Analyzing pet with LLaVA...");
+    
+    const visionPrompt = `Analyze this pet photo. Start with [DOG] or [CAT] or [RABBIT] etc.
+
+Describe: 1) Species and breed, 2) Exact fur color (if black say "jet black", if white say "pure white"), 3) Patterns/markings, 4) Eye color, 5) Ear shape, 6) Any unique features.
+
+Format: "[SPECIES] This is a [breed] with [color] fur. [Details...]"`;
+
+    let petDescription: string;
+    try {
+      const visionOutput = await replicate.run(
+        "yorickvp/llava-13b:80537f9eead1a5bfa72d5ac6ea6414379be41d4d4f6679fd776e9535d1eb58bb",
         {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `You are an expert pet portrait artist. Analyze this pet photo with EXTREME PRECISION to capture THIS EXACT pet - not a generic version of the breed.
-
-CRITICAL: Start your response with the EXACT species in caps:
-"[DOG] This is a..." or "[CAT] This is a..." or "[RABBIT] This is a..."
-
-Describe THIS SPECIFIC PET in meticulous detail:
-
-1. SPECIES & BREED: Exact animal type and specific breed or mix.
-
-2. COAT COLOR - BE EXTREMELY PRECISE:
-   - BLACK fur = "JET BLACK" or "SOLID BLACK" (never say gray/charcoal)
-   - WHITE fur = "PURE WHITE" or "SNOW WHITE"
-   - Other colors: be very specific ("golden honey blonde", "rich chocolate brown", "warm ginger orange")
-   - Describe ANY patterns: tabby stripes, spots, patches, brindle, ticking
-
-3. FACE STRUCTURE & PROPORTIONS:
-   - Head shape (round, wedge, square, dome-shaped)
-   - Muzzle: length (short/medium/long), width, shape
-   - Nose: color, size, shape
-   - Distance between eyes (close-set, wide-set, normal)
-
-4. EARS - VERY IMPORTANT:
-   - Shape (pointed, rounded, folded, floppy, erect, semi-erect)
-   - Size relative to head (large, small, proportionate)
-   - Position (high-set, low-set, wide apart)
-   - Inner ear color
-
-5. EYES:
-   - EXACT color (emerald green, copper amber, ice blue, warm brown, heterochromia)
-   - Shape (round, almond, oval)
-   - Size and expression
-
-6. UNIQUE IDENTIFIERS - What makes THIS pet unique:
-   - Specific markings (white blaze, chest patch, sock feet, facial mask)
-   - Any asymmetry or distinctive features
-   - Whisker patterns, eyebrow markings
-   - Scars, spots, or color variations
-
-7. BODY PROPORTIONS:
-   - Build (slender, stocky, muscular, petite)
-   - Leg length relative to body
-   - Overall size impression
-
-8. FUR TEXTURE: Length (short/medium/long), texture (silky, fluffy, wiry, sleek, plush)
-
-FORMAT: "[SPECIES] This is a [breed] with [exact coat color] fur. [Detailed description...]"
-
-IMPORTANT: This description must capture what makes THIS SPECIFIC PET unique and recognizable to their owner - not just a generic breed description.`,
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:image/jpeg;base64,${base64Image}`,
-                detail: "high",
-              },
-            },
-          ],
-        },
-      ],
-      max_tokens: 800,
-    });
-
-    const petDescription = visionResponse.choices[0]?.message?.content || "a beloved pet";
+          input: {
+            image: `data:image/jpeg;base64,${base64Image}`,
+            prompt: visionPrompt,
+            max_tokens: 500,
+          }
+        }
+      );
+      
+      // LLaVA returns a string or array
+      if (Array.isArray(visionOutput)) {
+        petDescription = visionOutput.join("");
+      } else if (typeof visionOutput === "string") {
+        petDescription = visionOutput;
+      } else {
+        petDescription = "a beloved pet";
+      }
+    } catch (visionError) {
+      console.error("Vision analysis error:", visionError);
+      petDescription = "a beloved pet";
+    }
 
     // Log for debugging
     console.log("Pet description from vision:", petDescription);
@@ -474,33 +427,15 @@ Style: Classical Dutch Golden Age painting, Rembrandt lighting, dark moody backg
 
     // Get detailed error message
     let errorMessage = "Failed to generate portrait. Please try again.";
-    let statusCode = 500;
-
-    if (error instanceof OpenAI.APIError) {
-      console.error("OpenAI API Error:", error.message, error.status, error.code);
-      
-      if (error.status === 401) {
-        errorMessage = "Invalid API key. Please check your configuration.";
-      } else if (error.status === 429) {
-        errorMessage = "Too many requests. Please try again in a moment.";
-        statusCode = 429;
-      } else if (error.status === 400) {
-        errorMessage = `Invalid request: ${error.message}`;
-        statusCode = 400;
-      } else if (error.message.includes("content_policy")) {
-        errorMessage = "Image couldn't be generated due to content policy. Please try a different photo.";
-        statusCode = 400;
-      } else {
-        errorMessage = `OpenAI Error: ${error.message}`;
-      }
-    } else if (error instanceof Error) {
-      errorMessage = `Error: ${error.message}`;
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
       console.error("Error details:", error.stack);
     }
 
     return NextResponse.json(
       { error: errorMessage },
-      { status: statusCode }
+      { status: 500 }
     );
   }
 }
