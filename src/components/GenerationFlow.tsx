@@ -218,7 +218,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     });
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (isRetry: boolean = false) => {
     if (!file) return;
     
     // Check limits before generating
@@ -226,6 +226,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     const check = canGenerate(limits);
     if (!check.allowed) {
       setError(check.reason || "Generation limit reached. Please purchase an image to unlock more generations.");
+      setStage("preview");
       return;
     }
     
@@ -274,8 +275,8 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
 
       setResult(data);
       
-      // Increment generation count (not a retry)
-      const updatedLimits = incrementGeneration(false);
+      // Increment generation count (mark as retry if applicable)
+      const updatedLimits = incrementGeneration(isRetry);
       setGenerationLimits(updatedLimits);
       const newCheck = canGenerate(updatedLimits);
       setLimitCheck(newCheck);
@@ -292,7 +293,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     }
   };
 
-  const handleRetry = useCallback(() => {
+  const handleRetry = () => {
     const limits = getLimits();
     
     // Check if retry is allowed
@@ -308,16 +309,15 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       return;
     }
     
+    // Mark retry as used BEFORE generating
     setRetryUsed(true);
     setResult(null);
     setExpirationTime(null);
+    setError(null);
     
-    // Increment as retry
-    const updatedLimits = incrementGeneration(true);
-    setGenerationLimits(updatedLimits);
-    
-    handleGenerate();
-  }, [retryUsed, file]);
+    // Call handleGenerate with isRetry flag
+    handleGenerate(true);
+  };
 
   const handlePurchaseClick = () => {
     setStage("email");
