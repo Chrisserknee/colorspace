@@ -365,13 +365,14 @@ AESTHETIC DETAILS:
 - The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
 !!!!!`;
 
-    // Generate image with OpenAI
+    // Generate image with DALL-E 3
     const imageResponse = await openai.images.generate({
-      model: "gpt-image-1",
+      model: "dall-e-3",
       prompt: generationPrompt,
       n: 1,
       size: "1024x1024",
-      quality: "high",
+      quality: "hd",
+      style: "vivid",
     });
 
     const imageData = imageResponse.data?.[0];
