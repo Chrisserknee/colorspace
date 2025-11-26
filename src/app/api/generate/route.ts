@@ -46,10 +46,12 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check for API key
-    if (!process.env.OPENAI_API_KEY) {
+    // Check for API keys - need either OpenAI or xAI
+    const useGrok = !!process.env.XAI_API_KEY;
+    
+    if (!process.env.OPENAI_API_KEY && !process.env.XAI_API_KEY) {
       return NextResponse.json(
-        { error: "OpenAI API key not configured" },
+        { error: "No API key configured (need OPENAI_API_KEY or XAI_API_KEY)" },
         { status: 500 }
       );
     }
@@ -62,10 +64,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize OpenAI client
-    const openai = new OpenAI({
+    // Initialize API clients
+    // Use Grok (xAI) if available, otherwise fall back to OpenAI
+    const grok = useGrok ? new OpenAI({
+      apiKey: process.env.XAI_API_KEY,
+      baseURL: "https://api.x.ai/v1",
+    }) : null;
+    
+    const openai = process.env.OPENAI_API_KEY ? new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-    });
+    }) : null;
+    
+    // Choose which client to use for each task
+    const visionClient = grok || openai!;
+    const imageClient = openai || grok!; // OpenAI for image gen if available, else Grok
+    
+    console.log(`Using ${grok ? 'Grok' : 'OpenAI'} for vision analysis`);
+    console.log(`Using ${openai ? 'OpenAI' : 'Grok'} for image generation`);
 
     // Parse form data
     const formData = await request.formData();
@@ -109,9 +124,11 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Use GPT-4o Vision to analyze the pet with extreme detail for accuracy
-    const visionResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
+    // Step 1: Use vision model to analyze the pet with extreme detail for accuracy
+    // Grok uses grok-2-vision, OpenAI uses gpt-4o
+    const visionModel = grok ? "grok-2-vision-1212" : "gpt-4o";
+    const visionResponse = await visionClient.chat.completions.create({
+      model: visionModel,
       messages: [
         {
           role: "user",
@@ -365,12 +382,16 @@ AESTHETIC DETAILS:
 - The owner must be able to recognize THIS IS THEIR PET, not just a generic ${species}
 !!!!!`;
 
-    const imageResponse = await openai.images.generate({
-      model: "gpt-image-1",
+    // Use appropriate image generation model
+    // If we have OpenAI, use gpt-image-1; if only Grok, use grok-2-image
+    const imageModel = openai ? "gpt-image-1" : "grok-2-image";
+    
+    const imageResponse = await imageClient.images.generate({
+      model: imageModel,
       prompt: generationPrompt,
       n: 1,
       size: "1024x1024",
-      quality: "high",
+      ...(openai ? { quality: "high" } : {}), // quality param only for OpenAI
     });
 
     const imageData = imageResponse.data?.[0];
@@ -383,10 +404,10 @@ AESTHETIC DETAILS:
 
     // Handle both base64 and URL responses
     if (imageData.b64_json) {
-      // gpt-image-1 returns base64
+      // gpt-image-1 and grok return base64
       generatedBuffer = Buffer.from(imageData.b64_json, "base64");
     } else if (imageData.url) {
-      // DALL-E 3 returns URL
+      // Some models return URL
       const downloadResponse = await fetch(imageData.url);
       const arrayBuffer = await downloadResponse.arrayBuffer();
       generatedBuffer = Buffer.from(arrayBuffer);
