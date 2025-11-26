@@ -89,6 +89,24 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
         href="data:${logoMimeType};base64,${logoBase64}"
         opacity="0.35"
       />
+      <!-- Top-right corner (smaller, 35% opacity) -->
+      <image 
+        x="${Math.round(width * 0.92 - watermarkWidth * 0.5)}" 
+        y="${Math.round(height * 0.08)}" 
+        width="${Math.round(watermarkWidth * 0.5)}" 
+        height="${Math.round(watermarkHeight * 0.5)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.35"
+      />
+      <!-- Bottom-left corner (smaller, 35% opacity) -->
+      <image 
+        x="${Math.round(width * 0.08)}" 
+        y="${Math.round(height * 0.92 - watermarkHeight * 0.5)}" 
+        width="${Math.round(watermarkWidth * 0.5)}" 
+        height="${Math.round(watermarkHeight * 0.5)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.35"
+      />
       <!-- Bottom-right corner (smaller, 35% opacity) -->
       <image 
         x="${Math.round(width * 0.92 - watermarkWidth * 0.5)}" 
@@ -97,6 +115,42 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
         height="${Math.round(watermarkHeight * 0.5)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
         opacity="0.35"
+      />
+      <!-- Top center (medium, 30% opacity) -->
+      <image 
+        x="${Math.round((width - watermarkWidth * 0.6) / 2)}" 
+        y="${Math.round(height * 0.05)}" 
+        width="${Math.round(watermarkWidth * 0.6)}" 
+        height="${Math.round(watermarkHeight * 0.6)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.3"
+      />
+      <!-- Bottom center (medium, 30% opacity) -->
+      <image 
+        x="${Math.round((width - watermarkWidth * 0.6) / 2)}" 
+        y="${Math.round(height * 0.95 - watermarkHeight * 0.6)}" 
+        width="${Math.round(watermarkWidth * 0.6)}" 
+        height="${Math.round(watermarkHeight * 0.6)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.3"
+      />
+      <!-- Left side center (medium, 30% opacity) -->
+      <image 
+        x="${Math.round(width * 0.05)}" 
+        y="${Math.round((height - watermarkHeight * 0.6) / 2)}" 
+        width="${Math.round(watermarkWidth * 0.6)}" 
+        height="${Math.round(watermarkHeight * 0.6)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.3"
+      />
+      <!-- Right side center (medium, 30% opacity) -->
+      <image 
+        x="${Math.round(width * 0.95 - watermarkWidth * 0.6)}" 
+        y="${Math.round((height - watermarkHeight * 0.6) / 2)}" 
+        width="${Math.round(watermarkWidth * 0.6)}" 
+        height="${Math.round(watermarkHeight * 0.6)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.3"
       />
     </svg>
   `;
