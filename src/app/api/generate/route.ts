@@ -195,47 +195,47 @@ The description must be accurate enough that the owner instantly recognizes thei
 
     // Randomize elements for unique paintings
     const cushions = [
-      "deep emerald green velvet cushion with gold floral embroidery and silk tassels",
-      "rich burgundy velvet cushion with silver damask pattern and braided trim",
-      "royal blue satin cushion with gold leaf scrollwork and pearl beading",
-      "deep purple velvet cushion with gold heraldic embroidery and fringe",
-      "crimson silk cushion with intricate gold brocade and corner rosettes",
-      "forest green velvet ottoman with antique gold filigree trim",
-      "navy blue velvet cushion with silver thread arabesques and tassels",
-      "wine red damask cushion with gold crest embroidery and silk piping"
+      "BRIGHT EMERALD GREEN plush velvet cushion with luxurious deep pile, gold floral embroidery, and silk tassels",
+      "VIVID RUBY RED thick velvet cushion with sumptuous velvety texture, silver damask pattern, and braided trim",
+      "BRILLIANT ROYAL BLUE rich velvet cushion with lustrous sheen, gold leaf scrollwork, and pearl beading",
+      "DEEP AMETHYST PURPLE plush velvet cushion with luxurious nap, gold heraldic embroidery, and silk fringe",
+      "BRIGHT SCARLET crushed velvet cushion with rich texture, intricate gold brocade, and corner rosettes",
+      "VIVID TEAL GREEN thick pile velvet ottoman with deep luxurious texture and antique gold filigree trim",
+      "RICH SAPPHIRE BLUE plush velvet cushion with velvety sheen, silver arabesques, and gold tassels",
+      "DEEP MAGENTA velvet cushion with sumptuous pile, gold crest embroidery, and silk piping"
     ];
     
     const robes = [
-      "deep crimson velvet robe with white ermine fur collar and gold clasps",
-      "royal purple velvet cape with ermine trim and pearl buttons",
-      "midnight blue velvet mantle with silver fox fur lining",
-      "burgundy brocade coat with gold embroidery and ermine cuffs",
-      "emerald green velvet cloak with sable fur trim and jeweled brooch",
-      "rich maroon satin robe with gold damask pattern and ermine collar",
-      "deep plum velvet cape with chinchilla fur trim and ruby clasp",
-      "antique gold brocade jacket with ermine lapels and emerald buttons"
+      "magnificent BRIGHT CRIMSON RED thick plush velvet royal robe with deep luxurious pile, white ermine fur collar, and gold clasps",
+      "opulent VIBRANT ROYAL PURPLE rich velvet coronation cape with sumptuous velvety texture, pristine ermine trim, and pearl buttons",
+      "regal VIVID SAPPHIRE BLUE deep-pile velvet emperor's mantle with lustrous sheen, silver fox fur lining, and diamond epaulettes",
+      "sumptuous RICH SCARLET RED crushed velvet king's coat with plush texture, gold thread embroidery, and ermine cuffs",
+      "majestic BRIGHT EMERALD GREEN thick velvet monarch's cloak with luxurious nap, sable fur trim, and jeweled brooch",
+      "lavish DEEP MAGENTA plush velvet ceremonial robe with rich velvety sheen, ermine collar, and trailing cape",
+      "stately VIVID VIOLET thick pile velvet duchess cape with sumptuous texture, chinchilla fur trim, and ruby clasp",
+      "resplendent BRIGHT COBALT BLUE luxurious velvet imperial robe with deep lustrous pile, ermine lapels, and gold insignia"
     ];
     
     const jewelry = [
-      "heavy gold chain with large ruby-studded medallion",
-      "pearl strand necklace with emerald pendant",
-      "ornate gold collar with sapphire centerpiece",
-      "antique silver chain with diamond-encrusted locket",
-      "gold rope necklace with carved jade medallion",
-      "jeweled gold torque with amethyst drops",
-      "pearl and gold choker with cameo pendant",
-      "layered gold chains with family crest medallion"
+      "magnificent heavy gold chain of office with enormous ruby-studded royal medallion and hanging pearls",
+      "stunning triple-strand pearl necklace with large pear-shaped emerald pendant surrounded by diamonds",
+      "ornate gold ceremonial collar with brilliant sapphire centerpiece and cascading diamond drops",
+      "exquisite platinum and diamond crown necklace with teardrop sapphire and filigree detailing",
+      "opulent gold rope chain with carved imperial jade medallion encircled by rubies",
+      "breathtaking jeweled gold torque with amethyst clusters and pearl accents fit for royalty",
+      "elegant multi-strand pearl and gold choker with antique cameo pendant framed in diamonds",
+      "regal layered gold chains bearing the royal family crest medallion with gemstone inlays"
     ];
     
     const backgrounds = [
-      "soft dove gray background with dusty blue velvet drapes and white marble column",
-      "light cream wall with sage green curtains and silver-framed mirror",
-      "pale stone gray interior with ivory silk drapes and classical sculpture",
-      "muted blue-gray backdrop with soft white curtains and porcelain vase",
-      "light taupe wall with cool gray drapery and antique books",
-      "soft silver-gray study with pale blue accents and crystal chandelier",
-      "creamy ivory background with muted teal curtains and gilded frame",
-      "cool neutral gray backdrop with blush pink drapery and marble bust"
+      "grand palace throne room with soft gray marble walls, dusty blue velvet drapes, and towering white Corinthian columns",
+      "elegant royal chamber with cream silk wallcovering, sage damask curtains, ornate gilded mirror, and crystal sconces",
+      "majestic palace gallery with pale stone walls, flowing ivory silk drapes, classical Greek sculpture, and parquet floors",
+      "stately drawing room with soft blue-gray paneled walls, white silk curtains, fine porcelain collection, and gold leaf moldings",
+      "refined aristocratic library with light taupe walls, cool gray velvet drapery, leather-bound books, and brass telescope",
+      "opulent palace salon with silver-gray walls, pale blue silk accents, magnificent crystal chandelier, and French windows",
+      "grand ballroom corner with creamy ivory walls, muted teal velvet curtains, enormous gilded frame, and marble fireplace",
+      "regal portrait gallery with cool neutral walls, blush pink silk drapery, classical marble busts, and heraldic tapestry"
     ];
     
     const lightingDirections = [
@@ -293,11 +293,20 @@ ${petDescription}
 - Cool to neutral color temperature - like a professional photograph
 - AVOID: warm/orange tint, grungy look, muddy colors, aged appearance
 
-===== ARTISTIC STYLE =====
-- Classical oil painting with visible brushstrokes and canvas texture
-- Museum-quality Dutch Golden Age portraiture style
-- Noble, dignified ${species} pose - seated regally on the cushion
-- Unique artistic interpretation - like a one-of-a-kind commissioned painting
+===== ARTISTIC STYLE (MAJESTIC & BEAUTIFUL) =====
+- Breathtaking museum-quality oil painting with masterful brushwork and rich canvas texture
+- Grand royal portraiture style inspired by court painters like Van Dyck and Velázquez
+- The ${species} should look MAJESTIC, REGAL, and NOBLE - like true royalty
+- Proud, dignified posture with head held high, exuding confidence and grace
+
+VELVET & COLOR EMPHASIS:
+- Render velvet fabric with RICH, LUXURIOUS, PLUSH texture - show the deep pile and lustrous sheen
+- Colors should be BRIGHT, VIBRANT, and SATURATED - not muted or dull
+- Reds should be VIVID CRIMSON/SCARLET, blues should be BRILLIANT SAPPHIRE/COBALT, purples should be RICH VIOLET/MAGENTA
+- Show how light plays across the velvet surface - highlighting the nap and creating depth
+- Jewels and gold should SPARKLE and GLEAM with lifelike brilliance
+- Overall feeling: magnificent, stately, elegant, fit for a palace
+- This is a BEAUTIFUL portrait worthy of hanging in a royal gallery
 
 !!!!! FINAL CHECK: This portrait MUST show a ${species}. ${notSpecies} !!!!!`;
 
