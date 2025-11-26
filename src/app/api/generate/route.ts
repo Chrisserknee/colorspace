@@ -320,9 +320,10 @@ ${petDescription}
       preview_url: previewUrl,
     });
 
+    // TODO: Change back to previewUrl for production (watermarked version)
     return NextResponse.json({
       imageId,
-      previewUrl,
+      previewUrl: hdUrl, // Using HD URL for testing - no watermark
     });
   } catch (error) {
     console.error("Generation error:", error);
