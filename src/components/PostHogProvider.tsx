@@ -36,6 +36,14 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
           }
         },
         capture_pageview: false, // We'll capture pageviews manually
+        session_recording: {
+          // Don't mask file inputs so we can see uploaded images in session replay
+          maskAllInputs: false,
+          // Only mask elements with this data attribute (for sensitive text)
+          maskTextSelector: '[data-posthog-mask]',
+          // Capture canvas elements (for any canvas-based image processing)
+          recordCanvas: true,
+        },
       });
     }
   }, []);
