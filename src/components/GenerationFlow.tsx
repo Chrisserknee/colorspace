@@ -149,6 +149,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   const [limitCheck, setLimitCheck] = useState<{ allowed: boolean; reason?: string } | null>(null);
   const [secretClickCount, setSecretClickCount] = useState(0);
   const [secretActivated, setSecretActivated] = useState(false);
+  const [useSecretCredit, setUseSecretCredit] = useState(false);
 
   // Set preview URL when file is provided
   useEffect(() => {
@@ -157,6 +158,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       // Reset secret click counter for new file
       setSecretClickCount(0);
       setSecretActivated(false);
+      setUseSecretCredit(false);
     }
   }, [file, previewUrl]);
 
@@ -303,6 +305,11 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       if (limits.packCredits > 0) {
         formData.append("usePackCredit", "true");
       }
+      
+      // Check if secret credit is activated (un-watermarked generation for testing)
+      if (useSecretCredit) {
+        formData.append("useSecretCredit", "true");
+      }
 
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -332,10 +339,17 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       // Handle pack credit usage or increment generation count
       const currentLimits = getLimits();
       const usedPackCredit = currentLimits.packCredits > 0;
+      const usedSecretCredit = useSecretCredit;
+      
       if (usedPackCredit) {
         // Use pack credit (un-watermarked)
         const updatedLimits = usePackCredit();
         setGenerationLimits(updatedLimits);
+      } else if (usedSecretCredit) {
+        // Secret credit used - increment generation count but don't use pack credit
+        const updatedLimits = incrementGeneration(isRetry);
+        setGenerationLimits(updatedLimits);
+        setUseSecretCredit(false); // Reset secret credit flag after use
       } else {
         // Increment generation count (mark as retry if applicable)
         const updatedLimits = incrementGeneration(isRetry);
@@ -349,6 +363,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
         image_id: data.imageId,
         is_retry: isRetry,
         used_pack_credit: usedPackCredit,
+        used_secret_credit: usedSecretCredit,
         gender: gender || "not_selected",
       });
       
@@ -537,9 +552,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                   const newCheck = canGenerate(limits);
                   setLimitCheck(newCheck);
                   setSecretActivated(true);
+                  setUseSecretCredit(true); // Enable un-watermarked generation for testing
                   
                   // Show subtle feedback
-                  console.log("🎉 Secret activated! Extra free generation granted.");
+                  console.log("🎉 Secret activated! Extra free generation granted (un-watermarked).");
                 }
               }}
             >

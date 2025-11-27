@@ -236,6 +236,7 @@ export async function POST(request: NextRequest) {
     const imageFile = formData.get("image") as File | null;
     const gender = formData.get("gender") as string | null;
     const usePackCredit = formData.get("usePackCredit") === "true";
+    const useSecretCredit = formData.get("useSecretCredit") === "true";
 
     if (!imageFile) {
       return NextResponse.json(
@@ -664,12 +665,16 @@ FULL BODY PORTRAIT: The ${species} is SEATED regally on ${cushion}, wearing ${ro
       throw new Error("No image data in response");
     }
 
-    // Create preview (watermarked if not using pack credit, un-watermarked if using pack credit)
+    // Create preview (watermarked if not using pack credit or secret credit, un-watermarked if using either)
     let previewBuffer: Buffer;
-    if (usePackCredit) {
-      // Un-watermarked preview for pack credits
+    if (usePackCredit || useSecretCredit) {
+      // Un-watermarked preview for pack credits or secret credit (testing)
       previewBuffer = generatedBuffer;
-      console.log("Using pack credit - generating un-watermarked image");
+      if (useSecretCredit) {
+        console.log("Using secret credit - generating un-watermarked image for testing");
+      } else {
+        console.log("Using pack credit - generating un-watermarked image");
+      }
     } else {
       // Watermarked preview for free generations
       previewBuffer = await createWatermarkedImage(generatedBuffer);
@@ -733,11 +738,12 @@ FULL BODY PORTRAIT: The ${species} is SEATED regally on ${cushion}, wearing ${ro
       
       await saveMetadata(imageId, {
         created_at: new Date().toISOString(),
-        paid: usePackCredit, // Mark as paid if using pack credit
+        paid: usePackCredit || useSecretCredit, // Mark as paid if using pack credit or secret credit
         pet_description: finalDescription,
         hd_url: hdUrl,
         preview_url: previewUrl,
         ...(usePackCredit ? { pack_generation: true } : {}),
+        ...(useSecretCredit ? { secret_generation: true } : {}),
       });
       console.log("Metadata saved successfully");
       
