@@ -71,99 +71,123 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoMimeType = logoMetadata.format === "png" ? "image/png" : "image/jpeg";
 
   // Create SVG with logo watermarks around the edges (NOT in center to keep pet face visible)
+  // Watermarks are WHITE and BRIGHT for better visibility
   const watermarkSvg = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- White filter to make logo appear white and bright -->
+        <filter id="whiteBright" x="-50%" y="-50%" width="200%" height="200%">
+          <feColorMatrix type="matrix" values="
+            0 0 0 0 1
+            0 0 0 0 1
+            0 0 0 0 1
+            0 0 0 1 0"/>
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="1.2"/>
+          </feComponentTransfer>
+        </filter>
+      </defs>
       <!-- NO CENTER WATERMARK - keep pet's face clearly visible -->
       
-      <!-- Top-left corner (larger, 45% opacity) -->
+      <!-- Top-left corner (larger, 65% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.05)}" 
         y="${Math.round(height * 0.05)}" 
         width="${Math.round(watermarkWidth * 0.6)}" 
         height="${Math.round(watermarkHeight * 0.6)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.65"
+        filter="url(#whiteBright)"
       />
-      <!-- Top-right corner (larger, 45% opacity) -->
+      <!-- Top-right corner (larger, 65% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.95 - watermarkWidth * 0.6)}" 
         y="${Math.round(height * 0.05)}" 
         width="${Math.round(watermarkWidth * 0.6)}" 
         height="${Math.round(watermarkHeight * 0.6)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.65"
+        filter="url(#whiteBright)"
       />
-      <!-- Bottom-left corner (larger, 45% opacity) -->
+      <!-- Bottom-left corner (larger, 65% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.05)}" 
         y="${Math.round(height * 0.95 - watermarkHeight * 0.6)}" 
         width="${Math.round(watermarkWidth * 0.6)}" 
         height="${Math.round(watermarkHeight * 0.6)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.65"
+        filter="url(#whiteBright)"
       />
-      <!-- Bottom-right corner (larger, 45% opacity) -->
+      <!-- Bottom-right corner (larger, 65% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.95 - watermarkWidth * 0.6)}" 
         y="${Math.round(height * 0.95 - watermarkHeight * 0.6)}" 
         width="${Math.round(watermarkWidth * 0.6)}" 
         height="${Math.round(watermarkHeight * 0.6)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.65"
+        filter="url(#whiteBright)"
       />
-      <!-- Top center (medium, 40% opacity) -->
+      <!-- Top center (medium, 60% opacity - brighter white) -->
       <image 
         x="${Math.round((width - watermarkWidth * 0.5) / 2)}" 
         y="${Math.round(height * 0.02)}" 
         width="${Math.round(watermarkWidth * 0.5)}" 
         height="${Math.round(watermarkHeight * 0.5)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.4"
+        opacity="0.6"
+        filter="url(#whiteBright)"
       />
-      <!-- Bottom center (medium, 40% opacity) -->
+      <!-- Bottom center (medium, 60% opacity - brighter white) -->
       <image 
         x="${Math.round((width - watermarkWidth * 0.5) / 2)}" 
         y="${Math.round(height * 0.98 - watermarkHeight * 0.5)}" 
         width="${Math.round(watermarkWidth * 0.5)}" 
         height="${Math.round(watermarkHeight * 0.5)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.4"
+        opacity="0.6"
+        filter="url(#whiteBright)"
       />
-      <!-- Left edge upper (35% opacity) -->
+      <!-- Left edge upper (55% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.02)}" 
         y="${Math.round(height * 0.30)}" 
         width="${Math.round(watermarkWidth * 0.45)}" 
         height="${Math.round(watermarkHeight * 0.45)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.35"
+        opacity="0.55"
+        filter="url(#whiteBright)"
       />
-      <!-- Left edge lower (35% opacity) -->
+      <!-- Left edge lower (55% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.02)}" 
         y="${Math.round(height * 0.60)}" 
         width="${Math.round(watermarkWidth * 0.45)}" 
         height="${Math.round(watermarkHeight * 0.45)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.35"
+        opacity="0.55"
+        filter="url(#whiteBright)"
       />
-      <!-- Right edge upper (35% opacity) -->
+      <!-- Right edge upper (55% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.98 - watermarkWidth * 0.45)}" 
         y="${Math.round(height * 0.30)}" 
         width="${Math.round(watermarkWidth * 0.45)}" 
         height="${Math.round(watermarkHeight * 0.45)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.35"
+        opacity="0.55"
+        filter="url(#whiteBright)"
       />
-      <!-- Right edge lower (35% opacity) -->
+      <!-- Right edge lower (55% opacity - brighter white) -->
       <image 
         x="${Math.round(width * 0.98 - watermarkWidth * 0.45)}" 
         y="${Math.round(height * 0.60)}" 
         width="${Math.round(watermarkWidth * 0.45)}" 
         height="${Math.round(watermarkHeight * 0.45)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.35"
+        opacity="0.55"
+        filter="url(#whiteBright)"
       />
     </svg>
   `;
@@ -636,14 +660,21 @@ CLASSICAL OIL PAINTING STYLE: This MUST look like a REAL HAND-PAINTED OIL PAINTI
 
     // Generate image with GPT-Image-1 (OpenAI's newest image model)
     console.log("Generating image with gpt-image-1...");
+    console.log("Generation type:", useSecretCredit ? "SECRET CREDIT (un-watermarked)" : usePackCredit ? "PACK CREDIT (un-watermarked)" : "FREE (watermarked)");
+    console.log("Detected species:", species);
+    console.log("Species enforcement:", notSpecies);
     
     // gpt-image-1 supports longer prompts than DALL-E 3
     console.log("Prompt length:", generationPrompt.length);
     console.log("Prompt preview (first 500 chars):", generationPrompt.substring(0, 500));
+    console.log("Prompt includes species enforcement:", generationPrompt.includes(notSpecies));
     
     // Note: gpt-image-1 may not support image-to-image directly
     // The detailed vision analysis description should provide sufficient reference
     // If image-to-image becomes available, we can add it here with lower strength (0.3-0.4)
+    
+    // IMPORTANT: Prompt generation is IDENTICAL for all generation types (free, pack, secret)
+    // The only difference is watermarking, which happens AFTER image generation
     
     const imageResponse = await openai.images.generate({
       model: "gpt-image-1",
