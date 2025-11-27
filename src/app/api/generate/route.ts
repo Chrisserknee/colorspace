@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
-import { uploadImage, saveMetadata } from "@/lib/supabase";
+import { uploadImage, saveMetadata, incrementPortraitCount } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
 
@@ -278,10 +278,11 @@ export async function POST(request: NextRequest) {
     // Generate unique ID for this generation
     const imageId = uuidv4();
 
-    // Process original image for vision API
+    // Process original image for vision API - improved preprocessing for better detail
+    // Use higher resolution and preserve full image without cropping
     const processedImage = await sharp(buffer)
-      .resize(512, 512, { fit: "cover" })
-      .jpeg({ quality: 85 })
+      .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 95 })
       .toBuffer();
 
     const base64Image = processedImage.toString("base64");
@@ -303,36 +304,45 @@ This is CRITICAL - identify the species correctly:
 - If it has whiskers, pointed ears, and a small nose = [CAT]
 - If it has a snout/muzzle and floppy or pointed dog ears = [DOG]
 
+CRITICAL: Identify the specific breed or breed mix if possible. This helps with accurate generation.
+
 Start with [CAT] or [DOG] in brackets, then describe:
 
 SECTION 1 - WHAT MAKES THIS PET UNIQUE (most important):
-List 3-5 distinctive features that set THIS pet apart from others of the same breed. Focus on:
-- Any asymmetrical features or unusual markings
-- Unique color patterns or patches (describe exact location)
+List 5-7 distinctive features that set THIS pet apart from others of the same breed. Focus on:
+- Any asymmetrical features or unusual markings - describe these in DETAIL
+- Unique color patterns or patches - describe EXACT location (e.g., "white patch on left cheek", "brown spot on right shoulder")
 - Distinctive facial expression or "look"
 - Anything that makes this pet special/recognizable
+- If there are ANY asymmetrical features, describe them in detail
 
 SECTION 2 - FACE (critical for recognition):
 - Face shape: Is it round like a circle, long/narrow, wedge-shaped, or square?
-- Eye spacing: Are eyes close together, wide apart, or normal?
-- Eye color: Use comparisons (like amber honey, dark chocolate, bright emerald, sky blue)
-- Nose: Color (pink, black, brown, spotted) and size
-- Muzzle: Short/medium/long, width
+- Face proportions: Describe face width relative to head height (e.g., "face is 60% as wide as head is tall")
+- Eye spacing: Are eyes close together, wide apart, or normal? Describe the exact spacing
+- Eye color: Use specific comparisons (like amber honey, dark chocolate, bright emerald, sky blue)
+- Nose: Color (pink, black, brown, spotted) and size relative to face
+- Muzzle: Short/medium/long, width relative to head
+- Any facial markings, scars, or distinctive features
 
 SECTION 3 - EARS:
 - Shape and size RELATIVE to the head (large ears? small ears?)
 - Position: High on head, low, wide apart?
 - Pointed, rounded, floppy, or folded?
+- Any ear markings or color variations
 
-SECTION 4 - COLORING:
-- Main fur color using comparisons (honey gold, charcoal gray, snow white, midnight black, caramel brown)
-- Any color gradients (darker on back, lighter underneath?)
-- Specific markings and their EXACT locations
+SECTION 4 - COLORING (describe EVERY visible marking, spot, patch, or color variation):
+- Main fur color using specific comparisons (honey gold, charcoal gray, snow white, midnight black, caramel brown)
+- Any color gradients (darker on back, lighter underneath?) - describe EXACTLY where colors transition
+- Specific markings and their EXACT locations - be precise (left side, right side, chest, back, etc.)
+- If there are multiple colors, describe each color and where it appears
+- Any patterns (stripes, spots, patches) and their precise locations
 
 SECTION 5 - FUR TYPE:
 - Length and texture (short sleek, medium fluffy, long silky, wiry)
+- Any variations in fur length in different areas
 
-Format your response as: "[SPECIES] UNIQUE FEATURES: [list the 3-5 most distinctive things]. FACE: [face details]. EARS: [ear details]. COLORING: [color details]. FUR: [texture]."`,
+Format your response as: "[SPECIES] BREED: [breed if identifiable]. UNIQUE FEATURES: [list the 5-7 most distinctive things with exact locations]. FACE: [face details including proportions]. EARS: [ear details]. COLORING: [color details with exact locations of all markings]. FUR: [texture]."`,
             },
             {
               type: "image_url",
@@ -344,10 +354,23 @@ Format your response as: "[SPECIES] UNIQUE FEATURES: [list the 3-5 most distinct
           ],
         },
       ],
-      max_tokens: 600,
+      max_tokens: 1000,
     });
 
     let petDescription = visionResponse.choices[0]?.message?.content || "a beloved pet";
+
+    // Log vision analysis output for debugging
+    console.log("=== VISION ANALYSIS OUTPUT ===");
+    console.log("Raw description length:", petDescription.length);
+    console.log("Raw description preview:", petDescription.substring(0, 200));
+    
+    // Validate description quality
+    if (petDescription.length < 100) {
+      console.warn("⚠️ Vision description is too short - may lack detail");
+    }
+    if (!petDescription.toLowerCase().includes("unique") && !petDescription.toLowerCase().includes("distinctive")) {
+      console.warn("⚠️ Vision description may lack unique features");
+    }
 
     // Sanitize description to remove problematic characters that might fail Supabase pattern validation
     // Keep most characters but remove emojis and problematic unicode
@@ -369,6 +392,12 @@ Format your response as: "[SPECIES] UNIQUE FEATURES: [list the 3-5 most distinct
     // Log for debugging
     console.log("Pet description from vision (sanitized):", petDescription);
     console.log("Description length:", petDescription.length);
+    console.log("Description quality check:", {
+      hasUniqueFeatures: petDescription.toLowerCase().includes("unique") || petDescription.toLowerCase().includes("distinctive"),
+      hasColorDetails: petDescription.toLowerCase().includes("color") || petDescription.toLowerCase().includes("marking"),
+      hasFaceDetails: petDescription.toLowerCase().includes("face") || petDescription.toLowerCase().includes("eye"),
+      length: petDescription.length,
+    });
 
     // Extract species from the description (format: [DOG], [CAT], etc.)
     const speciesMatch = petDescription.match(/\[(DOG|CAT|RABBIT|BIRD|HAMSTER|GUINEA PIG|FERRET|HORSE|PET)\]/i);
@@ -398,6 +427,7 @@ Format your response as: "[SPECIES] UNIQUE FEATURES: [list the 3-5 most distinct
                      : `DO NOT generate any animal other than a ${species}.`;
     
     console.log("Detected species:", species);
+    console.log("Species enforcement:", notSpecies);
 
     // Randomize elements for unique paintings - elegant palette: light blues, blacks, whites
     const cushions = [
@@ -487,6 +517,16 @@ Format your response as: "[SPECIES] UNIQUE FEATURES: [list the 3-5 most distinct
 - Proud, regal posture befitting nobility
 - The pet is centered in the frame with room to breathe around edges
 
+=== CRITICAL: EXACT MATCHING ===
+The generated pet MUST match the description EXACTLY:
+- Same colors - if described as 'midnight black', use midnight black, not charcoal gray
+- Same markings in same locations - if description says 'white patch on left cheek', generate a white patch on the LEFT CHEEK
+- Same face proportions - if described as 'round face', generate a round face, not oval
+- Preserve color gradients exactly - if darker on back, lighter on belly, maintain this gradient
+- Every marking, spot, patch, or stripe described MUST appear in the generated image in the EXACT same location
+- If asymmetrical markings are described, they MUST be asymmetrical in the generated image
+- Eye spacing, nose size, muzzle length must match the description precisely
+
 === THE ${species} - MUST MATCH EXACTLY ===
 ${petDescription}${genderInfo}
 
@@ -511,13 +551,40 @@ KEY QUALITIES:
 - Refined color palette - elegant blues, whites, blacks
 - NATURAL ANIMAL BODY - four legs, normal pet anatomy
 
-FULL BODY PORTRAIT: The ${species} is SEATED regally on ${cushion}, wearing ${robe} draped over its back, with ${jewelryItem} around its neck. ${background}. ${lighting}. Show the ENTIRE pet from ears to paws - wide framing, not a close-up. Museum-quality fine art portrait of a noble pet - fully animal, majestic seated pose, complete body visible.`;
+=== COLOR MATCHING REQUIREMENTS ===
+- Match colors EXACTLY as described - if described as 'midnight black', use midnight black, not charcoal gray
+- If described as 'snow white', use pure white, not off-white
+- If described as 'honey gold', use that exact golden honey color
+- Preserve color gradients exactly - if darker on back, lighter on belly, maintain this gradient
+- Do not change or approximate colors - use the exact colors described
+
+=== MARKINGS AND PATTERNS ===
+- Every marking, spot, patch, or stripe described MUST appear in the generated image in the EXACT same location
+- If description mentions 'left cheek', place marking on LEFT cheek (viewer's perspective)
+- If description mentions 'right shoulder', place marking on RIGHT shoulder
+- If asymmetrical markings are described, they MUST be asymmetrical in the generated image
+- Do not add markings that are not described
+- Do not remove or relocate markings that are described
+
+=== FACE PROPORTIONS ===
+- Match face proportions EXACTLY - if described as 'round face', generate a round face, not oval
+- If described as 'long/narrow face', generate a long narrow face
+- Eye spacing must match the description precisely - if eyes are 'close together', they must be close together
+- Nose size relative to face must match - if described as 'small nose', generate a small nose
+- Muzzle length must match - if described as 'short muzzle', generate a short muzzle
+
+FULL BODY PORTRAIT: The ${species} is SEATED regally on ${cushion}, wearing ${robe} draped over its back, with ${jewelryItem} around its neck. ${background}. ${lighting}. Show the ENTIRE pet from ears to paws - wide framing, not a close-up. Museum-quality fine art portrait of a noble pet - fully animal, majestic seated pose, complete body visible. The pet MUST match the description EXACTLY in every detail.`;
 
     // Generate image with GPT-Image-1 (OpenAI's newest image model)
     console.log("Generating image with gpt-image-1...");
     
     // gpt-image-1 supports longer prompts than DALL-E 3
     console.log("Prompt length:", generationPrompt.length);
+    console.log("Prompt preview (first 500 chars):", generationPrompt.substring(0, 500));
+    
+    // Note: gpt-image-1 may not support image-to-image directly
+    // The detailed vision analysis description should provide sufficient reference
+    // If image-to-image becomes available, we can add it here with lower strength (0.3-0.4)
     
     const imageResponse = await openai.images.generate({
       model: "gpt-image-1",
@@ -627,6 +694,10 @@ FULL BODY PORTRAIT: The ${species} is SEATED regally on ${cushion}, wearing ${ro
         ...(usePackCredit ? { pack_generation: true } : {}),
       });
       console.log("Metadata saved successfully");
+      
+      // Increment global portrait counter
+      const newCount = await incrementPortraitCount();
+      console.log(`Portrait count incremented to: ${newCount}`);
     } catch (metadataError) {
       console.error("Metadata save error:", metadataError);
       const errorMsg = metadataError instanceof Error ? metadataError.message : String(metadataError);

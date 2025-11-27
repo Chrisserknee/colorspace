@@ -180,4 +180,57 @@ export async function hasIPMadePurchase(ipAddress: string): Promise<boolean> {
   }
 }
 
+// Get current portrait count
+export async function getPortraitCount(): Promise<number> {
+  try {
+    const { data, error } = await supabase
+      .from("stats")
+      .select("portraits_created")
+      .eq("id", "global")
+      .single();
+
+    if (error) {
+      console.warn("Failed to get portrait count:", error.message);
+      return 335; // Fallback to starting number
+    }
+
+    return data?.portraits_created || 335;
+  } catch (err) {
+    console.error("Portrait count error:", err);
+    return 335;
+  }
+}
+
+// Increment portrait count and return new value
+export async function incrementPortraitCount(): Promise<number> {
+  try {
+    const { data, error } = await supabase.rpc("increment_portrait_count");
+
+    if (error) {
+      console.warn("Failed to increment portrait count:", error.message);
+      // Fallback: try direct update
+      const { data: updateData, error: updateError } = await supabase
+        .from("stats")
+        .update({ 
+          portraits_created: supabase.rpc("increment_portrait_count"),
+          updated_at: new Date().toISOString() 
+        })
+        .eq("id", "global")
+        .select("portraits_created")
+        .single();
+      
+      if (updateError) {
+        console.error("Fallback increment failed:", updateError.message);
+        return 335;
+      }
+      return updateData?.portraits_created || 335;
+    }
+
+    return data || 335;
+  } catch (err) {
+    console.error("Increment portrait count error:", err);
+    return 335;
+  }
+}
+
 

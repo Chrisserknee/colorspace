@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { captureEvent } from "@/lib/posthog";
 
@@ -8,6 +9,22 @@ interface HeroProps {
 }
 
 export default function Hero({ onUploadClick }: HeroProps) {
+  const [portraitCount, setPortraitCount] = useState<number>(335);
+  
+  useEffect(() => {
+    // Fetch current portrait count
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.portraitsCreated) {
+          setPortraitCount(data.portraitsCreated);
+        }
+      })
+      .catch(() => {
+        // Keep default count on error
+      });
+  }, []);
+
   return (
     <section className="min-h-[85vh] flex flex-col items-center justify-center px-6 py-12 sm:py-16 relative overflow-hidden">
       {/* Decorative elements */}
@@ -142,6 +159,43 @@ export default function Hero({ onUploadClick }: HeroProps) {
           >
             No sign up required
           </p>
+        </div>
+
+        {/* Social Proof Counter */}
+        <div className="mt-6 animate-fade-in-up delay-500">
+          <p className="text-sm" style={{ color: '#7A756D' }}>
+            <span style={{ color: '#C5A572', fontWeight: '500' }}>
+              {portraitCount.toLocaleString()}+
+            </span>
+            {" "}portraits created
+          </p>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6 animate-fade-in-up delay-600">
+          {/* Secure Checkout */}
+          <div className="flex items-center gap-2" style={{ color: '#7A756D' }}>
+            <svg className="w-4 h-4" style={{ color: '#4ADE80' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            <span className="text-xs sm:text-sm">Secure Checkout</span>
+          </div>
+          
+          {/* Instant Delivery */}
+          <div className="flex items-center gap-2" style={{ color: '#7A756D' }}>
+            <svg className="w-4 h-4" style={{ color: '#60A5FA' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+            </svg>
+            <span className="text-xs sm:text-sm">Instant Delivery</span>
+          </div>
+          
+          {/* Satisfaction Guaranteed */}
+          <div className="flex items-center gap-2" style={{ color: '#7A756D' }}>
+            <svg className="w-4 h-4" style={{ color: '#FBBF24' }} fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <span className="text-xs sm:text-sm">Satisfaction Guaranteed</span>
+          </div>
         </div>
       </div>
     </section>
