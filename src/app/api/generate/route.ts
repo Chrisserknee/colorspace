@@ -482,8 +482,22 @@ Format your response as: "[SPECIES] AGE: [PUPPY/KITTEN/ADULT]. BREED: [breed if 
                      : species === "CAT" ? "DO NOT generate a dog or any canine."
                      : `DO NOT generate any animal other than a ${species}.`;
     
+    console.log("=== SPECIES DETECTION ===");
     console.log("Detected species:", species);
     console.log("Species enforcement:", notSpecies);
+    console.log("Pet description contains species:", {
+      containsDog: petDescription.toLowerCase().includes("dog") || petDescription.toLowerCase().includes("puppy"),
+      containsCat: petDescription.toLowerCase().includes("cat") || petDescription.toLowerCase().includes("kitten"),
+      speciesMatch: speciesMatch ? speciesMatch[1] : "none",
+    });
+    
+    // Verify species detection is correct
+    if (species === "DOG" && (petDescription.toLowerCase().includes("cat") || petDescription.toLowerCase().includes("kitten"))) {
+      console.warn("⚠️ WARNING: Species mismatch detected! Description mentions cat but species is DOG");
+    }
+    if (species === "CAT" && (petDescription.toLowerCase().includes("dog") || petDescription.toLowerCase().includes("puppy"))) {
+      console.warn("⚠️ WARNING: Species mismatch detected! Description mentions dog but species is CAT");
+    }
 
     // Randomize elements for unique paintings - elegant palette: light blues, blacks, whites
     const cushions = [
