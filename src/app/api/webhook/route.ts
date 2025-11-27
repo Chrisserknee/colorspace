@@ -41,65 +41,89 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Handle the event
-  switch (event.type) {
-    // ✅ Payment successful
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const imageId = session.metadata?.imageId;
-      
-      if (imageId) {
-        await saveMetadata(imageId, {
-          paid: true,
-          paid_at: new Date().toISOString(),
-          stripe_session_id: session.id,
-          customer_email: session.customer_details?.email || null,
-          status: "completed",
-        });
-        console.log(`✅ Payment confirmed for image: ${imageId}`);
+  // Handle the event with proper error handling
+  // Always return 200 to Stripe to prevent retries, even if processing fails
+  try {
+    switch (event.type) {
+      // ✅ Payment successful
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const imageId = session.metadata?.imageId;
+        
+        if (imageId) {
+          try {
+            await saveMetadata(imageId, {
+              paid: true,
+              paid_at: new Date().toISOString(),
+              stripe_session_id: session.id,
+              customer_email: session.customer_details?.email || null,
+              status: "completed",
+            });
+            console.log(`✅ Payment confirmed for image: ${imageId}`);
+          } catch (error) {
+            console.error(`❌ Failed to save payment metadata for image ${imageId}:`, error);
+            // Log but don't throw - return 200 to prevent Stripe retries
+          }
+        } else {
+          console.log(`⚠️ checkout.session.completed event has no imageId in metadata (session: ${session.id})`);
+        }
+        break;
       }
-      break;
-    }
 
-    // ⏰ Checkout session expired
-    case "checkout.session.expired": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const imageId = session.metadata?.imageId;
-      
-      if (imageId) {
-        await saveMetadata(imageId, {
-          status: "expired",
-          expired_at: new Date().toISOString(),
-        });
-        console.log(`⏰ Checkout expired for image: ${imageId}`);
+      // ⏰ Checkout session expired
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const imageId = session.metadata?.imageId;
+        
+        if (imageId) {
+          try {
+            await saveMetadata(imageId, {
+              status: "expired",
+              expired_at: new Date().toISOString(),
+            });
+            console.log(`⏰ Checkout expired for image: ${imageId}`);
+          } catch (error) {
+            console.error(`❌ Failed to save expired status for image ${imageId}:`, error);
+            // Log but don't throw - return 200 to prevent Stripe retries
+          }
+        } else {
+          // This is normal for pack purchases or sessions without imageId
+          console.log(`ℹ️ checkout.session.expired event has no imageId (session: ${session.id}) - likely a pack purchase`);
+        }
+        break;
       }
-      break;
-    }
 
-    // 💸 Refund issued
-    case "charge.refunded": {
-      const charge = event.data.object as Stripe.Charge;
-      console.log(`💸 Refund processed: ${charge.id}`);
-      break;
-    }
+      // 💸 Refund issued
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        console.log(`💸 Refund processed: ${charge.id}`);
+        break;
+      }
 
-    // ⚠️ Dispute created
-    case "charge.dispute.created": {
-      const dispute = event.data.object as Stripe.Dispute;
-      console.log(`⚠️ Dispute created: ${dispute.id}`);
-      break;
-    }
+      // ⚠️ Dispute created
+      case "charge.dispute.created": {
+        const dispute = event.data.object as Stripe.Dispute;
+        console.log(`⚠️ Dispute created: ${dispute.id}`);
+        break;
+      }
 
-    // ❌ Payment failed
-    case "payment_intent.payment_failed": {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      console.log(`❌ Payment failed: ${paymentIntent.id}`);
-      break;
-    }
+      // ❌ Payment failed
+      case "payment_intent.payment_failed": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        console.log(`❌ Payment failed: ${paymentIntent.id}`);
+        break;
+      }
 
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+  } catch (error) {
+    // Catch any unexpected errors in event handling
+    console.error(`❌ Unexpected error processing webhook event ${event.type}:`, error);
+    // Still return 200 to prevent infinite retries
   }
 
+  // Always return 200 to Stripe to acknowledge receipt
+  // This prevents Stripe from retrying on processing errors
   return NextResponse.json({ received: true });
 }
