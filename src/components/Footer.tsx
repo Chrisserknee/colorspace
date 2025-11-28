@@ -24,8 +24,8 @@ export default function Footer({ onContactClick }: FooterProps) {
               <Image
                 src="/samples/LumePet2.png"
                 alt="LumePet Logo"
-                width={40}
-                height={40}
+                width={56}
+                height={56}
                 className="object-contain"
               />
             </div>
