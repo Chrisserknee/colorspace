@@ -26,7 +26,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
   }, []);
 
   return (
-    <section className="min-h-[85vh] flex flex-col items-center justify-center px-6 py-12 sm:py-16 relative overflow-hidden">
+    <section className="min-h-[85vh] flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 relative overflow-hidden w-full">
       {/* Decorative elements */}
       <div 
         className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl" 
@@ -37,7 +37,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
         style={{ backgroundColor: 'rgba(139, 58, 66, 0.08)' }} 
       />
 
-      <div className="max-w-4xl mx-auto text-center relative z-10">
+      <div className="w-full max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center">
         {/* Subtle vignette behind headline */}
         <div 
           className="absolute inset-0 -z-10 pointer-events-none"
@@ -139,10 +139,10 @@ export default function Hero({ onUploadClick }: HeroProps) {
         </p>
 
         {/* Sample portraits */}
-        <div className="flex justify-center items-center gap-4 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300 w-full">
+        <div className="flex justify-center items-center gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
           {/* First Portrait Frame */}
           <div 
-            className="w-44 h-52 sm:w-52 sm:h-64 md:w-64 md:h-80 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative"
+            className="w-36 h-44 sm:w-52 sm:h-64 md:w-64 md:h-80 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
             style={{ 
               padding: '2px',
             }}
@@ -215,7 +215,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
 
           {/* Second Portrait Frame */}
           <div 
-            className="w-44 h-52 sm:w-52 sm:h-64 md:w-64 md:h-80 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative"
+            className="w-36 h-44 sm:w-52 sm:h-64 md:w-64 md:h-80 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
             style={{ 
               padding: '2px',
             }}
