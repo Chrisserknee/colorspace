@@ -213,7 +213,7 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
         >
           <p className="text-sm" style={{ color: '#B8B2A8' }}>
             <span className="font-medium" style={{ color: '#C5A572' }}>💡 Tip:</span>{" "}
-            Front-facing photos with good lighting produce the most majestic Renaissance portraits!
+            Front-facing photos with good lighting produce the most majestic royal portraits!
           </p>
         </div>
       </div>

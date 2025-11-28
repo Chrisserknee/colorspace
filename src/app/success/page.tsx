@@ -224,7 +224,7 @@ function SuccessContent() {
             className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
-            Your Renaissance Portrait is Ready
+            Your Royal Portrait is Ready
           </h1>
           <p className="text-lg" style={{ color: '#B8B2A8' }}>
             Thank you for your purchase! Your pet has been immortalized.
@@ -238,7 +238,7 @@ function SuccessContent() {
               {imageUrl && (
                 <Image
                   src={imageUrl}
-                  alt="Your Renaissance pet portrait"
+                  alt="Your royal pet portrait"
                   fill
                   className="object-cover"
                   priority

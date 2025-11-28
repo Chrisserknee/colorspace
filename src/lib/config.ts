@@ -11,7 +11,7 @@ export const CONFIG = {
   
   // Product details
   PRODUCT_NAME: "LumePet Royal Portrait",
-  PRODUCT_DESCRIPTION: "Full-resolution, watermark-free royal Renaissance portrait of your beloved pet as nobility",
+  PRODUCT_DESCRIPTION: "Full-resolution, watermark-free royal portrait of your beloved pet as nobility",
   
   PACK_PRODUCT_NAME: "LumePet Generation Pack (2)",
   PACK_PRODUCT_DESCRIPTION: "2 un-watermarked generations - Create beautiful portraits without watermarks",
