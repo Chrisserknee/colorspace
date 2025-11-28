@@ -26,7 +26,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
   }, []);
 
   return (
-    <section className="min-h-[85vh] flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-16 relative overflow-hidden w-full">
+    <section className="min-h-[85vh] flex flex-col items-center justify-center px-4 sm:px-6 py-6 sm:py-10 relative overflow-hidden w-full">
       {/* Decorative elements */}
       <div 
         className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl" 
@@ -49,7 +49,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
         />
 
         {/* LumePet Logo */}
-        <div className="mb-4 sm:mb-5 animate-fade-in-up">
+        <div className="mb-2 sm:mb-3 animate-fade-in-up">
           <div className="flex justify-center">
             <div 
               className="relative logo-sparkle-container"
@@ -60,8 +60,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
               <Image
                 src="/samples/LumePet2.png"
                 alt="LumePet Logo"
-                width={130}
-                height={130}
+                width={90}
+                height={90}
                 className="object-contain animate-float"
                 priority
               />
@@ -80,7 +80,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
 
         {/* Tagline */}
         <p 
-          className="text-base sm:text-lg mb-3 animate-fade-in-up tracking-wide"
+          className="text-base sm:text-lg mb-2 animate-fade-in-up tracking-wide"
           style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
         >
           Your Cherished Pet in a Classic Masterpiece
