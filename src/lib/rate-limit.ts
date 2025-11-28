@@ -88,6 +88,9 @@ export const RATE_LIMITS = {
   
   // Webhook endpoint: 100 requests per minute (from Stripe)
   webhook: { maxRequests: 100, windowMs: 60000 },
+  
+  // Contact endpoint: 5 requests per minute per IP (prevent spam)
+  contact: { maxRequests: 5, windowMs: 60000 },
 };
 
 // Helper to get client IP from request
@@ -111,6 +114,9 @@ export function getClientIP(request: Request): string {
   
   return "unknown";
 }
+
+
+
 
 
 

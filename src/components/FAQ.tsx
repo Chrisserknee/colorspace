@@ -111,20 +111,6 @@ export default function FAQ() {
             </div>
           ))}
         </div>
-
-        {/* Contact note */}
-        <div className="text-center mt-12 reveal" style={{ transitionDelay: '500ms' }}>
-          <p style={{ color: '#7A756D' }}>
-            Still have questions?{" "}
-            <a 
-              href="mailto:hello@lumepet.com" 
-              className="hover:underline"
-              style={{ color: '#C5A572' }}
-            >
-              Contact us
-            </a>
-          </p>
-        </div>
       </div>
     </section>
   );

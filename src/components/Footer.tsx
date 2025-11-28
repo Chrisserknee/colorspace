@@ -1,6 +1,10 @@
 import Image from "next/image";
 
-export default function Footer() {
+interface FooterProps {
+  onContactClick?: () => void;
+}
+
+export default function Footer({ onContactClick }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -44,6 +48,19 @@ export default function Footer() {
             <a href="#faq" className="hover:text-[#C5A572] transition-colors">
               FAQ
             </a>
+            {onContactClick ? (
+              <button
+                onClick={onContactClick}
+                className="hover:text-[#C5A572] transition-colors bg-transparent border-none cursor-pointer"
+                style={{ color: '#7A756D' }}
+              >
+                Contact
+              </button>
+            ) : (
+              <a href="#contact" className="hover:text-[#C5A572] transition-colors">
+                Contact
+              </a>
+            )}
           </nav>
 
           {/* Copyright */}
