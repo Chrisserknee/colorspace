@@ -6,39 +6,27 @@ import Image from "next/image";
 const samples = [
   {
     id: 1,
+    title: "Royal Black Cat",
+    pet: "Black Cat",
+    image: "/samples/blackcat.png",
+  },
+  {
+    id: 2,
     title: "Royal Chihuahua",
     pet: "Chihuahua",
     image: "/samples/chihuahua.png",
   },
   {
-    id: 2,
-    title: "Duke Barkington",
-    pet: "Golden Retriever",
-    image: "/samples/golden.png",
-  },
-  {
     id: 3,
-    title: "Countess Tabby",
-    pet: "Tabby Cat",
-    image: "/samples/tabbycat.png",
+    title: "Noble Companion",
+    pet: "Dog",
+    image: "/samples/dog.png",
   },
   {
     id: 4,
-    title: "Noble Companion",
-    pet: "Mixed Breed Dog",
-    image: "/samples/dog2.png",
-  },
-  {
-    id: 5,
-    title: "Majestic Shadow",
-    pet: "Black Cat",
-    image: "/samples/cat2.png",
-  },
-  {
-    id: 6,
-    title: "Regal Companion",
-    pet: "Chihuahua",
-    image: "/samples/dog3.png",
+    title: "Majestic White Cat",
+    pet: "White Cat",
+    image: "/samples/whitecat.png",
   },
 ];
 
