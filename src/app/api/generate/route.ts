@@ -2,11 +2,181 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import Replicate from "replicate";
 import sharp from "sharp";
+import path from "path";
+import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
 import { uploadImage, saveMetadata, incrementPortraitCount } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
+
+// Rainbow Bridge memorial quotes - randomly selected for each portrait
+const RAINBOW_BRIDGE_QUOTES = [
+  "Where there is love, there is never truly goodbye.",
+  "Your pawprints may fade from the earth, but they shine forever at the Rainbow Bridge.",
+  "Until we meet again at the Bridge, run free, sweet soul.",
+  "The Rainbow Bridge is not the end—just a place where love waits.",
+  "Every pet who crosses the Bridge carries a piece of our heart with them.",
+  "What we shared cannot be lost; it just waits for us in the light.",
+  "They walk beside us for a while, but stay in our hearts forever.",
+  "Some angels have wings. Some have fur and wait for us at the Bridge.",
+  "The hardest part of having a pet is saying goodbye. The most beautiful part is knowing love continues at the Bridge.",
+  "One day, the love you shared will guide you back to each other at the Rainbow Bridge.",
+];
+
+// Add text overlay to rainbow bridge portrait (pet name and quote)
+async function addRainbowBridgeTextOverlay(
+  imageBuffer: Buffer,
+  petName: string
+): Promise<{ buffer: Buffer; quote: string }> {
+  console.log("Adding Rainbow Bridge text overlay for:", petName);
+  
+  // Get random quote
+  const quote = RAINBOW_BRIDGE_QUOTES[Math.floor(Math.random() * RAINBOW_BRIDGE_QUOTES.length)];
+  
+  // Get image dimensions
+  const metadata = await sharp(imageBuffer).metadata();
+  const width = metadata.width || 1024;
+  const height = metadata.height || 1024;
+  
+  // Create text SVG overlay
+  // Pet name at the bottom, quote above it
+  const fontSize = Math.floor(width * 0.06); // 6% of width for name
+  const quoteFontSize = Math.floor(width * 0.028); // 2.8% of width for quote
+  const padding = Math.floor(width * 0.05); // 5% padding
+  
+  // Escape special characters for SVG
+  const escapedName = petName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const escapedQuote = quote.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  
+  // Split quote into multiple lines if too long
+  const maxCharsPerLine = 45;
+  const words = escapedQuote.split(' ');
+  const quoteLines: string[] = [];
+  let currentLine = '';
+  
+  for (const word of words) {
+    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
+      currentLine = (currentLine + ' ' + word).trim();
+    } else {
+      if (currentLine) quoteLines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) quoteLines.push(currentLine);
+  
+  // Build quote tspans
+  const lineHeight = quoteFontSize * 1.4;
+  const quoteStartY = height - padding - fontSize - (quoteLines.length * lineHeight) - 20;
+  const quoteTspans = quoteLines.map((line, i) => 
+    `<tspan x="${width / 2}" dy="${i === 0 ? 0 : lineHeight}">${line}</tspan>`
+  ).join('');
+  
+  const svgOverlay = `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <defs>
+        <!-- Enhanced shadow filter for crisper text -->
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dx="0" dy="2" result="offsetblur"/>
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.7"/>
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#D4AF37;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#F5E6A3;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#D4AF37;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="bottomGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(0,0,0,0);stop-opacity:0" />
+          <stop offset="40%" style="stop-color:rgba(0,0,0,0.3);stop-opacity:0.3" />
+          <stop offset="100%" style="stop-color:rgba(0,0,0,0.5);stop-opacity:0.5" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Semi-transparent gradient at bottom for text readability -->
+      <rect x="0" y="${height - padding * 4 - fontSize - (quoteLines.length * lineHeight)}" width="${width}" height="${padding * 4 + fontSize + (quoteLines.length * lineHeight)}" 
+            fill="url(#bottomGradient)" />
+      
+      <!-- Quote text (italic, smaller) - Enhanced rendering -->
+      <text 
+        x="${width / 2}" 
+        y="${quoteStartY}" 
+        font-family="Georgia, 'Times New Roman', serif" 
+        font-size="${quoteFontSize}" 
+        font-style="italic"
+        fill="rgba(255,255,255,0.95)" 
+        text-anchor="middle"
+        filter="url(#shadow)"
+        text-rendering="geometricPrecision"
+        shape-rendering="geometricPrecision"
+        style="font-smooth: always; -webkit-font-smoothing: antialiased;"
+      >
+        ${quoteTspans}
+      </text>
+      
+      <!-- Pet name (larger, gold) - Enhanced rendering -->
+      <text 
+        x="${width / 2}" 
+        y="${height - padding}" 
+        font-family="Georgia, 'Times New Roman', serif" 
+        font-size="${fontSize}" 
+        font-weight="600"
+        fill="url(#goldGradient)" 
+        text-anchor="middle"
+        filter="url(#shadow)"
+        letter-spacing="0.1em"
+        text-rendering="geometricPrecision"
+        shape-rendering="geometricPrecision"
+        style="font-smooth: always; -webkit-font-smoothing: antialiased;"
+      >
+        ${escapedName}
+      </text>
+    </svg>
+  `;
+  
+  // Composite the text overlay onto the image with high quality settings
+  const overlayBuffer = Buffer.from(svgOverlay);
+  
+  // Render SVG overlay at high DPI for crisp text rendering, then resize to exact dimensions
+  const overlayPng = await sharp(overlayBuffer, {
+    density: 300 // Higher DPI for crisper text rendering
+  })
+    .resize(width, height, {
+      kernel: sharp.kernel.lanczos3, // High-quality resampling
+      fit: 'fill' // Ensure exact dimensions match
+    })
+    .png({ 
+      quality: 100,
+      compressionLevel: 6
+    })
+    .toBuffer();
+  
+  const result = await sharp(imageBuffer)
+    .composite([
+      {
+        input: overlayPng,
+        top: 0,
+        left: 0,
+        blend: 'over'
+      }
+    ])
+    .png({ 
+      quality: 100, 
+      compressionLevel: 6, // Balance between quality and file size
+      adaptiveFiltering: true,
+      palette: false // Use full color palette for better gradients
+    })
+    .toBuffer();
+  
+  console.log("✅ Rainbow Bridge text overlay added successfully");
+  return { buffer: result, quote };
+}
 
 // Generate image using FLUX model via Replicate for better pet identity preservation
 async function generateWithFlux(
@@ -1299,6 +1469,10 @@ export async function POST(request: NextRequest) {
     const gender = formData.get("gender") as string | null;
     const usePackCredit = formData.get("usePackCredit") === "true";
     const useSecretCredit = formData.get("useSecretCredit") === "true";
+    const style = formData.get("style") as string | null; // "rainbow-bridge" for memorial portraits
+    const petName = formData.get("petName") as string | null; // Pet's name for rainbow bridge portraits
+    
+    const isRainbowBridge = style === "rainbow-bridge";
 
     if (!imageFile) {
       return NextResponse.json(
@@ -2100,7 +2274,78 @@ This is a WHITE CAT - apply angelic luminous aesthetic:
 - More luminous than other pets - special angelic treatment
 ` : "";
 
-      const openAIImg2ImgPrompt = `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
+      // RAINBOW BRIDGE MEMORIAL PORTRAIT PROMPT
+      // Used when style === "rainbow-bridge" for memorial portraits of pets who have passed
+      const rainbowBridgePrompt = isRainbowBridge ? `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
+
+RAINBOW BRIDGE MEMORIAL PORTRAIT - Heavenly, angelic tribute to a beloved pet who has crossed the Rainbow Bridge.
+
+=== CRITICAL PET PRESERVATION ===
+- Preserve the face structure, skull shape, snout proportions EXACTLY from the original
+- Keep all markings, colors, fur patterns in their EXACT locations
+- Maintain the exact eye color, shape, spacing, and expression
+- Preserve ear shape, size, and position exactly
+- The pet's unique identifying features must remain unchanged
+- This is a memorial - accuracy is paramount
+
+=== HEAVENLY/ANGELIC AESTHETIC ===
+- ETHEREAL, peaceful, serene atmosphere
+- SOFT GLOWING LIGHT surrounding the pet - gentle radiance
+- ANGELIC appearance - divine, heavenly, peaceful
+- SOFT WHITES and CREAMS dominate the palette
+- Gentle pastel rainbow colors subtly present (soft pink, peach, lavender, mint, sky blue)
+- LUMINOUS quality throughout - pet appears to glow with inner light
+- Peaceful, content expression - at rest in a better place
+- Soft, diffused lighting with no harsh shadows
+- Dream-like, ethereal quality
+
+=== BACKGROUND VARIATIONS ===
+VARY THE COMPOSITION - Use different heavenly settings:
+- OPTION 1: Pet sitting or resting on a SOFT CLOUD PILLOW - fluffy, ethereal clouds that look like a comfortable cushion
+- OPTION 2: Pet surrounded by gentle HEAVENLY MIST with soft clouds drifting
+- OPTION 3: Pet in a field of soft LUMINOUS FLOWERS or petals floating gently
+- OPTION 4: Pet on a SOFT GOLDEN LIGHT PLATFORM with ethereal mist below
+- SOFT, GLOWING background - creamy whites, pale golds, gentle pastels
+- VERY SUBTLE rainbow arc or prismatic light in background (gentle, not overwhelming)
+- Soft light rays filtering through clouds
+- NO dark elements - all light and peaceful
+- Ethereal, heavenly atmosphere
+
+=== COMPOSITION ===
+- CENTERED portrait composition
+- Pet appears peaceful and serene
+- Natural pose - sitting or resting peacefully (sometimes on cloud pillow, sometimes floating)
+- VARY the pose: sitting upright, curled up, lying down peacefully
+- SOFT GLOW around the pet like a halo or aura
+- No royal elements (no thrones, cloaks, jewelry)
+- Simple, elegant, heavenly setting
+- Focus on the pet's face and peaceful expression
+
+=== LIGHTING ===
+- SOFT, DIFFUSED heavenly light
+- Gentle glow emanating from and around the pet
+- NO harsh shadows - soft and peaceful
+- Warm, golden undertones
+- Ethereal rim lighting creating angelic glow
+- Pet appears to be bathed in soft light
+- Light filtering through clouds creates soft dappled effect
+
+=== RENDERING - PAINTERLY STYLE ===
+- VISIBLE BRUSHSTROKES - soft, flowing, painterly brushwork
+- TEXTURED OIL PAINT appearance - like a classical painting
+- CANVAS GRAIN visible - museum-quality fine art
+- LONG FLOWING brush strokes - not digital, not airbrushed
+- Hand-painted charm with visible paint texture
+- Soft, dreamy, ethereal feel with painterly quality
+- NOT hyper-realistic - soft, artistic, painted
+- Museum-quality memorial portrait
+- Warm, comforting atmosphere
+- Paint texture visible on clouds, background, and pet's fur
+- Classical oil painting technique - like Gainsborough or Reynolds but heavenly
+
+CRITICAL: The ${species} must look EXACTLY like the original photo - this is a memorial portrait. Vary the composition (sometimes on cloud pillow, sometimes floating, sometimes in mist). Use visible brushstrokes and painterly technique throughout. The pet should appear peaceful, serene, and surrounded by heavenly light. Create a beautiful, varied, painterly tribute that brings comfort.` : null;
+
+      const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
 
 18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}
 
@@ -2581,8 +2826,18 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     }
     
     // Use the final buffer (refined if available, otherwise first)
-    const generatedBuffer = finalGeneratedBuffer;
+    let generatedBuffer = finalGeneratedBuffer;
     console.log(`Using ${refinementUsed ? "refined" : "first"} generation for final output`);
+
+    // Apply Rainbow Bridge text overlay if this is a memorial portrait
+    let selectedQuote: string | null = null;
+    if (isRainbowBridge && petName) {
+      console.log("🌈 Applying Rainbow Bridge text overlay...");
+      const overlayResult = await addRainbowBridgeTextOverlay(generatedBuffer, petName);
+      generatedBuffer = overlayResult.buffer;
+      selectedQuote = overlayResult.quote;
+      console.log("✅ Rainbow Bridge text overlay complete");
+    }
 
     // Create preview (watermarked if not using pack credit or secret credit, un-watermarked if using either)
     // NOTE: The generation model used above is IDENTICAL for all types (free, pack credit, secret credit).
@@ -2597,24 +2852,28 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
         console.log("Using pack credit - generating un-watermarked image");
       }
     } else {
-      // Watermarked preview for free generations
+      // Watermarked preview for free generations (including Rainbow Bridge)
       previewBuffer = await createWatermarkedImage(generatedBuffer);
       console.log("Free generation - creating watermarked preview");
     }
 
     // Upload HD image to Supabase Storage (always un-watermarked)
+    console.log(`📤 Uploading HD image to pet-portraits bucket: ${imageId}-hd.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
     const hdUrl = await uploadImage(
       generatedBuffer,
       `${imageId}-hd.png`,
       "image/png"
     );
+    console.log(`✅ HD image uploaded successfully: ${hdUrl.substring(0, 80)}...`);
 
     // Upload preview to Supabase Storage
+    console.log(`📤 Uploading preview image to pet-portraits bucket: ${imageId}-preview.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
     const previewUrl = await uploadImage(
       previewBuffer,
       `${imageId}-preview.png`,
       "image/png"
     );
+    console.log(`✅ Preview image uploaded successfully: ${previewUrl.substring(0, 80)}...`);
 
     // Validate URLs before saving
     try {
@@ -2659,14 +2918,25 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       
     await saveMetadata(imageId, {
       created_at: new Date().toISOString(),
-        paid: usePackCredit || useSecretCredit, // Mark as paid if using pack credit or secret credit
+        paid: usePackCredit || useSecretCredit, // Mark as paid only if using pack credit or secret credit
         pet_description: finalDescription,
       hd_url: hdUrl,
       preview_url: previewUrl,
+        // Note: style, pet_name, and quote fields not in portraits table schema yet
+        // Rainbow Bridge metadata: style="rainbow-bridge", pet_name, quote (stored in pet_description for now)
         ...(usePackCredit ? { pack_generation: true } : {}),
         // Note: secret_generation not saved to DB (testing feature only)
         // Note: refinement_used could be added to DB schema if tracking needed
       });
+    
+    // Log Rainbow Bridge metadata (for development/debugging)
+    if (isRainbowBridge) {
+      console.log("🌈 Rainbow Bridge metadata:", {
+        pet_name: petName || "N/A",
+        quote: selectedQuote || "N/A",
+        style: "rainbow-bridge"
+      });
+    }
       
       if (refinementUsed) {
         console.log("✅ Two-stage generation completed successfully - refined portrait used");

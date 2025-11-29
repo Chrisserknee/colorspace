@@ -20,8 +20,10 @@ export async function POST(request: NextRequest) {
   try {
     // Check for Stripe key
     if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("❌ STRIPE_SECRET_KEY environment variable is not set");
+      console.error("Available env vars:", Object.keys(process.env).filter(k => k.includes('STRIPE')));
       return NextResponse.json(
-        { error: "Stripe is not configured" },
+        { error: "Stripe is not configured. Please contact support." },
         { status: 500 }
       );
     }

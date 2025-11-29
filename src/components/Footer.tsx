@@ -48,6 +48,9 @@ export default function Footer({ onContactClick }: FooterProps) {
             <a href="#faq" className="hover:text-[#C5A572] transition-colors">
               FAQ
             </a>
+            <a href="/rainbow-bridge" className="hover:text-[#C5A572] transition-colors">
+              Rainbow Bridge
+            </a>
             {onContactClick ? (
               <button
                 onClick={onContactClick}

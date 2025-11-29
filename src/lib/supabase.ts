@@ -15,6 +15,8 @@ export async function uploadImage(
   fileName: string,
   contentType: string = "image/png"
 ): Promise<string> {
+  console.log(`📦 Uploading to Supabase Storage bucket "${STORAGE_BUCKET}": ${fileName} (${(buffer.length / 1024).toFixed(2)} KB)`);
+  
   const { data, error } = await supabase.storage
     .from(STORAGE_BUCKET)
     .upload(fileName, buffer, {
@@ -23,6 +25,7 @@ export async function uploadImage(
     });
 
   if (error) {
+    console.error(`❌ Upload failed for ${fileName}:`, error);
     throw new Error(`Failed to upload image: ${error.message}`);
   }
 
@@ -31,6 +34,7 @@ export async function uploadImage(
     .from(STORAGE_BUCKET)
     .getPublicUrl(fileName);
 
+  console.log(`✅ Successfully uploaded to ${STORAGE_BUCKET} bucket: ${fileName}`);
   return urlData.publicUrl;
 }
 

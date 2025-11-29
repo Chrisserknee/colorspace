@@ -48,6 +48,30 @@ export default function Hero({ onUploadClick }: HeroProps) {
           }}
         />
 
+        {/* Rainbow Bridge Link Pill */}
+        <div className="mb-4 sm:mb-5 animate-fade-in-up">
+          <a
+            href="/rainbow-bridge"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              color: '#F0EDE8',
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              letterSpacing: '0.05em',
+              textDecoration: 'none'
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span>Rainbow Bridge Portraits</span>
+          </a>
+        </div>
+
         {/* LumePet Logo */}
         <div className="mb-2 sm:mb-3 animate-fade-in-up">
           <div className="flex justify-center">
@@ -202,9 +226,9 @@ export default function Hero({ onUploadClick }: HeroProps) {
                     className="relative w-full h-full rounded-md overflow-hidden"
                     style={{
                       boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(0, 0, 0, 0.2)'
-                    }}
-                  >
-                    <img 
+            }}
+          >
+            <img 
                       src="/samples/whitecat.png" 
                       alt="Majestic White Cat portrait"
                       className="w-full h-full object-cover"
@@ -247,8 +271,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
                   inset 0 -2px 4px rgba(166, 139, 91, 0.4)
                 `.trim().replace(/\s+/g, ' '),
                 zIndex: 1
-              }}
-            >
+            }}
+          >
               {/* Middle frame layer - dimensional molding */}
               <div 
                 className="absolute inset-0.5 rounded-xl"

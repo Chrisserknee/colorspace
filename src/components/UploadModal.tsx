@@ -6,9 +6,11 @@ interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onFileSelected: (file: File) => void;
+  theme?: "default" | "rainbow-bridge";
 }
 
-export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadModalProps) {
+export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "default" }: UploadModalProps) {
+  const isRainbowBridge = theme === "rainbow-bridge";
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,12 +89,57 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
 
   if (!isOpen) return null;
 
+  // Theme colors
+  const colors = isRainbowBridge ? {
+    backdrop: 'rgba(255, 255, 255, 0.95)',
+    modalBg: '#FFFFFF',
+    border: 'rgba(212, 175, 55, 0.2)',
+    shadow: '0 25px 50px rgba(0, 0, 0, 0.1), 0 0 100px rgba(212, 175, 55, 0.1)',
+    closeBg: 'rgba(0, 0, 0, 0.05)',
+    closeColor: '#6B6B6B',
+    iconBg: 'rgba(212, 175, 55, 0.1)',
+    iconBorder: '1px solid rgba(212, 175, 55, 0.2)',
+    iconColor: '#D4AF37',
+    titleColor: '#4A4A4A',
+    subtitleColor: '#6B6B6B',
+    dropzoneActiveBorder: '#D4AF37',
+    dropzoneBorder: 'rgba(212, 175, 55, 0.2)',
+    dropzoneActiveBg: 'rgba(212, 175, 55, 0.05)',
+    dropzoneBg: 'rgba(0, 0, 0, 0.02)',
+    textPrimary: '#4A4A4A',
+    textSecondary: '#9B8AA0',
+    tipBg: 'rgba(212, 175, 55, 0.05)',
+    tipBorder: '1px solid rgba(212, 175, 55, 0.1)',
+    tipAccent: '#D4AF37',
+  } : {
+    backdrop: 'rgba(0, 0, 0, 0.8)',
+    modalBg: '#1A1A1A',
+    border: 'rgba(197, 165, 114, 0.2)',
+    shadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 100px rgba(197, 165, 114, 0.1)',
+    closeBg: 'rgba(255, 255, 255, 0.05)',
+    closeColor: '#B8B2A8',
+    iconBg: 'rgba(197, 165, 114, 0.1)',
+    iconBorder: '1px solid rgba(197, 165, 114, 0.2)',
+    iconColor: '#C5A572',
+    titleColor: '#F0EDE8',
+    subtitleColor: '#B8B2A8',
+    dropzoneActiveBorder: '#C5A572',
+    dropzoneBorder: 'rgba(197, 165, 114, 0.2)',
+    dropzoneActiveBg: 'rgba(197, 165, 114, 0.05)',
+    dropzoneBg: 'rgba(255, 255, 255, 0.02)',
+    textPrimary: '#F0EDE8',
+    textSecondary: '#7A756D',
+    tipBg: 'rgba(197, 165, 114, 0.05)',
+    tipBorder: '1px solid rgba(197, 165, 114, 0.1)',
+    tipAccent: '#C5A572',
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 backdrop-blur-sm animate-fade-in"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
+        style={{ backgroundColor: colors.backdrop }}
         onClick={onClose}
       />
       
@@ -100,16 +147,16 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
       <div 
         className="relative w-full max-w-lg rounded-3xl shadow-2xl animate-fade-in-up p-8"
         style={{ 
-          backgroundColor: '#1A1A1A',
-          border: '1px solid rgba(197, 165, 114, 0.2)',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 100px rgba(197, 165, 114, 0.1)'
+          backgroundColor: colors.modalBg,
+          border: `1px solid ${colors.border}`,
+          boxShadow: colors.shadow
         }}
       >
         {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: '#B8B2A8' }}
+          style={{ backgroundColor: colors.closeBg, color: colors.closeColor }}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -120,20 +167,20 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.2)' }}
+            style={{ backgroundColor: colors.iconBg, border: colors.iconBorder }}
           >
-            <svg className="w-8 h-8" style={{ color: '#C5A572' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-8 h-8" style={{ color: colors.iconColor }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <h3 
             className="text-2xl font-semibold mb-2"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: colors.titleColor }}
           >
-            Choose Your Pet Photo
+            {isRainbowBridge ? "Choose Your Pet's Photo" : "Choose Your Pet Photo"}
           </h3>
-          <p style={{ color: '#B8B2A8' }}>
-            Select a clear, well-lit photo of your pet
+          <p style={{ color: colors.subtitleColor }}>
+            {isRainbowBridge ? "Select a cherished photo of your beloved companion" : "Select a clear, well-lit photo of your pet"}
           </p>
         </div>
 
@@ -144,8 +191,8 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
           onDrop={handleDrop}
           className="relative border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer"
           style={{
-            borderColor: isDragging ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
-            backgroundColor: isDragging ? 'rgba(197, 165, 114, 0.05)' : 'rgba(255, 255, 255, 0.02)'
+            borderColor: isDragging ? colors.dropzoneActiveBorder : colors.dropzoneBorder,
+            backgroundColor: isDragging ? colors.dropzoneActiveBg : colors.dropzoneBg
           }}
           onClick={() => {
             try {
@@ -168,8 +215,8 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
             <div 
               className="w-12 h-12 rounded-full flex items-center justify-center transition-colors"
               style={{ 
-                backgroundColor: isDragging ? 'rgba(197, 165, 114, 0.15)' : 'rgba(197, 165, 114, 0.1)',
-                color: '#C5A572'
+                backgroundColor: isDragging ? colors.dropzoneActiveBg : colors.iconBg,
+                color: colors.iconColor
               }}
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,15 +225,15 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
             </div>
             
             <div>
-              <p className="font-medium" style={{ color: '#F0EDE8' }}>
+              <p className="font-medium" style={{ color: colors.textPrimary }}>
                 {isDragging ? "Drop your photo here" : "Drag & drop your photo here"}
               </p>
-              <p className="text-sm mt-1" style={{ color: '#7A756D' }}>
+              <p className="text-sm mt-1" style={{ color: colors.textSecondary }}>
                 or click to browse
               </p>
             </div>
             
-            <p className="text-xs" style={{ color: '#7A756D' }}>
+            <p className="text-xs" style={{ color: colors.textSecondary }}>
               JPEG, PNG, or WebP • Max 10MB
             </p>
           </div>
@@ -199,7 +246,7 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
             style={{ 
               backgroundColor: 'rgba(239, 68, 68, 0.1)',
               border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#F87171'
+              color: isRainbowBridge ? '#DC2626' : '#F87171'
             }}
           >
             {error}
@@ -209,11 +256,14 @@ export default function UploadModal({ isOpen, onClose, onFileSelected }: UploadM
         {/* Tips */}
         <div 
           className="mt-6 p-4 rounded-xl"
-          style={{ backgroundColor: 'rgba(197, 165, 114, 0.05)', border: '1px solid rgba(197, 165, 114, 0.1)' }}
+          style={{ backgroundColor: colors.tipBg, border: colors.tipBorder }}
         >
-          <p className="text-sm" style={{ color: '#B8B2A8' }}>
-            <span className="font-medium" style={{ color: '#C5A572' }}>💡 Tip:</span>{" "}
-            Front-facing photos with good lighting produce the most majestic royal portraits!
+          <p className="text-sm" style={{ color: colors.subtitleColor }}>
+            <span className="font-medium" style={{ color: colors.tipAccent }}>💡 Tip:</span>{" "}
+            {isRainbowBridge 
+              ? "Photos where you can clearly see their face create the most beautiful memorials."
+              : "Front-facing photos with good lighting produce the most majestic royal portraits!"
+            }
           </p>
         </div>
       </div>
