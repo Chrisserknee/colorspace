@@ -393,7 +393,11 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
       return;
     }
 
-    if (!result) return;
+    if (!result) {
+      console.error("No result found when trying to checkout");
+      setError("Please generate a portrait first.");
+      return;
+    }
     
     // Track email submitted
     const isPackPurchase = result.imageId === "pack";
@@ -404,9 +408,17 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
     });
     
     setStage("checkout");
+    setError(null); // Clear any previous errors
 
     try {
       const isPackPurchase = result.imageId === "pack";
+      
+      console.log("Creating checkout session:", {
+        imageId: isPackPurchase ? null : result.imageId,
+        email,
+        type: isPackPurchase ? "pack" : "image",
+        packType: isPackPurchase ? "2-pack" : undefined,
+      });
       
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -422,6 +434,7 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
       });
 
       const data = await response.json();
+      console.log("Checkout API response:", data);
 
       if (!response.ok) {
         console.error("Checkout API error:", data);
@@ -429,15 +442,17 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
       }
 
       if (!data.checkoutUrl) {
+        console.error("No checkout URL in response:", data);
         throw new Error("No checkout URL received from server");
       }
 
+      console.log("Redirecting to:", data.checkoutUrl);
       window.location.href = data.checkoutUrl;
     } catch (err) {
       console.error("Checkout error:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to redirect to checkout.";
       setError(errorMessage);
-      setStage("result");
+      setStage("email"); // Go back to email stage so user can see the error
     }
   };
 
@@ -930,6 +945,19 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                 <p className="text-center text-sm mb-4" style={{ color: '#DC2626' }}>
                   {emailError}
                 </p>
+              )}
+
+              {error && (
+                <div 
+                  className="mb-4 p-3 rounded-xl text-center text-sm"
+                  style={{ 
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    color: '#DC2626'
+                  }}
+                >
+                  {error}
+                </div>
               )}
 
               <button 
