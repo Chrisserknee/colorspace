@@ -664,7 +664,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           color: '#1A1A1A',
                         }}
                       >
-                        Buy 2-Pack ($15) - Un-watermarked
+                        Buy 2-Pack ($34.99) - Un-watermarked
                       </button>
                     </div>
                   </div>
@@ -827,7 +827,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
 
             {/* Price */}
             <div className="text-center mb-2">
-              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#F0EDE8' }}>$9</span>
+              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#F0EDE8' }}>$19.99</span>
             </div>
 
             {/* Expiration Timer */}
@@ -943,7 +943,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           color: '#1A1A1A',
                         }}
                       >
-                        Buy 2-Pack ($15) - Un-watermarked
+                        Buy 2-Pack ($34.99) - Un-watermarked
                       </button>
                     </div>
                   );
@@ -969,7 +969,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           color: '#1A1A1A',
                         }}
                       >
-                        Buy 2-Pack ($15) - Un-watermarked
+                        Buy 2-Pack ($34.99) - Un-watermarked
                       </button>
                     </div>
                   );

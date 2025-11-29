@@ -819,7 +819,7 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                     color: '#FFFFFF',
                   }}
                 >
-                  Buy 2-Pack ($15)
+                  Buy 2-Pack ($34.99)
                 </button>
               </div>
             )}
@@ -934,7 +934,7 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
             </h3>
 
             <div className="text-center mb-2">
-              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#4A4A4A' }}>$9</span>
+              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#4A4A4A' }}>$19.99</span>
             </div>
 
             <div className="text-center mb-3 sm:mb-4">
@@ -1045,7 +1045,7 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                           color: '#FFFFFF',
                         }}
                       >
-                        Buy 2-Pack ($15)
+                        Buy 2-Pack ($34.99)
                       </button>
                     </div>
                   );

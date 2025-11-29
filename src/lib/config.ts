@@ -1,12 +1,12 @@
 // Configuration constants
 export const CONFIG = {
   // Price for HD portrait in dollars
-  PRICE_DISPLAY: "$9",
-  PRICE_AMOUNT: parseInt(process.env.PRICE_AMOUNT || "900", 10), // in cents ($9)
+  PRICE_DISPLAY: "$19.99",
+  PRICE_AMOUNT: parseInt(process.env.PRICE_AMOUNT || "1999", 10), // in cents ($19.99)
   
   // Pack pricing
-  PACK_2_PRICE_DISPLAY: "$15",
-  PACK_2_PRICE_AMOUNT: 1500, // $15 in cents
+  PACK_2_PRICE_DISPLAY: "$34.99",
+  PACK_2_PRICE_AMOUNT: 3499, // $34.99 in cents (save $5 vs buying 2 singles)
   PACK_2_GENERATIONS: 2, // 2 generations per pack
   
   // Product details
