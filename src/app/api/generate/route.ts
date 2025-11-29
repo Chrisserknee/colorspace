@@ -2843,23 +2843,15 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     let generatedBuffer = finalGeneratedBuffer;
     console.log(`Using ${refinementUsed ? "refined" : "first"} generation for final output`);
 
-    // Apply Rainbow Bridge text overlay if this is a memorial portrait
+    // For Rainbow Bridge, select a quote for client-side rendering
+    // Server-side text overlay disabled - client renders text using Canvas API for 100% reliability
     let selectedQuote: string | null = null;
     console.log(`🌈 Rainbow Bridge check: isRainbowBridge=${isRainbowBridge}, petName="${petName}", style="${style}"`);
-    if (isRainbowBridge && petName) {
-      try {
-        console.log("🌈 Applying Rainbow Bridge text overlay...");
-        console.log(`   Pet name: "${petName}"`);
-        const overlayResult = await addRainbowBridgeTextOverlay(generatedBuffer, petName);
-        generatedBuffer = overlayResult.buffer;
-        selectedQuote = overlayResult.quote;
-        console.log(`✅ Rainbow Bridge text overlay complete. Quote: "${selectedQuote}"`);
-      } catch (overlayError) {
-        console.error("❌ Rainbow Bridge text overlay FAILED:", overlayError);
-        // Continue without overlay rather than failing the entire generation
-      }
-    } else if (isRainbowBridge && !petName) {
-      console.warn("⚠️ Rainbow Bridge style but NO petName provided - skipping text overlay");
+    if (isRainbowBridge) {
+      // Select a random quote to send to client for Canvas rendering
+      selectedQuote = RAINBOW_BRIDGE_QUOTES[Math.floor(Math.random() * RAINBOW_BRIDGE_QUOTES.length)];
+      console.log(`🌈 Rainbow Bridge portrait - quote selected for client-side rendering: "${selectedQuote}"`);
+      console.log(`   Pet name: "${petName}" (text will be rendered by browser Canvas API)`);
     }
 
     // Create preview (watermarked if not using pack credit or secret credit, un-watermarked if using either)
@@ -2987,9 +2979,15 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     }
 
     // Return watermarked preview - HD version only available after purchase
+    // For Rainbow Bridge, also return quote and petName for client-side text rendering
     return NextResponse.json({
       imageId,
       previewUrl: previewUrl, // Watermarked version for preview
+      ...(isRainbowBridge ? { 
+        quote: selectedQuote,
+        petName: petName,
+        isRainbowBridge: true 
+      } : {}),
     });
   } catch (error) {
     console.error("Generation error:", error);

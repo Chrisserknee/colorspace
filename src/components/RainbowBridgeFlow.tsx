@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
@@ -16,6 +16,9 @@ interface RainbowBridgeFlowProps {
 interface GeneratedResult {
   imageId: string;
   previewUrl: string;
+  quote?: string;
+  petName?: string;
+  isRainbowBridge?: boolean;
 }
 
 // Heavenly phrases for generation animation
@@ -131,6 +134,132 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
   const [secretClickCount, setSecretClickCount] = useState(0);
   const [secretActivated, setSecretActivated] = useState(false);
   const [useSecretCredit, setUseSecretCredit] = useState(false);
+  const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Function to render text overlay on canvas and return data URL
+  const renderTextOverlay = useCallback(async (imageUrl: string, name: string, quote: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
+      img.crossOrigin = 'anonymous';
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Could not get canvas context'));
+          return;
+        }
+
+        // Set canvas size to match image
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Draw the original image
+        ctx.drawImage(img, 0, 0);
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const padding = Math.floor(width * 0.04);
+
+        // Calculate text sizes
+        const nameFontSize = Math.floor(width * 0.055);
+        const quoteFontSize = Math.floor(width * 0.024);
+
+        // Draw gradient overlay at bottom for text readability
+        const gradientHeight = Math.floor(height * 0.25);
+        const gradient = ctx.createLinearGradient(0, height - gradientHeight, 0, height);
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(0.4, 'rgba(0, 0, 0, 0.4)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, height - gradientHeight, width, gradientHeight);
+
+        // Draw quote text (white, italic)
+        ctx.font = `italic ${quoteFontSize}px Georgia, "Times New Roman", serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        
+        // Word wrap the quote
+        const maxWidth = width - padding * 4;
+        const words = `"${quote}"`.split(' ');
+        const lines: string[] = [];
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine ? `${currentLine} ${word}` : word;
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine) lines.push(currentLine);
+
+        // Position quote above name
+        const lineHeight = quoteFontSize * 1.4;
+        const nameY = height - padding;
+        const quoteStartY = nameY - nameFontSize - padding - (lines.length - 1) * lineHeight;
+
+        // Draw quote with shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 2;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        
+        lines.forEach((line, i) => {
+          ctx.fillText(line, width / 2, quoteStartY + i * lineHeight);
+        });
+
+        // Draw pet name (gold, bold)
+        ctx.font = `bold ${nameFontSize}px Georgia, "Times New Roman", serif`;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 3;
+        
+        // Create gold gradient for name
+        const goldGradient = ctx.createLinearGradient(width * 0.3, 0, width * 0.7, 0);
+        goldGradient.addColorStop(0, '#D4AF37');
+        goldGradient.addColorStop(0.5, '#F5E6A3');
+        goldGradient.addColorStop(1, '#D4AF37');
+        ctx.fillStyle = goldGradient;
+        
+        ctx.fillText(name.toUpperCase(), width / 2, nameY);
+
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+
+        resolve(canvas.toDataURL('image/png', 1.0));
+      };
+
+      img.onerror = () => {
+        reject(new Error('Failed to load image'));
+      };
+
+      img.src = imageUrl;
+    });
+  }, []);
+
+  // Generate canvas image when result is available
+  useEffect(() => {
+    if (result?.previewUrl && petName) {
+      const quote = result.quote || "Until we meet again at the Bridge, run free, sweet soul.";
+      renderTextOverlay(result.previewUrl, petName, quote)
+        .then(dataUrl => {
+          setCanvasImageUrl(dataUrl);
+          console.log("✅ Canvas text overlay rendered successfully");
+        })
+        .catch(err => {
+          console.error("Failed to render canvas overlay:", err);
+          setCanvasImageUrl(result.previewUrl); // Fallback to original
+        });
+    }
+  }, [result, petName, renderTextOverlay]);
 
   // Set preview URL when file is provided
   useEffect(() => {
@@ -472,6 +601,7 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
     setSecretClickCount(0);
     setSecretActivated(false);
     setUseSecretCredit(false);
+    setCanvasImageUrl(null);
     
     const limits = getLimits();
     setGenerationLimits(limits);
@@ -797,11 +927,11 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
               <span className="font-mono font-bold text-sm sm:text-base" style={{ color: '#4A4A4A' }}>{timeRemaining}</span>
             </div>
 
-            {result.previewUrl && (
+            {(canvasImageUrl || result.previewUrl) && (
               <div className="relative max-w-[200px] sm:max-w-xs mx-auto mb-4 sm:mb-6 rounded-xl overflow-hidden shadow-lg">
                 <div className="relative aspect-square">
                   <Image
-                    src={result.previewUrl}
+                    src={canvasImageUrl || result.previewUrl}
                     alt={`${petName}'s memorial portrait`}
                     fill
                     className="object-cover"
@@ -810,6 +940,9 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                 </div>
               </div>
             )}
+            
+            {/* Hidden canvas for rendering */}
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
 
             <p className="text-center mb-3 sm:mb-4 text-sm sm:text-base" style={{ color: '#6B6B6B' }}>
               A beautiful tribute to {petName} —<br className="hidden sm:block" />
