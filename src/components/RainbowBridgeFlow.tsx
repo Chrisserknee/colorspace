@@ -543,6 +543,18 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
     try {
       const isPackPurchase = result.imageId === "pack";
       
+      // Store Rainbow Bridge data in localStorage for success page
+      if (!isPackPurchase && result.imageId) {
+        const rainbowBridgeData = {
+          imageId: result.imageId,
+          petName: petName,
+          quote: result.quote || "Until we meet again at the Bridge, run free, sweet soul.",
+          timestamp: Date.now()
+        };
+        localStorage.setItem(`rainbow_bridge_${result.imageId}`, JSON.stringify(rainbowBridgeData));
+        console.log("Saved Rainbow Bridge data for success page:", rainbowBridgeData);
+      }
+      
       console.log("Creating checkout session:", {
         imageId: isPackPurchase ? null : result.imageId,
         email,

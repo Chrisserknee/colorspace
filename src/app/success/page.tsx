@@ -1,9 +1,17 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
+// Rainbow Bridge text overlay data from localStorage
+interface RainbowBridgeData {
+  imageId: string;
+  petName: string;
+  quote: string;
+  timestamp: number;
+}
 
 // Grant purchase bonus generations or pack credits
 const grantPurchaseBonus = (type?: string, packType?: string) => {
@@ -60,8 +68,122 @@ function SuccessContent() {
   const packType = searchParams.get("packType");
   
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [displayImageUrl, setDisplayImageUrl] = useState<string | null>(null);
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [rainbowBridgeData, setRainbowBridgeData] = useState<RainbowBridgeData | null>(null);
+
+  // Function to render text overlay on canvas
+  const renderTextOverlay = useCallback(async (imageUrl: string, name: string, quote: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
+      img.crossOrigin = 'anonymous';
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Could not get canvas context'));
+          return;
+        }
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const padding = Math.floor(width * 0.04);
+        const nameFontSize = Math.floor(width * 0.055);
+        const quoteFontSize = Math.floor(width * 0.024);
+
+        // Draw gradient overlay
+        const gradientHeight = Math.floor(height * 0.25);
+        const gradient = ctx.createLinearGradient(0, height - gradientHeight, 0, height);
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(0.4, 'rgba(0, 0, 0, 0.4)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, height - gradientHeight, width, gradientHeight);
+
+        // Draw quote
+        ctx.font = `italic ${quoteFontSize}px Georgia, "Times New Roman", serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        
+        const maxWidth = width - padding * 4;
+        const words = `"${quote}"`.split(' ');
+        const lines: string[] = [];
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine ? `${currentLine} ${word}` : word;
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine) lines.push(currentLine);
+
+        const lineHeight = quoteFontSize * 1.4;
+        const nameY = height - padding;
+        const quoteStartY = nameY - nameFontSize - padding - (lines.length - 1) * lineHeight;
+
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 2;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        
+        lines.forEach((line, i) => {
+          ctx.fillText(line, width / 2, quoteStartY + i * lineHeight);
+        });
+
+        // Draw pet name
+        ctx.font = `bold ${nameFontSize}px Georgia, "Times New Roman", serif`;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 3;
+        
+        const goldGradient = ctx.createLinearGradient(width * 0.3, 0, width * 0.7, 0);
+        goldGradient.addColorStop(0, '#D4AF37');
+        goldGradient.addColorStop(0.5, '#F5E6A3');
+        goldGradient.addColorStop(1, '#D4AF37');
+        ctx.fillStyle = goldGradient;
+        
+        ctx.fillText(name.toUpperCase(), width / 2, nameY);
+        ctx.shadowColor = 'transparent';
+
+        resolve(canvas.toDataURL('image/png', 1.0));
+      };
+
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = imageUrl;
+    });
+  }, []);
+
+  // Check for Rainbow Bridge data
+  useEffect(() => {
+    if (imageId) {
+      const stored = localStorage.getItem(`rainbow_bridge_${imageId}`);
+      if (stored) {
+        try {
+          const data = JSON.parse(stored) as RainbowBridgeData;
+          // Only use if less than 1 hour old
+          if (Date.now() - data.timestamp < 3600000) {
+            setRainbowBridgeData(data);
+            console.log("Found Rainbow Bridge data:", data);
+          }
+        } catch (e) {
+          console.error("Failed to parse Rainbow Bridge data:", e);
+        }
+      }
+    }
+  }, [imageId]);
   
   // Grant purchase bonus when page loads (after successful payment)
   useEffect(() => {
@@ -88,28 +210,67 @@ function SuccessContent() {
     }
   }, [imageId]);
 
+  // Apply Rainbow Bridge text overlay when image and data are ready
+  useEffect(() => {
+    if (imageUrl && rainbowBridgeData) {
+      console.log("Applying Rainbow Bridge text overlay to success page...");
+      renderTextOverlay(imageUrl, rainbowBridgeData.petName, rainbowBridgeData.quote)
+        .then(dataUrl => {
+          setDisplayImageUrl(dataUrl);
+          console.log("✅ Rainbow Bridge text overlay applied to success page");
+        })
+        .catch(err => {
+          console.error("Failed to apply overlay:", err);
+          setDisplayImageUrl(imageUrl);
+        });
+    } else if (imageUrl) {
+      setDisplayImageUrl(imageUrl);
+    }
+  }, [imageUrl, rainbowBridgeData, renderTextOverlay]);
+
   const handleDownload = async () => {
     if (!imageId) return;
     
     setIsDownloading(true);
     
     try {
-      const response = await fetch(`/api/download?imageId=${imageId}`);
-      
-      if (!response.ok) {
-        throw new Error("Download failed");
+      // For Rainbow Bridge portraits, use the canvas-rendered image with text overlay
+      if (rainbowBridgeData && displayImageUrl && displayImageUrl.startsWith('data:')) {
+        console.log("Downloading Rainbow Bridge portrait with text overlay...");
+        
+        // Convert data URL to blob
+        const response = await fetch(displayImageUrl);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `rainbow-bridge-${rainbowBridgeData.petName.replace(/[^a-zA-Z0-9]/g, '-')}-${imageId}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        console.log("✅ Rainbow Bridge download complete with text overlay");
+      } else {
+        // Regular download from server
+        const response = await fetch(`/api/download?imageId=${imageId}`);
+        
+        if (!response.ok) {
+          throw new Error("Download failed");
+        }
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `pet-portrait-${imageId}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
       }
-      
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `pet-renaissance-${imageId}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Download error:", error);
       alert("Failed to download. Please try again.");
@@ -224,10 +385,12 @@ function SuccessContent() {
             className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
-            Your Royal Portrait is Ready
+            {rainbowBridgeData ? `${rainbowBridgeData.petName}'s Memorial Portrait is Ready` : "Your Royal Portrait is Ready"}
           </h1>
           <p className="text-lg" style={{ color: '#B8B2A8' }}>
-            Thank you for your purchase! Your pet has been immortalized.
+            {rainbowBridgeData 
+              ? `Thank you for your purchase. ${rainbowBridgeData.petName} will be remembered forever.`
+              : "Thank you for your purchase! Your pet has been immortalized."}
           </p>
         </div>
 
@@ -235,10 +398,10 @@ function SuccessContent() {
         <div className="animate-fade-in-up delay-200">
           <div className="ornate-frame max-w-lg mx-auto mb-8">
             <div className="relative aspect-square rounded overflow-hidden shadow-2xl">
-              {imageUrl && (
+              {displayImageUrl && (
                 <Image
-                  src={imageUrl}
-                  alt="Your royal pet portrait"
+                  src={displayImageUrl}
+                  alt={rainbowBridgeData ? `${rainbowBridgeData.petName}'s memorial portrait` : "Your royal pet portrait"}
                   fill
                   className="object-cover"
                   priority
