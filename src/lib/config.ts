@@ -2,7 +2,7 @@
 export const CONFIG = {
   // Price for HD portrait in dollars
   PRICE_DISPLAY: "$19.99",
-  PRICE_AMOUNT: parseInt(process.env.PRICE_AMOUNT || "1999", 10), // in cents ($19.99)
+  PRICE_AMOUNT: 1999, // $19.99 in cents - hardcoded to avoid env var issues
   
   // Pack pricing
   PACK_2_PRICE_DISPLAY: "$34.99",

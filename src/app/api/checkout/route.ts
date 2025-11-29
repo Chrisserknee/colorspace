@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     let metadata = null;
-    let priceAmount = CONFIG.PRICE_AMOUNT; // Use config price (default $9)
+    let priceAmount = CONFIG.PRICE_AMOUNT; // Use config price ($19.99)
     let productName = CONFIG.PRODUCT_NAME;
     let productDescription = CONFIG.PRODUCT_DESCRIPTION;
     let productImage: string[] = [];
