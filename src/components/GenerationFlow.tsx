@@ -132,6 +132,26 @@ const usePackCredit = () => {
   return limits;
 };
 
+// Save pet image to localStorage before checkout (so it can be restored after pack purchase)
+const savePendingImage = (imageDataUrl: string) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("lumepet_pending_image", imageDataUrl);
+  }
+};
+
+// Get and clear pending image from localStorage
+const getPendingImage = (): string | null => {
+  if (typeof window === "undefined") return null;
+  const image = localStorage.getItem("lumepet_pending_image");
+  return image;
+};
+
+const clearPendingImage = () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("lumepet_pending_image");
+  }
+};
+
 export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   const [stage, setStage] = useState<Stage>("preview");
   const [result, setResult] = useState<GeneratedResult | null>(null);
@@ -150,6 +170,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   const [secretClickCount, setSecretClickCount] = useState(0);
   const [secretActivated, setSecretActivated] = useState(false);
   const [useSecretCredit, setUseSecretCredit] = useState(false);
+  const [showPackPurchaseSuccess, setShowPackPurchaseSuccess] = useState(false);
 
   // Set preview URL when file is provided - use base64 data URL for PostHog capture
   useEffect(() => {
@@ -201,6 +222,25 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     // Check if user has used their free retry
     setRetryUsed(limits.freeRetriesUsed >= 1);
   }, [file]);
+
+  // Check if returning from pack purchase (restored=true in URL)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("restored") === "true") {
+        // Show success message
+        setShowPackPurchaseSuccess(true);
+        // Clean up URL
+        window.history.replaceState({}, "", window.location.pathname);
+        // Hide success message after 5 seconds
+        setTimeout(() => setShowPackPurchaseSuccess(false), 5000);
+        // Refresh limits to show new credits
+        const limits = getLimits();
+        setGenerationLimits(limits);
+        setLimitCheck(canGenerate(limits));
+      }
+    }
+  }, []);
 
   // Phrase cycling animation during generation - slow and elegant
   useEffect(() => {
@@ -661,6 +701,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                             pack_type: "2-pack",
                             source: "preview_limit_reached",
                           });
+                          // Save the pet image so it can be restored after purchase
+                          if (previewUrl) {
+                            savePendingImage(previewUrl);
+                          }
                           setStage("email");
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
@@ -679,6 +723,24 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Pack purchase success message */}
+            {showPackPurchaseSuccess && (
+              <div 
+                className="mb-6 p-4 rounded-xl text-center animate-fade-in-up"
+                style={{ 
+                  backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+                  border: '1px solid rgba(34, 197, 94, 0.3)' 
+                }}
+              >
+                <p className="font-semibold" style={{ color: '#4ADE80' }}>
+                  🎉 +2 Generations Added!
+                </p>
+                <p className="text-sm mt-1" style={{ color: '#B8B2A8' }}>
+                  Your pack purchase was successful. You can now generate!
+                </p>
               </div>
             )}
 
@@ -955,6 +1017,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                             pack_type: "2-pack",
                             source: "limit_reached",
                           });
+                          // Save the pet image so it can be restored after purchase
+                          if (previewUrl) {
+                            savePendingImage(previewUrl);
+                          }
                           setStage("email");
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
@@ -984,6 +1050,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                             pack_type: "2-pack",
                             source: "retry_used",
                           });
+                          // Save the pet image so it can be restored after purchase
+                          if (previewUrl) {
+                            savePendingImage(previewUrl);
+                          }
                           setStage("email");
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);

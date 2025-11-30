@@ -191,6 +191,12 @@ function SuccessContent() {
   }, [type, packType]);
 
   useEffect(() => {
+    // For pack purchases, we don't need to validate an image
+    if (type === "pack") {
+      setIsValid(true);
+      return;
+    }
+    
     if (imageId) {
       fetch(`/api/image-info?imageId=${imageId}`)
         .then((res) => res.json())
@@ -208,7 +214,7 @@ function SuccessContent() {
     } else {
       setIsValid(false);
     }
-  }, [imageId]);
+  }, [imageId, type]);
 
   // Apply Rainbow Bridge text overlay when image and data are ready
   useEffect(() => {
@@ -301,8 +307,8 @@ function SuccessContent() {
     );
   }
 
-  // Error state
-  if (!isValid || !imageId) {
+  // Error state (skip for pack purchases which don't have an imageId)
+  if (!isValid || (!imageId && type !== "pack")) {
     return (
       <div className="min-h-screen bg-renaissance flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
@@ -336,6 +342,9 @@ function SuccessContent() {
 
   // Pack purchase success (no image to show)
   if (type === "pack") {
+    // Check if there's a saved pet image to restore
+    const savedPetImage = typeof window !== "undefined" ? localStorage.getItem("lumepet_pending_image") : null;
+    
     return (
       <div className="min-h-screen bg-renaissance py-12 px-6">
         <div className="max-w-2xl mx-auto">
@@ -355,12 +364,40 @@ function SuccessContent() {
             >
               Pack Purchased Successfully!
             </h1>
-            <p className="text-lg mb-6" style={{ color: '#B8B2A8' }}>
-              You now have 2 un-watermarked generations available. Start creating your masterpieces!
+            
+            {/* Credits badge */}
+            <div 
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-full mb-6"
+              style={{ 
+                backgroundColor: 'rgba(197, 165, 114, 0.15)', 
+                border: '2px solid rgba(197, 165, 114, 0.4)' 
+              }}
+            >
+              <span className="text-2xl">🎨</span>
+              <span className="text-lg font-semibold" style={{ color: '#C5A572' }}>
+                +2 Generations Added!
+              </span>
+            </div>
+            
+            <p className="text-lg mb-8" style={{ color: '#B8B2A8' }}>
+              {savedPetImage 
+                ? "Your pet image is ready! Click below to continue generating."
+                : "You now have 2 watermarked generations available. Start creating your masterpieces!"}
             </p>
-            <Link href="/" className="btn-primary inline-flex">
-              Start Creating
+            
+            <Link 
+              href="/?restored=true" 
+              className="btn-primary inline-flex text-lg px-8 py-4"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+              </svg>
+              {savedPetImage ? "Continue with Your Pet" : "Start Creating"}
             </Link>
+            
+            <p className="text-sm mt-4" style={{ color: '#7A756D' }}>
+              (does not include the full HD version)
+            </p>
           </div>
         </div>
       </div>
