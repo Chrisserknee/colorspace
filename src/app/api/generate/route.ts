@@ -25,7 +25,7 @@ const RAINBOW_BRIDGE_QUOTES = [
 ];
 
 // Add text overlay to rainbow bridge portrait (pet name and quote)
-// Uses sharp's built-in text rendering for serverless compatibility
+// Uses SVG compositing for serverless compatibility (sharp's text input requires libvips fonts)
 async function addRainbowBridgeTextOverlay(
   imageBuffer: Buffer,
   petName: string
@@ -45,136 +45,104 @@ async function addRainbowBridgeTextOverlay(
   
   try {
     const padding = Math.floor(width * 0.04);
+    const nameFontSize = Math.floor(width * 0.055);
+    const quoteFontSize = Math.floor(width * 0.024);
     
-    // Use sharp's text input with simple options (no Pango markup for better compatibility)
-    // This uses libvips text rendering which should work in serverless
+    // Word wrap the quote
+    const maxQuoteWidth = width - padding * 8;
+    const approxCharsPerLine = Math.floor(maxQuoteWidth / (quoteFontSize * 0.5));
+    const words = quote.split(' ');
+    const quoteLines: string[] = [];
+    let currentLine = '';
     
-    // Render pet name
-    console.log("   Rendering name text...");
-    const nameText = await sharp({
-      text: {
-        text: petName.toUpperCase(),
-        width: width - padding * 2,
-        height: Math.floor(height * 0.08),
-        align: 'center',
-        rgba: true,
-        dpi: 150,
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      if (testLine.length > approxCharsPerLine && currentLine) {
+        quoteLines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
       }
-    })
-    .png()
-    .toBuffer();
-    
-    // Tint the name text to gold color
-    const nameTextGold = await sharp(nameText)
-      .tint({ r: 212, g: 175, b: 55 })
-      .png()
-      .toBuffer();
-    
-    console.log("   Name text rendered, size:", nameTextGold.length, "bytes");
-    
-    // Render quote text
-    console.log("   Rendering quote text...");
-    const quoteText = await sharp({
-      text: {
-        text: `"${quote}"`,
-        width: width - padding * 4,
-        height: Math.floor(height * 0.12),
-        align: 'center',
-        rgba: true,
-        dpi: 120,
-      }
-    })
-    .png()
-    .toBuffer();
-    
-    // Keep quote text white
-    const quoteTextWhite = await sharp(quoteText)
-      .tint({ r: 255, g: 255, b: 255 })
-      .ensureAlpha()
-      .png()
-      .toBuffer();
-    
-    console.log("   Quote text rendered, size:", quoteTextWhite.length, "bytes");
-    
-    // Get dimensions of rendered text
-    const nameMetadata = await sharp(nameTextGold).metadata();
-    const quoteMetadata = await sharp(quoteTextWhite).metadata();
-    
-    const nameHeight = nameMetadata.height || Math.floor(height * 0.06);
-    const nameWidth = nameMetadata.width || width - padding * 2;
-    const quoteHeight = quoteMetadata.height || Math.floor(height * 0.08);
-    const quoteWidth = quoteMetadata.width || width - padding * 4;
-    
-    // Calculate positions from bottom
-    const nameY = height - padding - nameHeight;
-    const quoteY = nameY - quoteHeight - Math.floor(padding / 2);
-    
-    // Create dark gradient overlay for text readability
-    const gradientHeight = nameHeight + quoteHeight + padding * 4;
-    const gradientY = height - gradientHeight;
-    
-    // Simple gradient using sharp create
-    const gradientBuffer = await sharp({
-      create: {
-        width: width,
-        height: gradientHeight,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 0.5 }
-      }
-    })
-    .png()
-    .toBuffer();
-    
-    // Apply vertical gradient by compositing multiple strips
-    const gradientStrips: { input: Buffer; top: number; left: number; blend: sharp.Blend }[] = [];
-    const numStrips = 10;
-    const stripHeight = Math.ceil(gradientHeight / numStrips);
-    
-    for (let i = 0; i < numStrips; i++) {
-      const alpha = (i / numStrips) * 0.6; // 0 to 0.6 opacity
-      const strip = await sharp({
-        create: {
-          width: width,
-          height: stripHeight,
-          channels: 4,
-          background: { r: 0, g: 0, b: 0, alpha: alpha }
-        }
-      }).png().toBuffer();
-      
-      gradientStrips.push({
-        input: strip,
-        top: gradientY + (i * stripHeight),
-        left: 0,
-        blend: 'over' as sharp.Blend
-      });
     }
+    if (currentLine) quoteLines.push(currentLine);
     
-    // Composite everything together
+    // Calculate text positioning
+    const lineHeight = quoteFontSize * 1.4;
+    const totalQuoteHeight = quoteLines.length * lineHeight;
+    const nameY = height - padding - nameFontSize;
+    const quoteStartY = nameY - padding - totalQuoteHeight;
+    
+    // Gradient height to cover text area
+    const gradientHeight = Math.floor(height * 0.28);
+    
+    // Escape special XML characters
+    const escapeXml = (str: string) => str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+    
+    // Create SVG with gradient, quote, and name
+    const quoteLinesXml = quoteLines.map((line, i) => 
+      `<text x="${width / 2}" y="${quoteStartY + i * lineHeight}" 
+        font-family="Georgia, 'Times New Roman', serif" 
+        font-size="${quoteFontSize}" 
+        font-style="italic"
+        fill="rgba(255, 255, 255, 0.95)" 
+        text-anchor="middle"
+        filter="url(#shadow)">"${escapeXml(line)}"</text>`
+    ).join('\n');
+    
+    const svgOverlay = `
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="fadeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:rgb(0,0,0);stop-opacity:0" />
+            <stop offset="40%" style="stop-color:rgb(0,0,0);stop-opacity:0.4" />
+            <stop offset="100%" style="stop-color:rgb(0,0,0);stop-opacity:0.7" />
+          </linearGradient>
+          <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#D4AF37" />
+            <stop offset="50%" style="stop-color:#F5E6A3" />
+            <stop offset="100%" style="stop-color:#D4AF37" />
+          </linearGradient>
+          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.8)"/>
+          </filter>
+        </defs>
+        
+        <!-- Dark gradient at bottom for text readability -->
+        <rect x="0" y="${height - gradientHeight}" width="${width}" height="${gradientHeight}" fill="url(#fadeGradient)"/>
+        
+        <!-- Quote text -->
+        ${quoteLinesXml}
+        
+        <!-- Pet name in gold -->
+        <text x="${width / 2}" y="${nameY}" 
+          font-family="Georgia, 'Times New Roman', serif" 
+          font-size="${nameFontSize}" 
+          font-weight="bold"
+          fill="url(#goldGradient)" 
+          text-anchor="middle"
+          filter="url(#shadow)">${escapeXml(petName.toUpperCase())}</text>
+      </svg>
+    `;
+    
+    console.log("   Created SVG overlay, compositing...");
+    
+    // Composite SVG onto image
     const result = await sharp(imageBuffer)
-      .ensureAlpha()
-      .composite([
-        // Dark gradient strips at bottom
-        ...gradientStrips,
-        // Quote text (centered)
-        { 
-          input: quoteTextWhite, 
-          top: quoteY, 
-          left: Math.floor((width - quoteWidth) / 2), 
-          blend: 'over' 
-        },
-        // Pet name (centered)
-        { 
-          input: nameTextGold, 
-          top: nameY, 
-          left: Math.floor((width - nameWidth) / 2), 
-          blend: 'over' 
-        },
-      ])
+      .composite([{
+        input: Buffer.from(svgOverlay),
+        top: 0,
+        left: 0,
+      }])
       .png({ quality: 100, compressionLevel: 6 })
       .toBuffer();
     
     console.log("   Result buffer size:", result.length, "bytes");
-    console.log("✅ Rainbow Bridge text overlay added successfully");
+    console.log("✅ Rainbow Bridge text overlay added successfully (SVG method)");
     return { buffer: result, quote };
   } catch (textError) {
     console.error("❌ Text rendering failed:", textError);
