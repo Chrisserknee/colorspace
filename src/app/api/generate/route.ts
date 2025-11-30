@@ -2949,9 +2949,8 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       preview_url: previewUrl,
         // Note: style, pet_name, and quote fields not in portraits table schema yet
         // Rainbow Bridge metadata: style="rainbow-bridge", pet_name, quote (stored in pet_description for now)
-        ...(usePackCredit ? { pack_generation: true } : {}),
+        // Note: pack_generation not tracked in DB - pack credits just give watermarked generations
         // Note: secret_generation not saved to DB (testing feature only)
-        // Note: refinement_used could be added to DB schema if tracking needed
       });
     
     // Log Rainbow Bridge metadata (for development/debugging)
