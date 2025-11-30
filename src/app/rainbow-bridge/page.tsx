@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import RainbowBridgeHero from "@/components/RainbowBridgeHero";
+import RainbowBridgeTestimonials from "@/components/RainbowBridgeTestimonials";
 import RainbowBridgeFooter from "@/components/RainbowBridgeFooter";
 import UploadModal from "@/components/UploadModal";
 import RainbowBridgeFlow from "@/components/RainbowBridgeFlow";
@@ -27,6 +28,9 @@ export default function RainbowBridge() {
     <main className="min-h-screen bg-gradient-to-b from-[#FEFEFE] via-[#F8F6F3] to-[#F5F0EB]">
       {/* Hero Section */}
       <RainbowBridgeHero onUploadClick={handleUploadClick} />
+
+      {/* Testimonials Section */}
+      <RainbowBridgeTestimonials />
 
       {/* Footer */}
       <RainbowBridgeFooter />
