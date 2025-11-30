@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { saveMetadata, getMetadata } from "@/lib/supabase";
+import { sendPortraitEmail } from "@/lib/email";
 
 // Initialize Stripe lazily to avoid build-time errors
 function getStripe(): Stripe {
@@ -56,21 +57,57 @@ export async function POST(request: NextRequest) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const imageId = session.metadata?.imageId;
+        const customerEmail = session.customer_details?.email;
+        const isPackPurchase = session.metadata?.type === "pack";
         
-        if (imageId) {
+        if (imageId && !isPackPurchase) {
           try {
+            // Save payment metadata
             await saveMetadata(imageId, {
               paid: true,
               paid_at: new Date().toISOString(),
               stripe_session_id: session.id,
-              customer_email: session.customer_details?.email || null,
+              customer_email: customerEmail || null,
               status: "completed",
             });
             console.log(`✅ Payment confirmed for image: ${imageId}`);
+            
+            // Send confirmation email with download link
+            if (customerEmail) {
+              const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://lumepet.app";
+              const downloadUrl = `${baseUrl}/success?imageId=${imageId}`;
+              
+              // Get metadata to check if it's a Rainbow Bridge portrait
+              const metadata = await getMetadata(imageId);
+              const isRainbowBridge = metadata?.pet_description?.includes("rainbow") || 
+                                       metadata?.pet_description?.includes("heavenly") ||
+                                       metadata?.pet_description?.includes("memorial");
+              
+              // Try to get pet name from localStorage data sent via checkout
+              // For now, we'll use a generic approach
+              const petName = metadata?.pet_name || undefined;
+              
+              const emailResult = await sendPortraitEmail({
+                to: customerEmail,
+                confirmationId: imageId.substring(0, 8).toUpperCase(),
+                downloadUrl,
+                isRainbowBridge,
+                petName,
+              });
+              
+              if (emailResult.success) {
+                console.log(`📧 Confirmation email sent to ${customerEmail}`);
+              } else {
+                console.warn(`⚠️ Failed to send email: ${emailResult.error}`);
+              }
+            }
           } catch (error) {
-            console.error(`❌ Failed to save payment metadata for image ${imageId}:`, error);
+            console.error(`❌ Failed to process payment for image ${imageId}:`, error);
             // Log but don't throw - return 200 to prevent Stripe retries
           }
+        } else if (isPackPurchase) {
+          console.log(`📦 Pack purchase completed (session: ${session.id})`);
+          // Pack purchases don't have a specific image to email about
         } else {
           console.log(`⚠️ checkout.session.completed event has no imageId in metadata (session: ${session.id})`);
         }
