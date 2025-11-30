@@ -656,7 +656,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                     {/* Pack Purchase Option */}
                     <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.3)' }}>
                       <p className="text-sm font-semibold mb-2" style={{ color: '#C5A572' }}>Unlock More Generations</p>
-                      <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Purchase a pack to get un-watermarked generations</p>
+                      <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Purchase a pack to get more watermarked generations</p>
                       <button
                         onClick={() => {
                           captureEvent("pack_purchase_button_clicked", {
@@ -673,8 +673,11 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           color: '#1A1A1A',
                         }}
                       >
-                        Buy 2-Pack ($34.99) - Un-watermarked
+                        Buy 2-Pack of Watermarked Generations for $5
                       </button>
+                      <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
+                        (does not include the full HD version)
+                      </p>
                     </div>
                   </div>
                 )}
@@ -962,8 +965,11 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           color: '#1A1A1A',
                         }}
                       >
-                        Buy 2-Pack ($34.99) - Un-watermarked
+                        Buy 2-Pack of Watermarked Generations for $5
                       </button>
+                      <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
+                        (does not include the full HD version)
+                      </p>
                     </div>
                   );
                 } else {
@@ -988,8 +994,11 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           color: '#1A1A1A',
                         }}
                       >
-                        Buy 2-Pack ($34.99) - Un-watermarked
+                        Buy 2-Pack of Watermarked Generations for $5
                       </button>
+                      <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
+                        (does not include the full HD version)
+                      </p>
                     </div>
                   );
                 }
