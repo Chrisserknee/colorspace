@@ -722,6 +722,16 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               </div>
             </div>
 
+            {/* Pricing Info */}
+            <div className="text-center mb-6 p-4 rounded-xl" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.2)' }}>
+              <p className="text-sm" style={{ color: '#C5A572', fontWeight: '500' }}>
+                Final HD portrait: $19.99
+              </p>
+              <p className="text-xs mt-1" style={{ color: '#7A756D' }}>
+                Watermarked version – free
+              </p>
+            </div>
+
             <div className="text-center">
               <button 
                 onClick={() => handleGenerate(false)} 
