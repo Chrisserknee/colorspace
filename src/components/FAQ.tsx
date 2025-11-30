@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     question: "What do I get after purchase?",
-    answer: "You receive a high-resolution, watermark-free digital image (2048x2048 pixels) perfect for printing. Frame it, share it, or use it as a stunning profile picture!",
+    answer: "You receive a high-resolution, watermark-free digital image perfect for printing. Frame it, share it, or use it as a stunning profile picture!",
   },
   {
     question: "What kind of photos work best?",
