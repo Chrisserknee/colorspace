@@ -19,6 +19,8 @@ interface GeneratedResult {
   quote?: string;
   petName?: string;
   isRainbowBridge?: boolean;
+  previewTextUrl?: string;  // Server-rendered preview with text overlay
+  hdTextUrl?: string;       // Server-rendered HD with text overlay
 }
 
 // Heavenly phrases for generation animation
@@ -247,17 +249,26 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
   }, []);
 
   // Generate canvas image when result is available
+  // Prefer server-rendered text URL if available, fallback to client-side rendering
   useEffect(() => {
     if (result?.previewUrl && petName) {
+      // If server provided a text overlay URL, use it directly
+      if (result.previewTextUrl) {
+        console.log("✅ Using server-rendered text overlay URL");
+        setCanvasImageUrl(result.previewTextUrl);
+        return;
+      }
+      
+      // Fallback to client-side canvas rendering
       const quote = result.quote || "Until we meet again at the Bridge, run free, sweet soul.";
       renderTextOverlay(result.previewUrl, petName, quote)
         .then(dataUrl => {
           setCanvasImageUrl(dataUrl);
-          console.log("✅ Canvas text overlay rendered successfully");
+          console.log("✅ Canvas text overlay rendered successfully (client-side fallback)");
         })
         .catch(err => {
           console.error("Failed to render canvas overlay:", err);
-          setCanvasImageUrl(result.previewUrl); // Fallback to original
+          setCanvasImageUrl(result.previewUrl); // Fallback to original without text
         });
     }
   }, [result, petName, renderTextOverlay]);

@@ -53,8 +53,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check if user wants the text overlay version (for Rainbow Bridge)
+    const withText = searchParams.get("withText") === "true";
+    
+    // Determine which URL to fetch
+    let downloadUrl = metadata.hd_url;
+    let filenamePrefix = "pet-renaissance";
+    
+    if (withText) {
+      // Try to get the HD text version by modifying the URL
+      // The text version is stored as {imageId}-hd-text.png instead of {imageId}-hd.png
+      const textUrl = metadata.hd_url.replace("-hd.png", "-hd-text.png");
+      
+      // Check if the text version exists
+      const textCheckResponse = await fetch(textUrl, { method: 'HEAD' });
+      if (textCheckResponse.ok) {
+        downloadUrl = textUrl;
+        filenamePrefix = "rainbow-bridge-memorial";
+        console.log(`📥 Downloading HD image with text overlay: ${imageId}`);
+      } else {
+        console.log(`📥 Text version not found, falling back to regular HD: ${imageId}`);
+      }
+    }
+
     // Fetch the HD image from Supabase Storage
-    const imageResponse = await fetch(metadata.hd_url);
+    const imageResponse = await fetch(downloadUrl);
     
     if (!imageResponse.ok) {
       return NextResponse.json(
@@ -69,7 +92,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse(imageBuffer, {
       headers: {
         "Content-Type": "image/png",
-        "Content-Disposition": `attachment; filename="pet-renaissance-${imageId}.png"`,
+        "Content-Disposition": `attachment; filename="${filenamePrefix}-${imageId}.png"`,
         "Content-Length": imageBuffer.byteLength.toString(),
       },
     });

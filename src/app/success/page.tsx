@@ -204,6 +204,11 @@ function SuccessContent() {
           if (data.hdUrl) {
             setImageUrl(data.hdUrl);
             setIsValid(true);
+            
+            // If there's a text version URL available, store it for Rainbow Bridge portraits
+            if (data.hdTextUrl) {
+              console.log("Server has HD text version available:", data.hdTextUrl);
+            }
           } else {
             setIsValid(false);
           }
@@ -217,17 +222,34 @@ function SuccessContent() {
   }, [imageId, type]);
 
   // Apply Rainbow Bridge text overlay when image and data are ready
+  // Try server-rendered version first, fall back to client-side rendering
   useEffect(() => {
     if (imageUrl && rainbowBridgeData) {
-      console.log("Applying Rainbow Bridge text overlay to success page...");
-      renderTextOverlay(imageUrl, rainbowBridgeData.petName, rainbowBridgeData.quote)
-        .then(dataUrl => {
-          setDisplayImageUrl(dataUrl);
-          console.log("✅ Rainbow Bridge text overlay applied to success page");
+      // First try to use server-rendered text version
+      const serverTextUrl = imageUrl.replace("-hd.png", "-hd-text.png");
+      
+      // Check if server version exists
+      fetch(serverTextUrl, { method: 'HEAD' })
+        .then(res => {
+          if (res.ok) {
+            console.log("✅ Using server-rendered text overlay for display");
+            setDisplayImageUrl(serverTextUrl);
+          } else {
+            throw new Error("Server text version not found");
+          }
         })
-        .catch(err => {
-          console.error("Failed to apply overlay:", err);
-          setDisplayImageUrl(imageUrl);
+        .catch(() => {
+          // Fall back to client-side canvas rendering
+          console.log("Server text version not available, rendering client-side...");
+          renderTextOverlay(imageUrl, rainbowBridgeData.petName, rainbowBridgeData.quote)
+            .then(dataUrl => {
+              setDisplayImageUrl(dataUrl);
+              console.log("✅ Rainbow Bridge text overlay applied via client-side rendering");
+            })
+            .catch(err => {
+              console.error("Failed to apply overlay:", err);
+              setDisplayImageUrl(imageUrl);
+            });
         });
     } else if (imageUrl) {
       setDisplayImageUrl(imageUrl);
@@ -240,43 +262,66 @@ function SuccessContent() {
     setIsDownloading(true);
     
     try {
-      // For Rainbow Bridge portraits, use the canvas-rendered image with text overlay
-      if (rainbowBridgeData && displayImageUrl && displayImageUrl.startsWith('data:')) {
-        console.log("Downloading Rainbow Bridge portrait with text overlay...");
+      // For Rainbow Bridge portraits, download the server-rendered version with text
+      if (rainbowBridgeData) {
+        console.log("Downloading Rainbow Bridge portrait with text overlay from server...");
         
-        // Convert data URL to blob
-        const response = await fetch(displayImageUrl);
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
+        // Try to download server-rendered HD with text
+        const response = await fetch(`/api/download?imageId=${imageId}&withText=true`);
         
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `rainbow-bridge-${rainbowBridgeData.petName.replace(/[^a-zA-Z0-9]/g, '-')}-${imageId}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        console.log("✅ Rainbow Bridge download complete with text overlay");
-      } else {
-        // Regular download from server
-        const response = await fetch(`/api/download?imageId=${imageId}`);
-        
-        if (!response.ok) {
-          throw new Error("Download failed");
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `rainbow-bridge-${rainbowBridgeData.petName.replace(/[^a-zA-Z0-9]/g, '-')}-${imageId}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          console.log("✅ Rainbow Bridge download complete (server-rendered with text)");
+          return;
         }
         
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `pet-portrait-${imageId}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        // Fallback: if server version not available, use client-rendered canvas image
+        if (displayImageUrl && displayImageUrl.startsWith('data:')) {
+          console.log("Server text version not available, using client-rendered version...");
+          const canvasResponse = await fetch(displayImageUrl);
+          const blob = await canvasResponse.blob();
+          const url = URL.createObjectURL(blob);
+          
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `rainbow-bridge-${rainbowBridgeData.petName.replace(/[^a-zA-Z0-9]/g, '-')}-${imageId}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          console.log("✅ Rainbow Bridge download complete (client-rendered with text)");
+          return;
+        }
       }
+      
+      // Regular download from server (without text)
+      const response = await fetch(`/api/download?imageId=${imageId}`);
+      
+      if (!response.ok) {
+        throw new Error("Download failed");
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `pet-portrait-${imageId}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Download error:", error);
       alert("Failed to download. Please try again.");

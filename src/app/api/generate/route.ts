@@ -2853,15 +2853,27 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     let generatedBuffer = finalGeneratedBuffer;
     console.log(`Using ${refinementUsed ? "refined" : "first"} generation for final output`);
 
-    // For Rainbow Bridge, select a quote for client-side rendering
-    // Server-side text overlay disabled - client renders text using Canvas API for 100% reliability
+    // For Rainbow Bridge, create text overlay versions (with quote and pet name)
     let selectedQuote: string | null = null;
+    let hdTextBuffer: Buffer | null = null;
+    let previewTextBuffer: Buffer | null = null;
+    
     console.log(`🌈 Rainbow Bridge check: isRainbowBridge=${isRainbowBridge}, petName="${petName}", style="${style}"`);
-    if (isRainbowBridge) {
-      // Select a random quote to send to client for Canvas rendering
-      selectedQuote = RAINBOW_BRIDGE_QUOTES[Math.floor(Math.random() * RAINBOW_BRIDGE_QUOTES.length)];
-      console.log(`🌈 Rainbow Bridge portrait - quote selected for client-side rendering: "${selectedQuote}"`);
-      console.log(`   Pet name: "${petName}" (text will be rendered by browser Canvas API)`);
+    if (isRainbowBridge && petName) {
+      // Create text overlay version using server-side rendering
+      console.log(`🌈 Creating Rainbow Bridge text overlay for ${petName}...`);
+      try {
+        const textOverlayResult = await addRainbowBridgeTextOverlay(generatedBuffer, petName);
+        hdTextBuffer = textOverlayResult.buffer;
+        selectedQuote = textOverlayResult.quote;
+        console.log(`🌈 Rainbow Bridge HD text overlay created successfully`);
+        console.log(`   Quote: "${selectedQuote}"`);
+        console.log(`   Pet name: "${petName}"`);
+      } catch (textError) {
+        console.error("🌈 Failed to create text overlay, continuing without it:", textError);
+        // Still select a quote for client-side fallback
+        selectedQuote = RAINBOW_BRIDGE_QUOTES[Math.floor(Math.random() * RAINBOW_BRIDGE_QUOTES.length)];
+      }
     }
 
     // Create preview (watermarked for free and pack credits, un-watermarked only for secret credit testing)
@@ -2881,8 +2893,24 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
         console.log("Free generation - creating watermarked preview");
       }
     }
+    
+    // Create watermarked preview with text overlay for Rainbow Bridge
+    if (isRainbowBridge && hdTextBuffer) {
+      try {
+        if (useSecretCredit) {
+          // Un-watermarked preview with text for secret credit
+          previewTextBuffer = hdTextBuffer;
+        } else {
+          // Watermarked preview with text
+          previewTextBuffer = await createWatermarkedImage(hdTextBuffer);
+        }
+        console.log(`🌈 Rainbow Bridge preview with text created`);
+      } catch (previewTextError) {
+        console.error("🌈 Failed to create preview text version:", previewTextError);
+      }
+    }
 
-    // Upload HD image to Supabase Storage (always un-watermarked)
+    // Upload HD image to Supabase Storage (always un-watermarked, without text)
     console.log(`📤 Uploading HD image to pet-portraits bucket: ${imageId}-hd.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
     const hdUrl = await uploadImage(
       generatedBuffer,
@@ -2890,8 +2918,20 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       "image/png"
     );
     console.log(`✅ HD image uploaded successfully: ${hdUrl.substring(0, 80)}...`);
+    
+    // Upload HD image with text overlay for Rainbow Bridge
+    let hdTextUrl: string | null = null;
+    if (isRainbowBridge && hdTextBuffer) {
+      console.log(`📤 Uploading HD image WITH TEXT to pet-portraits bucket: ${imageId}-hd-text.png`);
+      hdTextUrl = await uploadImage(
+        hdTextBuffer,
+        `${imageId}-hd-text.png`,
+        "image/png"
+      );
+      console.log(`✅ HD image with text uploaded successfully: ${hdTextUrl.substring(0, 80)}...`);
+    }
 
-    // Upload preview to Supabase Storage
+    // Upload preview to Supabase Storage (without text)
     console.log(`📤 Uploading preview image to pet-portraits bucket: ${imageId}-preview.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
     const previewUrl = await uploadImage(
       previewBuffer,
@@ -2899,6 +2939,18 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       "image/png"
     );
     console.log(`✅ Preview image uploaded successfully: ${previewUrl.substring(0, 80)}...`);
+    
+    // Upload preview with text overlay for Rainbow Bridge
+    let previewTextUrl: string | null = null;
+    if (isRainbowBridge && previewTextBuffer) {
+      console.log(`📤 Uploading preview image WITH TEXT to pet-portraits bucket: ${imageId}-preview-text.png`);
+      previewTextUrl = await uploadImage(
+        previewTextBuffer,
+        `${imageId}-preview-text.png`,
+        "image/png"
+      );
+      console.log(`✅ Preview image with text uploaded successfully: ${previewTextUrl.substring(0, 80)}...`);
+    }
 
     // Validate URLs before saving
     try {
@@ -2988,14 +3040,17 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     }
 
     // Return watermarked preview - HD version only available after purchase
-    // For Rainbow Bridge, also return quote and petName for client-side text rendering
+    // For Rainbow Bridge, also return quote, petName, and text overlay URLs
     return NextResponse.json({
       imageId,
-      previewUrl: previewUrl, // Watermarked version for preview
+      previewUrl: previewUrl, // Watermarked version for preview (without text)
       ...(isRainbowBridge ? { 
         quote: selectedQuote,
         petName: petName,
-        isRainbowBridge: true 
+        isRainbowBridge: true,
+        // Include text overlay URLs if available
+        previewTextUrl: previewTextUrl || undefined,
+        hdTextUrl: hdTextUrl || undefined,
       } : {}),
     });
   } catch (error) {
