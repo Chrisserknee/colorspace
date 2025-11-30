@@ -91,6 +91,9 @@ export const RATE_LIMITS = {
   
   // Contact endpoint: 5 requests per minute per IP (prevent spam)
   contact: { maxRequests: 5, windowMs: 60000 },
+  
+  // Upload endpoint: 20 requests per minute per IP (for text overlay uploads)
+  upload: { maxRequests: 20, windowMs: 60000 },
 };
 
 // Helper to get client IP from request
