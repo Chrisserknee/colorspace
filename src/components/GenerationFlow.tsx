@@ -692,32 +692,35 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                   <div>
                     <p className="mb-3">{limitCheck.reason}</p>
                     {/* Pack Purchase Option */}
-                    <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.3)' }}>
+                    <div 
+                      className="mt-4 p-4 rounded-lg cursor-pointer transition-all hover:scale-[1.02]" 
+                      style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.3)' }}
+                      onClick={() => {
+                        captureEvent("pack_purchase_button_clicked", {
+                          pack_type: "2-pack",
+                          source: "preview_limit_reached",
+                        });
+                        // Save the pet image so it can be restored after purchase
+                        if (previewUrl) {
+                          savePendingImage(previewUrl);
+                        }
+                        setStage("email");
+                        setEmailError(null);
+                        setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
+                      }}
+                    >
                       <p className="text-sm font-semibold mb-2" style={{ color: '#C5A572' }}>Unlock More Generations</p>
                       <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Purchase a pack to get more watermarked generations</p>
-                      <button
-                        onClick={() => {
-                          captureEvent("pack_purchase_button_clicked", {
-                            pack_type: "2-pack",
-                            source: "preview_limit_reached",
-                          });
-                          // Save the pet image so it can be restored after purchase
-                          if (previewUrl) {
-                            savePendingImage(previewUrl);
-                          }
-                          setStage("email");
-                          setEmailError(null);
-                          setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
-                        }}
-                        className="w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                      <div
+                        className="w-full py-2 px-4 rounded-lg font-semibold text-sm text-center"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                         }}
                       >
                         Buy 2-Pack of Watermarked Generations for $5
-                      </button>
-                      <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
+                      </div>
+                      <p className="text-xs mt-2 text-center" style={{ color: '#7A756D' }}>
                         (does not include the full HD version)
                       </p>
                     </div>
@@ -1011,7 +1014,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
                         {check.reason || "Generation limit reached. Purchase a pack to unlock more!"}
                       </p>
-                      <button
+                      <div
                         onClick={() => {
                           captureEvent("pack_purchase_button_clicked", {
                             pack_type: "2-pack",
@@ -1025,14 +1028,14 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                         }}
-                        className="w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                        className="w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105 cursor-pointer"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                         }}
                       >
                         Buy 2-Pack of Watermarked Generations for $5
-                      </button>
+                      </div>
                       <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
                         (does not include the full HD version)
                       </p>
@@ -1044,7 +1047,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
                         You&apos;ve used your 2 free generations. Purchase a pack to unlock more!
                       </p>
-                      <button
+                      <div
                         onClick={() => {
                           captureEvent("pack_purchase_button_clicked", {
                             pack_type: "2-pack",
@@ -1058,14 +1061,14 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                         }}
-                        className="w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                        className="w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105 cursor-pointer"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                         }}
                       >
                         Buy 2-Pack of Watermarked Generations for $5
-                      </button>
+                      </div>
                       <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
                         (does not include the full HD version)
                       </p>

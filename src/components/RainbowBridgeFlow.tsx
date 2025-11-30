@@ -817,20 +817,24 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                 color: '#DC2626'
               }}>
                 <p className="mb-3">{limitCheck.reason}</p>
-                <button
+                <div
                   onClick={() => {
+                    // Save the pet image so it can be restored after purchase
+                    if (previewUrl) {
+                      localStorage.setItem("lumepet_pending_image", previewUrl);
+                    }
                     setStage("email");
                     setEmailError(null);
                     setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                   }}
-                  className="py-2 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                  className="py-3 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105 cursor-pointer inline-block"
                   style={{ 
                     backgroundColor: '#D4AF37', 
                     color: '#FFFFFF',
                   }}
                 >
                   Buy 2-Pack of Watermarked Generations for $5
-                </button>
+                </div>
                 <p className="text-xs mt-2" style={{ color: '#8B8B8B' }}>
                   (does not include the full HD version)
                 </p>
@@ -1056,20 +1060,24 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                       <p className="text-sm mb-3" style={{ color: '#9B8AA0' }}>
                         Want to create more memorial portraits?
                       </p>
-                      <button
+                      <div
                         onClick={() => {
+                          // Save the pet image so it can be restored after purchase
+                          if (previewUrl) {
+                            localStorage.setItem("lumepet_pending_image", previewUrl);
+                          }
                           setStage("email");
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                         }}
-                        className="py-2 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                        className="py-3 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105 cursor-pointer inline-block"
                         style={{ 
                           backgroundColor: '#D4AF37', 
                           color: '#FFFFFF',
                         }}
                       >
                         Buy 2-Pack of Watermarked Generations for $5
-                      </button>
+                      </div>
                       <p className="text-xs mt-2" style={{ color: '#8B8B8B' }}>
                         (does not include the full HD version)
                       </p>
