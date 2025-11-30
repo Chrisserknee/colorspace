@@ -6,8 +6,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Storage bucket name
+// Storage bucket names
 export const STORAGE_BUCKET = "pet-portraits";
+export const UPLOADS_BUCKET = "pet-uploads";
 
 // Helper to upload image to Supabase Storage
 export async function uploadImage(
@@ -35,6 +36,36 @@ export async function uploadImage(
     .getPublicUrl(fileName);
 
   console.log(`✅ Successfully uploaded to ${STORAGE_BUCKET} bucket: ${fileName}`);
+  return urlData.publicUrl;
+}
+
+// Helper to upload original pet photo to pet-uploads bucket
+export async function uploadPetPhoto(
+  buffer: Buffer,
+  fileName: string,
+  contentType: string = "image/png"
+): Promise<string> {
+  console.log(`📷 Uploading original pet photo to "${UPLOADS_BUCKET}": ${fileName} (${(buffer.length / 1024).toFixed(2)} KB)`);
+  
+  const { data, error } = await supabase.storage
+    .from(UPLOADS_BUCKET)
+    .upload(fileName, buffer, {
+      contentType,
+      upsert: true,
+    });
+
+  if (error) {
+    console.error(`❌ Pet photo upload failed for ${fileName}:`, error);
+    // Don't throw - this is a non-critical operation
+    return "";
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from(UPLOADS_BUCKET)
+    .getPublicUrl(fileName);
+
+  console.log(`✅ Successfully uploaded pet photo to ${UPLOADS_BUCKET} bucket: ${fileName}`);
   return urlData.publicUrl;
 }
 
