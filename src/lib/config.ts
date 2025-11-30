@@ -5,8 +5,8 @@ export const CONFIG = {
   PRICE_AMOUNT: 1999, // $19.99 in cents
   
   // Pack pricing
-  PACK_2_PRICE_DISPLAY: "$34.99",
-  PACK_2_PRICE_AMOUNT: 3499, // $34.99 in cents (save $5 vs buying 2 singles)
+  PACK_2_PRICE_DISPLAY: "$5",
+  PACK_2_PRICE_AMOUNT: 500, // $5 in cents
   PACK_2_GENERATIONS: 2, // 2 generations per pack
   
   // Product details
@@ -14,7 +14,7 @@ export const CONFIG = {
   PRODUCT_DESCRIPTION: "Full-resolution, watermark-free royal portrait of your beloved pet as nobility",
   
   PACK_PRODUCT_NAME: "LumePet Generation Pack (2)",
-  PACK_PRODUCT_DESCRIPTION: "2 un-watermarked generations - Create beautiful portraits without watermarks",
+  PACK_PRODUCT_DESCRIPTION: "2 watermarked generations (does not include the full HD version)",
   
   // API URLs
   BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",

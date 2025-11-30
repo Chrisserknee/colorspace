@@ -829,8 +829,11 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                     color: '#FFFFFF',
                   }}
                 >
-                  Buy 2-Pack ($34.99)
+                  Buy 2-Pack of Watermarked Generations for $5
                 </button>
+                <p className="text-xs mt-2" style={{ color: '#8B8B8B' }}>
+                  (does not include the full HD version)
+                </p>
               </div>
             )}
 
@@ -1065,8 +1068,11 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                           color: '#FFFFFF',
                         }}
                       >
-                        Buy 2-Pack ($34.99)
+                        Buy 2-Pack of Watermarked Generations for $5
                       </button>
+                      <p className="text-xs mt-2" style={{ color: '#8B8B8B' }}>
+                        (does not include the full HD version)
+                      </p>
                     </div>
                   );
                 }
