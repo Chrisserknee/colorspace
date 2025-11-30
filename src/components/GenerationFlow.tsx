@@ -706,36 +706,54 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                     <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.3)' }}>
                       <p className="text-sm font-semibold mb-2" style={{ color: '#C5A572' }}>Unlock More Generations</p>
                       <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Purchase a pack to get more watermarked generations</p>
-                      <button
-                        type="button"
-                        onPointerDown={(e) => {
-                          e.stopPropagation();
-                          console.log("Pack button pointer down - saving image and changing stage");
-                          // Save the pet image so it can be restored after purchase
+                      <a
+                        href="#buy-pack"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          console.log("Pack link clicked - starting checkout flow");
+                          // Save the pet image
                           if (previewUrl) {
                             savePendingImage(previewUrl);
                           }
-                          // Use setTimeout to ensure state updates happen
-                          setTimeout(() => {
-                            console.log("Setting result and stage...");
-                            setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
-                            setEmailError(null);
-                            setStage("email");
-                            console.log("Stage should now be email");
-                          }, 0);
+                          // Directly start checkout process
+                          const emailInput = prompt("Enter your email to purchase 2-Pack for $5:");
+                          if (emailInput && emailInput.includes("@")) {
+                            // Redirect to checkout
+                            fetch("/api/checkout", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                email: emailInput,
+                                type: "pack",
+                                packType: "2-pack",
+                              }),
+                            })
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data.checkoutUrl) {
+                                  window.location.href = data.checkoutUrl;
+                                } else {
+                                  alert("Error: " + (data.error || "Failed to create checkout"));
+                                }
+                              })
+                              .catch(err => {
+                                alert("Error: " + err.message);
+                              });
+                          } else if (emailInput) {
+                            alert("Please enter a valid email address");
+                          }
                         }}
-                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
+                        className="block w-full py-4 px-4 rounded-lg font-semibold text-base text-center transition-all active:scale-95 hover:brightness-110"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                           touchAction: 'manipulation',
-                          WebkitTapHighlightColor: 'transparent',
                           minHeight: '50px',
-                          userSelect: 'none',
+                          textDecoration: 'none',
                         }}
                       >
                         Buy 2-Pack for $5
-                      </button>
+                      </a>
                       <p className="text-xs mt-2 text-center" style={{ color: '#7A756D' }}>
                         (watermarked, does not include HD)
                       </p>
@@ -1030,33 +1048,40 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
                         {check.reason || "Generation limit reached. Purchase a pack to unlock more!"}
                       </p>
-                      <button
-                        type="button"
-                        onPointerDown={(e) => {
-                          e.stopPropagation();
-                          console.log("Pack button pointer down (limit_reached)");
-                          // Save the pet image so it can be restored after purchase
-                          if (previewUrl) {
-                            savePendingImage(previewUrl);
+                      <a
+                        href="#buy-pack"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          console.log("Pack link clicked (limit_reached)");
+                          if (previewUrl) savePendingImage(previewUrl);
+                          const emailInput = prompt("Enter your email to purchase 2-Pack for $5:");
+                          if (emailInput && emailInput.includes("@")) {
+                            fetch("/api/checkout", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ email: emailInput, type: "pack", packType: "2-pack" }),
+                            })
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data.checkoutUrl) window.location.href = data.checkoutUrl;
+                                else alert("Error: " + (data.error || "Failed to create checkout"));
+                              })
+                              .catch(err => alert("Error: " + err.message));
+                          } else if (emailInput) {
+                            alert("Please enter a valid email address");
                           }
-                          setTimeout(() => {
-                            setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
-                            setEmailError(null);
-                            setStage("email");
-                          }, 0);
                         }}
-                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
+                        className="block w-full py-4 px-4 rounded-lg font-semibold text-base text-center transition-all active:scale-95 hover:brightness-110"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                           touchAction: 'manipulation',
-                          WebkitTapHighlightColor: 'transparent',
                           minHeight: '50px',
-                          userSelect: 'none',
+                          textDecoration: 'none',
                         }}
                       >
                         Buy 2-Pack for $5
-                      </button>
+                      </a>
                       <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
                         (watermarked, does not include HD)
                       </p>
@@ -1068,33 +1093,40 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
                         You&apos;ve used your 2 free generations. Purchase a pack to unlock more!
                       </p>
-                      <button
-                        type="button"
-                        onPointerDown={(e) => {
-                          e.stopPropagation();
-                          console.log("Pack button pointer down (retry_used)");
-                          // Save the pet image so it can be restored after purchase
-                          if (previewUrl) {
-                            savePendingImage(previewUrl);
+                      <a
+                        href="#buy-pack"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          console.log("Pack link clicked (retry_used)");
+                          if (previewUrl) savePendingImage(previewUrl);
+                          const emailInput = prompt("Enter your email to purchase 2-Pack for $5:");
+                          if (emailInput && emailInput.includes("@")) {
+                            fetch("/api/checkout", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ email: emailInput, type: "pack", packType: "2-pack" }),
+                            })
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data.checkoutUrl) window.location.href = data.checkoutUrl;
+                                else alert("Error: " + (data.error || "Failed to create checkout"));
+                              })
+                              .catch(err => alert("Error: " + err.message));
+                          } else if (emailInput) {
+                            alert("Please enter a valid email address");
                           }
-                          setTimeout(() => {
-                            setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
-                            setEmailError(null);
-                            setStage("email");
-                          }, 0);
                         }}
-                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
+                        className="block w-full py-4 px-4 rounded-lg font-semibold text-base text-center transition-all active:scale-95 hover:brightness-110"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                           touchAction: 'manipulation',
-                          WebkitTapHighlightColor: 'transparent',
                           minHeight: '50px',
-                          userSelect: 'none',
+                          textDecoration: 'none',
                         }}
                       >
                         Buy 2-Pack for $5
-                      </button>
+                      </a>
                       <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
                         (watermarked, does not include HD)
                       </p>
