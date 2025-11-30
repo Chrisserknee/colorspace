@@ -248,23 +248,63 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
     });
   }, []);
 
+  // Upload canvas-rendered text overlay to Supabase (for HD download with text)
+  const uploadTextOverlay = useCallback(async (imageId: string, imageDataUrl: string, type: 'hd-text' | 'preview-text') => {
+    try {
+      const response = await fetch('/api/upload-text-overlay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageId, imageDataUrl, type }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Uploaded ${type} to Supabase:`, data.fileName);
+        return data.url;
+      } else {
+        console.warn(`Failed to upload ${type}:`, await response.text());
+        return null;
+      }
+    } catch (err) {
+      console.warn(`Error uploading ${type}:`, err);
+      return null;
+    }
+  }, []);
+
   // Generate canvas image when result is available
   // Always use client-side canvas rendering for reliable text overlay display
-  // (Server-side sharp text rendering may fail on serverless environments)
+  // Then upload the rendered images to Supabase for HD download
   useEffect(() => {
-    if (result?.previewUrl && petName) {
+    if (result?.previewUrl && result?.imageId && petName) {
       const quote = result.quote || "Until we meet again at the Bridge, run free, sweet soul.";
+      
+      // Render preview with text for display
       renderTextOverlay(result.previewUrl, petName, quote)
-        .then(dataUrl => {
+        .then(async (dataUrl) => {
           setCanvasImageUrl(dataUrl);
           console.log("✅ Canvas text overlay rendered successfully");
+          
+          // Upload preview-text version to Supabase (non-blocking)
+          uploadTextOverlay(result.imageId, dataUrl, 'preview-text');
+          
+          // Also render and upload the HD version with text
+          // The HD URL follows the pattern: replace -preview.png with -hd.png
+          const hdUrl = result.previewUrl.replace('-preview.png', '-hd.png');
+          try {
+            const hdTextDataUrl = await renderTextOverlay(hdUrl, petName, quote);
+            console.log("✅ HD text overlay rendered successfully");
+            // Upload HD-text version to Supabase (non-blocking)
+            uploadTextOverlay(result.imageId, hdTextDataUrl, 'hd-text');
+          } catch (hdErr) {
+            console.warn("Could not render HD text overlay:", hdErr);
+          }
         })
         .catch(err => {
           console.error("Failed to render canvas overlay:", err);
           setCanvasImageUrl(result.previewUrl); // Fallback to original without text
         });
     }
-  }, [result, petName, renderTextOverlay]);
+  }, [result, petName, renderTextOverlay, uploadTextOverlay]);
 
   // Set preview URL when file is provided
   useEffect(() => {
