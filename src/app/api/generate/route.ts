@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
-import { uploadImage, uploadPetPhoto, saveMetadata, incrementPortraitCount } from "@/lib/supabase";
+import { uploadImage, saveMetadata, incrementPortraitCount } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
 
@@ -1529,19 +1529,8 @@ export async function POST(request: NextRequest) {
     // Generate unique ID for this generation
     const imageId = uuidv4();
 
-    // Upload original pet photo to pet-uploads bucket (non-blocking)
-    // This saves the user's original upload for reference/analytics
-    const uploadTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const originalFileName = `${imageId}-original-${uploadTimestamp}.${imageFile.type.split('/')[1] || 'png'}`;
-    uploadPetPhoto(buffer, originalFileName, imageFile.type)
-      .then(url => {
-        if (url) {
-          console.log(`📷 Original pet photo saved: ${originalFileName}`);
-        }
-      })
-      .catch(err => {
-        console.warn(`⚠️ Failed to save original pet photo (non-critical): ${err.message}`);
-      });
+    // Note: Original pet photo is now uploaded immediately when user selects it
+    // via the /api/upload-pet endpoint (in GenerationFlow and RainbowBridgeFlow)
 
     // Process original image for vision API - improved preprocessing for better detail
     // Use higher resolution and preserve full image without cropping

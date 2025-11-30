@@ -280,6 +280,15 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
       };
       reader.readAsDataURL(file);
       
+      // Upload pet photo to Supabase immediately (non-blocking)
+      const uploadFormData = new FormData();
+      uploadFormData.append("image", file);
+      uploadFormData.append("source", "rainbow-bridge");
+      fetch("/api/upload-pet", {
+        method: "POST",
+        body: uploadFormData,
+      }).catch(err => console.warn("Pet photo upload failed (non-critical):", err));
+      
       // Reset secret click counter for new file
       setSecretClickCount(0);
       setSecretActivated(false);
