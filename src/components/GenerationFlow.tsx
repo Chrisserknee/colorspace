@@ -488,15 +488,23 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   };
 
   const handleEmailSubmit = async () => {
+    console.log("handleEmailSubmit called, email:", email, "result:", result);
+    
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address");
       return;
     }
 
-    if (!result) return;
+    if (!result) {
+      console.error("No result set - cannot proceed to checkout");
+      setEmailError("Something went wrong. Please try again.");
+      return;
+    }
     
     // Track email submitted
     const isPackPurchase = result.imageId === "pack";
+    console.log("isPackPurchase:", isPackPurchase);
+    
     captureEvent("email_submitted", {
       is_pack_purchase: isPackPurchase,
       pack_type: isPackPurchase ? "2-pack" : null,
@@ -506,30 +514,33 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     setStage("checkout");
 
     try {
-      // Check if this is a pack purchase
-      const isPackPurchase = result.imageId === "pack";
+      const requestBody = { 
+        imageId: isPackPurchase ? null : result.imageId, 
+        email,
+        type: isPackPurchase ? "pack" : "image",
+        packType: isPackPurchase ? "2-pack" : undefined,
+      };
+      console.log("Calling checkout API with:", requestBody);
       
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          imageId: isPackPurchase ? null : result.imageId, 
-          email,
-          type: isPackPurchase ? "pack" : "image",
-          packType: isPackPurchase ? "2-pack" : undefined,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
+      console.log("Checkout API response:", data);
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to create checkout session");
       }
 
+      console.log("Redirecting to:", data.checkoutUrl);
       window.location.href = data.checkoutUrl;
     } catch (err) {
+      console.error("Checkout error:", err);
       setError(err instanceof Error ? err.message : "Failed to redirect to checkout. Please try again.");
       setStage("result");
     }
@@ -1106,10 +1117,12 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                 className="text-2xl font-semibold mb-2"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
               >
-                Almost There!
+                {result?.imageId === "pack" ? "Get Your 2-Pack!" : "Almost There!"}
               </h3>
               <p style={{ color: '#B8B2A8' }}>
-                Enter your email to receive your masterpiece
+                {result?.imageId === "pack" 
+                  ? "Enter your email to complete your $5 pack purchase"
+                  : "Enter your email to receive your masterpiece"}
               </p>
             </div>
 
@@ -1138,18 +1151,29 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               )}
 
               <button 
+                type="button"
                 onClick={handleEmailSubmit}
                 className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
                 style={{ 
                   backgroundColor: '#C5A572', 
                   color: '#1A1A1A',
+                  touchAction: 'manipulation',
                 }}
               >
-                Continue to Payment
+                {result?.imageId === "pack" ? "Pay $5 - Get 2 Generations" : "Continue to Payment"}
               </button>
 
               <button 
-                onClick={() => setStage("result")}
+                type="button"
+                onClick={() => {
+                  // Go back to appropriate stage
+                  if (result?.imageId === "pack") {
+                    setStage("preview");
+                    setResult(null);
+                  } else {
+                    setStage("result");
+                  }
+                }}
                 className="w-full text-center text-sm py-3 mt-3 transition-colors hover:text-[#C5A572]"
                 style={{ color: '#7A756D' }}
               >
