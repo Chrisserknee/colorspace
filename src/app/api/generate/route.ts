@@ -84,9 +84,10 @@ async function addRainbowBridgeTextOverlay(
       .replace(/'/g, '&apos;');
     
     // Create SVG with gradient, quote, and name
+    // Use generic 'serif' font family for serverless compatibility (specific fonts like Georgia aren't available)
     const quoteLinesXml = quoteLines.map((line, i) => 
       `<text x="${width / 2}" y="${quoteStartY + i * lineHeight}" 
-        font-family="Georgia, 'Times New Roman', serif" 
+        font-family="DejaVu Serif, Liberation Serif, serif" 
         font-size="${quoteFontSize}" 
         font-style="italic"
         fill="rgba(255, 255, 255, 0.95)" 
@@ -120,7 +121,7 @@ async function addRainbowBridgeTextOverlay(
         
         <!-- Pet name in gold -->
         <text x="${width / 2}" y="${nameY}" 
-          font-family="Georgia, 'Times New Roman', serif" 
+          font-family="DejaVu Serif, Liberation Serif, serif" 
           font-size="${nameFontSize}" 
           font-weight="bold"
           fill="url(#goldGradient)" 
