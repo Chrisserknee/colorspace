@@ -161,32 +161,43 @@ export async function saveContact(data: {
       });
 
     if (error) {
+      console.log("Contacts table error:", error.code, error.message);
+      
       // If contacts table doesn't exist, fall back to emails table with metadata
-      if (error.code === "42P01" || error.message.includes("does not exist")) {
+      // Check for various error patterns that indicate missing table
+      const isTableMissing = 
+        error.code === "42P01" || 
+        error.message.includes("does not exist") ||
+        error.message.includes("relation") ||
+        error.code === "PGRST116";
+      
+      if (isTableMissing) {
         console.warn("Contacts table not found, saving to emails table as fallback");
-        
-        // Save to emails table with contact info in source
-        const { error: emailError } = await supabase
-          .from("emails")
-          .insert({
-            email: data.email.toLowerCase().trim(),
-            image_id: null,
-            source: `contact: ${data.name} - ${data.message.substring(0, 100)}`,
-            created_at: new Date().toISOString(),
-          });
-
-        if (emailError) {
-          console.error("Failed to save contact to emails fallback:", emailError);
-          return { success: false, error: emailError.message };
-        }
-        
-        return { success: true };
       }
       
-      console.error("Failed to save contact:", error);
-      return { success: false, error: error.message };
+      // Always try the fallback for any error - save to emails table
+      // Use upsert to handle duplicate emails
+      const { error: emailError } = await supabase
+        .from("emails")
+        .upsert({
+          email: data.email.toLowerCase().trim(),
+          image_id: null,
+          source: `contact: ${data.name} - ${data.message.substring(0, 100)}`,
+          created_at: new Date().toISOString(),
+        }, {
+          onConflict: "email",
+        });
+
+      if (emailError) {
+        console.error("Failed to save contact to emails fallback:", emailError);
+        return { success: false, error: emailError.message };
+      }
+      
+      console.log("Contact saved to emails table successfully");
+      return { success: true };
     }
 
+    console.log("Contact saved to contacts table successfully");
     return { success: true };
   } catch (err) {
     console.error("Contact save error:", err);
