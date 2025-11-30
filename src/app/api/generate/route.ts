@@ -1968,6 +1968,23 @@ Be VERY careful - misidentifying will cause major errors.`,
       petDescription.toLowerCase().includes("snow white") ||
       petDescription.toLowerCase().includes("pure white")
     );
+    
+    // Check if black cat or dark-coated pet - preserve deep black color
+    const isBlackCat = species === "CAT" && (
+      petDescription.toLowerCase().includes("black") ||
+      petDescription.toLowerCase().includes("ebony") ||
+      petDescription.toLowerCase().includes("jet black") ||
+      petDescription.toLowerCase().includes("coal black")
+    );
+    
+    // Check if dark-coated pet (any species)
+    const isDarkCoated = (
+      petDescription.toLowerCase().includes("black") ||
+      petDescription.toLowerCase().includes("dark brown") ||
+      petDescription.toLowerCase().includes("ebony") ||
+      petDescription.toLowerCase().includes("charcoal") ||
+      petDescription.toLowerCase().includes("jet black")
+    ) && !petDescription.toLowerCase().includes("white");
 
     // Step 2: Generate late 18th-century aristocratic royal portrait - SPECIES AND PET ACCURACY ARE #1 PRIORITY
     const genderInfo = gender ? `\n=== GENDER ===\nThis is a ${gender === "male" ? "male" : "female"} ${species}.` : "";
@@ -1991,6 +2008,19 @@ This is a WHITE CAT - apply angelic luminous aesthetic:
 - SOFT GLOW around the entire cat - gentle radiance
 - Enhanced presence - the white cat should GLOW with light
 - More luminous than other pets - special angelic treatment` : "";
+    
+    // Add black cat color preservation treatment
+    const blackCatTreatment = isBlackCat || isDarkCoated ? `
+=== BLACK/DARK-COATED PET - CRITICAL COLOR PRESERVATION ===
+This is a ${isBlackCat ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve the DEEP BLACK/DARK color:
+- The pet MUST remain DEEP BLACK or DARK BROWN - NEVER white, gray, or light colored
+- Preserve RICH DEEP BLACK fur color throughout - maintain dark tones
+- Use SUBTLE highlights ONLY - gentle rim lighting that doesn't wash out the black
+- DEEP SHADOWS are correct - black pets have darker shadows naturally
+- AVOID over-brightening - maintain the pet's natural dark coloration
+- The black/dark color is ESSENTIAL to the pet's identity - preserve it exactly
+- Use contrast with lighter backgrounds/cloaks to make the black fur stand out
+- DO NOT lighten or brighten the fur color - keep it DEEP and RICH BLACK/DARK` : "";
     
     // Age preservation instructions
     let agePreservationInstructions = "";
@@ -2063,7 +2093,7 @@ WHAT CREATES INSTANT RECOGNITION:
 - Proud, regal posture befitting nobility
 ${facialStructureSection}
 === THE ${species} - DETAILED DESCRIPTION ===
-${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${agePreservationInstructions}
+${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${blackCatTreatment}${agePreservationInstructions}
 
 === CRITICAL: EXACT MATCHING ===
 The generated pet MUST match the description EXACTLY:
@@ -2240,6 +2270,22 @@ RENDERING: TRUE OIL PAINTING with LONG FLOWING visible brush strokes, thick laye
         petDescription.toLowerCase().includes("pure white")
       );
       
+      // Check if black cat or dark-coated pet for OpenAI img2img
+      const isBlackCatForOpenAI = species === "CAT" && (
+        petDescription.toLowerCase().includes("black") ||
+        petDescription.toLowerCase().includes("ebony") ||
+        petDescription.toLowerCase().includes("jet black") ||
+        petDescription.toLowerCase().includes("coal black")
+      );
+      
+      const isDarkCoatedForOpenAI = (
+        petDescription.toLowerCase().includes("black") ||
+        petDescription.toLowerCase().includes("dark brown") ||
+        petDescription.toLowerCase().includes("ebony") ||
+        petDescription.toLowerCase().includes("charcoal") ||
+        petDescription.toLowerCase().includes("jet black")
+      ) && !petDescription.toLowerCase().includes("white");
+      
       const feminineAestheticForOpenAI = gender === "female" ? `
 === FEMININE AESTHETIC ===
 This is a FEMALE ${species} - apply feminine aesthetic:
@@ -2258,6 +2304,19 @@ This is a WHITE CAT - apply angelic luminous aesthetic:
 - SOFT GLOW around the entire cat - gentle radiance
 - Enhanced presence - the white cat should GLOW with light
 - More luminous than other pets - special angelic treatment
+` : "";
+      
+      const blackCatTreatmentForOpenAI = isBlackCatForOpenAI || isDarkCoatedForOpenAI ? `
+=== BLACK/DARK-COATED PET - CRITICAL COLOR PRESERVATION ===
+This is a ${isBlackCatForOpenAI ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve the DEEP BLACK/DARK color:
+- The pet MUST remain DEEP BLACK or DARK BROWN - NEVER white, gray, or light colored
+- Preserve RICH DEEP BLACK fur color throughout - maintain dark tones
+- Use SUBTLE highlights ONLY - gentle rim lighting that doesn't wash out the black
+- DEEP SHADOWS are correct - black pets have darker shadows naturally
+- AVOID over-brightening - maintain the pet's natural dark coloration
+- The black/dark color is ESSENTIAL to the pet's identity - preserve it exactly
+- Use contrast with lighter backgrounds/cloaks to make the black fur stand out
+- DO NOT lighten or brighten the fur color - keep it DEEP and RICH BLACK/DARK
 ` : "";
 
       // RAINBOW BRIDGE MEMORIAL PORTRAIT PROMPT
@@ -2336,7 +2395,7 @@ CRITICAL: The ${species} must look EXACTLY like the original photo - this is a m
 
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
 
-18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}
+18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
 
 === CRITICAL PET PRESERVATION ===
 - Preserve the face structure, skull shape, snout proportions EXACTLY from the original
@@ -2609,6 +2668,22 @@ The ${species} should match the reference image exactly - same face, markings, c
         petDescription.toLowerCase().includes("pure white")
       );
       
+      // Check if black cat or dark-coated pet for FLUX
+      const isBlackCatForFlux = species === "CAT" && (
+        petDescription.toLowerCase().includes("black") ||
+        petDescription.toLowerCase().includes("ebony") ||
+        petDescription.toLowerCase().includes("jet black") ||
+        petDescription.toLowerCase().includes("coal black")
+      );
+      
+      const isDarkCoatedForFlux = (
+        petDescription.toLowerCase().includes("black") ||
+        petDescription.toLowerCase().includes("dark brown") ||
+        petDescription.toLowerCase().includes("ebony") ||
+        petDescription.toLowerCase().includes("charcoal") ||
+        petDescription.toLowerCase().includes("jet black")
+      ) && !petDescription.toLowerCase().includes("white");
+      
       const feminineAestheticForFlux = gender === "female" ? `
 === FEMININE AESTHETIC ===
 FEMALE ${species} - feminine aesthetic:
@@ -2626,8 +2701,19 @@ WHITE CAT - angelic luminous:
 - SOFT GLOW around entire cat - gentle radiance
 - Enhanced presence - cat GLOWS with light
 ` : "";
+      
+      const blackCatTreatmentForFlux = isBlackCatForFlux || isDarkCoatedForFlux ? `
+=== BLACK/DARK-COATED PET - CRITICAL COLOR PRESERVATION ===
+${isBlackCatForFlux ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve DEEP BLACK/DARK color:
+- Pet MUST remain DEEP BLACK or DARK BROWN - NEVER white, gray, or light
+- Preserve RICH DEEP BLACK fur - maintain dark tones
+- SUBTLE highlights ONLY - don't wash out black
+- AVOID over-brightening - keep natural dark color
+- Black/dark color is ESSENTIAL - preserve exactly
+- DO NOT lighten fur - keep DEEP RICH BLACK/DARK
+` : "";
 
-      const fluxPrompt = `18th-century aristocratic oil portrait. Late 18th-century European aristocratic portraiture (1770-1830 Georgian/Regency/Napoleonic era). Style of Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForFlux}${whiteCatTreatmentForFlux}
+      const fluxPrompt = `18th-century aristocratic oil portrait. Late 18th-century European aristocratic portraiture (1770-1830 Georgian/Regency/Napoleonic era). Style of Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForFlux}${whiteCatTreatmentForFlux}${blackCatTreatmentForFlux}
 
 === LIGHTING (Brighter Dramatic Chiaroscuro with Glow - Retaining Darker Tones) ===
 - Dramatic, directional CHIAROSCURO lighting with BRIGHTER overall illumination
