@@ -2235,7 +2235,7 @@ RENDERING: TRUE OIL PAINTING with LONG FLOWING visible brush strokes, thick laye
       : useIPAdapter ? "USE_IP_ADAPTER=true"
       : useFluxModel ? "USE_FLUX_MODEL=true"
       : "No model flags set, using default GPT-Image-1");
-    console.log("Generation type:", useSecretCredit ? "SECRET CREDIT (un-watermarked)" : usePackCredit ? "PACK CREDIT (un-watermarked)" : "FREE (watermarked)");
+    console.log("Generation type:", useSecretCredit ? "SECRET CREDIT (un-watermarked)" : usePackCredit ? "PACK CREDIT (watermarked)" : "FREE (watermarked)");
     console.log("⚠️ IMPORTANT: All generation types (free, pack credit, secret credit) use the SAME model:", modelName);
     console.log("⚠️ The only difference is watermarking - generation model is identical for all types.");
     console.log("Detected species:", species);
@@ -2864,22 +2864,22 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       console.log(`   Pet name: "${petName}" (text will be rendered by browser Canvas API)`);
     }
 
-    // Create preview (watermarked if not using pack credit or secret credit, un-watermarked if using either)
+    // Create preview (watermarked for free and pack credits, un-watermarked only for secret credit testing)
     // NOTE: The generation model used above is IDENTICAL for all types (free, pack credit, secret credit).
-    // The ONLY difference is watermarking - free gets watermarked, pack/secret get un-watermarked.
+    // The $5 pack gives watermarked generations - only secret credit is un-watermarked (for testing).
     let previewBuffer: Buffer;
-    if (usePackCredit || useSecretCredit) {
-      // Un-watermarked preview for pack credits or secret credit (testing)
+    if (useSecretCredit) {
+      // Un-watermarked preview ONLY for secret credit (testing)
       previewBuffer = generatedBuffer;
-      if (useSecretCredit) {
-        console.log("Using secret credit - generating un-watermarked image for testing");
-      } else {
-        console.log("Using pack credit - generating un-watermarked image");
-      }
+      console.log("Using secret credit - generating un-watermarked image for testing");
     } else {
-      // Watermarked preview for free generations (including Rainbow Bridge)
+      // Watermarked preview for free generations AND pack credits ($5 pack = watermarked)
       previewBuffer = await createWatermarkedImage(generatedBuffer);
-      console.log("Free generation - creating watermarked preview");
+      if (usePackCredit) {
+        console.log("Using pack credit ($5 pack) - creating watermarked preview");
+      } else {
+        console.log("Free generation - creating watermarked preview");
+      }
     }
 
     // Upload HD image to Supabase Storage (always un-watermarked)
@@ -2943,7 +2943,7 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       
     await saveMetadata(imageId, {
       created_at: new Date().toISOString(),
-        paid: usePackCredit || useSecretCredit, // Mark as paid only if using pack credit or secret credit
+        paid: useSecretCredit, // Mark as paid only if using secret credit (testing) - pack credits are watermarked
         pet_description: finalDescription,
       hd_url: hdUrl,
       preview_url: previewUrl,

@@ -38,7 +38,7 @@ interface GenerationLimits {
   freeRetriesUsed: number; // Free retries used (max 1)
   purchases: number; // Number of individual image purchases made
   packPurchases: number; // Number of pack purchases made
-  packCredits: number; // Remaining pack generation credits (un-watermarked)
+  packCredits: number; // Remaining pack generation credits (watermarked)
   lastReset?: string; // Date of last reset (optional for daily limits)
 }
 
@@ -82,7 +82,7 @@ const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: str
   const totalAllowed = freeLimit + purchaseBonus;
   const totalUsed = freeUsed;
   
-  // Check if user has pack credits (un-watermarked generations)
+  // Check if user has pack credits (watermarked generations from $5 pack)
   if (limits.packCredits > 0) {
     return { allowed: true, hasPackCredits: true };
   }
@@ -90,7 +90,7 @@ const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: str
   if (totalUsed >= totalAllowed) {
     return {
       allowed: false,
-      reason: `You've reached your free generation limit (${freeLimit} free generations). Purchase a pack to unlock more un-watermarked generations!`,
+      reason: `You've reached your free generation limit (${freeLimit} free generations). Purchase a pack to unlock more generations!`,
       hasPackCredits: false,
     };
   }
@@ -369,7 +369,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
         formData.append("gender", gender);
       }
       
-      // Check if user has pack credits (un-watermarked generation)
+      // Check if user has pack credits (watermarked generation from $5 pack)
       const limits = getLimits();
       if (limits.packCredits > 0) {
         formData.append("usePackCredit", "true");
@@ -411,7 +411,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       const usedSecretCredit = useSecretCredit;
       
       if (usedPackCredit) {
-        // Use pack credit (un-watermarked)
+        // Use pack credit (watermarked from $5 pack)
         const updatedLimits = usePackCredit();
         setGenerationLimits(updatedLimits);
       } else if (usedSecretCredit) {
@@ -681,7 +681,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                 {limitCheck.allowed ? (
                   <p>
                     {generationLimits.packCredits > 0 ? (
-                      `✨ ${generationLimits.packCredits} un-watermarked generation${generationLimits.packCredits !== 1 ? 's' : ''} remaining`
+                      `✨ ${generationLimits.packCredits} watermarked generation${generationLimits.packCredits !== 1 ? 's' : ''} remaining`
                     ) : generationLimits.purchases > 0 ? (
                       `✨ ${2 + (generationLimits.purchases * 2) - generationLimits.freeGenerations} generations remaining`
                     ) : (
