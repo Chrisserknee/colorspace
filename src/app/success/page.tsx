@@ -387,11 +387,25 @@ function SuccessContent() {
           >
             {rainbowBridgeData ? `${rainbowBridgeData.petName}'s Memorial Portrait is Ready` : "Your Royal Portrait is Ready"}
           </h1>
-          <p className="text-lg" style={{ color: '#B8B2A8' }}>
+          <p className="text-lg mb-4" style={{ color: '#B8B2A8' }}>
             {rainbowBridgeData 
               ? `Thank you for your purchase. ${rainbowBridgeData.petName} will be remembered forever.`
               : "Thank you for your purchase! Your pet has been immortalized."}
           </p>
+          
+          {/* Bonus generations notice */}
+          <div 
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+            style={{ 
+              backgroundColor: 'rgba(197, 165, 114, 0.1)', 
+              border: '1px solid rgba(197, 165, 114, 0.3)' 
+            }}
+          >
+            <span style={{ color: '#C5A572' }}>🎁</span>
+            <span className="text-sm" style={{ color: '#C5A572' }}>
+              You now have <strong>2 more generations</strong> available!
+            </span>
+          </div>
         </div>
 
         {/* Portrait display - NO WATERMARK */}
