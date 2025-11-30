@@ -8,6 +8,12 @@ export const metadata: Metadata = {
   title: "LumePet | Turn Your Pet Into a Masterpiece",
   description: "Transform your beloved pet into a stunning royal oil painting portrait. Upload a photo and watch the magic happen.",
   keywords: ["pet portrait", "royal art", "pet painting", "oil painting", "pet masterpiece"],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/favicon.svg",
+  },
   openGraph: {
     title: "LumePet | Turn Your Pet Into a Masterpiece",
     description: "Transform your beloved pet into a stunning royal oil painting portrait.",
