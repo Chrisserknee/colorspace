@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { saveContact } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { isValidEmail, sanitizeString } from "@/lib/validation";
 
@@ -46,19 +46,16 @@ export async function POST(request: NextRequest) {
     const sanitizedEmail = sanitizeString(email.toLowerCase().trim(), 254);
     const sanitizedMessage = sanitizeString(message.trim(), 2000);
 
-    // Save to Supabase contacts table
-    const { error } = await supabase
-      .from("contacts")
-      .insert({
-        name: sanitizedName,
-        email: sanitizedEmail,
-        message: sanitizedMessage,
-        ip_address: clientIP,
-        created_at: new Date().toISOString(),
-      });
+    // Save contact form submission (will fallback to emails table if contacts doesn't exist)
+    const result = await saveContact({
+      name: sanitizedName,
+      email: sanitizedEmail,
+      message: sanitizedMessage,
+      ip_address: clientIP,
+    });
 
-    if (error) {
-      console.error("Failed to save contact form:", error);
+    if (!result.success) {
+      console.error("Failed to save contact form:", result.error);
       return NextResponse.json(
         { error: "Failed to send message. Please try again later." },
         { status: 500 }

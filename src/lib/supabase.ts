@@ -141,6 +141,59 @@ export async function saveEmail(email: string, imageId?: string, source: string 
   return true;
 }
 
+// Helper to save contact form submission
+export async function saveContact(data: {
+  name: string;
+  email: string;
+  message: string;
+  ip_address?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    // First, try to insert into contacts table
+    const { error } = await supabase
+      .from("contacts")
+      .insert({
+        name: data.name,
+        email: data.email,
+        message: data.message,
+        ip_address: data.ip_address || null,
+        created_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      // If contacts table doesn't exist, fall back to emails table with metadata
+      if (error.code === "42P01" || error.message.includes("does not exist")) {
+        console.warn("Contacts table not found, saving to emails table as fallback");
+        
+        // Save to emails table with contact info in source
+        const { error: emailError } = await supabase
+          .from("emails")
+          .insert({
+            email: data.email.toLowerCase().trim(),
+            image_id: null,
+            source: `contact: ${data.name} - ${data.message.substring(0, 100)}`,
+            created_at: new Date().toISOString(),
+          });
+
+        if (emailError) {
+          console.error("Failed to save contact to emails fallback:", emailError);
+          return { success: false, error: emailError.message };
+        }
+        
+        return { success: true };
+      }
+      
+      console.error("Failed to save contact:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error("Contact save error:", err);
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
 // Helper to get all emails (for export)
 export async function getAllEmails() {
   const { data, error } = await supabase
