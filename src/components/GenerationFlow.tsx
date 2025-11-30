@@ -708,29 +708,26 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Purchase a pack to get more watermarked generations</p>
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
+                        onPointerDown={(e) => {
                           e.stopPropagation();
-                          console.log("Pack purchase button clicked!");
-                          captureEvent("pack_purchase_button_clicked", {
-                            pack_type: "2-pack",
-                            source: "preview_limit_reached",
-                          });
+                          console.log("Pack button pointer down!");
+                          alert("Button clicked! Going to email step...");
                           // Save the pet image so it can be restored after purchase
                           if (previewUrl) {
                             savePendingImage(previewUrl);
                           }
-                          setStage("email");
-                          setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
+                          setEmailError(null);
+                          setStage("email");
                         }}
-                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
+                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                           touchAction: 'manipulation',
                           WebkitTapHighlightColor: 'transparent',
                           minHeight: '50px',
+                          userSelect: 'none',
                         }}
                       >
                         Buy 2-Pack for $5
@@ -1031,29 +1028,26 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       </p>
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
+                        onPointerDown={(e) => {
                           e.stopPropagation();
-                          console.log("Pack purchase button clicked (limit_reached)!");
-                          captureEvent("pack_purchase_button_clicked", {
-                            pack_type: "2-pack",
-                            source: "limit_reached",
-                          });
+                          console.log("Pack button pointer down (limit_reached)!");
+                          alert("Button clicked! Going to email step...");
                           // Save the pet image so it can be restored after purchase
                           if (previewUrl) {
                             savePendingImage(previewUrl);
                           }
-                          setStage("email");
-                          setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
+                          setEmailError(null);
+                          setStage("email");
                         }}
-                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
+                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                           touchAction: 'manipulation',
                           WebkitTapHighlightColor: 'transparent',
                           minHeight: '50px',
+                          userSelect: 'none',
                         }}
                       >
                         Buy 2-Pack for $5
@@ -1071,29 +1065,26 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       </p>
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
+                        onPointerDown={(e) => {
                           e.stopPropagation();
-                          console.log("Pack purchase button clicked (retry_used)!");
-                          captureEvent("pack_purchase_button_clicked", {
-                            pack_type: "2-pack",
-                            source: "retry_used",
-                          });
+                          console.log("Pack button pointer down (retry_used)!");
+                          alert("Button clicked! Going to email step...");
                           // Save the pet image so it can be restored after purchase
                           if (previewUrl) {
                             savePendingImage(previewUrl);
                           }
-                          setStage("email");
-                          setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
+                          setEmailError(null);
+                          setStage("email");
                         }}
-                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
+                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
                           touchAction: 'manipulation',
                           WebkitTapHighlightColor: 'transparent',
                           minHeight: '50px',
+                          userSelect: 'none',
                         }}
                       >
                         Buy 2-Pack for $5
