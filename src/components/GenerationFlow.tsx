@@ -697,7 +697,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Purchase a pack to get more watermarked generations</p>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log("Pack purchase button clicked!");
                           captureEvent("pack_purchase_button_clicked", {
                             pack_type: "2-pack",
                             source: "preview_limit_reached",
@@ -710,16 +713,19 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                         }}
-                        className="w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all active:scale-95 hover:brightness-110"
+                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
+                          touchAction: 'manipulation',
+                          WebkitTapHighlightColor: 'transparent',
+                          minHeight: '50px',
                         }}
                       >
-                        Buy 2-Pack of Watermarked Generations for $5
+                        Buy 2-Pack for $5
                       </button>
                       <p className="text-xs mt-2 text-center" style={{ color: '#7A756D' }}>
-                        (does not include the full HD version)
+                        (watermarked, does not include HD)
                       </p>
                     </div>
                   </div>
@@ -1014,7 +1020,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       </p>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log("Pack purchase button clicked (limit_reached)!");
                           captureEvent("pack_purchase_button_clicked", {
                             pack_type: "2-pack",
                             source: "limit_reached",
@@ -1027,16 +1036,19 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                         }}
-                        className="w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all active:scale-95 hover:brightness-110"
+                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
+                          touchAction: 'manipulation',
+                          WebkitTapHighlightColor: 'transparent',
+                          minHeight: '50px',
                         }}
                       >
-                        Buy 2-Pack of Watermarked Generations for $5
+                        Buy 2-Pack for $5
                       </button>
                       <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
-                        (does not include the full HD version)
+                        (watermarked, does not include HD)
                       </p>
                     </div>
                   );
@@ -1048,7 +1060,10 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                       </p>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log("Pack purchase button clicked (retry_used)!");
                           captureEvent("pack_purchase_button_clicked", {
                             pack_type: "2-pack",
                             source: "retry_used",
@@ -1061,16 +1076,19 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                         }}
-                        className="w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all active:scale-95 hover:brightness-110"
+                        className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
                         style={{ 
                           backgroundColor: '#C5A572', 
                           color: '#1A1A1A',
+                          touchAction: 'manipulation',
+                          WebkitTapHighlightColor: 'transparent',
+                          minHeight: '50px',
                         }}
                       >
-                        Buy 2-Pack of Watermarked Generations for $5
+                        Buy 2-Pack for $5
                       </button>
                       <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
-                        (does not include the full HD version)
+                        (watermarked, does not include HD)
                       </p>
                     </div>
                   );

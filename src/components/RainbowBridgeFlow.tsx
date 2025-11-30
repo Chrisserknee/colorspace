@@ -819,7 +819,10 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                 <p className="mb-3">{limitCheck.reason}</p>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("RainbowBridge pack purchase clicked!");
                     // Save the pet image so it can be restored after purchase
                     if (previewUrl) {
                       localStorage.setItem("lumepet_pending_image", previewUrl);
@@ -828,16 +831,19 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                     setEmailError(null);
                     setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                   }}
-                  className="py-3 px-4 rounded-lg font-semibold text-sm transition-all active:scale-95 hover:brightness-110"
+                  className="py-4 px-6 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
                   style={{ 
                     backgroundColor: '#D4AF37', 
                     color: '#FFFFFF',
+                    touchAction: 'manipulation',
+                    WebkitTapHighlightColor: 'transparent',
+                    minHeight: '50px',
                   }}
                 >
-                  Buy 2-Pack of Watermarked Generations for $5
+                  Buy 2-Pack for $5
                 </button>
                 <p className="text-xs mt-2" style={{ color: '#8B8B8B' }}>
-                  (does not include the full HD version)
+                  (watermarked, does not include HD)
                 </p>
               </div>
             )}
@@ -1063,7 +1069,10 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                       </p>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log("RainbowBridge pack purchase clicked (result)!");
                           // Save the pet image so it can be restored after purchase
                           if (previewUrl) {
                             localStorage.setItem("lumepet_pending_image", previewUrl);
@@ -1072,16 +1081,19 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
                           setEmailError(null);
                           setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
                         }}
-                        className="py-3 px-4 rounded-lg font-semibold text-sm transition-all active:scale-95 hover:brightness-110"
+                        className="py-4 px-6 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-10"
                         style={{ 
                           backgroundColor: '#D4AF37', 
                           color: '#FFFFFF',
+                          touchAction: 'manipulation',
+                          WebkitTapHighlightColor: 'transparent',
+                          minHeight: '50px',
                         }}
                       >
-                        Buy 2-Pack of Watermarked Generations for $5
+                        Buy 2-Pack for $5
                       </button>
                       <p className="text-xs mt-2" style={{ color: '#8B8B8B' }}>
-                        (does not include the full HD version)
+                        (watermarked, does not include HD)
                       </p>
                     </div>
                   );
