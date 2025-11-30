@@ -439,7 +439,7 @@ async function applyStyleTransfer(
         input: {
           image: contentImageUrl,
           prompt: "oil painting portrait, late 18th-century European aristocratic style (1770-1830), Georgian Regency Napoleonic era portraiture, classical fine art, LONG FLOWING visible brushstrokes, elongated brushwork, rich impasto texture, BRIGHT warm golden lighting, BRIGHTER overall illumination, DEEP RICH SATURATED luminous colors, rich jewel tones, SILKY LUSTROUS fabrics with visible sheen, PURE BRIGHT WHITE highlights, SUBTLE LUMINOUS GLOW throughout, gentle radiance and brightness, hand-painted charm with slight imperfections, elegant AIRY NOT gloomy, DEEP RICH SATURATED colors, DARKER TONES retained in shadows and background for depth, SPACIOUS background with DEPTH, luminous glazing technique, BRIGHT and beautiful, BRIGHTER illumination, subject GLOWS with BRIGHT warm light, fabrics GLOW with DEEP RICH color, preserve deep blacks rich and intact, slightly soft edges painterly, Gainsborough Reynolds Vigée Le Brun style",
-          negative_prompt: "photograph, photo, realistic, modern, digital art, cartoon, anime, blurry, low quality, watermark, gloomy, overly dark, dark background, muted colors, dull colors, dark colors, short brushstrokes, grey whites, muddy whites, too perfect, clinical, sharp edges everywhere, flat background, medieval, Renaissance, matte fabrics, non-silky textures, human clothing, sleeves, buttons, tailored garments, human-like pose, anthropomorphic, human posture",
+          negative_prompt: "photograph, photo, realistic, modern, digital art, cartoon, anime, blurry, low quality, watermark, gloomy, overly dark, dark background, muted colors, dull colors, dark colors, short brushstrokes, grey whites, muddy whites, too perfect, clinical, sharp edges everywhere, flat background, medieval, Renaissance, matte fabrics, non-silky textures, human clothing, sleeves, buttons, tailored garments, human-like pose, anthropomorphic, human posture, standing upright, standing on hind legs, bipedal, close-up, cropped",
           prompt_strength: styleStrength,
           num_inference_steps: 25,
           guidance_scale: 7.5,
@@ -606,11 +606,11 @@ RENDERING:
 
   const negativePrompt = `photograph, photo, photorealistic, modern, digital art, cartoon, anime, 3d render, 
 blurry, low quality, watermark, text, logo, 
-human body, humanoid, anthropomorphic, bipedal, 
+human body, humanoid, anthropomorphic, bipedal, standing upright, human pose, standing on hind legs,
 wrong species, different animal, 
 dark, gloomy, shadowy, muddy colors, muted colors, dull colors,
 deformed, disfigured, bad anatomy, wrong proportions,
-ugly, duplicate, extra limbs, missing limbs`;
+ugly, duplicate, extra limbs, missing limbs, close-up, cropped`;
   
   console.log("Generating with SDXL...");
   
@@ -2191,7 +2191,7 @@ FUR TONES:
 - Nose size relative to face must match - if described as 'small nose', generate a small nose
 - Muzzle length must match - if described as 'short muzzle', generate a short muzzle
 
-FULL BODY PORTRAIT: The ${species} is SEATED NATURALLY like a real ${species} on ${cushion}, with ${robe} draped over its back (NOT clothing, just draped fabric), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak. Natural animal seated pose. Show the ENTIRE pet from ears to paws - wide framing, not a close-up. 
+FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
 
 RENDERING: TRUE OIL PAINTING with LONG FLOWING visible brush strokes, thick layered pigments, BRIGHT WHITE highlights, high detail but NOT photorealistic and NOT too perfect. Late 18th-century European aristocratic portrait feel (1770-1830 Georgian/Regency/Napoleonic era, Gainsborough/Reynolds/Vigée Le Brun style) - elegant and AIRY, NOT gloomy, hand-painted charm with slight imperfections. NOT Renaissance. NOT digital, NOT airbrushed, NOT overly smooth, NOT overly perfect. Subtle SOFT GLOW throughout - gentle luminosity. SPACIOUS background with ATMOSPHERIC DEPTH - feels like grand chamber. Single warm key light - BRIGHTLY LIT subject, soft chiaroscuro with moderate shadows, warm golden rim highlights. DEEP RICH SATURATED jewel-toned fabrics. DAINTY, DELICATE SOFT PLUSH VELVETY cloak DRAPED over pet (NOT clothing, just draped fabric) with visible velvet nap and plush texture, PURE BRIGHT WHITE ermine trim, dainty antique jewelry with BRIGHT sparkling gem clusters and BRIGHT WHITE pearls. Velvet throne cushion with gold embroidery. Pet seated NATURALLY like a real ${species} - NOT human-like pose. NO human clothing. Pet MUST match original EXACTLY - warm natural fur with BRIGHT WHITE painterly highlights and LONG brushwork, deep blacks preserved rich and saturated. All whites should be PURE BRIGHT WHITE. Slightly soft edges - painterly not clinical.`;
 
@@ -2328,15 +2328,18 @@ VARY THE COMPOSITION - Use different heavenly settings:
 - NO dark elements - all light and peaceful
 - Ethereal, heavenly atmosphere
 
-=== COMPOSITION ===
-- CENTERED portrait composition
+=== COMPOSITION (ZOOMED OUT, Natural Resting Pose) ===
+- ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
+- CENTERED portrait composition with space around the pet
 - Pet appears peaceful and serene
-- Natural pose - sitting or resting peacefully (sometimes on cloud pillow, sometimes floating)
-- VARY the pose: sitting upright, curled up, lying down peacefully
+- SITTING or RESTING NATURALLY on the cloud/surface - NEVER standing upright like a human
+- Pet should be clearly seated or lying down comfortably on the cloud pillow
+- Natural resting pose - sitting, curled up, or lying down peacefully
+- Show from head to paws - wide framing, NOT a close-up
 - SOFT GLOW around the pet like a halo or aura
 - No royal elements (no thrones, cloaks, jewelry)
 - Simple, elegant, heavenly setting
-- Focus on the pet's face and peaceful expression
+- Pet looks comfortable and at peace in their resting position
 
 === LIGHTING ===
 - SOFT, DIFFUSED heavenly light
@@ -2397,13 +2400,17 @@ FOR MULTICOLOR PETS: harmonize with dominant fur tone using DEEP/RICH colors, ac
 
 Apply same harmony to GEMSTONES: select DEEP RICH gems that complement pet's eyes or fur (DEEP ruby, DEEP emerald, DEEP sapphire, RICH topaz, DEEP amethyst) - SPARKLING, LUMINOUS, and DEEP SATURATED
 
-=== COMPOSITION (Wide, Centered, Full Cushion Visible) ===
-- WIDE and CENTERED composition
-- Show FULL CUSHION, regal posture, classical aristocratic portrait aesthetics
-- Pet seated NATURALLY like a real ${species} - NOT human-like posture
-- Natural animal seated pose: body low, front paws resting naturally on cushion
-- Body ¾ view, head forward - natural animal posture
+=== COMPOSITION (ZOOMED OUT, Wide, Centered, Full Body Visible) ===
+- ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
+- WIDE and CENTERED composition with space around the pet
+- Show FULL CUSHION with pet clearly SITTING or RESTING on it
+- Pet SEATED or LYING DOWN NATURALLY like a real ${species} would rest
+- NEVER standing upright like a human - always sitting, lying, or resting
+- Natural animal posture: body low, front paws resting on cushion, relaxed pose
+- Pet should look comfortable and naturally positioned on the cushion
+- Body ¾ view, head forward - natural animal resting posture
 - FRONT PAWS VISIBLE and resting naturally on cushion
+- Show from head to paws - wide framing, NOT a close-up
 - NO human clothing - ONLY a cloak draped over the pet
 - All colors automatically unified and harmonious with pet's natural palette
 
