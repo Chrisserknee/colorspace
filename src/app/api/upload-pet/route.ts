@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   const clientIP = getClientIP(request);
 
   // Rate limiting - use a more lenient limit for uploads
-  const rateLimit = checkRateLimit(`upload:${clientIP}`, RATE_LIMITS.generation);
+  const rateLimit = checkRateLimit(`upload:${clientIP}`, RATE_LIMITS.generate);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many uploads. Please wait a moment." },
