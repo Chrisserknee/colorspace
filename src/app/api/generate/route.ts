@@ -10,6 +10,36 @@ import { uploadImage, saveMetadata, incrementPortraitCount } from "@/lib/supabas
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
 
+// Analyze image to detect if pet is black/dark-colored
+async function analyzeImageDarkness(imageBuffer: Buffer): Promise<{ isDark: boolean; averageBrightness: number }> {
+  try {
+    // Resize to smaller size for faster analysis
+    const resized = await sharp(imageBuffer)
+      .resize(200, 200, { fit: 'inside' })
+      .greyscale()
+      .raw()
+      .toBuffer();
+    
+    // Calculate average brightness (0-255, where 0 is black, 255 is white)
+    let totalBrightness = 0;
+    for (let i = 0; i < resized.length; i++) {
+      totalBrightness += resized[i];
+    }
+    const averageBrightness = totalBrightness / resized.length;
+    
+    // Consider dark if average brightness is below 80 (out of 255)
+    // This threshold catches black/dark brown pets but not medium-colored ones
+    const isDark = averageBrightness < 80;
+    
+    console.log(`🔍 Image darkness analysis: average brightness = ${averageBrightness.toFixed(1)}/255, isDark = ${isDark}`);
+    
+    return { isDark, averageBrightness };
+  } catch (error) {
+    console.warn("Failed to analyze image darkness:", error);
+    return { isDark: false, averageBrightness: 128 }; // Default to medium brightness
+  }
+}
+
 // Rainbow Bridge memorial quotes - randomly selected for each portrait
 const RAINBOW_BRIDGE_QUOTES = [
   "Where there is love, there is never truly goodbye.",
@@ -1597,8 +1627,12 @@ Provide SPECIFIC measurements and ratios with FINER DETAIL:
 - Ear hair patterns or tufts
 
 === SECTION 4 - COLORING (EXHAUSTIVE DETAIL - ENHANCED) ===
+CRITICAL: For BLACK or DARK pets, you MUST explicitly state "black" or "dark" in your description. Do not use vague terms like "dark-colored" - be specific: "black", "jet black", "coal black", "deep black", "dark brown", etc.
+
 Primary coat color using EXACT shade comparisons:
 - Base color (e.g., "rich mahogany brown like polished wood" not just "brown")
+- For BLACK pets: Explicitly state "black", "jet black", "coal black", "deep black", or "charcoal black"
+- For DARK BROWN pets: Explicitly state "dark brown", "chocolate brown", "ebony brown"
 - Secondary colors and their precise locations
 - Color gradients with transition points (e.g., "darkens from golden to russet starting at shoulder line")
 - Subtle color shifts or undertones (e.g., "warm golden undertones in sunlight")
@@ -1962,29 +1996,57 @@ Be VERY careful - misidentifying will cause major errors.`,
       jewelryItem = feminineJewelry[Math.floor(Math.random() * feminineJewelry.length)];
     }
 
+    // Analyze image darkness to detect black/dark pets (even if description doesn't explicitly say "black")
+    const imageDarkness = await analyzeImageDarkness(buffer);
+    const lowerDesc = petDescription.toLowerCase();
+    
     // Check if white cat - add angelic luminous treatment
     const isWhiteCat = species === "CAT" && (
-      petDescription.toLowerCase().includes("white") || 
-      petDescription.toLowerCase().includes("snow white") ||
-      petDescription.toLowerCase().includes("pure white")
+      lowerDesc.includes("white") || 
+      lowerDesc.includes("snow white") ||
+      lowerDesc.includes("pure white")
     );
     
     // Check if black cat or dark-coated pet - preserve deep black color
-    const isBlackCat = species === "CAT" && (
-      petDescription.toLowerCase().includes("black") ||
-      petDescription.toLowerCase().includes("ebony") ||
-      petDescription.toLowerCase().includes("jet black") ||
-      petDescription.toLowerCase().includes("coal black")
+    // Use BOTH description analysis AND image pixel analysis for robust detection
+    const descriptionSaysBlack = (
+      lowerDesc.includes("black") ||
+      lowerDesc.includes("ebony") ||
+      lowerDesc.includes("jet black") ||
+      lowerDesc.includes("coal black") ||
+      lowerDesc.includes("charcoal") ||
+      lowerDesc.includes("dark brown")
     );
     
-    // Check if dark-coated pet (any species)
+    // Force black cat detection if: (1) it's a cat AND (2) image is dark AND (3) description doesn't contradict
+    const isBlackCat = species === "CAT" && (
+      descriptionSaysBlack || 
+      (imageDarkness.isDark && !lowerDesc.includes("white") && !lowerDesc.includes("light"))
+    );
+    
+    // Check if dark-coated pet (any species) - use image analysis as backup
     const isDarkCoated = (
-      petDescription.toLowerCase().includes("black") ||
-      petDescription.toLowerCase().includes("dark brown") ||
-      petDescription.toLowerCase().includes("ebony") ||
-      petDescription.toLowerCase().includes("charcoal") ||
-      petDescription.toLowerCase().includes("jet black")
-    ) && !petDescription.toLowerCase().includes("white");
+      descriptionSaysBlack ||
+      (imageDarkness.isDark && !lowerDesc.includes("white") && !lowerDesc.includes("light"))
+    ) && !lowerDesc.includes("white");
+    
+    // Log detection results for debugging
+    if (species === "CAT") {
+      console.log(`🐱 Cat color detection:`, {
+        descriptionSaysBlack,
+        imageIsDark: imageDarkness.isDark,
+        averageBrightness: imageDarkness.averageBrightness,
+        isBlackCat,
+        isDarkCoated,
+        descriptionPreview: petDescription.substring(0, 100)
+      });
+      
+      // If image is dark but description doesn't mention black, add it to description
+      if (imageDarkness.isDark && !descriptionSaysBlack && !isWhiteCat) {
+        console.log("⚠️ DARK CAT DETECTED: Image is dark but description doesn't mention black. Adding 'black' to description.");
+        petDescription = `black ${petDescription}`;
+      }
+    }
 
     // Step 2: Generate late 18th-century aristocratic royal portrait - SPECIES AND PET ACCURACY ARE #1 PRIORITY
     const genderInfo = gender ? `\n=== GENDER ===\nThis is a ${gender === "male" ? "male" : "female"} ${species}.` : "";
@@ -2263,28 +2325,33 @@ RENDERING: TRUE OIL PAINTING with LONG FLOWING visible brush strokes, thick laye
         ? "CRITICAL: This is a DOG. Generate ONLY a DOG. DO NOT generate a cat. This MUST be a DOG."
         : `CRITICAL: This is a ${species}. Generate ONLY a ${species}.`;
       
-      // Check if white cat for OpenAI img2img
+      // Use the same robust detection logic (petDescription already updated with "black" if needed)
+      const descLower = petDescription.toLowerCase();
       const isWhiteCatForOpenAI = species === "CAT" && (
-        petDescription.toLowerCase().includes("white") || 
-        petDescription.toLowerCase().includes("snow white") ||
-        petDescription.toLowerCase().includes("pure white")
+        descLower.includes("white") || 
+        descLower.includes("snow white") ||
+        descLower.includes("pure white")
       );
       
-      // Check if black cat or dark-coated pet for OpenAI img2img
+      // Check if black cat or dark-coated pet - use same logic as main detection
+      const descSaysBlackForOpenAI = (
+        descLower.includes("black") ||
+        descLower.includes("ebony") ||
+        descLower.includes("jet black") ||
+        descLower.includes("coal black") ||
+        descLower.includes("charcoal") ||
+        descLower.includes("dark brown")
+      );
+      
       const isBlackCatForOpenAI = species === "CAT" && (
-        petDescription.toLowerCase().includes("black") ||
-        petDescription.toLowerCase().includes("ebony") ||
-        petDescription.toLowerCase().includes("jet black") ||
-        petDescription.toLowerCase().includes("coal black")
+        descSaysBlackForOpenAI || 
+        (imageDarkness.isDark && !descLower.includes("white") && !descLower.includes("light"))
       );
       
       const isDarkCoatedForOpenAI = (
-        petDescription.toLowerCase().includes("black") ||
-        petDescription.toLowerCase().includes("dark brown") ||
-        petDescription.toLowerCase().includes("ebony") ||
-        petDescription.toLowerCase().includes("charcoal") ||
-        petDescription.toLowerCase().includes("jet black")
-      ) && !petDescription.toLowerCase().includes("white");
+        descSaysBlackForOpenAI ||
+        (imageDarkness.isDark && !descLower.includes("white") && !descLower.includes("light"))
+      ) && !descLower.includes("white");
       
       const feminineAestheticForOpenAI = gender === "female" ? `
 === FEMININE AESTHETIC ===
@@ -2661,28 +2728,33 @@ The ${species} should match the reference image exactly - same face, markings, c
       console.log("📌 Pet identity will be preserved from original image");
       console.log("📌 No fallback - if Replicate fails, generation fails");
       
-      // Check if white cat for FLUX
+      // Use the same robust detection logic (petDescription already updated with "black" if needed)
+      const descLowerFlux = petDescription.toLowerCase();
       const isWhiteCatForFlux = species === "CAT" && (
-        petDescription.toLowerCase().includes("white") || 
-        petDescription.toLowerCase().includes("snow white") ||
-        petDescription.toLowerCase().includes("pure white")
+        descLowerFlux.includes("white") || 
+        descLowerFlux.includes("snow white") ||
+        descLowerFlux.includes("pure white")
       );
       
-      // Check if black cat or dark-coated pet for FLUX
+      // Check if black cat or dark-coated pet - use same logic as main detection
+      const descSaysBlackForFlux = (
+        descLowerFlux.includes("black") ||
+        descLowerFlux.includes("ebony") ||
+        descLowerFlux.includes("jet black") ||
+        descLowerFlux.includes("coal black") ||
+        descLowerFlux.includes("charcoal") ||
+        descLowerFlux.includes("dark brown")
+      );
+      
       const isBlackCatForFlux = species === "CAT" && (
-        petDescription.toLowerCase().includes("black") ||
-        petDescription.toLowerCase().includes("ebony") ||
-        petDescription.toLowerCase().includes("jet black") ||
-        petDescription.toLowerCase().includes("coal black")
+        descSaysBlackForFlux || 
+        (imageDarkness.isDark && !descLowerFlux.includes("white") && !descLowerFlux.includes("light"))
       );
       
       const isDarkCoatedForFlux = (
-        petDescription.toLowerCase().includes("black") ||
-        petDescription.toLowerCase().includes("dark brown") ||
-        petDescription.toLowerCase().includes("ebony") ||
-        petDescription.toLowerCase().includes("charcoal") ||
-        petDescription.toLowerCase().includes("jet black")
-      ) && !petDescription.toLowerCase().includes("white");
+        descSaysBlackForFlux ||
+        (imageDarkness.isDark && !descLowerFlux.includes("white") && !descLowerFlux.includes("light"))
+      ) && !descLowerFlux.includes("white");
       
       const feminineAestheticForFlux = gender === "female" ? `
 === FEMININE AESTHETIC ===
