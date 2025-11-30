@@ -6,9 +6,11 @@ import RainbowBridgeTestimonials from "@/components/RainbowBridgeTestimonials";
 import RainbowBridgeFooter from "@/components/RainbowBridgeFooter";
 import UploadModal from "@/components/UploadModal";
 import RainbowBridgeFlow from "@/components/RainbowBridgeFlow";
+import ContactModal from "@/components/Contact";
 
 export default function RainbowBridge() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleUploadClick = () => {
@@ -33,7 +35,7 @@ export default function RainbowBridge() {
       <RainbowBridgeTestimonials />
 
       {/* Footer */}
-      <RainbowBridgeFooter />
+      <RainbowBridgeFooter onContactClick={() => setIsContactModalOpen(true)} />
 
       {/* Upload Modal */}
       <UploadModal
@@ -41,6 +43,12 @@ export default function RainbowBridge() {
         onClose={() => setIsUploadModalOpen(false)}
         onFileSelected={handleFileSelected}
         theme="rainbow-bridge"
+      />
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
       />
 
       {/* Generation Flow (shows after file selection) */}

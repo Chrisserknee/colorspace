@@ -1,7 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function RainbowBridgeFooter() {
+interface RainbowBridgeFooterProps {
+  onContactClick?: () => void;
+}
+
+export default function RainbowBridgeFooter({ onContactClick }: RainbowBridgeFooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -34,14 +38,25 @@ export default function RainbowBridgeFooter() {
             </span>
           </div>
 
-          {/* Link back to main site */}
-          <Link 
-            href="/"
-            className="text-sm transition-colors hover:opacity-80"
-            style={{ color: '#9B8AA0' }}
-          >
-            ← Back to LumePet
-          </Link>
+          {/* Links */}
+          <div className="flex items-center gap-6">
+            <Link 
+              href="/"
+              className="text-sm transition-colors hover:opacity-80"
+              style={{ color: '#9B8AA0' }}
+            >
+              ← Back to LumePet
+            </Link>
+            {onContactClick && (
+              <button
+                onClick={onContactClick}
+                className="text-sm transition-colors hover:opacity-80 bg-transparent border-none cursor-pointer"
+                style={{ color: '#9B8AA0' }}
+              >
+                Contact Us
+              </button>
+            )}
+          </div>
 
           {/* Copyright */}
           <p className="text-sm" style={{ color: '#9B8AA0' }}>

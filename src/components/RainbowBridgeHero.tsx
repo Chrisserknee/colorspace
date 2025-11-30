@@ -10,6 +10,21 @@ interface RainbowBridgeHeroProps {
 
 export default function RainbowBridgeHero({ onUploadClick }: RainbowBridgeHeroProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [portraitCount, setPortraitCount] = useState<number>(455);
+
+  // Fetch portrait count
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.portraitsCreated) {
+          setPortraitCount(data.portraitsCreated);
+        }
+      })
+      .catch(() => {
+        // Keep default count on error
+      });
+  }, []);
 
   // Close modal on ESC key
   useEffect(() => {
@@ -374,6 +389,16 @@ export default function RainbowBridgeHero({ onUploadClick }: RainbowBridgeHeroPr
             style={{ color: '#9B8AA0', fontStyle: 'italic' }}
           >
             Forever in our hearts
+          </p>
+        </div>
+
+        {/* Portrait Counter */}
+        <div className="mt-6 animate-fade-in-up delay-500">
+          <p className="text-sm" style={{ color: '#8B8B8B' }}>
+            <span style={{ color: '#D4AF37', fontWeight: '500' }}>
+              {portraitCount.toLocaleString()}+
+            </span>
+            {" "}portraits created
           </p>
         </div>
 
