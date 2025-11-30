@@ -710,15 +710,19 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                         type="button"
                         onPointerDown={(e) => {
                           e.stopPropagation();
-                          console.log("Pack button pointer down!");
-                          alert("Button clicked! Going to email step...");
+                          console.log("Pack button pointer down - saving image and changing stage");
                           // Save the pet image so it can be restored after purchase
                           if (previewUrl) {
                             savePendingImage(previewUrl);
                           }
-                          setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
-                          setEmailError(null);
-                          setStage("email");
+                          // Use setTimeout to ensure state updates happen
+                          setTimeout(() => {
+                            console.log("Setting result and stage...");
+                            setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
+                            setEmailError(null);
+                            setStage("email");
+                            console.log("Stage should now be email");
+                          }, 0);
                         }}
                         className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
                         style={{ 
@@ -1030,15 +1034,16 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                         type="button"
                         onPointerDown={(e) => {
                           e.stopPropagation();
-                          console.log("Pack button pointer down (limit_reached)!");
-                          alert("Button clicked! Going to email step...");
+                          console.log("Pack button pointer down (limit_reached)");
                           // Save the pet image so it can be restored after purchase
                           if (previewUrl) {
                             savePendingImage(previewUrl);
                           }
-                          setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
-                          setEmailError(null);
-                          setStage("email");
+                          setTimeout(() => {
+                            setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
+                            setEmailError(null);
+                            setStage("email");
+                          }, 0);
                         }}
                         className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
                         style={{ 
@@ -1067,15 +1072,16 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                         type="button"
                         onPointerDown={(e) => {
                           e.stopPropagation();
-                          console.log("Pack button pointer down (retry_used)!");
-                          alert("Button clicked! Going to email step...");
+                          console.log("Pack button pointer down (retry_used)");
                           // Save the pet image so it can be restored after purchase
                           if (previewUrl) {
                             savePendingImage(previewUrl);
                           }
-                          setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
-                          setEmailError(null);
-                          setStage("email");
+                          setTimeout(() => {
+                            setResult({ imageId: "pack", previewUrl: "" } as GeneratedResult);
+                            setEmailError(null);
+                            setStage("email");
+                          }, 0);
                         }}
                         className="w-full py-4 px-4 rounded-lg font-semibold text-base transition-all active:scale-95 hover:brightness-110 relative z-50"
                         style={{ 
