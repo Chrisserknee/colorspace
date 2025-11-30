@@ -411,21 +411,19 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   const handleRetry = () => {
     const limits = getLimits();
     
-    // Check if retry is allowed
-    if (limits.freeRetriesUsed >= 1) {
-      setError("You've already used your free retry. Purchase an image to unlock more generations!");
-      return;
-    }
-    
-    // Check overall generation limit
+    // Check overall generation limit (user gets 2 free generations total)
     const check = canGenerate(limits);
     if (!check.allowed) {
       setError(check.reason || "Generation limit reached.");
       return;
     }
     
-    // Mark retry as used BEFORE generating
-    setRetryUsed(true);
+    // Check if user still has free generations remaining
+    if (limits.freeGenerations >= 2) {
+      setError("You've used your 2 free generations. Purchase a pack to unlock more!");
+      return;
+    }
+    
     setResult(null);
     setExpirationTime(null);
     setError(null);
@@ -930,17 +928,19 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
               {(() => {
                 const limits = getLimits();
                 const check = canGenerate(limits);
-                const hasFreeRetry = limits.freeRetriesUsed < 1;
-                const canRetry = check.allowed && hasFreeRetry;
+                // User can retry if they still have free generations remaining (less than 2 used)
+                const hasRemainingFreeGens = limits.freeGenerations < 2;
+                const canRetry = check.allowed && hasRemainingFreeGens;
                 
                 if (canRetry) {
+                  const remaining = 2 - limits.freeGenerations;
                   return (
                     <button 
                       onClick={handleRetry}
                       className="w-full text-center text-sm py-2 transition-colors hover:text-[#C5A572]"
                       style={{ color: '#7A756D' }}
                     >
-                      🔄 Try Again (1 free retry)
+                      🔄 Try Again ({remaining} free generation{remaining !== 1 ? 's' : ''} remaining)
                     </button>
                   );
                 } else if (!check.allowed) {
@@ -976,7 +976,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                   return (
                     <div className="text-center">
                       <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
-                        You&apos;ve used your free retry. Purchase a pack to unlock more generations!
+                        You&apos;ve used your 2 free generations. Purchase a pack to unlock more!
                       </p>
                       <button
                         onClick={() => {
@@ -1128,3 +1128,4 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     </div>
   );
 }
+
