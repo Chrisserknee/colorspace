@@ -77,8 +77,8 @@ const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: str
   const freeLimit = 2;
   const freeUsed = limits.freeGenerations;
   
-  // Each purchase grants 5 additional generations
-  const purchaseBonus = limits.purchases * 5;
+  // Each purchase grants 2 additional watermarked generations
+  const purchaseBonus = limits.purchases * 2;
   const totalAllowed = freeLimit + purchaseBonus;
   const totalUsed = freeUsed;
   
@@ -645,7 +645,7 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
                     {generationLimits.packCredits > 0 ? (
                       `✨ ${generationLimits.packCredits} un-watermarked generation${generationLimits.packCredits !== 1 ? 's' : ''} remaining`
                     ) : generationLimits.purchases > 0 ? (
-                      `✨ ${2 + (generationLimits.purchases * 5) - generationLimits.freeGenerations} generations remaining (${generationLimits.purchases} purchase${generationLimits.purchases > 1 ? 's' : ''} active)`
+                      `✨ ${2 + (generationLimits.purchases * 2) - generationLimits.freeGenerations} generations remaining`
                     ) : (
                       `✨ ${2 - generationLimits.freeGenerations} free generation${2 - generationLimits.freeGenerations !== 1 ? 's' : ''} remaining`
                     )}

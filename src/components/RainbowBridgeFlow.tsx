@@ -77,7 +77,8 @@ const saveLimits = (limits: GenerationLimits) => {
 const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: string; hasPackCredits?: boolean } => {
   const freeLimit = 2;
   const freeUsed = limits.freeGenerations;
-  const purchaseBonus = limits.purchases * 5;
+  // Each purchase grants 2 additional watermarked generations
+  const purchaseBonus = limits.purchases * 2;
   const totalAllowed = freeLimit + purchaseBonus;
   const totalUsed = freeUsed;
   
