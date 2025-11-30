@@ -249,22 +249,15 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
   }, []);
 
   // Generate canvas image when result is available
-  // Prefer server-rendered text URL if available, fallback to client-side rendering
+  // Always use client-side canvas rendering for reliable text overlay display
+  // (Server-side sharp text rendering may fail on serverless environments)
   useEffect(() => {
     if (result?.previewUrl && petName) {
-      // If server provided a text overlay URL, use it directly
-      if (result.previewTextUrl) {
-        console.log("✅ Using server-rendered text overlay URL");
-        setCanvasImageUrl(result.previewTextUrl);
-        return;
-      }
-      
-      // Fallback to client-side canvas rendering
       const quote = result.quote || "Until we meet again at the Bridge, run free, sweet soul.";
       renderTextOverlay(result.previewUrl, petName, quote)
         .then(dataUrl => {
           setCanvasImageUrl(dataUrl);
-          console.log("✅ Canvas text overlay rendered successfully (client-side fallback)");
+          console.log("✅ Canvas text overlay rendered successfully");
         })
         .catch(err => {
           console.error("Failed to render canvas overlay:", err);

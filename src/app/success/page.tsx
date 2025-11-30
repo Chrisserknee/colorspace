@@ -222,34 +222,18 @@ function SuccessContent() {
   }, [imageId, type]);
 
   // Apply Rainbow Bridge text overlay when image and data are ready
-  // Try server-rendered version first, fall back to client-side rendering
+  // Always use client-side canvas rendering for reliable text overlay
   useEffect(() => {
     if (imageUrl && rainbowBridgeData) {
-      // First try to use server-rendered text version
-      const serverTextUrl = imageUrl.replace("-hd.png", "-hd-text.png");
-      
-      // Check if server version exists
-      fetch(serverTextUrl, { method: 'HEAD' })
-        .then(res => {
-          if (res.ok) {
-            console.log("✅ Using server-rendered text overlay for display");
-            setDisplayImageUrl(serverTextUrl);
-          } else {
-            throw new Error("Server text version not found");
-          }
+      console.log("Applying Rainbow Bridge text overlay to success page...");
+      renderTextOverlay(imageUrl, rainbowBridgeData.petName, rainbowBridgeData.quote)
+        .then(dataUrl => {
+          setDisplayImageUrl(dataUrl);
+          console.log("✅ Rainbow Bridge text overlay applied to success page");
         })
-        .catch(() => {
-          // Fall back to client-side canvas rendering
-          console.log("Server text version not available, rendering client-side...");
-          renderTextOverlay(imageUrl, rainbowBridgeData.petName, rainbowBridgeData.quote)
-            .then(dataUrl => {
-              setDisplayImageUrl(dataUrl);
-              console.log("✅ Rainbow Bridge text overlay applied via client-side rendering");
-            })
-            .catch(err => {
-              console.error("Failed to apply overlay:", err);
-              setDisplayImageUrl(imageUrl);
-            });
+        .catch(err => {
+          console.error("Failed to apply overlay:", err);
+          setDisplayImageUrl(imageUrl);
         });
     } else if (imageUrl) {
       setDisplayImageUrl(imageUrl);
