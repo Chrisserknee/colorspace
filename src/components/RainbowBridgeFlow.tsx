@@ -1153,63 +1153,19 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                 backgroundColor: 'rgba(212, 175, 55, 0.05)',
                 border: '1px solid rgba(212, 175, 55, 0.2)',
               }}>
-                <p className="mb-3" style={{ color: '#DC2626' }}>{limitCheck.reason}</p>
-                <p className="text-sm font-semibold mb-4" style={{ color: '#D4AF37' }}>✨ Unlock More Portraits</p>
-                
-                {/* Pack Options - Three Tier */}
-                <div className="grid grid-cols-3 gap-2">
-                  {/* $1 - 1 Generation */}
-                  <a
-                    href="/pack-checkout?pack=1"
-                    className="block p-3 rounded-lg text-center transition-all hover:scale-105"
-                    style={{ 
-                      backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                      border: '1px solid rgba(212, 175, 55, 0.3)',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <p className="text-lg font-bold" style={{ color: '#4A4A4A' }}>$1</p>
-                    <p className="text-xs" style={{ color: '#6B6B6B' }}>1 portrait</p>
-                  </a>
-                  
-                  {/* $5 - 5 Generations - Best Value */}
-                  <a
-                    href="/pack-checkout?pack=5"
-                    className="block p-3 rounded-lg text-center transition-all hover:scale-105 relative"
-                    style={{ 
-                      backgroundColor: '#D4AF37',
-                      border: '2px solid #E6C866',
-                      textDecoration: 'none',
-                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)',
-                    }}
-                  >
-                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#4ADE80', color: '#1A1A1A' }}>BEST</span>
-                    <p className="text-lg font-bold" style={{ color: '#FFFFFF' }}>$5</p>
-                    <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>5 portraits</p>
-                  </a>
-                  
-                  {/* $10 - 10 Generations - Most Savings */}
-                  <a
-                    href="/pack-checkout?pack=10"
-                    className="block p-3 rounded-lg text-center transition-all hover:scale-105 relative"
-                    style={{ 
-                      backgroundColor: 'rgba(212, 175, 55, 0.15)',
-                      border: '1px solid rgba(212, 175, 55, 0.4)',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#60A5FA', color: '#1A1A1A' }}>SAVE</span>
-                    <p className="text-lg font-bold" style={{ color: '#4A4A4A' }}>$10</p>
-                    <p className="text-xs" style={{ color: '#6B6B6B' }}>10 portraits</p>
-                  </a>
-                </div>
-                
-                <p className="text-[10px] mt-3" style={{ color: '#7A756D' }}>
-                  Watermarked previews • HD available for $19.99 each
-                </p>
-                <p className="text-[10px] mt-2 italic" style={{ color: '#D4AF37' }}>
-                  95% of LumePet users unlock more portraits after their first 2.
-                </p>
+                <p className="mb-4" style={{ color: '#DC2626' }}>{limitCheck.reason}</p>
+                <a
+                  href="/pack-checkout"
+                  className="inline-block px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105"
+                  style={{ 
+                    backgroundColor: '#D4AF37',
+                    color: '#FFFFFF',
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)',
+                  }}
+                >
+                  ✨ Unlock More Portraits
+                </a>
               </div>
             )}
 
@@ -1521,57 +1477,17 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                       <p className="text-sm mb-4" style={{ color: '#9B8AA0' }}>
                         Want to create more memorial portraits?
                       </p>
-                      
-                      {/* Pack Options - Compact Three Tier */}
-                      <div className="grid grid-cols-3 gap-2">
-                        <a
-                          href="/pack-checkout?pack=1"
-                          className="block p-2 rounded-lg text-center transition-all hover:scale-105"
-                          style={{ 
-                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                            border: '1px solid rgba(212, 175, 55, 0.3)',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <p className="text-sm font-bold" style={{ color: '#4A4A4A' }}>$1</p>
-                          <p className="text-[10px]" style={{ color: '#6B6B6B' }}>1 portrait</p>
-                        </a>
-                        
-                        <a
-                          href="/pack-checkout?pack=5"
-                          className="block p-2 rounded-lg text-center transition-all hover:scale-105 relative"
-                          style={{ 
-                            backgroundColor: '#D4AF37',
-                            border: '2px solid #E6C866',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#4ADE80', color: '#1A1A1A' }}>BEST</span>
-                          <p className="text-sm font-bold" style={{ color: '#FFFFFF' }}>$5</p>
-                          <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>5 portraits</p>
-                        </a>
-                        
-                        <a
-                          href="/pack-checkout?pack=10"
-                          className="block p-2 rounded-lg text-center transition-all hover:scale-105 relative"
-                          style={{ 
-                            backgroundColor: 'rgba(212, 175, 55, 0.15)',
-                            border: '1px solid rgba(212, 175, 55, 0.4)',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#60A5FA', color: '#1A1A1A' }}>SAVE</span>
-                          <p className="text-sm font-bold" style={{ color: '#4A4A4A' }}>$10</p>
-                          <p className="text-[10px]" style={{ color: '#6B6B6B' }}>10 portraits</p>
-                        </a>
-                      </div>
-                      
-                      <p className="text-[9px] mt-2" style={{ color: '#7A756D' }}>
-                        Watermarked previews
-                      </p>
-                      <p className="text-[9px] mt-1 italic" style={{ color: '#D4AF37' }}>
-                        95% of users unlock more portraits after their first 2
-                      </p>
+                      <a
+                        href="/pack-checkout"
+                        className="inline-block px-5 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                        style={{ 
+                          backgroundColor: '#D4AF37',
+                          color: '#FFFFFF',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        ✨ Unlock More Portraits
+                      </a>
                     </div>
                   );
                 }

@@ -969,66 +969,20 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                     )}
                   </p>
                 ) : (
-                  <div>
-                    <p className="mb-3">{limitCheck.reason}</p>
-                    {/* Pack Purchase Options - Three Tiers */}
-                    <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(197, 165, 114, 0.05)', border: '1px solid rgba(197, 165, 114, 0.2)' }}>
-                      <p className="text-sm font-semibold mb-4 text-center" style={{ color: '#C5A572' }}>✨ Unlock More Portraits</p>
-                      
-                      <div className="grid grid-cols-3 gap-2">
-                        {/* $1 - 1 Generation */}
-                        <a
-                          href="/pack-checkout?pack=1"
-                          className="block p-3 rounded-lg text-center transition-all hover:scale-105"
-                          style={{ 
-                            backgroundColor: 'rgba(197, 165, 114, 0.1)',
-                            border: '1px solid rgba(197, 165, 114, 0.3)',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <p className="text-lg font-bold" style={{ color: '#F0EDE8' }}>$1</p>
-                          <p className="text-xs" style={{ color: '#B8B2A8' }}>1 portrait</p>
-                        </a>
-                        
-                        {/* $5 - 5 Generations - Best Value */}
-                        <a
-                          href="/pack-checkout?pack=5"
-                          className="block p-3 rounded-lg text-center transition-all hover:scale-105 relative"
-                          style={{ 
-                            backgroundColor: '#C5A572',
-                            border: '2px solid #D4B896',
-                            textDecoration: 'none',
-                            boxShadow: '0 4px 15px rgba(197, 165, 114, 0.4)',
-                          }}
-                        >
-                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#4ADE80', color: '#1A1A1A' }}>BEST</span>
-                          <p className="text-lg font-bold" style={{ color: '#1A1A1A' }}>$5</p>
-                          <p className="text-xs font-medium" style={{ color: '#2D2A26' }}>5 portraits</p>
-                        </a>
-                        
-                        {/* $10 - 10 Generations - Most Savings */}
-                        <a
-                          href="/pack-checkout?pack=10"
-                          className="block p-3 rounded-lg text-center transition-all hover:scale-105 relative"
-                          style={{ 
-                            backgroundColor: 'rgba(197, 165, 114, 0.15)',
-                            border: '1px solid rgba(197, 165, 114, 0.4)',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#60A5FA', color: '#1A1A1A' }}>SAVE</span>
-                          <p className="text-lg font-bold" style={{ color: '#F0EDE8' }}>$10</p>
-                          <p className="text-xs" style={{ color: '#B8B2A8' }}>10 portraits</p>
-                        </a>
-                      </div>
-                      
-                      <p className="text-[10px] mt-3 text-center" style={{ color: '#9A958D' }}>
-                        Watermarked previews • HD available for $19.99 each
-                      </p>
-                      <p className="text-[10px] mt-2 text-center italic" style={{ color: '#C5A572' }}>
-                        95% of LumePet users unlock more portraits after their first 2.
-                      </p>
-                    </div>
+                  <div className="text-center">
+                    <p className="mb-4">{limitCheck.reason}</p>
+                    <a
+                      href="/pack-checkout"
+                      className="inline-block px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105"
+                      style={{ 
+                        backgroundColor: '#C5A572',
+                        color: '#1A1A1A',
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 15px rgba(197, 165, 114, 0.4)',
+                      }}
+                    >
+                      ✨ Unlock More Portraits
+                    </a>
                   </div>
                 )}
               </div>
@@ -1409,57 +1363,17 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                       <p className="text-sm mb-4" style={{ color: '#7A756D' }}>
                         Want to generate more portraits?
                       </p>
-                      
-                      {/* Pack Options - Compact Three Tier */}
-                      <div className="grid grid-cols-3 gap-2">
-                        <a
-                          href="/pack-checkout?pack=1"
-                          className="block p-2 rounded-lg text-center transition-all hover:scale-105"
-                          style={{ 
-                            backgroundColor: 'rgba(197, 165, 114, 0.1)',
-                            border: '1px solid rgba(197, 165, 114, 0.3)',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <p className="text-sm font-bold" style={{ color: '#F0EDE8' }}>$1</p>
-                          <p className="text-[10px]" style={{ color: '#B8B2A8' }}>1 portrait</p>
-                        </a>
-                        
-                        <a
-                          href="/pack-checkout?pack=5"
-                          className="block p-2 rounded-lg text-center transition-all hover:scale-105 relative"
-                          style={{ 
-                            backgroundColor: '#C5A572',
-                            border: '2px solid #D4B896',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#4ADE80', color: '#1A1A1A' }}>BEST</span>
-                          <p className="text-sm font-bold" style={{ color: '#1A1A1A' }}>$5</p>
-                          <p className="text-[10px] font-medium" style={{ color: '#2D2A26' }}>5 portraits</p>
-                        </a>
-                        
-                        <a
-                          href="/pack-checkout?pack=10"
-                          className="block p-2 rounded-lg text-center transition-all hover:scale-105 relative"
-                          style={{ 
-                            backgroundColor: 'rgba(197, 165, 114, 0.15)',
-                            border: '1px solid rgba(197, 165, 114, 0.4)',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#60A5FA', color: '#1A1A1A' }}>SAVE</span>
-                          <p className="text-sm font-bold" style={{ color: '#F0EDE8' }}>$10</p>
-                          <p className="text-[10px]" style={{ color: '#B8B2A8' }}>10 portraits</p>
-                        </a>
-                      </div>
-                      
-                      <p className="text-[9px] mt-2" style={{ color: '#9A958D' }}>
-                        Watermarked previews
-                      </p>
-                      <p className="text-[9px] mt-1 italic" style={{ color: '#C5A572' }}>
-                        95% of users unlock more portraits after their first 2
-                      </p>
+                      <a
+                        href="/pack-checkout"
+                        className="inline-block px-5 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                        style={{ 
+                          backgroundColor: '#C5A572',
+                          color: '#1A1A1A',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        ✨ Unlock More Portraits
+                      </a>
                     </div>
                   );
                 }
