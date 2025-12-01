@@ -251,7 +251,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
             </p>
           </div>
 
-          {/* Second Portrait - Theodore */}
+          {/* Second Portrait - Duchess */}
           <div className="flex flex-col items-center">
             <div 
               className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
@@ -313,7 +313,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                     >
                       <img 
                         src="/samples/chihuahua.png" 
-                        alt="Theodore - Royal Dog Portrait"
+                        alt="Duchess - Royal Dog Portrait"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -331,7 +331,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 letterSpacing: '0.05em'
               }}
             >
-              Theodore
+              Duchess
             </p>
           </div>
         </div>
