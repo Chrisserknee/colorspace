@@ -1203,88 +1203,74 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
           </div>
         )}
 
-        {/* Generating Stage - Elegant Full-Screen Loading */}
+        {/* Generating Stage - Elegant Loading */}
         {stage === "generating" && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 sm:relative sm:inset-auto sm:z-auto sm:p-8 sm:min-h-[400px]" style={{ backgroundColor: '#0F0F0F' }}>
-            <div className="flex flex-col items-center justify-center w-full max-w-sm">
-              {/* Elegant glow background effect */}
-              <div 
-                className="absolute inset-0 opacity-30 pointer-events-none"
+          <div className="p-6 sm:p-8 flex flex-col items-center justify-center min-h-[400px]">
+            {/* Floating LumePet Logo with enhanced glow */}
+            <div 
+              className="mb-8 relative"
+              style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
+            >
+              <Image
+                src="/samples/LumePet2.png"
+                alt="LumePet"
+                width={120}
+                height={120}
+                className="object-contain animate-float"
                 style={{
-                  background: 'radial-gradient(circle at 50% 40%, rgba(197, 165, 114, 0.15) 0%, transparent 60%)',
+                  filter: 'drop-shadow(0 0 20px rgba(197, 165, 114, 0.5)) drop-shadow(0 0 40px rgba(197, 165, 114, 0.3))'
                 }}
+                priority
               />
-              
-              {/* Floating LumePet Logo with enhanced glow */}
-              <div 
-                className="mb-10 relative"
-                style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
+            </div>
+            
+            {/* Creating your masterpiece title */}
+            <h3 
+              className="text-xl sm:text-2xl font-semibold mb-3 text-center"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            >
+              Creating Your Masterpiece
+            </h3>
+            
+            {/* Fading phrase */}
+            <div className="h-12 flex items-center justify-center mb-6">
+              <p 
+                className={`text-base sm:text-lg italic text-center transition-all duration-1000 ease-in-out px-4 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
+                style={{ 
+                  fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                  color: '#C5A572',
+                  letterSpacing: '0.05em',
+                }}
               >
-                <div 
-                  className="absolute inset-0 blur-2xl opacity-50"
-                  style={{ backgroundColor: 'rgba(197, 165, 114, 0.3)' }}
-                />
-                <Image
-                  src="/samples/LumePet2.png"
-                  alt="LumePet"
-                  width={140}
-                  height={140}
-                  className="object-contain animate-float relative z-10"
-                  style={{
-                    filter: 'drop-shadow(0 0 30px rgba(197, 165, 114, 0.6)) drop-shadow(0 0 60px rgba(197, 165, 114, 0.3))'
-                  }}
-                  priority
-                />
-              </div>
-              
-              {/* Creating your masterpiece title */}
-              <h3 
-                className="text-xl sm:text-2xl font-semibold mb-4 text-center"
-                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
-              >
-                Creating Your Masterpiece
-              </h3>
-              
-              {/* Fading phrase */}
-              <div className="h-14 flex items-center justify-center mb-8">
-                <p 
-                  className={`text-base sm:text-lg italic text-center transition-all duration-1000 ease-in-out px-4 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
-                  style={{ 
-                    fontFamily: "'Cormorant Garamond', Georgia, serif", 
-                    color: '#C5A572',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  {VICTORIAN_PHRASES[currentPhrase]}
-                </p>
-              </div>
-
-              {/* Progress bar with percentage */}
-              <div className="w-full max-w-xs mb-3">
-                <div 
-                  className="h-2 rounded-full overflow-hidden"
-                  style={{ backgroundColor: 'rgba(197, 165, 114, 0.15)' }}
-                >
-                  <div 
-                    className="h-full rounded-full transition-all duration-300 ease-out"
-                    style={{ 
-                      backgroundColor: '#C5A572',
-                      width: `${generationProgress}%`,
-                      boxShadow: '0 0 10px rgba(197, 165, 114, 0.5)',
-                    }}
-                  />
-                </div>
-              </div>
-              
-              {/* Progress percentage */}
-              <p className="text-sm font-medium mb-2" style={{ color: '#C5A572' }}>
-                {Math.round(generationProgress)}%
-              </p>
-
-              <p className="text-xs text-center" style={{ color: '#7A756D' }}>
-                Our artists are hand-painting your portrait...
+                {VICTORIAN_PHRASES[currentPhrase]}
               </p>
             </div>
+
+            {/* Progress bar with percentage */}
+            <div className="w-full max-w-xs mb-3 px-4">
+              <div 
+                className="h-2 rounded-full overflow-hidden"
+                style={{ backgroundColor: 'rgba(197, 165, 114, 0.15)' }}
+              >
+                <div 
+                  className="h-full rounded-full transition-all duration-300 ease-out"
+                  style={{ 
+                    backgroundColor: '#C5A572',
+                    width: `${generationProgress}%`,
+                    boxShadow: '0 0 10px rgba(197, 165, 114, 0.5)',
+                  }}
+                />
+              </div>
+            </div>
+            
+            {/* Progress percentage */}
+            <p className="text-sm font-medium mb-2" style={{ color: '#C5A572' }}>
+              {Math.round(generationProgress)}%
+            </p>
+
+            <p className="text-xs text-center" style={{ color: '#7A756D' }}>
+              Our artists are hand-painting your portrait...
+            </p>
           </div>
         )}
 

@@ -1331,88 +1331,74 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
           </div>
         )}
 
-        {/* Generating Stage - Heavenly Full-Screen Loading */}
+        {/* Generating Stage - Heavenly Loading */}
         {stage === "generating" && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 sm:relative sm:inset-auto sm:z-auto sm:p-8 sm:min-h-[400px]" style={{ backgroundColor: '#FDFCFA' }}>
-            <div className="flex flex-col items-center justify-center w-full max-w-sm">
-              {/* Elegant glow background effect */}
-              <div 
-                className="absolute inset-0 opacity-30 pointer-events-none"
+          <div className="p-6 sm:p-8 flex flex-col items-center justify-center min-h-[400px]">
+            {/* Floating LumePet Logo with enhanced glow */}
+            <div 
+              className="mb-8 relative"
+              style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
+            >
+              <Image
+                src="/samples/LumePet2.png"
+                alt="LumePet"
+                width={120}
+                height={120}
+                className="object-contain animate-float"
                 style={{
-                  background: 'radial-gradient(circle at 50% 40%, rgba(212, 175, 55, 0.2) 0%, transparent 60%)',
+                  filter: 'drop-shadow(0 0 20px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.3))'
                 }}
+                priority
               />
-              
-              {/* Floating LumePet Logo with enhanced glow */}
-              <div 
-                className="mb-10 relative"
-                style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
+            </div>
+            
+            {/* Creating memorial title */}
+            <h3 
+              className="text-xl sm:text-2xl font-semibold mb-3 text-center"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#4A4A4A' }}
+            >
+              Creating {petName}&apos;s Memorial
+            </h3>
+            
+            {/* Fading phrase */}
+            <div className="h-12 flex items-center justify-center mb-6">
+              <p 
+                className={`text-base sm:text-lg italic text-center transition-all duration-1000 ease-in-out px-4 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
+                style={{ 
+                  fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                  color: '#9B8AA0',
+                  letterSpacing: '0.05em',
+                }}
               >
-                <div 
-                  className="absolute inset-0 blur-2xl opacity-40"
-                  style={{ backgroundColor: 'rgba(212, 175, 55, 0.4)' }}
-                />
-                <Image
-                  src="/samples/LumePet2.png"
-                  alt="LumePet"
-                  width={140}
-                  height={140}
-                  className="object-contain animate-float relative z-10"
-                  style={{
-                    filter: 'drop-shadow(0 0 30px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 60px rgba(212, 175, 55, 0.3))'
-                  }}
-                  priority
-                />
-              </div>
-              
-              {/* Creating memorial title */}
-              <h3 
-                className="text-xl sm:text-2xl font-semibold mb-4 text-center"
-                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#4A4A4A' }}
-              >
-                Creating {petName}&apos;s Memorial
-              </h3>
-              
-              {/* Fading phrase */}
-              <div className="h-14 flex items-center justify-center mb-8">
-                <p 
-                  className={`text-base sm:text-lg italic text-center transition-all duration-1000 ease-in-out px-4 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
-                  style={{ 
-                    fontFamily: "'Cormorant Garamond', Georgia, serif", 
-                    color: '#9B8AA0',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  {HEAVENLY_PHRASES[currentPhrase]}
-                </p>
-              </div>
-
-              {/* Progress bar with percentage */}
-              <div className="w-full max-w-xs mb-3">
-                <div 
-                  className="h-2 rounded-full overflow-hidden"
-                  style={{ backgroundColor: 'rgba(212, 175, 55, 0.15)' }}
-                >
-                  <div 
-                    className="h-full rounded-full transition-all duration-300 ease-out"
-                    style={{ 
-                      backgroundColor: '#D4AF37',
-                      width: `${generationProgress}%`,
-                      boxShadow: '0 0 10px rgba(212, 175, 55, 0.5)',
-                    }}
-                  />
-                </div>
-              </div>
-              
-              {/* Progress percentage */}
-              <p className="text-sm font-medium mb-2" style={{ color: '#D4AF37' }}>
-                {Math.round(generationProgress)}%
-              </p>
-
-              <p className="text-xs text-center" style={{ color: '#9B8AA0' }}>
-                Our artists are hand-painting {petName}&apos;s portrait...
+                {HEAVENLY_PHRASES[currentPhrase]}
               </p>
             </div>
+
+            {/* Progress bar with percentage */}
+            <div className="w-full max-w-xs mb-3 px-4">
+              <div 
+                className="h-2 rounded-full overflow-hidden"
+                style={{ backgroundColor: 'rgba(212, 175, 55, 0.15)' }}
+              >
+                <div 
+                  className="h-full rounded-full transition-all duration-300 ease-out"
+                  style={{ 
+                    backgroundColor: '#D4AF37',
+                    width: `${generationProgress}%`,
+                    boxShadow: '0 0 10px rgba(212, 175, 55, 0.5)',
+                  }}
+                />
+              </div>
+            </div>
+            
+            {/* Progress percentage */}
+            <p className="text-sm font-medium mb-2" style={{ color: '#D4AF37' }}>
+              {Math.round(generationProgress)}%
+            </p>
+
+            <p className="text-xs text-center" style={{ color: '#9B8AA0' }}>
+              Our artists are hand-painting {petName}&apos;s portrait...
+            </p>
           </div>
         )}
 
