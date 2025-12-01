@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { saveMetadata, getMetadata } from "@/lib/supabase";
+import { saveMetadata, getMetadata, markLeadAsPurchased } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
 
 // Initialize Stripe lazily to avoid build-time errors
@@ -72,6 +72,17 @@ export async function POST(request: NextRequest) {
             });
             console.log(`✅ Payment confirmed for image: ${imageId}`);
             
+            // Mark lead as purchased to stop follow-up emails
+            if (customerEmail) {
+              try {
+                await markLeadAsPurchased(customerEmail);
+                console.log(`📧 Lead marked as purchased: ${customerEmail}`);
+              } catch (leadError) {
+                console.warn(`⚠️ Failed to mark lead as purchased:`, leadError);
+                // Don't fail the webhook - lead tracking is non-critical
+              }
+            }
+            
             // Send confirmation email with download link
             if (customerEmail) {
               const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://lumepet.app";
@@ -108,6 +119,15 @@ export async function POST(request: NextRequest) {
         } else if (isPackPurchase) {
           console.log(`📦 Pack purchase completed (session: ${session.id})`);
           // Pack purchases don't have a specific image to email about
+          // But we should still mark the lead as purchased
+          if (customerEmail) {
+            try {
+              await markLeadAsPurchased(customerEmail);
+              console.log(`📧 Lead marked as purchased (pack): ${customerEmail}`);
+            } catch (leadError) {
+              console.warn(`⚠️ Failed to mark lead as purchased:`, leadError);
+            }
+          }
         } else {
           console.log(`⚠️ checkout.session.completed event has no imageId in metadata (session: ${session.id})`);
         }
