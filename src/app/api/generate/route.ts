@@ -437,8 +437,8 @@ async function applyStyleTransfer(
       {
         input: {
           image: contentImageUrl,
-          prompt: "oil painting portrait, late 18th-century European aristocratic style (1770-1830), Georgian Regency Napoleonic era portraiture, classical fine art, LONG FLOWING visible brushstrokes, elongated brushwork, rich impasto texture, BRIGHT warm golden lighting, BRIGHTER overall illumination, DEEP RICH SATURATED luminous colors, rich jewel tones, SILKY LUSTROUS fabrics with visible sheen, PURE BRIGHT WHITE highlights, SUBTLE LUMINOUS GLOW throughout, gentle radiance and brightness, hand-painted charm with slight imperfections, elegant AIRY NOT gloomy, DEEP RICH SATURATED colors, DARKER TONES retained in shadows and background for depth, SPACIOUS background with DEPTH, luminous glazing technique, BRIGHT and beautiful, BRIGHTER illumination, subject GLOWS with BRIGHT warm light, fabrics GLOW with DEEP RICH color, preserve deep blacks rich and intact, slightly soft edges painterly, Gainsborough Reynolds Vigée Le Brun style",
-          negative_prompt: "photograph, photo, realistic, modern, digital art, cartoon, anime, blurry, low quality, watermark, gloomy, overly dark, dark background, muted colors, dull colors, dark colors, short brushstrokes, grey whites, muddy whites, too perfect, clinical, sharp edges everywhere, flat background, medieval, Renaissance, matte fabrics, non-silky textures, human clothing, sleeves, buttons, tailored garments, human-like pose, anthropomorphic, human posture, standing upright, standing on hind legs, bipedal, close-up, cropped",
+          prompt: "AUTHENTIC 300-year-old HEAVILY AGED ANTIQUE oil painting portrait, late 18th-century European aristocratic masterpiece (1770-1830), EXTREMELY ROUGH WEATHERED TEXTURE like ancient artifact, PROMINENT CRAQUELURE visible crack network throughout like cracked earth, HEAVY THICK AMBER VARNISH PATINA noticeably yellowed and aged, THICK SCULPTURAL IMPASTO with worn peaks, COARSE CANVAS WEAVE clearly visible throughout, WEATHERED WORN EDGES paint thinned at corners and perimeter, SIGNIFICANT SURFACE WEAR rubbed areas, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES, GRIME DUST PATINA in crevices, FOXING age spots discoloration, PET IN NATURAL RELAXED comfortable pose, colors with STRONG AMBER CAST from aged varnish, LOOSE FLOWING BRUSHWORK long sweeping strokes, Gainsborough LOOSE FEATHERY brushwork Reynolds glazes Vigée Le Brun elegance, DISCOVERED IN FORGOTTEN CASTLE after 300 years covered in dust and centuries of patina, LUSTROUS fabrics GLEAMING gold SPARKLING gems, ancient museum artifact quality",
+          negative_prompt: "photograph, photo, photorealistic, modern, digital art, cartoon, anime, CGI, 3D render, blurry, low quality, watermark, gloomy, flat lighting, muted colors, dull colors, grey colors, muddy colors, smooth gradients, airbrushed, plastic looking, too perfect, too smooth, too clean, too new, freshly painted, pristine, crisp clean edges, restored, cleaned, clinical, sharp edges everywhere, flat background, flat colors, no texture, no brushstrokes, no cracks, no aging, no patina, overly refined, digitally perfect, stiff pose, rigid posture, medieval, Renaissance, matte fabrics, human clothing, human-like pose, anthropomorphic, standing upright, bipedal, close-up, cropped, washed out, faded, low contrast",
           prompt_strength: styleStrength,
           num_inference_steps: 25,
           guidance_scale: 7.5,
@@ -553,61 +553,70 @@ async function generateWithStableDiffusion(
   const breedInfo = breed ? `${breed} ${species.toLowerCase()}` : species.toLowerCase();
   
   // Create a detailed prompt that describes both the pet and the desired style
-  const sdPrompt = `A majestic royal late 18th-century European aristocratic oil painting portrait of a ${breedInfo}, seated regally on a luxurious velvet cushion. Georgian/Regency/Napoleonic era style (1770-1830).
+  const sdPrompt = `AUTHENTIC 300-year-old HEAVILY AGED ANTIQUE oil painting masterpiece portrait of a ${breedInfo}, in NATURAL RELAXED POSE on luxurious velvet cushion. Late 18th-century European aristocratic style (1770-1830) Georgian/Regency/Napoleonic era.
 
 SUBJECT - THIS SPECIFIC ${species.toUpperCase()}:
 The ${species.toLowerCase()} has the exact features from the reference image - preserve the face structure, eye color, markings, and unique characteristics.
 
-STYLE AND SETTING:
-- Classical Flemish/Dutch Golden Age oil painting style
-- Rich impasto brushstrokes, visible paint texture
-- Luminous glazing technique with depth
-- Warm golden late 18th-century portrait lighting from the left
-- Elegant palace interior background with rich colors
+NATURAL RELAXED POSE (NOT stiff or rigid):
+- Pet looks COMFORTABLE and AT EASE - relaxed body language, soft posture
+- Can be: slightly reclined, settled down naturally, head tilted, gently curved, or peacefully resting
+- Expression AUTHENTIC and genuine - not forced or artificial
+- Front paws visible, positioned naturally (crossed, tucked, or resting)
+- Overall feeling of a beloved pet captured in a quiet, comfortable moment
 
-ROYAL ATTIRE:
-- Dainty delicate velvet cloak in sapphire blue, ruby red, cream, or white - soft plush velvety texture
-- Gold thread embroidery patterns throughout
-- Ermine-style white fur trim with black spots
-- Dainty delicate fabric with soft plush velvety texture draped delicately over body
-- Dainty antique jewelry: gem clusters (ruby, emerald, amethyst, topaz), gold filigree, small pearls, multi-chain necklaces
-- NOT modern jewelry, NOT simple beads
+HEAVILY AGED ANTIQUE OIL PAINTING (PUSH AGING EFFECTS HARD):
+- LOOSE FLOWING BRUSHWORK: Long sweeping strokes 6-12 inches, graceful curves following form
+- EXTREMELY ROUGH WEATHERED TEXTURE: Surface looks ANCIENT, heavily TEXTURED like artifact
+- PROMINENT CRAQUELURE: CLEARLY VISIBLE network of cracks throughout - like cracked dried earth
+- HEAVY THICK AMBER VARNISH PATINA: Noticeably yellowed and aged golden-brown tone
+- THICK SCULPTURAL IMPASTO with WORN PEAKS from centuries of handling
+- VISIBLE BRISTLE MARKS showing brush movement direction
+- FEATHERY EDGES: Soft trailing brush endings that fade naturally
+- DRY BRUSH SCRATCHES: Heavy scratchy, textured strokes throughout
+- COARSE CANVAS WEAVE clearly visible - aged linen texture prominent
+- SIGNIFICANT SURFACE WEAR: Obvious weathering on raised impasto, rubbed areas
+- WEATHERED SOFT EDGES: Paint worn at corners and perimeter, canvas peeking through
+- GRIME AND DUST: Visible accumulation in every paint crevice - centuries of patina
+- FOXING AND AGE SPOTS: Discoloration marks from time
+
+COLORS WITH STRONG AMBER CAST:
+- BRILLIANT JEWEL TONES with heavy amber varnish overlay - noticeably aged
+- LUSTROUS velvet cloak, GLEAMING gold embroidery
+- SPARKLING gems with INTERNAL FIRE
+- Everything has warm amber-brown cast from aged varnish layers
+- Colors MELLOWED and WARMED by 300 years
 
 COMPOSITION:
-- Subject LOW and CENTRAL on velvet throne cushion
-- Body ¾ view, head forward - late 18th-century aristocratic portrait posture
-- Front paws visible, resting on cushion
-- Cloak draped over body + cushion with realistic folds
-- Medium close-up: chest to top of head
-- Noble, dignified expression
+- Subject LOW and CENTRAL on ornate velvet throne cushion
+- NATURAL body position - comfortable, relaxed, at ease
+- Front paws visible, positioned naturally
+- Cloak draped naturally with realistic fabric folds
+- Authentic, genuine expression
 
-BACKGROUND:
-- Deep dark gradient: black → espresso → deep olive (soft painterly, NOT uniform)
-- Large draped fabrics behind: heavy velvet/brocade in burgundy, crimson, deep purple
-- Visible folds, shadows, texture
-- ZERO modern elements - late 18th-century aristocratic portrait studio only
+ATMOSPHERIC BACKGROUND:
+- SFUMATO depth: warm earth tones receding into atmospheric haze
+- Rich draped fabrics with heavily aged quality
+- LUMINOUS quality with heavy amber varnish glow
 
-LIGHTING (18th-19th Century Style):
-- Single warm key light from upper left/front
-- Soft dramatic chiaroscuro: deep shadows, strong highlights
-- Sculpted fur texture, background falls into darkness
-- Warm golden rim highlights around pet
+DISCOVERED IN FORGOTTEN CASTLE:
+- Looks like ANCIENT 300-year-old painting by Gainsborough, Reynolds, or Vigée Le Brun
+- LOOSE FEATHERY BRUSHWORK - light, airy, flowing, alive with movement
+- HEAVY CRAQUELURE, THICK PATINA, SIGNIFICANT SURFACE WEAR throughout
+- Discovered in a castle attic after 300 years - NOT cleaned or restored
+- EXTREMELY ROUGH WEATHERED AUTHENTIC TEXTURE - ancient artifact quality
+- Worth millions - belongs in National Portrait Gallery`;
 
-RENDERING:
-- TRUE OIL PAINTING: LONG FLOWING visible brush strokes, thick layered pigments
-- ELONGATED brushwork - longer strokes for painterly effect
-- BRIGHT highlights throughout
-- BRIGHTER overall illumination - well-lit subject
-- High detail but NOT photorealistic
-- Late 18th-century aristocratic portrait feel (1770-1830)
-- NOT digital, NOT airbrushed, NOT smooth
-- NOT Renaissance - specifically Georgian/Regency/Napoleonic era`;
-
-  const negativePrompt = `photograph, photo, photorealistic, modern, digital art, cartoon, anime, 3d render, 
+  const negativePrompt = `photograph, photo, photorealistic, modern, digital art, cartoon, anime, 3d render, CGI,
 blurry, low quality, watermark, text, logo, 
 human body, humanoid, anthropomorphic, bipedal, standing upright, human pose, standing on hind legs,
 wrong species, different animal, 
-dark, gloomy, shadowy, muddy colors, muted colors, dull colors,
+flat colors, flat lighting, no texture, smooth gradients, airbrushed, plastic looking, too smooth, too perfect,
+too clean, too new, freshly painted, pristine, crisp edges, restored, cleaned,
+stiff pose, rigid posture, unnatural position, forced expression,
+no cracks, no aging, no patina, no weathering,
+overly refined, digitally perfect, clinical, polished, slick,
+muted colors, dull colors, grey colors, muddy colors, washed out, faded, low saturation,
 deformed, disfigured, bad anatomy, wrong proportions,
 ugly, duplicate, extra limbs, missing limbs, close-up, cropped`;
   
@@ -753,40 +762,43 @@ async function generateRoyalScene(
   const scenePrompt = `A luxurious Victorian royal portrait scene with bright vibrant jewel tones and ornate details, empty and ready for a pet to be placed.
 
 SCENE ELEMENTS:
-- Plush BRIGHT TEAL/TURQUOISE velvet cushion with intricate GOLD EMBROIDERY and gold tassel, positioned in foreground
-- Sumptuous BRIGHT DEEP RED/BURGUNDY velvet royal robe with ornate GOLD FILIGREE trim, draped elegantly
-- Dainty delicate PEARL NECKLACE with small bright colorful gemstone pendant (vibrant rubies, emeralds, sapphires), displayed on cushion
-- Cream/ivory RUFFLED LACE COLLAR (Elizabethan ruff style) ready to frame a pet's neck
-- BRIGHT DEEP GREEN velvet curtain draped on one side for depth
-- Rich warm BRIGHT GOLDEN-OLIVE background with soft painterly gradient, luminous and vibrant
+- LUSTROUS velvet cushion with VISIBLE PILE texture catching light, GLEAMING gold embroidery with METALLIC SHEEN, ornate gold tassels
+- SUMPTUOUS velvet royal robe with RICH SATURATED color, BRILLIANT gold filigree trim that SHIMMERS, natural draping folds
+- SPARKLING jewelry: pearls with IRIDESCENT overtones, gems with INTERNAL FIRE and light refraction
+- Cream/ivory RUFFLED LACE COLLAR with delicate texture details, Elizabethan ruff style
+- RICH SATURATED velvet curtain draped to one side creating atmospheric depth
+- LUMINOUS warm background with SFUMATO gradient, seems to GLOW from within
 
-COLORS (IMPORTANT):
-- Bright vibrant teal/turquoise velvet cushion
-- Bright deep burgundy/crimson red robe  
-- Gold embroidery and trim throughout
-- Bright deep forest green curtain accent
-- Warm bright golden background
-- Cream/ivory lace details
-- Pearl white and bright colorful gemstone jewelry (vibrant rubies, emeralds, sapphires)
-- Preserve deep blacks rich and intact where they exist
+VIVID SATURATED COLORS:
+- BRILLIANT jewel-toned velvet cushion - colors that SING with vibrancy
+- RICH SATURATED burgundy/crimson robe with LUSTROUS sheen
+- GLEAMING gold embroidery with true METALLIC reflection quality
+- DEEP SATURATED forest green curtain accent
+- WARM GLOWING golden-amber background radiating light
+- LUSTROUS cream/ivory lace with subtle warm undertones
+- SPARKLING gems: vivid ruby, rich emerald, deep sapphire with BRILLIANT internal fire
+- VELVETY deep blacks with subtle undertones - never flat or grey
 
-LIGHTING:
-- Bright warm, golden late 18th-century portrait lighting
-- Luminous and vibrant, not harsh
-- Gentle shadows for depth
-- Rich, bright, and inviting atmosphere
+AUTHENTIC OIL PAINTING LIGHTING:
+- BRILLIANT warm golden key light making everything RADIATE
+- LUMINOUS atmosphere - fabrics seem to GLOW from within
+- Rich chiaroscuro with COLORFUL shadows (warm browns, deep reds) not grey
+- GLEAMING highlights on metallic and lustrous surfaces
 
-STYLE:
-- Classical Flemish/Dutch Golden Age oil painting
-- Visible brushstrokes and rich impasto texture
-- Museum masterpiece quality
-- Ornate, luxurious, regal
+AUTHENTIC OIL PAINTING STYLE:
+- THICK IMPASTO texture with RAISED PAINT on highlights
+- VISIBLE BRISTLE MARKS in brushstrokes
+- TRANSPARENT GLAZES creating depth in shadows
+- CANVAS WEAVE visible through thin paint areas
+- VARNISHED SATIN FINISH with rich lustrous sheen
+- Museum masterpiece quality - looks genuinely antique
 
 IMPORTANT: 
 - Leave clear space in center for a pet to be composited
 - No animals or people in the scene
 - The cushion and robe should be arranged for a pet to appear seated/resting
-- Make it look like a real late 18th-century aristocratic portrait painting (Gainsborough, Reynolds, Vigée Le Brun style)`;
+- Must look like genuine late 18th-century masterpiece by Gainsborough, Reynolds, or Vigée Le Brun
+- AUTHENTIC hand-painted texture with natural paint imperfections`;
 
   console.log("Generating scene with GPT-Image-1...");
   
@@ -1916,8 +1928,9 @@ Be VERY careful - misidentifying will cause major errors.`,
       // Continue without facial analysis - the main description should still work
     }
 
-    // Randomize elements for unique paintings - elegant palette: light blues, blacks, whites
+    // Randomize elements for unique paintings - SIGNIFICANTLY EXPANDED for maximum variety
     const cushions = [
+      // Original elegant tones
       "ORNATE SOFT SAGE GREEN velvet throne cushion with RICH intricate gold embroidery patterns, BRIGHT decorative gold tassels at corners, detailed ornate gold threadwork, luxurious thick velvet texture, visible fabric folds, elaborate decorative details",
       "ORNATE SOFT PERIWINKLE BLUE velvet throne cushion with RICH intricate gold thread embroidery, BRIGHT decorative gold tassels, detailed ornate patterns, rich plush texture, elaborate ornate details",
       "ORNATE WARM TAUPE velvet throne cushion with RICH elegant gold embroidery patterns, BRIGHT gold tassels, detailed ornate gold threadwork, sumptuous velvety texture, elaborate classical styling",
@@ -1925,10 +1938,31 @@ Be VERY careful - misidentifying will cause major errors.`,
       "ORNATE DUSTY BLUE velvet throne cushion with RICH antique gold embroidery, BRIGHT decorative gold tassels at corners, detailed ornate patterns, plush royal texture, elaborate details",
       "ORNATE SOFT GREY velvet cushion with RICH gold thread patterns, BRIGHT ornate gold tassels, detailed intricate embroidery, thick velvety surface, elaborate classical details",
       "ORNATE SAGE GREEN velvet throne cushion with RICH intricate gold embroidery, BRIGHT gold tassels, detailed ornate patterns, luxurious deep pile, elaborate ornate styling",
-      "ORNATE SOFT SAPPHIRE velvet cushion with RICH antique gold decorative embroidery, BRIGHT gold tassels, detailed ornate patterns, rich thick velvet, elaborate sumptuous texture"
+      "ORNATE SOFT SAPPHIRE velvet cushion with RICH antique gold decorative embroidery, BRIGHT gold tassels, detailed ornate patterns, rich thick velvet, elaborate sumptuous texture",
+      // Rich jewel tones
+      "ORNATE DEEP RUBY RED velvet throne cushion with RICH silver thread embroidery, BRIGHT silver tassels, intricate baroque patterns, plush luxurious texture, regal commanding presence",
+      "ORNATE ROYAL PURPLE velvet throne cushion with RICH gold damask patterns, ornate gold fringe trim, sumptuous imperial purple, thick velvet pile, elaborate royal details",
+      "ORNATE MIDNIGHT NAVY velvet cushion with RICH gold fleur-de-lis embroidery, BRIGHT gold tassels, deep nautical blue, luxurious texture, aristocratic elegance",
+      "ORNATE BURNT SIENNA velvet throne cushion with RICH copper thread embroidery, warm autumn tones, copper tassels, earthy luxury, Renaissance-inspired details",
+      // Soft pastels
+      "ORNATE BLUSH PINK velvet throne cushion with DELICATE rose gold embroidery, soft feminine tones, rose gold tassels, romantic pastel luxury, refined texture",
+      "ORNATE POWDER BLUE velvet cushion with RICH silver thread detailing, soft dreamy blue, silver tassels, ethereal texture, gentle aristocratic elegance",
+      "ORNATE SOFT CORAL velvet throne cushion with GOLD sunset-inspired embroidery, warm peachy coral, gold tassels, tropical warmth, luxurious comfort",
+      "ORNATE CHAMPAGNE IVORY velvet cushion with RICH gold thread patterns, soft cream tones, gold tassels, elegant neutrality, timeless sophistication",
+      // Bold contrasts
+      "ORNATE JET BLACK velvet throne cushion with RICH gold baroque embroidery, dramatic contrast, gold tassels, mysterious depth, commanding presence",
+      "ORNATE HUNTER GREEN velvet cushion with RICH bronze thread patterns, deep forest tones, bronze tassels, natural elegance, woodland nobility",
+      "ORNATE TEAL velvet throne cushion with RICH gold Art Nouveau embroidery, vibrant blue-green, gold tassels, artistic flair, distinctive luxury",
+      "ORNATE PLUM velvet cushion with RICH silver damask patterns, deep purple-red, silver tassels, wine-dark luxury, opulent texture",
+      // Unique textures
+      "ORNATE DUSTY MAUVE brocade throne cushion with WOVEN gold thread patterns, textured damask weave, gold tassels, antique charm, heirloom quality",
+      "ORNATE STEEL BLUE silk cushion with EMBROIDERED silver dragons and clouds, Eastern-inspired luxury, silver tassels, exotic elegance, worldly sophistication",
+      "ORNATE TERRACOTTA velvet throne cushion with RICH gold Moorish geometric patterns, warm Mediterranean tones, gold tassels, architectural elegance",
+      "ORNATE SEAFOAM GREEN velvet cushion with RICH pearl and shell embroidery, oceanic elegance, pearl tassels, maritime luxury, coastal nobility"
     ];
     
     const robes = [
+      // Original elegant options
       "DAINTY SOFT SAPPHIRE BLUE velvet cloak with delicate gold thread embroidery patterns, soft plush velvety texture with visible nap, ermine-style PURE BRIGHT WHITE fur trim with black spots, draped delicately over body, dainty refined luxurious velvet fabric with realistic folds",
       "DAINTY DUSTY ROSE velvet cloak with intricate delicate gold thread patterns, soft plush velvety texture, PURE WHITE ermine fur trim, dainty refined fabric draped over body and cushion, visible velvety texture and soft folds",
       "DAINTY CREAM WHITE velvet cloak with delicate ornate gold embroidery, soft plush velvety texture with visible nap, ermine-style PURE BRIGHT WHITE fur trim with black spots, dainty sumptuous velvet fabric draped naturally",
@@ -1936,10 +1970,35 @@ Be VERY careful - misidentifying will cause major errors.`,
       "DAINTY MUTED BURGUNDY velvet cloak with delicate antique gold thread patterns, soft plush velvety texture with visible nap, PURE WHITE ermine fur trim, dainty luxurious velvet fabric draped over body",
       "DAINTY IVORY CREAM velvet cloak with delicate elaborate gold embroidery, soft plush velvety texture, ermine-style PURE BRIGHT WHITE fur trim, dainty refined velvet fabric with natural draping and soft folds",
       "DAINTY SAGE GREEN velvet cloak with delicate gold thread embroidery, soft plush velvety texture with visible nap, PURE BRIGHT WHITE ermine fur trim with black spots, dainty sumptuous velvet fabric draped dramatically",
-      "DAINTY DUSTY CORAL velvet cloak with delicate intricate gold patterns, soft plush velvety texture, PURE BRIGHT WHITE ermine fur trim, dainty luxurious velvet fabric with realistic soft draping"
+      "DAINTY DUSTY CORAL velvet cloak with delicate intricate gold patterns, soft plush velvety texture, PURE BRIGHT WHITE ermine fur trim, dainty luxurious velvet fabric with realistic soft draping",
+      // Rich jewel tones
+      "LUXURIOUS DEEP EMERALD GREEN velvet cloak with silver thread Celtic knot embroidery, soft plush texture, PURE WHITE Arctic fox fur trim, dramatic aristocratic draping with elegant folds",
+      "REGAL ROYAL PURPLE velvet cloak with gold fleur-de-lis embroidery throughout, rich imperial texture, PURE WHITE ermine fur trim with black spots, majestic commanding presence",
+      "OPULENT RUBY RED velvet cloak with intricate gold Baroque scrollwork, sumptuous texture, PURE BRIGHT WHITE ermine fur trim, passionate dramatic elegance with deep folds",
+      "DISTINGUISHED MIDNIGHT NAVY velvet cloak with silver star and moon embroidery, deep celestial blue, PURE WHITE fur trim, mysterious nocturnal elegance",
+      // Metallic and shimmer
+      "SHIMMERING GOLD BROCADE cloak with woven metallic threads, rich texture catching light, PURE WHITE ermine fur trim, sunlit warmth and opulence, draped with natural folds",
+      "LUSTROUS SILVER-GREY velvet cloak with platinum thread detailing, moonlit elegance, PURE BRIGHT WHITE fur trim, sophisticated neutrality with visible texture",
+      "BRONZE-TOUCHED COPPER velvet cloak with gold autumn leaf embroidery, warm sunset tones, CREAM WHITE fur trim, earthy nobility with soft draping",
+      // Pastels and soft tones
+      "DELICATE MINT GREEN velvet cloak with silver botanical embroidery, fresh spring tones, PURE WHITE fur trim, garden party elegance with gentle folds",
+      "SOFT LAVENDER velvet cloak with gold butterfly and flower embroidery, gentle purple hues, PURE BRIGHT WHITE ermine fur trim, romantic whimsy",
+      "WARM APRICOT velvet cloak with copper thread sunrise patterns, soft peachy tones, CREAM WHITE fur trim, golden hour warmth",
+      "PALE SEAFOAM velvet cloak with pearl and shell embroidery, oceanic softness, PURE WHITE fur trim, coastal aristocracy",
+      // Bold and dramatic
+      "DRAMATIC JET BLACK velvet cloak with gold constellation embroidery, mysterious depth, PURE BRIGHT WHITE ermine fur trim with black spots, striking contrast",
+      "RICH CHOCOLATE BROWN velvet cloak with gold oak leaf patterns, warm espresso tones, CREAM WHITE fur trim, woodland sophistication",
+      "DEEP TEAL velvet cloak with gold Art Deco geometric patterns, vibrant blue-green, PURE WHITE fur trim, artistic modernist elegance",
+      "WINE PLUM velvet cloak with silver grape vine embroidery, deep burgundy-purple, PURE BRIGHT WHITE fur trim, vineyard nobility",
+      // Exotic and unique
+      "PEACOCK BLUE velvet cloak with iridescent feather-inspired embroidery, exotic shimmer, PURE WHITE fur trim, magnificent display",
+      "BURNT ORANGE velvet cloak with gold phoenix embroidery, fiery sunset warmth, CREAM WHITE fur trim, bold renaissance spirit",
+      "FOREST HUNTER GREEN velvet cloak with bronze oak and acorn patterns, deep woodland tones, CREAM fur trim, noble outdoorsman elegance",
+      "ANTIQUE ROSE velvet cloak with vintage gold filigree patterns, aged romantic pink, PURE BRIGHT WHITE ermine fur trim, nostalgic charm"
     ];
     
     const jewelry = [
+      // Original classic multi-gem options
       "dainty antique multi-chain gold necklace with multiple gem clusters (ruby, emerald, amethyst, topaz), gold filigree details, small pearls interspersed, NOT modern jewelry",
       "delicate antique gold necklace with gem clusters (ruby red, emerald green, amethyst purple), intricate gold filigree, tiny pearls, multiple fine chains, classical styling",
       "ornate antique gold multi-chain necklace with small gem clusters (topaz, ruby, emerald), delicate gold filigree work, tiny pearl accents, dainty and refined",
@@ -1947,10 +2006,40 @@ Be VERY careful - misidentifying will cause major errors.`,
       "dainty gold filigree necklace with gem clusters (ruby, emerald, amethyst), multiple delicate chains, tiny pearl accents, antique classical styling",
       "refined antique gold multi-chain necklace with small gem clusters (topaz yellow, ruby red, emerald green, amethyst purple), intricate filigree, tiny pearls",
       "delicate antique gold necklace with ornate gem clusters (ruby, amethyst, emerald, topaz), gold filigree work, small pearls, multiple fine chains, dainty and elegant",
-      "ornate antique gold necklace with multiple gem clusters (emerald, ruby, topaz, amethyst), delicate gold filigree, tiny pearl accents, NOT modern, classical jewelry"
+      "ornate antique gold necklace with multiple gem clusters (emerald, ruby, topaz, amethyst), delicate gold filigree, tiny pearl accents, NOT modern, classical jewelry",
+      // Single statement gems
+      "magnificent antique gold pendant necklace with LARGE central SAPPHIRE surrounded by diamond accents, royal blue brilliance, fine gold chain, statement piece",
+      "elegant antique gold necklace with LARGE teardrop EMERALD pendant, surrounded by tiny pearls, deep green brilliance, refined single-gem elegance",
+      "stunning antique gold necklace with LARGE oval RUBY pendant framed in gold filigree, passionate red brilliance, classical dramatic beauty",
+      "regal antique gold necklace with LARGE cushion-cut AMETHYST pendant, royal purple depth, surrounded by seed pearls, Victorian grandeur",
+      // Pearl-focused
+      "classic triple-strand PEARL necklace with gold clasp featuring small ruby accent, timeless elegance, creamy white lustrous pearls, understated luxury",
+      "elegant graduated PEARL necklace with ornate gold and emerald clasp, single strand of increasing pearl sizes, classic sophistication",
+      "baroque PEARL choker with gold Art Nouveau setting, irregular lustrous pearls, unique organic shapes, artistic refinement",
+      "delicate antique gold necklace with large central PEARL surrounded by tiny sapphires, moonlit elegance, romantic styling",
+      // Silver/platinum variations
+      "delicate antique SILVER filigree necklace with MOONSTONE pendant, ethereal opalescent shimmer, mystical elegance, silvery chain",
+      "elegant antique SILVER necklace with cluster of AQUAMARINES and diamonds, icy blue beauty, winter elegance, platinum styling",
+      "refined SILVER choker with OPAL pendant showing rainbow fire, iridescent mystery, Art Nouveau inspired, unique character",
+      // Unique gems and combinations
+      "antique gold necklace with TURQUOISE and coral cabochons, Southwestern inspired elegance, warm earthy tones, distinctive styling",
+      "elegant gold necklace with GARNET cluster surrounded by seed pearls, deep wine-red warmth, Victorian romance, January birthstone",
+      "delicate gold necklace with PERIDOT and diamond pendant, fresh lime green sparkle, spring elegance, August brightness",
+      "ornate gold necklace with CITRINE sunburst pendant, warm golden amber, summer sunshine captured in stone, November radiance",
+      // Layered and complex
+      "elaborate antique gold BIB NECKLACE with cascading gems and pearls, statement piece, multiple layers of jeweled elegance, museum quality",
+      "intricate antique gold COLLAR necklace with alternating rubies and diamonds, regal commanding presence, crown jewel elegance",
+      "delicate THREE-TIER gold necklace with pearls on first tier, small gems on second, larger gems on third, layered luxury",
+      // Cameo and vintage
+      "elegant antique gold necklace with CAMEO pendant featuring classical profile, carved shell artistry, Victorian antiquity, timeless charm",
+      "refined antique gold locket necklace with diamond and pearl accent, ornate engraving, sentimental elegance, heirloom quality",
+      // Bold and dramatic
+      "magnificent gold necklace with LARGE MEDALLION pendant featuring lion motif surrounded by rubies, royal heraldry, commanding presence",
+      "dramatic antique gold necklace with BLACK ONYX and diamond pendant, striking contrast, mysterious elegance, bold sophistication"
     ];
     
     const backgrounds = [
+      // Original warm neutral tones
       "SPACIOUS grand chamber background with DEPTH, soft gradient from WARM TAUPE to SOFT BROWN with atmospheric perspective, large DUSTY ROSE velvet drapery hanging behind with visible folds, BRIGHTER pastel-leaning tones, elegant and airy NOT gloomy",
       "DEEP SPACIOUS room background with sense of grand chamber, warm SOFT TAUPE to MUTED CARAMEL gradient, heavy SOFT BURGUNDY velvet brocade draped behind with rich texture, BRIGHTER pastel tones, elegant airy atmosphere",
       "grand chamber with ATMOSPHERIC DEPTH, soft WARM BEIGE to TAUPE painterly gradient, large MUTED MAUVE velvet fabric draped behind with visible texture, BRIGHTER color scheme, spacious elegant feel",
@@ -1958,14 +2047,58 @@ Be VERY careful - misidentifying will cause major errors.`,
       "DEEP BLACK background creating STRONG CONTRAST with fabrics and jewelry, rich DEEP BLACK velvet drapery hanging behind, dramatic contrast with pet's natural colors and bright fabrics, elegant dramatic atmosphere",
       "ATMOSPHERIC DEPTH background suggesting grand chamber, soft WARM BEIGE to TAUPE to SOFT OLIVE gradient, MUTED LAVENDER velvet drapery behind with visible texture, BRIGHTER elegant pastel tones",
       "DEEP BLACK background with STRONG CONTRAST, rich DEEP BLACK velvet fabric draped behind creating dramatic contrast with bright fabrics and jewelry, elegant dramatic portrait atmosphere",
-      "grand chamber with ATMOSPHERIC PERSPECTIVE and DEPTH, soft WARM CARAMEL to TAUPE gradient, large SOFT BURGUNDY brocade drapery with rich folds, BRIGHTER pastel tones, spacious elegant royal atmosphere"
+      "grand chamber with ATMOSPHERIC PERSPECTIVE and DEPTH, soft WARM CARAMEL to TAUPE gradient, large SOFT BURGUNDY brocade drapery with rich folds, BRIGHTER pastel tones, spacious elegant royal atmosphere",
+      // Library and study settings
+      "GRAND LIBRARY background with ATMOSPHERIC DEPTH, warm wood paneling visible, leather-bound books on shelves, DEEP FOREST GREEN velvet curtain to one side, scholarly aristocratic ambiance, warm lamplight glow",
+      "DISTINGUISHED STUDY background, mahogany bookshelves receding into atmospheric shadow, RICH BURGUNDY leather chair arm visible, globe and brass instruments, intellectual nobility",
+      // Palace and architectural
+      "PALATIAL MARBLE COLUMN background with ATMOSPHERIC DEPTH, Corinthian column partially visible, DEEP CRIMSON silk drapery, grand architecture suggesting palace interior, regal opulence",
+      "ORNATE GILDED FRAME background effect, as if portrait within portrait, DEEP NAVY velvet behind, gold rococo frame elements visible, museum gallery presentation",
+      "GRAND BALLROOM suggestion in background, crystal chandelier reflections, SOFT GOLD silk drapery, atmospheric candlelit ambiance, festive aristocratic setting",
+      // Nature and garden inspired
+      "CONSERVATORY background with ATMOSPHERIC DEPTH, suggestion of exotic plants and palms, PEACOCK BLUE silk curtain, Victorian botanical garden elegance, natural light filtering through",
+      "ENGLISH GARDEN view through window suggestion, SOFT SAGE GREEN silk drapery framing scene, roses and hedges in soft focus, country estate elegance",
+      "AUTUMNAL ESTATE background, warm golden light suggesting harvest season, BURNT SIENNA velvet drapery, falling leaves impression, seasonal warmth",
+      // Dramatic and moody
+      "DRAMATIC STORM CLOUDS background, atmospheric turbulence suggesting heroic portrait, ROYAL PURPLE velvet drapery, Romantic era drama, theatrical presence",
+      "VENETIAN EVENING background, suggestion of canal and architecture through window, DEEP TEAL silk curtain, Italian Renaissance mystery, exotic locale",
+      "MOONLIT CHAMBER background, silvery blue atmospheric light, MIDNIGHT BLUE velvet drapery, nocturnal elegance, romantic mystery",
+      // Rich jewel-toned
+      "LUXURIOUS CHAMBER with EMERALD GREEN damask wallpaper suggestion, GOLD silk drapery, jewel-box richness, saturated aristocratic splendor",
+      "REGAL THRONE ROOM suggestion, ROYAL PURPLE and GOLD heraldic elements in background, crown and scepter suggestions, imperial grandeur",
+      "SAPPHIRE DRAWING ROOM background, RICH BLUE silk walls suggested, CREAM and GOLD accents, cool elegant sophistication",
+      // Light and airy
+      "BRIGHT MORNING CHAMBER, soft diffused daylight, SOFT PINK silk drapery, fresh and luminous atmosphere, optimistic elegance",
+      "SEASIDE VILLA suggestion, Mediterranean light filtering in, SOFT AQUA silk curtain, coastal aristocratic living, breezy sophistication",
+      "SUNLIT ORANGERY background, warm golden afternoon light, SOFT CORAL drapery, citrus and sunshine warmth, garden party elegance",
+      // Unique and artistic
+      "ARTIST'S STUDIO suggestion, painterly chaos in soft focus behind, OCHRE velvet curtain, creative aristocracy, Bohemian elegance",
+      "MUSIC ROOM background, grand piano edge visible in shadow, SOFT ROSE silk drapery, cultured refinement, melodic atmosphere",
+      "WINTER PALACE suggestion, frost patterns and icy elegance, SILVER-WHITE silk drapery, cool sophisticated splendor, crystalline beauty"
     ];
     
     const lightingDirections = [
+      // Original warm upper-left variations
       "single WARM KEY LIGHT from upper left, BRIGHTER illumination on subject, soft chiaroscuro with moderate shadows and STRONG BRIGHT WHITE highlights, sculpted fur texture, warm dark background (not pitch black), warm golden RIM HIGHLIGHTS, subtle SOFT GLOW throughout, elegant NOT gloomy",
       "single warm KEY LIGHT from upper front-left, BRIGHTLY LIT subject with subtle SOFT GLOW overall, soft chiaroscuro lighting with moderate shadows, BRIGHT WHITE highlights on fur, warm dark background, warm golden rim light, gentle luminosity",
       "warm KEY LIGHT from upper left creating BRIGHT illumination with subtle SOFT GLOW, soft chiaroscuro, moderate shadows contrasting with STRONG BRIGHT WHITE highlights, fur texture sculpted by light, golden rim highlights, warm dark background, gentle luminous atmosphere",
-      "single WARM KEY LIGHT upper left, BRIGHTER overall lighting on subject with subtle SOFT GLOW throughout, classic portrait lighting with moderate shadows and BRIGHT WHITE highlights, sculpted fur texture, warm golden glow around pet, gentle luminosity"
+      "single WARM KEY LIGHT upper left, BRIGHTER overall lighting on subject with subtle SOFT GLOW throughout, classic portrait lighting with moderate shadows and BRIGHT WHITE highlights, sculpted fur texture, warm golden glow around pet, gentle luminosity",
+      // Different directions
+      "dramatic KEY LIGHT from upper RIGHT, BRIGHTER illumination creating interesting shadow play, soft chiaroscuro with depth, STRONG BRIGHT WHITE highlights on fur, warm golden rim on opposite side, elegant asymmetric lighting",
+      "soft FRONTAL KEY LIGHT slightly elevated, EVEN BRIGHT illumination on face, minimal shadows for youthful effect, BRIGHT WHITE highlights throughout, gentle fill light, flattering portraiture style",
+      "three-quarter KEY LIGHT from front-right, BRIGHT illumination with classic Rembrandt triangle shadow, sculpted dimensional lighting, STRONG highlights, warm golden tones, masterful portrait technique",
+      // Mood variations
+      "GOLDEN HOUR warm light from left, sunset warmth permeating scene, RICH AMBER tones with BRIGHT highlights, elongated shadows, romantic atmospheric glow, magic hour elegance",
+      "soft DIFFUSED DAYLIGHT from above-left, BRIGHT but gentle illumination, minimal harsh shadows, airy luminosity, SOFT WHITE highlights, natural window-light effect, fresh and clear",
+      "CANDLELIT warm glow suggesting multiple soft sources, WARM GOLDEN illumination, gentle flickering quality, intimate atmosphere, BRIGHT highlights on fur tips, romantic historic ambiance",
+      "DRAMATIC Baroque lighting with strong KEY from upper left, deep shadows contrasting with BRILLIANT highlights, theatrical chiaroscuro, Caravaggio-inspired, bold and commanding",
+      // Cool tones
+      "COOL northern light from large window suggestion, BRIGHT silvery illumination, sophisticated cool tones with BRIGHT WHITE highlights, minimal warm shadows, elegant clarity",
+      "MOONLIT atmospheric lighting, COOL SILVER-BLUE key light with warm accent, mysterious romantic glow, BRIGHT highlights catching light beautifully, nocturnal elegance",
+      // Specialty effects
+      "HALO RIM LIGHT behind subject creating angelic glow, WARM KEY light from front-left, ethereal radiance around pet, BRIGHT luminous presence, heavenly portrait effect",
+      "soft BUTTERFLY LIGHTING from directly above-front, glamorous Hollywood-style illumination, BRIGHT and flattering, minimal shadows under features, star quality presence",
+      "SPLIT LIGHTING dramatic half-face illumination, KEY LIGHT from direct side, mysterious and artistic, STRONG contrast between lit and shadow sides, bold artistic choice"
     ];
 
     // Pick random elements
@@ -1977,21 +2110,46 @@ Be VERY careful - misidentifying will cause major errors.`,
 
     // Adjust for FEMALE pets - feminine aesthetic
     if (gender === "female") {
-      // Lighter, softer cloak colors for female pets
+      // Lighter, softer cloak colors for female pets - EXPANDED variety
       const feminineRobes = [
+        // Original options
         "DAINTY SOFT PINK velvet cloak with delicate gold thread embroidery, soft plush velvety texture, PURE WHITE ermine fur trim, dainty refined fabric - lighter softer feminine tones",
         "DAINTY LAVENDER velvet cloak with delicate gold patterns, soft plush velvety texture, PURE BRIGHT WHITE ermine fur trim, dainty luxurious fabric - soft feminine colors",
         "DAINTY SOFT ROSE velvet cloak with delicate ornate gold embroidery, soft plush velvety texture, PURE WHITE ermine fur trim, dainty refined fabric - lighter feminine tones",
         "DAINTY PEARL WHITE velvet cloak with delicate gold thread detailing, soft plush velvety texture, PURE BRIGHT WHITE ermine fur trim, dainty sumptuous fabric - soft luminous feminine",
-        "DAINTY SOFT BLUE velvet cloak with delicate gold embroidery, soft plush velvety texture, PURE WHITE ermine fur trim, dainty luxurious fabric - lighter softer feminine colors"
+        "DAINTY SOFT BLUE velvet cloak with delicate gold embroidery, soft plush velvety texture, PURE WHITE ermine fur trim, dainty luxurious fabric - lighter softer feminine colors",
+        // Expanded pastels
+        "DELICATE BLUSH PEACH velvet cloak with rose gold butterfly embroidery, soft ethereal texture, PURE WHITE swan feather trim, romantic feminine elegance",
+        "SOFT MINT GREEN velvet cloak with silver botanical embroidery, fresh spring texture, PURE BRIGHT WHITE fur trim, garden fairy princess style",
+        "ETHEREAL POWDER BLUE velvet cloak with silver snowflake patterns, dreamy winter texture, PURE WHITE Arctic fox trim, ice princess elegance",
+        "GENTLE LILAC velvet cloak with gold wisteria embroidery, soft purple hues, PURE WHITE ermine trim, Victorian feminine grace",
+        "WARM CHAMPAGNE velvet cloak with gold lace patterns, soft cream tones, PURE BRIGHT WHITE fur trim, bridal elegance",
+        // Deeper feminine tones
+        "RICH DUSTY MAUVE velvet cloak with antique rose gold embroidery, sophisticated feminine depth, PURE WHITE ermine trim, romantic vintage beauty",
+        "SOFT CORAL PINK velvet cloak with gold seashell embroidery, warm sunset feminine tones, CREAM WHITE fur trim, mermaid princess elegance",
+        "DELICATE PERIWINKLE velvet cloak with silver star embroidery, twilight feminine softness, PURE BRIGHT WHITE fur trim, celestial grace"
       ];
       robe = feminineRobes[Math.floor(Math.random() * feminineRobes.length)];
       
-      // Finer, more delicate jewelry for female pets
+      // Finer, more delicate jewelry for female pets - EXPANDED variety
       const feminineJewelry = [
+        // Original options
         "extra delicate fine antique gold necklace with tiny gem clusters (small ruby, emerald, amethyst), intricate gold filigree, tiny pearls, very fine chains - FINER and more delicate",
         "dainty delicate antique gold necklace with small gem clusters, ornate fine filigree work, tiny pearl accents, multiple fine delicate chains - FINER jewelry",
-        "delicate fine gold necklace with petite gem clusters, intricate delicate filigree, small pearls, fine delicate chains - FINER and more refined"
+        "delicate fine gold necklace with petite gem clusters, intricate delicate filigree, small pearls, fine delicate chains - FINER and more refined",
+        // Pearl-focused feminine
+        "elegant triple-strand SEED PEARL choker with tiny diamond accent, delicate cream lustre, feminine grace, princess worthy",
+        "dainty single PEARL pendant on fine gold chain, simple elegant femininity, luminous cream drop, understated beauty",
+        "delicate FRESHWATER PEARL necklace with tiny pink tourmaline accents, romantic soft pink tones, feminine sweetness",
+        // Single gem feminine
+        "delicate fine gold necklace with single teardrop ROSE QUARTZ pendant, soft pink love stone, feminine romantic energy",
+        "elegant thin gold necklace with small PINK SAPPHIRE pendant surrounded by seed pearls, feminine luxury",
+        "dainty gold chain with AQUAMARINE drop and tiny diamonds, icy feminine elegance, mermaid treasure",
+        "refined fine silver necklace with MOONSTONE pendant, ethereal feminine shimmer, mystical beauty",
+        // Floral and nature
+        "delicate gold necklace with tiny FLOWER CLUSTER of mixed gems (pink sapphire, peridot, citrine), garden femininity",
+        "dainty gold chain with BUTTERFLY pendant set with tiny diamonds and sapphires, whimsical feminine charm",
+        "elegant gold necklace with HEART-SHAPED locket featuring tiny ruby, sentimental feminine keepsake"
       ];
       jewelryItem = feminineJewelry[Math.floor(Math.random() * feminineJewelry.length)];
     }
@@ -2140,19 +2298,30 @@ WHAT CREATES INSTANT RECOGNITION:
 
 === COMPOSITION (CRITICAL - Follow Exactly) ===
 - Subject positioned LOW and CENTRAL - resting on cushion, not standing or floating
-- Body ¾ VIEW, head forward or slightly angled - late 18th-century aristocratic portrait posture
+- Body ¾ VIEW, head forward or slightly angled - classical portrait posture
 - FRONT PAWS VISIBLE and resting on cushion - signature trait
 - Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
 - MEDIUM CLOSE-UP framing: chest to top of head (NOT full body, NOT face only)
 - Camera at pet's eye level or slightly above
 
-=== POSE: REGAL SEATED POSITION ===
-- The ${species} is SEATED majestically on throne cushion
-- Front paws visible, resting elegantly on cushion
-- Head held high with noble, dignified expression
-- Body ¾ view - late 18th-century aristocratic portrait posture
-- Dainty delicate cloak draped naturally over body - soft plush velvety texture
-- Proud, regal posture befitting nobility
+=== POSE: NATURAL AND RELAXED (Varied Positions) ===
+Choose ONE of these natural, comfortable poses - NOT always stiffly upright:
+- RELAXED RECLINE: Pet lounging comfortably, slightly reclined against cushion, relaxed posture
+- SOFT SETTLE: Pet settled down naturally, paws tucked or crossed casually, at ease
+- GENTLE TILT: Head tilted slightly to one side with curious or thoughtful expression
+- COZY CURL: Body slightly curved, comfortable and content, like resting by a fire
+- DIGNIFIED REST: Upright but relaxed, not stiff - natural noble bearing without tension
+- SLEEPY ELEGANCE: Slightly drowsy, heavy-lidded eyes, peaceful and serene expression
+- ALERT BUT CALM: Ears relaxed (not fully perked), attentive but comfortable
+
+KEY POSE QUALITIES:
+- The ${species} should look COMFORTABLE and AT EASE - not posed stiffly
+- Natural body language - relaxed shoulders, soft posture, genuine expression
+- Front paws visible, positioned naturally (crossed, tucked, or resting)
+- Head position can vary: straight, tilted, slightly turned - whatever feels natural
+- Expression should feel AUTHENTIC - not forced or artificial
+- Cloak draped naturally over body - soft plush velvety texture
+- Overall feeling of a beloved pet captured in a quiet, comfortable moment
 ${facialStructureSection}
 === THE ${species} - DETAILED DESCRIPTION ===
 ${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${blackCatTreatment}${agePreservationInstructions}
@@ -2169,64 +2338,135 @@ The generated pet MUST match the description EXACTLY:
 
 This ${species} portrait must look like THIS EXACT ${species}. ${notSpecies}
 
-=== STYLE: CLASSICAL OIL PAINTING - ROYAL PORTRAIT ===
-This MUST look like a REAL OIL PAINTING with visible brushstrokes, rich texture, and luminous depth:
-- CLASSICAL OIL PAINTING TECHNIQUE: Visible brushstrokes, rich impasto texture, layered glazing
-- LATE 18TH-CENTURY STYLE: Like Gainsborough, Reynolds, or Vigée Le Brun (1770-1830) - rich, luminous, painterly, Georgian/Regency/Napoleonic era
-- TEXTURE: Visible paint texture, brush marks, rich oil paint application
-- DEPTH: Multiple layers of paint creating luminous depth and richness
-- SURFACE QUALITY: Matte to semi-gloss finish typical of oil paintings
-- NO PHOTOGRAPHIC LOOK: Must look hand-painted, not like a photo filter
+=== STYLE: AUTHENTIC ANTIQUE OIL PAINTING - MUSEUM MASTERPIECE ===
+This MUST look like a GENUINE 200+ YEAR OLD ANTIQUE OIL PAINTING - discovered in a grand estate:
+- LOOSE FLOWING BRUSHWORK: Long, sweeping, elegant strokes that FLOW across the canvas with graceful energy
+- ROUGH TACTILE TEXTURE: The surface should look ROUGH, WEATHERED, and TEXTURED - not smooth or digital
+- AUTHENTIC OIL PAINTING TECHNIQUE: THICK IMPASTO with visible paint ridges, layered wet-on-wet glazing, scumbling effects
+- GENUINE BRUSH TEXTURE: Individual bristle marks clearly visible, directional strokes following form, varying pressure creating THICK and THIN areas
+- FEATHERY STROKES: Like Gainsborough's famous feathery brushwork - light, airy, flowing, alive with movement
+- LATE 18TH-CENTURY MASTERS: Thomas Gainsborough's loose feathery luminosity, Joshua Reynolds' rich glazes, Élisabeth Vigée Le Brun's pearlescent elegance (1770-1830)
+- PAINT SURFACE TEXTURE: Raised impasto peaks in highlights, rough canvas weave visible through thin areas, tactile weathered quality
+- NATURAL PAINT BEHAVIOR: Paint pooling in crevices, dry brush scratches, uneven loading, age-related settling
 
-=== COLOR PALETTE (Brighter, Pastel-Leaning Royal Portrait) ===
+ANTIQUE AGING EFFECTS (EXTREMELY CRITICAL - PUSH THIS HARD):
+- HEAVY CRAQUELURE: PROMINENT network of cracks throughout entire paint surface - like a 300-year-old masterpiece
+- DEEP CRACKS in thick impasto areas, fine spider-web cracks in thin glazed areas
+- AGED VARNISH: HEAVY warm amber/golden/brown patina - noticeably yellowed and aged
+- SIGNIFICANT SURFACE WEAR: Visible paint loss on edges, worn impasto peaks, rubbed areas
+- WEATHERED EDGES: Paint worn away at corners and edges, canvas showing through in spots
+- CANVAS AGING: Prominently visible aged linen texture, warping, uneven tension
+- COLOR MELLOWING: Colors noticeably softened and warmed by centuries - rich amber cast throughout
+- DUST AND GRIME: Visible accumulation in paint crevices and texture - the patina of centuries
+- FOXING AND AGE SPOTS: Subtle discoloration spots from age
+- VARNISH UNEVENNESS: Pooling, drips, and uneven application of aged varnish layers
+- PATINA OF TIME: STRONG warm, golden-brown quality throughout - unmistakably antique
+- LOOKS 300 YEARS OLD: Not just old - ANCIENT, like discovered in a forgotten castle
+
+WEATHERED EDGE TREATMENT (CRITICAL):
+- WORN CORNERS: Paint visibly thinned or missing at corners
+- EDGE RUBBING: Soft, worn areas along all edges where handling has occurred
+- FRAME SHADOW LINES: Subtle darkening suggesting centuries under a frame
+- EXPOSED GROUND: Hints of reddish-brown ground layer showing through worn areas
+- SOFT PERIMETER: Edges should feel soft, worn, weathered - NOT crisp or clean
+
+- EXTREMELY ROUGH TEXTURE: Broken, tactile, weathered surface throughout
+- DEPTH FROM LAYERING: Underpainting showing through worn areas, colored grounds visible
+- LUSTROUS BUT AGED VARNISH: Rich patina with amber warmth, some areas more worn than others
+- ABSOLUTELY NOT: digital, smooth, clean, new-looking, fresh, perfect, crisp edges, or pristine
+
+=== COLOR PALETTE (VIVID, SATURATED, LUMINOUS - Like Fresh Oil Paint) ===
 BACKGROUND & SHADOWS:
-- BRIGHTER warm tones: soft taupe, warm beige, muted caramel, soft olive
-- Soft painterly gradients with ATMOSPHERIC DEPTH
-- NOT dark or gloomy - warm and inviting
+- RICH warm earth tones: burnt umber, raw sienna, warm ochre, deep olive
+- GLOWING atmospheric gradients with sfumato depth - colors seem to RADIATE from within
+- Deep shadows with COLOR - not grey or muddy, but rich browns, deep burgundies, forest greens
+- Warm and LUMINOUS - as if lit from within
 
 FABRICS & DRAPES:
-- BRIGHTER PASTEL-LEANING jewel tones: dusty rose, soft sapphire, muted emerald, soft burgundy, dusty lavender, sage green
-- BRIGHT cream/ivory accents
-- BRIGHT antique gold embroidery throughout
-- Colors should be LUMINOUS and SOFT - not harsh
+- SATURATED JEWEL TONES with BRILLIANT sheen: vivid ruby red, deep sapphire blue, rich emerald green, royal purple, warm amber gold
+- LUSTROUS silk and velvet that CATCHES LIGHT - visible sheen and reflection
+- BRIGHT cream/ivory with warm undertones that GLOW
+- BRILLIANT antique gold embroidery that SHIMMERS with metallic quality
+- Colors should be RICH and RADIANT - like stained glass lit from behind
 
 JEWELRY:
-- BRIGHT gold + soft ruby pink + muted emerald + soft amethyst + warm topaz
-- Gold filigree, small BRIGHT WHITE pearls, multi-chain necklaces
-- BRIGHT gem highlights that sparkle
-- NOT modern, NOT simple beads
+- GLEAMING gold with warm reflective highlights - looks like real polished metal
+- BRILLIANT gems that SPARKLE: deep ruby, vivid emerald, rich sapphire, warm topaz, glowing amethyst
+- Gems should have INTERNAL FIRE - light refracting within
+- LUSTROUS pearls with iridescent overtones - pink, blue, green shimmer
+- Metallic surfaces CATCH and REFLECT light realistically
 
 FUR TONES:
-- Naturalistic, warm, softly blended
-- Painterly with LONG flowing brushwork
-- BRIGHT highlights on fur
-- Preserve exact pet coloring
-- Keep deep blacks rich and saturated
+- RICH naturalistic colors with LUMINOUS depth - fur should seem to GLOW with health
+- Warm reflected light bouncing into shadows - no dead flat areas
+- BRILLIANT WHITE highlights on fur tips that POP with brightness
+- Multiple tones within single colors - warm and cool variations creating LIFE
+- Preserve exact pet coloring with ENHANCED vibrancy
+- Deep blacks should be VELVETY and RICH - with subtle blue or brown undertones
 
-=== RENDERING STYLE (Critical) ===
-- TRUE OIL PAINTING TEXTURE - LONG, FLOWING visible brush strokes throughout
-- ELONGATED brushwork - longer strokes for painterly effect
-- High detail but NOT photorealistic, NOT too perfect
-- Late 18th-century aristocratic portrait feel (1770-1830) - Georgian/Regency/Napoleonic era with hand-painted charm
-- Thick, layered pigments with BRIGHT WHITE highlights
-- NOT digital, NOT airbrushed, NOT overly smooth, NOT overly perfect
-- Painterly fur with LONG flowing brushwork
-- Subtle SOFT GLOW throughout - gentle luminosity and warmth
-- Slightly soft edges in places - painterly not clinical
+=== RENDERING STYLE (Critical - AUTHENTIC OIL PAINTING) ===
+BRUSHWORK - LOOSE, FLOWING, EXPRESSIVE:
+- LONG SWEEPING STROKES: Elegant flowing brush movements 6-12 inches long, graceful curves following form
+- GESTURAL FLUIDITY: Brushwork should feel ALIVE and DYNAMIC - the energy of the artist's hand visible
+- FEATHERY EDGES: Soft, wispy brush endings that trail off naturally - NOT hard stops
+- VARIED STROKE WIDTH: Thick confident strokes transitioning to thin delicate trails within single movements
+- VISIBLE BRISTLE TRACKS: Individual brush hair marks clearly visible, showing direction and speed of stroke
+- DIRECTIONAL FLOW: All strokes follow the natural form - fur growth direction, fabric drape, facial contours
+- IMPASTO RIDGES: Thick raised paint creating 3D texture on highlights - you could feel it with your fingers
+- SCUMBLED ROUGHNESS: Broken color, dry brush dragging, unblended areas for textural interest
 
-=== KEY QUALITIES ===
-- SPACIOUS background with DEPTH - feels like grand chamber, NOT flat
-- BRIGHTER PASTEL-LEANING fabrics (dusty rose, soft sapphire, sage green, muted mauve)
-- Rich velvety textures on cloak and cushion
-- Single warm key light - BRIGHTER illumination on subject
-- Subtle SOFT GLOW overall - gentle luminous atmosphere
-- Warm golden rim highlights around pet
-- Dainty antique jewelry with BRIGHT sparkling gem clusters
-- PURE BRIGHT WHITE ermine-style fur trim on cloak
-- NATURAL ANIMAL BODY - four legs, normal pet anatomy
-- PRESERVE DEEP BLACKS in fur - rich and saturated
-- BRIGHTER overall - pastel-leaning, airy, NOT gloomy
-- Hand-painted feel with slight imperfections - NOT too perfect
+PAINT TEXTURE - EXTREMELY ROUGH AND WEATHERED:
+- THICK AND THIN CONTRAST: Heavy impasto peaks in lights, thin scraped glazes in shadows
+- PROMINENT CANVAS WEAVE: Coarse linen texture CLEARLY visible throughout - especially in thin areas
+- HEAVY IMPASTO: Really thick, textured paint that stands up from the surface - almost sculptural
+- NATURAL IMPERFECTIONS: Paint pooling, drips, uneven loading, brush running dry, palette scrapings
+- EXTREMELY ROUGH TACTILE SURFACE: Should look like you could feel every bump and ridge
+- BROKEN JAGGED EDGES: Rough, uneven, weathered transitions - like an ancient artifact
+- DRY BRUSH SCRATCHES: Heavy scratchy, textured strokes throughout
+- PALETTE KNIFE GOUGES: Thick angular paint, scraped areas, knife marks visible
+- GRANULAR TEXTURE: Paint surface should have GRIT and TOOTH - not smooth anywhere
+- CRACKS AND FISSURES: Age cracks throughout adding to textural complexity
+- WORN PEAKS: Impasto highlights worn smooth from centuries of handling
+- ACCUMULATED TEXTURE: Layers upon layers of paint, varnish, dirt, history
+
+LUMINOSITY:
+- GLOWING FROM WITHIN: Colors appear to radiate light, not just reflect it
+- BRILLIANT HIGHLIGHTS: Pure white and warm highlights that seem to EMIT light
+- RICH SATURATED DARKS: Shadows full of color, not grey or muddy
+- OPTICAL MIXING: Layered transparent colors create depth and vibrancy
+- WARM LIGHT BOUNCING: Reflected warm tones in shadow areas
+
+FINISH QUALITY - HEAVILY AGED AND WEATHERED:
+- THICK AMBER VARNISH PATINA: HEAVY warm amber/brown/golden varnish - noticeably aged and yellowed
+- PROMINENT CRAQUELURE: CLEARLY VISIBLE network of cracks throughout - like cracked dried earth
+- HEAVY SURFACE WEATHERING: Obvious wear on raised impasto, worn edges, rubbed areas, paint loss
+- MULTIPLE VARNISH LAYERS: Uneven, pooled, dripped varnish accumulation over centuries
+- DEPTH AND DIMENSION: Many visible paint and varnish layers creating complex depth
+- EXTREMELY ROUGH TACTILE SURFACE: HEAVILY textured, weathered, rough - ancient artifact quality
+- GRIME AND PATINA: Visible accumulation of dust, dirt, age in every crevice
+- CANVAS AGING: Prominently visible aged coarse linen texture, warping, buckling
+- FOXING AND SPOTS: Age spots, discoloration, the marks of time
+- VISIBLE HAND OF ARTIST: Every stroke shows human creation - spontaneous, expressive, alive
+- HEAVILY WORN EDGES: Corners and edges worn, paint thinned, canvas peeking through
+- SOFT WEATHERED PERIMETER: All edges soft and worn from centuries of handling
+- COLOR MELLOWING: Rich warm tones with STRONG amber cast from aged varnish
+- DISCOVERED IN A CASTLE: Looks like found in an attic after 300 years - not cleaned or restored
+- ABSOLUTELY NOT: smooth, clean, pristine, new-looking, digitally perfect, fresh, or crisp
+
+=== KEY QUALITIES (VIVID, LUMINOUS, AUTHENTIC) ===
+- ATMOSPHERIC DEPTH: Background recedes with sfumato, grand chamber feeling, air between elements
+- SATURATED JEWEL-TONED fabrics: Rich ruby, deep sapphire, emerald green - colors that SING with vibrancy
+- LUSTROUS VELVET TEXTURE: Visible pile direction, light catching raised nap, rich color depth in folds
+- BRILLIANT WARM LIGHTING: Strong key light making subject GLOW, warm golden radiance
+- LUMINOUS ATMOSPHERE: Everything seems to emit soft inner light - not just reflect
+- GLEAMING GOLD accents: Metallic embroidery that catches light, warm reflective quality
+- SPARKLING GEMS: Jewelry with internal fire, light refracting within stones, brilliant faceted highlights
+- PURE BRILLIANT WHITE highlights: Crisp bright whites that POP against rich colors
+- NATURAL ANIMAL BODY: Four legs, normal pet anatomy - never anthropomorphic
+- VELVETY DEEP BLACKS: Rich saturated darks with subtle undertones - never flat or grey
+- RICH CONTRAST: Bright lights against deep shadows creating dramatic depth
+- AUTHENTIC BRUSHWORK: Visible paint texture, bristle marks, natural imperfections of hand-painting
+- MUSEUM QUALITY: Looks like a genuine antique masterpiece worth millions
 
 === COLOR MATCHING REQUIREMENTS ===
 - Match colors EXACTLY as described - if described as 'midnight black', use rich deep midnight black, not charcoal gray
@@ -2254,7 +2494,7 @@ FUR TONES:
 
 FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
 
-RENDERING: TRUE OIL PAINTING with LONG FLOWING visible brush strokes, thick layered pigments, BRIGHT WHITE highlights, high detail but NOT photorealistic and NOT too perfect. Late 18th-century European aristocratic portrait feel (1770-1830 Georgian/Regency/Napoleonic era, Gainsborough/Reynolds/Vigée Le Brun style) - elegant and AIRY, NOT gloomy, hand-painted charm with slight imperfections. NOT Renaissance. NOT digital, NOT airbrushed, NOT overly smooth, NOT overly perfect. Subtle SOFT GLOW throughout - gentle luminosity. SPACIOUS background with ATMOSPHERIC DEPTH - feels like grand chamber. Single warm key light - BRIGHTLY LIT subject, soft chiaroscuro with moderate shadows, warm golden rim highlights. DEEP RICH SATURATED jewel-toned fabrics. DAINTY, DELICATE SOFT PLUSH VELVETY cloak DRAPED over pet (NOT clothing, just draped fabric) with visible velvet nap and plush texture, PURE BRIGHT WHITE ermine trim, dainty antique jewelry with BRIGHT sparkling gem clusters and BRIGHT WHITE pearls. Velvet throne cushion with gold embroidery. Pet seated NATURALLY like a real ${species} - NOT human-like pose. NO human clothing. Pet MUST match original EXACTLY - warm natural fur with BRIGHT WHITE painterly highlights and LONG brushwork, deep blacks preserved rich and saturated. All whites should be PURE BRIGHT WHITE. Slightly soft edges - painterly not clinical.`;
+RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
 
     // Determine which model to use for generation
     // Priority: OpenAI img2img > Stable Diffusion > Composite > Style Transfer > IP-Adapter > FLUX > GPT-Image-1

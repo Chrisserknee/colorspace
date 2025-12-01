@@ -1027,15 +1027,22 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
               className="relative aspect-square max-w-[200px] sm:max-w-xs mx-auto rounded-xl overflow-hidden shadow-lg mb-4 cursor-pointer"
               style={{ border: '2px solid rgba(212, 175, 55, 0.3)' }}
               onClick={() => {
-                if (secretActivated) return; // Already activated
                 const newCount = secretClickCount + 1;
                 setSecretClickCount(newCount);
                 
                 if (newCount >= 6) {
-                  // Grant extra free generation by reducing used count
+                  // Grant 8 extra free generations (can stack up to 15 total)
                   const limits = getLimits();
+                  const freeLimit = 2;
+                  const maxTotal = 15; // Maximum total free generations allowed
+                  const minFreeGen = -(maxTotal - freeLimit); // -13, allows up to 15 total
+                  
+                  // Grant 8 generations by reducing used count (can go negative = bonus credits)
                   const oldUsed = limits.freeGenerations;
-                  limits.freeGenerations = Math.max(0, limits.freeGenerations - 1); // Reduce used count by 1
+                  const newFreeGen = Math.max(minFreeGen, limits.freeGenerations - 8);
+                  const granted = oldUsed - newFreeGen;
+                  limits.freeGenerations = newFreeGen;
+                  
                   saveLimits(limits);
                   setGenerationLimits(limits);
                   const newCheck = canGenerate(limits);
@@ -1043,9 +1050,20 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                   setSecretActivated(true);
                   setUseSecretCredit(true); // Enable un-watermarked generation for testing
                   
+                  // Reset click count to allow stacking (can click 6 more times for more bonus)
+                  setSecretClickCount(0);
+                  
+                  // Calculate total available
+                  const totalAvailable = freeLimit - limits.freeGenerations;
+                  
                   // Show subtle feedback
-                  console.log(`🎉 Secret activated! Extra free generation granted (un-watermarked). Used count: ${oldUsed} → ${limits.freeGenerations}`);
+                  console.log(`🎉 Secret activated! +${granted} generations granted (un-watermarked). Total available: ${totalAvailable}`);
                   console.log("Can generate:", newCheck.allowed);
+                  
+                  // Reset activated after short delay so user can stack more
+                  setTimeout(() => {
+                    setSecretActivated(false);
+                  }, 2000);
                 }
               }}
             >

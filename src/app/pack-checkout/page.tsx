@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 
 type PackType = "1" | "5" | "10";
@@ -53,6 +52,7 @@ const PACKS: PackInfo[] = [
 
 function PackCheckoutContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const packParam = searchParams.get("pack") as PackType | null;
   
   const [selectedPack, setSelectedPack] = useState<PackType>(packParam || "5");
@@ -248,13 +248,13 @@ function PackCheckoutContent() {
         </form>
 
         <div className="mt-6 text-center">
-          <Link 
-            href="/"
-            className="text-sm transition-colors hover:underline"
+          <button 
+            onClick={() => router.back()}
+            className="text-sm transition-colors hover:underline cursor-pointer bg-transparent border-none"
             style={{ color: '#7A756D' }}
           >
-            ← Back to home
-          </Link>
+            ← Back to my portrait
+          </button>
         </div>
       </div>
     </div>
