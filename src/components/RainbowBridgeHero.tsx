@@ -11,6 +11,16 @@ interface RainbowBridgeHeroProps {
 export default function RainbowBridgeHero({ onUploadClick }: RainbowBridgeHeroProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [portraitCount, setPortraitCount] = useState<number>(455);
+  const [isClosingLightbox, setIsClosingLightbox] = useState(false);
+
+  // Handle lightbox close with animation
+  const closeLightbox = () => {
+    setIsClosingLightbox(true);
+    setTimeout(() => {
+      setSelectedImage(null);
+      setIsClosingLightbox(false);
+    }, 350);
+  };
 
   // Fetch portrait count
   useEffect(() => {
@@ -29,8 +39,8 @@ export default function RainbowBridgeHero({ onUploadClick }: RainbowBridgeHeroPr
   // Close modal on ESC key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedImage(null);
+      if (e.key === "Escape" && !isClosingLightbox) {
+        closeLightbox();
       }
     };
 
@@ -416,24 +426,40 @@ export default function RainbowBridgeHero({ onUploadClick }: RainbowBridgeHeroPr
       {/* Lightbox Modal for Enlarged Portraits */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-          onClick={() => setSelectedImage(null)}
-          style={{ animation: 'fadeIn 0.3s ease-in-out' }}
+          className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm ${isClosingLightbox ? 'pointer-events-none' : ''}`}
+          onClick={closeLightbox}
         >
+          {/* Backdrop */}
+          <div 
+            className={`absolute inset-0 bg-black/80 ${isClosingLightbox ? 'animate-fade-out' : 'animate-fade-in'}`}
+          />
+          
           {/* Close button */}
           <button
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-colors hover:bg-white/20"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#FFFFFF' }}
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 hover:rotate-90 active:scale-95"
+            style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              color: '#FFFFFF',
+              boxShadow: '0 0 0 0 rgba(255, 255, 255, 0)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.25)';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.boxShadow = '0 0 0 0 rgba(255, 255, 255, 0)';
+            }}
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-6 h-6 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
           {/* Enlarged Image */}
           <div 
-            className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center"
+            className={`relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center ${isClosingLightbox ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative w-full h-full max-w-2xl max-h-[85vh] rounded-2xl overflow-hidden shadow-2xl">

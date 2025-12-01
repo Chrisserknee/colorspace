@@ -14,6 +14,16 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Handle close with animation
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 350);
+  };
 
   const validateFile = (file: File): boolean => {
     setError(null);
@@ -97,6 +107,9 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
     shadow: '0 25px 50px rgba(0, 0, 0, 0.1), 0 0 100px rgba(212, 175, 55, 0.1)',
     closeBg: 'rgba(0, 0, 0, 0.05)',
     closeColor: '#6B6B6B',
+    closeHoverBg: 'rgba(212, 175, 55, 0.15)',
+    closeHoverColor: '#D4AF37',
+    closeGlow: '0 0 15px rgba(212, 175, 55, 0.3)',
     iconBg: 'rgba(212, 175, 55, 0.1)',
     iconBorder: '1px solid rgba(212, 175, 55, 0.2)',
     iconColor: '#D4AF37',
@@ -118,6 +131,9 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
     shadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 100px rgba(197, 165, 114, 0.1)',
     closeBg: 'rgba(255, 255, 255, 0.05)',
     closeColor: '#B8B2A8',
+    closeHoverBg: 'rgba(197, 165, 114, 0.2)',
+    closeHoverColor: '#C5A572',
+    closeGlow: '0 0 15px rgba(197, 165, 114, 0.4)',
     iconBg: 'rgba(197, 165, 114, 0.1)',
     iconBorder: '1px solid rgba(197, 165, 114, 0.2)',
     iconColor: '#C5A572',
@@ -138,14 +154,14 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 backdrop-blur-sm animate-fade-in"
+        className={`absolute inset-0 backdrop-blur-sm ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
         style={{ backgroundColor: colors.backdrop }}
-        onClick={onClose}
+        onClick={handleClose}
       />
       
       {/* Modal */}
       <div 
-        className="relative w-full max-w-lg rounded-3xl shadow-2xl animate-fade-in-up p-8"
+        className={`relative w-full max-w-lg rounded-3xl shadow-2xl p-8 ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: colors.modalBg,
           border: `1px solid ${colors.border}`,
@@ -154,11 +170,25 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
       >
         {/* Close button */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-          style={{ backgroundColor: colors.closeBg, color: colors.closeColor }}
+          onClick={handleClose}
+          className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 hover:rotate-90 active:scale-95"
+          style={{ 
+            backgroundColor: colors.closeBg, 
+            color: colors.closeColor,
+            boxShadow: '0 0 0 0 transparent'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.closeHoverBg;
+            e.currentTarget.style.color = colors.closeHoverColor;
+            e.currentTarget.style.boxShadow = colors.closeGlow;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.closeBg;
+            e.currentTarget.style.color = colors.closeColor;
+            e.currentTarget.style.boxShadow = '0 0 0 0 transparent';
+          }}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-5 h-5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

@@ -72,11 +72,34 @@ export async function POST(request: NextRequest) {
     let productImage: string[] = [];
 
     if (isPackPurchase) {
-      // Pack purchase
-      if (packType === "2-pack") {
-        priceAmount = CONFIG.PACK_2_PRICE_AMOUNT;
-        productName = CONFIG.PACK_PRODUCT_NAME;
-        productDescription = CONFIG.PACK_PRODUCT_DESCRIPTION;
+      // Pack purchase - handle different pack types
+      switch (packType) {
+        case "1-pack":
+          priceAmount = CONFIG.PACK_1_PRICE_AMOUNT;
+          productName = CONFIG.PACK_1_NAME;
+          productDescription = CONFIG.PACK_1_DESCRIPTION;
+          break;
+        case "5-pack":
+          priceAmount = CONFIG.PACK_5_PRICE_AMOUNT;
+          productName = CONFIG.PACK_5_NAME;
+          productDescription = CONFIG.PACK_5_DESCRIPTION;
+          break;
+        case "10-pack":
+          priceAmount = CONFIG.PACK_10_PRICE_AMOUNT;
+          productName = CONFIG.PACK_10_NAME;
+          productDescription = CONFIG.PACK_10_DESCRIPTION;
+          break;
+        case "2-pack":
+          // Legacy support
+          priceAmount = CONFIG.PACK_2_PRICE_AMOUNT;
+          productName = CONFIG.PACK_PRODUCT_NAME;
+          productDescription = CONFIG.PACK_PRODUCT_DESCRIPTION;
+          break;
+        default:
+          return NextResponse.json(
+            { error: "Invalid pack type" },
+            { status: 400 }
+          );
       }
       console.log(`Creating pack checkout session: ${packType}, price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
     } else {

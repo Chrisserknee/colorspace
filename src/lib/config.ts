@@ -4,17 +4,39 @@ export const CONFIG = {
   PRICE_DISPLAY: "$19.99",
   PRICE_AMOUNT: 1999, // $19.99 in cents
   
-  // Pack pricing
+  // Pack pricing - Tiered options
+  // Starter Pack: $1 for 1 portrait
+  PACK_1_PRICE_DISPLAY: "$1",
+  PACK_1_PRICE_AMOUNT: 100, // $1 in cents
+  PACK_1_PORTRAITS: 1,
+  PACK_1_NAME: "Starter Pack",
+  PACK_1_DESCRIPTION: "1 watermarked portrait to try it out",
+  
+  // Popular Pack: $5 for 5 portraits (Best Value)
+  PACK_5_PRICE_DISPLAY: "$5",
+  PACK_5_PRICE_AMOUNT: 500, // $5 in cents
+  PACK_5_PORTRAITS: 5,
+  PACK_5_NAME: "Popular Pack",
+  PACK_5_DESCRIPTION: "5 watermarked portraits - Best value!",
+  
+  // Pro Pack: $10 for 10 portraits (Most Savings)
+  PACK_10_PRICE_DISPLAY: "$10",
+  PACK_10_PRICE_AMOUNT: 1000, // $10 in cents
+  PACK_10_PORTRAITS: 10,
+  PACK_10_NAME: "Pro Pack",
+  PACK_10_DESCRIPTION: "10 watermarked portraits - Maximum savings!",
+  
+  // Legacy support (deprecated, use PACK_5 instead)
   PACK_2_PRICE_DISPLAY: "$5",
   PACK_2_PRICE_AMOUNT: 500, // $5 in cents
-  PACK_2_GENERATIONS: 2, // 2 generations per pack
+  PACK_2_PORTRAITS: 2, // 2 portraits per pack
   
   // Product details
   PRODUCT_NAME: "LumePet Royal Portrait",
   PRODUCT_DESCRIPTION: "Full-resolution, watermark-free royal portrait of your beloved pet as nobility",
   
-  PACK_PRODUCT_NAME: "LumePet Generation Pack (2)",
-  PACK_PRODUCT_DESCRIPTION: "2 watermarked generations (does not include the full HD version)",
+  PACK_PRODUCT_NAME: "LumePet Portrait Pack",
+  PACK_PRODUCT_DESCRIPTION: "Watermarked portraits (does not include the full HD version)",
   
   // API URLs
   BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",

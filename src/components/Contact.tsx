@@ -17,6 +17,16 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Handle close with animation
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 350);
+  };
 
   // Reset form when modal closes
   useEffect(() => {
@@ -95,7 +105,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
       // Close modal after 3 seconds on success
       setTimeout(() => {
         setSubmitStatus("idle");
-        onClose();
+        handleClose();
       }, 3000);
     } catch (err) {
       setSubmitStatus("error");
@@ -107,14 +117,14 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
   // Close on Escape key
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen && !isClosing) {
+        handleClose();
       }
     };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => document.removeEventListener("keydown", handleEscapeKey);
+  }, [isOpen, isClosing]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -132,12 +142,17 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
-      onClick={onClose}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${isClosing ? 'pointer-events-none' : ''}`}
+      onClick={handleClose}
     >
+      {/* Backdrop */}
       <div 
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl"
+        className={`absolute inset-0 ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
+      />
+      
+      <div 
+        className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: 'rgba(20, 20, 20, 0.95)',
           border: '1px solid rgba(197, 165, 114, 0.2)',
@@ -147,15 +162,26 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
       >
         {/* Close Button */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full hover:bg-opacity-20 transition-colors"
+          onClick={handleClose}
+          className="absolute top-4 right-4 z-10 p-2 rounded-full transition-all duration-200 hover:scale-110 hover:rotate-90 active:scale-95"
           style={{ 
             color: '#B8B2A8',
-            backgroundColor: 'rgba(197, 165, 114, 0.1)'
+            backgroundColor: 'rgba(197, 165, 114, 0.1)',
+            boxShadow: '0 0 0 0 rgba(197, 165, 114, 0)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(197, 165, 114, 0.2)';
+            e.currentTarget.style.color = '#C5A572';
+            e.currentTarget.style.boxShadow = '0 0 15px rgba(197, 165, 114, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(197, 165, 114, 0.1)';
+            e.currentTarget.style.color = '#B8B2A8';
+            e.currentTarget.style.boxShadow = '0 0 0 0 rgba(197, 165, 114, 0)';
           }}
           aria-label="Close"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

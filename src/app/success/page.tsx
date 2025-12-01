@@ -49,10 +49,33 @@ const grantPurchaseBonus = (type?: string, packType?: string) => {
   
   // Only grant bonus if it's been more than 5 seconds since last grant (prevents refresh abuse)
   if (!lastPurchase || (now - parseInt(lastPurchase)) > 5000) {
-    if (type === "pack" && packType === "2-pack") {
+    if (type === "pack") {
       limits.packPurchases = (limits.packPurchases || 0) + 1;
-      limits.packCredits = (limits.packCredits || 0) + 2; // 2-pack gives 2 credits
+      
+      // Grant credits based on pack type
+      let creditsToAdd = 0;
+      switch (packType) {
+        case "1-pack":
+          creditsToAdd = 1;
+          break;
+        case "5-pack":
+          creditsToAdd = 5;
+          break;
+        case "10-pack":
+          creditsToAdd = 10;
+          break;
+        case "2-pack":
+          // Legacy support
+          creditsToAdd = 2;
+          break;
+        default:
+          console.warn("Unknown pack type:", packType);
+          creditsToAdd = 1; // Fallback to 1
+      }
+      
+      limits.packCredits = (limits.packCredits || 0) + creditsToAdd;
       sessionStorage.setItem("last_pack_purchase_time", now.toString());
+      console.log(`Pack purchase granted: ${creditsToAdd} credits (${packType})`);
     } else {
       limits.purchases += 1;
       sessionStorage.setItem("last_purchase_time", now.toString());

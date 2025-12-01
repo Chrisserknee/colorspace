@@ -5,7 +5,7 @@ import Image from "next/image";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
 
-type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
+type Stage = "preview" | "email-capture" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
 
 interface GenerationFlowProps {
@@ -174,6 +174,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   const [showPackPurchaseSuccess, setShowPackPurchaseSuccess] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // Supabase URL for session
   const [sessionRestored, setSessionRestored] = useState(false);
+  const [isClosing, setIsClosing] = useState(false); // For closing animation
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -405,6 +406,41 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
     });
   };
 
+  // New handler for pre-generation email capture
+  const handlePreGenerateEmailSubmit = async () => {
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    // Save to lume_leads (triggers Email #1 if conditions met)
+    try {
+      const sessionContext = {
+        style: "royal",
+        gender: gender,
+        uploadedImageUrl: uploadedImageUrl,
+        source: "pre-generate",
+      };
+      
+      console.log("💾 Saving lead before generation:", { email, context: sessionContext });
+      
+      await fetch("/api/lume-leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, context: sessionContext }),
+      });
+      
+      captureEvent("email_captured_pre_generate", {
+        gender: gender || "not_selected",
+      });
+    } catch (err) {
+      console.warn("Failed to save lead (non-critical):", err);
+    }
+    
+    // Now proceed with actual generation
+    doGenerate(false);
+  };
+
   const handleGenerate = async (isRetry: boolean = false) => {
     if (!file) return;
     
@@ -417,6 +453,23 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       return;
     }
     
+    // If email not captured yet, go to email capture stage first (skip for retries)
+    if (!email && !isRetry) {
+      setStage("email-capture");
+      setEmailError(null);
+      return;
+    }
+    
+    // Proceed with generation
+    doGenerate(isRetry);
+  };
+
+  const doGenerate = async (isRetry: boolean = false) => {
+    if (!file) return;
+    
+    // Get limits at the start for tracking
+    const currentLimitsForTracking = getLimits();
+    
     setStage("generating");
     setError(null);
     setCurrentPhrase(0);
@@ -425,7 +478,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
     // Track generation started
     captureEvent("generation_started", {
       is_retry: isRetry,
-      has_pack_credits: limits.packCredits > 0,
+      has_pack_credits: currentLimitsForTracking.packCredits > 0,
       gender: gender || "not_selected",
     });
 
@@ -510,6 +563,29 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
         used_secret_credit: usedSecretCredit,
         gender: gender || "not_selected",
       });
+      
+      // Update session with generated result (for email follow-ups)
+      if (email) {
+        try {
+          const updatedContext = {
+            style: "royal",
+            gender: gender,
+            uploadedImageUrl: uploadedImageUrl,
+            imageId: data.imageId,
+            previewUrl: data.previewUrl,
+            source: "generated",
+          };
+          
+          await fetch("/api/lume-leads", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, context: updatedContext }),
+          });
+          console.log("💾 Updated session with generated result");
+        } catch (err) {
+          console.warn("Failed to update session with result (non-critical):", err);
+        }
+      }
       
       // Set 15-minute expiration timer
       setExpirationTime(Date.now() + 15 * 60 * 1000);
@@ -679,47 +755,53 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   };
 
   const handleReset = () => {
-    // If user came from email link, redirect to home page instead of resetting
-    if (initialEmail) {
-      window.location.href = '/';
-      return;
-    }
+    // Trigger closing animation first
+    setIsClosing(true);
     
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewUrl(null);
-    setResult(null);
-    setStage("preview");
-    setError(null);
-    setExpirationTime(null);
-    setEmail("");
-    setGender(null);
-    
-    // Refresh limits check (don't reset limits - they persist)
-    const limits = getLimits();
-    setGenerationLimits(limits);
-    const check = canGenerate(limits);
-    setLimitCheck(check);
-    setRetryUsed(limits.freeRetriesUsed >= 1);
-    
-    onReset();
+    setTimeout(() => {
+      // If user came from email link, redirect to home page instead of resetting
+      if (initialEmail) {
+        window.location.href = '/';
+        return;
+      }
+      
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(null);
+      setResult(null);
+      setStage("preview");
+      setError(null);
+      setExpirationTime(null);
+      setEmail("");
+      setGender(null);
+      setIsClosing(false);
+      
+      // Refresh limits check (don't reset limits - they persist)
+      const limits = getLimits();
+      setGenerationLimits(limits);
+      const check = canGenerate(limits);
+      setLimitCheck(check);
+      setRetryUsed(limits.freeRetriesUsed >= 1);
+      
+      onReset();
+    }, 350); // Match animation duration for premium feel
   };
 
   // Show nothing if no file AND no session restore in progress
   if (!file && !initialEmail) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto ${isClosing ? 'pointer-events-none' : ''}`}>
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 backdrop-blur-sm" 
+        className={`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'animate-fade-out' : ''}`}
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
       />
       
       {/* Content */}
       <div 
-        className="relative w-full max-w-2xl rounded-3xl shadow-2xl animate-fade-in-up my-8"
+        className={`relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: '#1A1A1A',
           border: '1px solid rgba(197, 165, 114, 0.2)',
@@ -729,17 +811,64 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
         {/* Close button */}
         <button
           onClick={handleReset}
-          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-colors hover:bg-white/20"
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#B8B2A8' }}
+          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 hover:rotate-90 active:scale-95"
+          style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+            color: '#B8B2A8',
+            boxShadow: '0 0 0 0 rgba(197, 165, 114, 0)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(197, 165, 114, 0.2)';
+            e.currentTarget.style.color = '#C5A572';
+            e.currentTarget.style.boxShadow = '0 0 15px rgba(197, 165, 114, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.color = '#B8B2A8';
+            e.currentTarget.style.boxShadow = '0 0 0 0 rgba(197, 165, 114, 0)';
+          }}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-5 h-5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
+        {/* Portrait Counter - Top left - Always visible */}
+        {stage !== "checkout" && stage !== "restoring" && (
+          <div 
+            className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 z-10"
+            style={{ 
+              backgroundColor: 'rgba(26, 26, 26, 0.9)',
+              border: '1px solid rgba(197, 165, 114, 0.4)',
+              color: '#C5A572',
+              boxShadow: '0 0 15px rgba(197, 165, 114, 0.2), inset 0 0 10px rgba(197, 165, 114, 0.05)'
+            }}
+          >
+            {/* Gold Glowing Paintbrush Icon */}
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+              style={{ 
+                filter: 'drop-shadow(0 0 3px rgba(197, 165, 114, 0.8))',
+                color: '#D4B896'
+              }}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+            </svg>
+            <span>
+              {generationLimits.packCredits > 0 
+                ? `${generationLimits.packCredits} portrait${generationLimits.packCredits !== 1 ? 's' : ''}`
+                : `${Math.max(0, 2 - generationLimits.freeGenerations)} free`
+              }
+            </span>
+          </div>
+        )}
+
         {/* Preview Stage */}
         {stage === "preview" && (
-          <div className="p-8">
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             <div className="text-center mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
@@ -841,27 +970,62 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 ) : (
                   <div>
                     <p className="mb-3">{limitCheck.reason}</p>
-                    {/* Pack Purchase Option - Direct link approach */}
-                    <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.3)' }}>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#C5A572' }}>Unlock More Generations</p>
-                      <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>Tap below to purchase a pack</p>
-                      <a
-                        href="/pack-checkout"
-                        className="block w-full py-4 px-4 rounded-lg font-semibold text-base text-center"
-                        style={{ 
-                          backgroundColor: '#C5A572', 
-                          color: '#1A1A1A',
-                          minHeight: '50px',
-                          textDecoration: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        Buy 2-Pack for $5 →
-                      </a>
-                      <p className="text-xs mt-2 text-center" style={{ color: '#7A756D' }}>
-                        (watermarked, does not include HD)
+                    {/* Pack Purchase Options - Three Tiers */}
+                    <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(197, 165, 114, 0.05)', border: '1px solid rgba(197, 165, 114, 0.2)' }}>
+                      <p className="text-sm font-semibold mb-4 text-center" style={{ color: '#C5A572' }}>✨ Unlock More Portraits</p>
+                      
+                      <div className="grid grid-cols-3 gap-2">
+                        {/* $1 - 1 Generation */}
+                        <a
+                          href="/pack-checkout?pack=1"
+                          className="block p-3 rounded-lg text-center transition-all hover:scale-105"
+                          style={{ 
+                            backgroundColor: 'rgba(197, 165, 114, 0.1)',
+                            border: '1px solid rgba(197, 165, 114, 0.3)',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <p className="text-lg font-bold" style={{ color: '#F0EDE8' }}>$1</p>
+                          <p className="text-xs" style={{ color: '#B8B2A8' }}>1 portrait</p>
+                        </a>
+                        
+                        {/* $5 - 5 Generations - Best Value */}
+                        <a
+                          href="/pack-checkout?pack=5"
+                          className="block p-3 rounded-lg text-center transition-all hover:scale-105 relative"
+                          style={{ 
+                            backgroundColor: '#C5A572',
+                            border: '2px solid #D4B896',
+                            textDecoration: 'none',
+                            boxShadow: '0 4px 15px rgba(197, 165, 114, 0.4)',
+                          }}
+                        >
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#4ADE80', color: '#1A1A1A' }}>BEST</span>
+                          <p className="text-lg font-bold" style={{ color: '#1A1A1A' }}>$5</p>
+                          <p className="text-xs font-medium" style={{ color: '#2D2A26' }}>5 portraits</p>
+                        </a>
+                        
+                        {/* $10 - 10 Generations - Most Savings */}
+                        <a
+                          href="/pack-checkout?pack=10"
+                          className="block p-3 rounded-lg text-center transition-all hover:scale-105 relative"
+                          style={{ 
+                            backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                            border: '1px solid rgba(197, 165, 114, 0.4)',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#60A5FA', color: '#1A1A1A' }}>SAVE</span>
+                          <p className="text-lg font-bold" style={{ color: '#F0EDE8' }}>$10</p>
+                          <p className="text-xs" style={{ color: '#B8B2A8' }}>10 portraits</p>
+                        </a>
+                      </div>
+                      
+                      <p className="text-[10px] mt-3 text-center" style={{ color: '#9A958D' }}>
+                        Watermarked previews • HD available for $19.99 each
+                      </p>
+                      <p className="text-[10px] mt-2 text-center italic" style={{ color: '#C5A572' }}>
+                        95% of LumePet users unlock more portraits after their first 2.
                       </p>
                     </div>
                   </div>
@@ -953,9 +1117,100 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
           </div>
         )}
 
+        {/* Email Capture Stage (Before Generation) */}
+        {stage === "email-capture" && (
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+            <div className="text-center mb-6">
+              <h3 
+                className="text-2xl font-semibold mb-2"
+                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+              >
+                One Quick Step
+              </h3>
+              <p style={{ color: '#B8B2A8' }}>
+                Enter your email to create your royal portrait
+              </p>
+            </div>
+
+            {/* Preview of uploaded image */}
+            {previewUrl && (
+              <div 
+                className="relative aspect-square max-w-[150px] mx-auto rounded-xl overflow-hidden shadow-lg mb-6"
+                style={{ border: '2px solid rgba(197, 165, 114, 0.3)' }}
+              >
+                <Image
+                  src={previewUrl}
+                  alt="Your pet"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+            )}
+
+            <div className="max-w-sm mx-auto">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError(null);
+                }}
+                placeholder="your@email.com"
+                className="w-full px-4 py-3 rounded-xl text-center text-lg mb-4 outline-none transition-all"
+                style={{ 
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  border: emailError ? '2px solid #F87171' : '2px solid rgba(197, 165, 114, 0.3)',
+                  color: '#F0EDE8'
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && handlePreGenerateEmailSubmit()}
+                autoFocus
+              />
+              
+              {emailError && (
+                <p className="text-center text-sm mb-4" style={{ color: '#F87171' }}>
+                  {emailError}
+                </p>
+              )}
+
+              <button 
+                type="button"
+                onClick={handlePreGenerateEmailSubmit}
+                className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                style={{ 
+                  backgroundColor: '#C5A572', 
+                  color: '#1A1A1A',
+                  touchAction: 'manipulation',
+                }}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                </svg>
+                Generate My Portrait
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => {
+                  setStage("preview");
+                  setEmailError(null);
+                }}
+                className="w-full text-center text-sm py-3 mt-3 transition-colors hover:text-[#C5A572]"
+                style={{ color: '#7A756D' }}
+              >
+                ← Go back
+              </button>
+
+              <p className="text-center text-xs mt-4" style={{ color: '#5A5650' }}>
+                We&apos;ll save your portrait so you can access it anytime
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Generating Stage - Elegant Victorian Animation */}
         {stage === "generating" && (
-          <div className="p-8 text-center min-h-[500px] flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="p-4 sm:p-6 text-center min-h-[350px] sm:min-h-[400px] flex flex-col items-center justify-center relative overflow-hidden">
             {/* Decorative background elements */}
             <div className="absolute inset-0 pointer-events-none">
               {/* Floating particles */}
@@ -1034,7 +1289,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Result Stage - Purchase Modal */}
         {stage === "result" && result && (
-          <div className="p-4 sm:p-8 max-h-[90vh] overflow-y-auto">
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             {/* Download icon */}
             <div className="flex justify-center mb-2 sm:mb-4">
               <svg className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#B8B2A8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1148,55 +1403,62 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                       🔄 Try Again ({remaining} free generation{remaining !== 1 ? 's' : ''} remaining)
                     </button>
                   );
-                } else if (!check.allowed) {
-                  return (
-                    <div className="text-center">
-                      <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
-                        {check.reason || "Generation limit reached. Purchase a pack to unlock more!"}
-                      </p>
-                      <a
-                        href="/pack-checkout"
-                        className="block w-full py-4 px-4 rounded-lg font-semibold text-base text-center"
-                        style={{ 
-                          backgroundColor: '#C5A572', 
-                          color: '#1A1A1A',
-                          minHeight: '50px',
-                          textDecoration: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        Buy 2-Pack for $5 →
-                      </a>
-                      <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
-                        (watermarked, does not include HD)
-                      </p>
-                    </div>
-                  );
                 } else {
                   return (
                     <div className="text-center">
-                      <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
-                        You&apos;ve used your 2 free generations. Purchase a pack to unlock more!
+                      <p className="text-sm mb-4" style={{ color: '#7A756D' }}>
+                        Want to generate more portraits?
                       </p>
-                      <a
-                        href="/pack-checkout"
-                        className="block w-full py-4 px-4 rounded-lg font-semibold text-base text-center"
-                        style={{ 
-                          backgroundColor: '#C5A572', 
-                          color: '#1A1A1A',
-                          minHeight: '50px',
-                          textDecoration: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        Buy 2-Pack for $5 →
-                      </a>
-                      <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
-                        (watermarked, does not include HD)
+                      
+                      {/* Pack Options - Compact Three Tier */}
+                      <div className="grid grid-cols-3 gap-2">
+                        <a
+                          href="/pack-checkout?pack=1"
+                          className="block p-2 rounded-lg text-center transition-all hover:scale-105"
+                          style={{ 
+                            backgroundColor: 'rgba(197, 165, 114, 0.1)',
+                            border: '1px solid rgba(197, 165, 114, 0.3)',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <p className="text-sm font-bold" style={{ color: '#F0EDE8' }}>$1</p>
+                          <p className="text-[10px]" style={{ color: '#B8B2A8' }}>1 portrait</p>
+                        </a>
+                        
+                        <a
+                          href="/pack-checkout?pack=5"
+                          className="block p-2 rounded-lg text-center transition-all hover:scale-105 relative"
+                          style={{ 
+                            backgroundColor: '#C5A572',
+                            border: '2px solid #D4B896',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#4ADE80', color: '#1A1A1A' }}>BEST</span>
+                          <p className="text-sm font-bold" style={{ color: '#1A1A1A' }}>$5</p>
+                          <p className="text-[10px] font-medium" style={{ color: '#2D2A26' }}>5 portraits</p>
+                        </a>
+                        
+                        <a
+                          href="/pack-checkout?pack=10"
+                          className="block p-2 rounded-lg text-center transition-all hover:scale-105 relative"
+                          style={{ 
+                            backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                            border: '1px solid rgba(197, 165, 114, 0.4)',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: '#60A5FA', color: '#1A1A1A' }}>SAVE</span>
+                          <p className="text-sm font-bold" style={{ color: '#F0EDE8' }}>$10</p>
+                          <p className="text-[10px]" style={{ color: '#B8B2A8' }}>10 portraits</p>
+                        </a>
+                      </div>
+                      
+                      <p className="text-[9px] mt-2" style={{ color: '#9A958D' }}>
+                        Watermarked previews
+                      </p>
+                      <p className="text-[9px] mt-1 italic" style={{ color: '#C5A572' }}>
+                        95% of users unlock more portraits after their first 2
                       </p>
                     </div>
                   );
@@ -1208,8 +1470,8 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Email Capture Stage */}
         {stage === "email" && (
-          <div className="p-8">
-            <div className="text-center mb-6">
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+            <div className="text-center mb-4 sm:mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
@@ -1282,8 +1544,8 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Expired Stage */}
         {stage === "expired" && (
-          <div className="p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
+          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
               <svg className="w-8 h-8" style={{ color: '#F87171' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -1310,9 +1572,9 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Checkout Stage */}
         {stage === "checkout" && (
-          <div className="p-8 text-center">
+          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
             <div 
-              className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center"
+              className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
               style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}
             >
               <div 
@@ -1339,9 +1601,9 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Restoring Session Stage */}
         {stage === "restoring" && (
-          <div className="p-8 text-center">
+          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
             <div 
-              className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center"
+              className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
               style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}
             >
               <div 

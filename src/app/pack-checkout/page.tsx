@@ -1,12 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default function PackCheckoutPage() {
+type PackType = "1" | "5" | "10";
+
+interface PackInfo {
+  id: PackType;
+  name: string;
+  price: string;
+  priceAmount: number;
+  portraits: number;
+  packType: string;
+  badge?: string;
+  badgeColor?: string;
+  featured?: boolean;
+}
+
+const PACKS: PackInfo[] = [
+  {
+    id: "1",
+    name: "Starter",
+    price: "$1",
+    priceAmount: 1,
+    portraits: 1,
+    packType: "1-pack",
+  },
+  {
+    id: "5",
+    name: "Popular",
+    price: "$5",
+    priceAmount: 5,
+    portraits: 5,
+    packType: "5-pack",
+    badge: "BEST VALUE",
+    badgeColor: "#4ADE80",
+    featured: true,
+  },
+  {
+    id: "10",
+    name: "Pro",
+    price: "$10",
+    priceAmount: 10,
+    portraits: 10,
+    packType: "10-pack",
+    badge: "MOST SAVINGS",
+    badgeColor: "#60A5FA",
+  },
+];
+
+function PackCheckoutContent() {
+  const searchParams = useSearchParams();
+  const packParam = searchParams.get("pack") as PackType | null;
+  
+  const [selectedPack, setSelectedPack] = useState<PackType>(packParam || "5");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Update selected pack when URL param changes
+  useEffect(() => {
+    if (packParam && ["1", "5", "10"].includes(packParam)) {
+      setSelectedPack(packParam);
+    }
+  }, [packParam]);
+
+  const currentPack = PACKS.find(p => p.id === selectedPack) || PACKS[1];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +87,7 @@ export default function PackCheckoutPage() {
         body: JSON.stringify({
           email,
           type: "pack",
-          packType: "2-pack",
+          packType: currentPack.packType,
         }),
       });
 
@@ -47,24 +108,88 @@ export default function PackCheckoutPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#0F0F0F' }}>
       <div 
-        className="w-full max-w-md p-8 rounded-2xl"
+        className="w-full max-w-lg p-6 sm:p-8 rounded-2xl"
         style={{ 
           backgroundColor: '#1A1A1A',
           border: '1px solid rgba(197, 165, 114, 0.3)',
         }}
       >
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 
-            className="text-3xl font-semibold mb-2"
+            className="text-2xl sm:text-3xl font-semibold mb-2"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
           >
-            2-Pack Purchase
+            ✨ Unlock More Portraits
           </h1>
           <p style={{ color: '#B8B2A8' }}>
-            Get 2 watermarked generations for just $5
+            Choose a pack that works for you
+          </p>
+          <p className="text-xs mt-2 italic" style={{ color: '#C5A572' }}>
+            95% of LumePet users unlock more portraits after their first 2.
           </p>
         </div>
 
+        {/* Pack Selection */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {PACKS.map((pack) => (
+            <button
+              key={pack.id}
+              type="button"
+              onClick={() => setSelectedPack(pack.id)}
+              className={`relative p-4 rounded-xl text-center transition-all ${
+                selectedPack === pack.id ? 'scale-105' : 'hover:scale-102'
+              }`}
+              style={{ 
+                backgroundColor: selectedPack === pack.id 
+                  ? (pack.featured ? '#C5A572' : 'rgba(197, 165, 114, 0.2)')
+                  : 'rgba(197, 165, 114, 0.08)',
+                border: selectedPack === pack.id 
+                  ? `2px solid ${pack.featured ? '#D4B896' : '#C5A572'}`
+                  : '1px solid rgba(197, 165, 114, 0.2)',
+                boxShadow: selectedPack === pack.id && pack.featured
+                  ? '0 4px 20px rgba(197, 165, 114, 0.4)'
+                  : 'none',
+              }}
+            >
+              {pack.badge && (
+                <span 
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap"
+                  style={{ backgroundColor: pack.badgeColor, color: '#1A1A1A' }}
+                >
+                  {pack.badge}
+                </span>
+              )}
+              <p 
+                className="text-xs mb-1 font-medium"
+                style={{ 
+                  color: selectedPack === pack.id && pack.featured ? '#1A1A1A' : '#B8B2A8'
+                }}
+              >
+                {pack.name}
+              </p>
+              <p 
+                className="text-2xl sm:text-3xl font-bold"
+                style={{ 
+                  color: selectedPack === pack.id 
+                    ? (pack.featured ? '#1A1A1A' : '#F0EDE8')
+                    : '#C5A572'
+                }}
+              >
+                {pack.price}
+              </p>
+              <p 
+                className="text-sm mt-1"
+                style={{ 
+                  color: selectedPack === pack.id && pack.featured ? '#2D2A26' : '#7A756D'
+                }}
+              >
+                {pack.portraits} portrait{pack.portraits > 1 ? 's' : ''}
+              </p>
+            </button>
+          ))}
+        </div>
+
+        {/* Selected Pack Summary */}
         <div 
           className="p-4 rounded-xl mb-6 text-center"
           style={{ 
@@ -72,9 +197,16 @@ export default function PackCheckoutPage() {
             border: '1px solid rgba(197, 165, 114, 0.2)',
           }}
         >
-          <p className="text-2xl font-bold" style={{ color: '#C5A572' }}>$5.00</p>
-          <p className="text-sm" style={{ color: '#7A756D' }}>2 watermarked generations</p>
-          <p className="text-xs mt-1" style={{ color: '#7A756D' }}>(does not include HD version)</p>
+          <p className="text-sm mb-1" style={{ color: '#B8B2A8' }}>Selected:</p>
+          <p className="text-xl font-bold" style={{ color: '#C5A572' }}>
+            {currentPack.name} Pack - {currentPack.price}
+          </p>
+          <p className="text-sm" style={{ color: '#7A756D' }}>
+            {currentPack.portraits} watermarked portrait{currentPack.portraits > 1 ? 's' : ''}
+          </p>
+          <p className="text-xs mt-1" style={{ color: '#5A5650' }}>
+            HD versions available for $19.99 each
+          </p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -104,14 +236,14 @@ export default function PackCheckoutPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-xl font-semibold text-lg transition-all"
+            className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
             style={{ 
               backgroundColor: loading ? '#8B7355' : '#C5A572', 
               color: '#1A1A1A',
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? "Processing..." : "Pay $5 with Stripe"}
+            {loading ? "Processing..." : `Pay ${currentPack.price} with Stripe`}
           </button>
         </form>
 
@@ -129,3 +261,14 @@ export default function PackCheckoutPage() {
   );
 }
 
+export default function PackCheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0F0F0F' }}>
+        <div className="text-center" style={{ color: '#B8B2A8' }}>Loading...</div>
+      </div>
+    }>
+      <PackCheckoutContent />
+    </Suspense>
+  );
+}

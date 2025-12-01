@@ -58,6 +58,53 @@ h1, h2, h3, h4 {
   color: var(--text-primary);
 }
 
+/* ============================================
+   INTERACTIVE ELEMENT ENHANCEMENTS
+   ============================================ */
+
+/* Base transition for all interactive elements */
+button, 
+a, 
+input, 
+select, 
+textarea,
+[role="button"],
+.interactive {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Press animation for all clickable elements */
+button:not(:disabled):active,
+[role="button"]:not(:disabled):active,
+.btn-primary:not(:disabled):active,
+.btn-secondary:not(:disabled):active,
+.interactive:active {
+  transform: scale(0.97) !important;
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Hover lift effect for clickable cards/links */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-lift:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Glow effect on hover */
+.hover-glow {
+  transition: box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+.hover-glow:hover {
+  filter: brightness(1.05);
+}
+
 /* Button Styles */
 .btn-primary {
   background: linear-gradient(135deg, #8B3A42 0%, #722F37 100%);
@@ -68,29 +115,47 @@ h1, h2, h3, h4 {
   border-radius: 9999px;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 20px rgba(139, 58, 66, 0.4);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 30px rgba(139, 58, 66, 0.5);
   background: linear-gradient(135deg, #A34D56 0%, #8B3A42 100%);
 }
 
+.btn-primary:hover::after {
+  opacity: 1;
+}
+
 .btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 2px 10px rgba(139, 58, 66, 0.4);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .btn-secondary {
@@ -102,18 +167,39 @@ h1, h2, h3, h4 {
   border-radius: 9999px;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 20px rgba(197, 165, 114, 0.3);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-secondary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .btn-secondary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 30px rgba(197, 165, 114, 0.4);
+}
+
+.btn-secondary:hover::after {
+  opacity: 1;
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 2px 10px rgba(197, 165, 114, 0.3);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Card Styles - Dark Mode */
@@ -124,7 +210,7 @@ h1, h2, h3, h4 {
     0 4px 6px rgba(0, 0, 0, 0.3),
     0 10px 40px rgba(0, 0, 0, 0.4);
   padding: 2rem;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(197, 165, 114, 0.1);
 }
 
@@ -134,6 +220,308 @@ h1, h2, h3, h4 {
     0 8px 12px rgba(0, 0, 0, 0.4),
     0 20px 60px rgba(0, 0, 0, 0.5);
   border-color: rgba(197, 165, 114, 0.2);
+}
+
+.card:active {
+  transform: translateY(-2px) scale(0.995);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   INPUT ENHANCEMENTS
+   ============================================ */
+
+/* Input focus animation */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+select:focus {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(197, 165, 114, 0.15);
+}
+
+/* Checkbox/Radio enhancements */
+input[type="checkbox"],
+input[type="radio"] {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+input[type="checkbox"]:active,
+input[type="radio"]:active {
+  transform: scale(0.9);
+}
+
+/* ============================================
+   LINK ENHANCEMENTS
+   ============================================ */
+
+/* Text link hover effect */
+a:not(.btn-primary):not(.btn-secondary):not([class*="block"]) {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+/* Underline animation for text links */
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gold);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* ============================================
+   ICON BUTTON ENHANCEMENTS
+   ============================================ */
+
+/* Icon buttons (close, back, etc.) */
+.icon-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+}
+
+/* Rotating icon on hover */
+.icon-rotate:hover svg,
+.icon-rotate:hover .icon {
+  transform: rotate(90deg);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   CLOSE BUTTON ENHANCEMENTS
+   ============================================ */
+
+/* Standard close button with glow effect */
+.close-btn {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+  background: rgba(197, 165, 114, 0.2);
+  color: var(--gold);
+  box-shadow: 0 0 15px rgba(197, 165, 114, 0.4);
+}
+
+.close-btn:active {
+  transform: scale(0.95) rotate(90deg);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.close-btn svg {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light theme close button */
+.close-btn-light {
+  background: rgba(0, 0, 0, 0.05);
+  color: #6B6B6B;
+}
+
+.close-btn-light:hover {
+  background: rgba(212, 175, 55, 0.15);
+  color: #D4AF37;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+/* Dark theme close button */
+.close-btn-dark {
+  background: rgba(255, 255, 255, 0.1);
+  color: #B8B2A8;
+}
+
+.close-btn-dark:hover {
+  background: rgba(197, 165, 114, 0.2);
+  color: #C5A572;
+  box-shadow: 0 0 15px rgba(197, 165, 114, 0.4);
+}
+
+/* ============================================
+   RIPPLE EFFECT (for touchscreens)
+   ============================================ */
+
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  opacity: 0;
+}
+
+.ripple:active::before {
+  width: 300%;
+  height: 300%;
+  opacity: 0;
+  transition: width 0s, height 0s, opacity 0.6s ease;
+}
+
+/* ============================================
+   SPRING ANIMATIONS
+   ============================================ */
+
+@keyframes spring-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  75% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+@keyframes spring-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-spring-pop {
+  animation: spring-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-spring-press {
+  animation: spring-press 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-wiggle:hover {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* ============================================
+   TAB/PILL BUTTON ENHANCEMENTS
+   ============================================ */
+
+.tab-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--gold);
+  transform: translateX(-50%);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn:hover::after,
+.tab-btn.active::after {
+  width: 80%;
+}
+
+.tab-btn:active {
+  transform: scale(0.97);
+}
+
+/* ============================================
+   IMAGE/MEDIA ENHANCEMENTS
+   ============================================ */
+
+.img-hover-zoom {
+  overflow: hidden;
+}
+
+.img-hover-zoom img {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.img-hover-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Subtle image press effect */
+.img-press:active img {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* ============================================
+   TOOLTIP ANIMATIONS
+   ============================================ */
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(197, 165, 114, 0.2);
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
 }
 
 /* Ornate Frame Effect - Dark Mode */
@@ -204,9 +592,25 @@ h1, h2, h3, h4 {
   }
 }
 
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 @keyframes float {
@@ -223,8 +627,25 @@ h1, h2, h3, h4 {
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
+.animate-fade-out-down {
+  animation: fadeOutDown 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Modal closing animations */
+.modal-closing .modal-backdrop {
+  animation: fadeOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.modal-closing .modal-content {
+  animation: fadeOutDown 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-float {
@@ -406,10 +827,137 @@ h1, h2, h3, h4 {
   background: var(--gold);
 }
 
-/* Focus States */
+/* ============================================
+   FOCUS STATES (Accessibility)
+   ============================================ */
+
 *:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+  transition: outline-offset 0.1s ease;
+}
+
+*:focus-visible:active {
+  outline-offset: 0px;
+}
+
+/* Beautiful focus ring for buttons */
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(197, 165, 114, 0.2);
+}
+
+/* Input focus glow */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(197, 165, 114, 0.2), 0 0 20px rgba(197, 165, 114, 0.1);
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(197, 165, 114, 0.1) 0%,
+    rgba(197, 165, 114, 0.2) 50%,
+    rgba(197, 165, 114, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Button loading state */
+.btn-loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.btn-loading::after {
+  content: '';
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-left: 0.5rem;
+}
+
+/* ============================================
+   SUCCESS/ERROR FEEDBACK ANIMATIONS
+   ============================================ */
+
+@keyframes success-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-success {
+  animation: success-pulse 0.6s ease-out;
+}
+
+.animate-error {
+  animation: error-shake 0.5s ease-out;
+}
+
+/* ============================================
+   HOVER BRIGHTNESS ADJUSTMENTS
+   ============================================ */
+
+.hover-bright:hover {
+  filter: brightness(1.1);
+  transition: filter 0.2s ease;
+}
+
+.hover-dim:hover {
+  filter: brightness(0.9);
+  transition: filter 0.2s ease;
+}
+
+/* ============================================
+   TOUCH-FRIENDLY ENHANCEMENTS
+   ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Larger tap targets on touch devices */
+  button, 
+  [role="button"], 
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Disable hover effects on touch */
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .card:hover {
+    transform: none;
+  }
+  
+  /* Keep active states on touch */
+  .btn-primary:active,
+  .btn-secondary:active {
+    transform: scale(0.97);
+  }
 }
 
 /* Selection */

@@ -19,8 +19,18 @@
 
 import { Resend } from 'resend';
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-initialize Resend client to avoid build errors when env var is not set
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resendClient) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendClient;
+}
 
 // From email address - update if you have a custom domain
 const FROM_EMAIL = 'LumePet <noreply@lumepet.app>';
@@ -132,7 +142,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<Ema
       return { success: false, error: 'Email not configured' };
     }
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResendClient().emails.send({
       from: FROM_EMAIL,
       to: [to],
       subject,
