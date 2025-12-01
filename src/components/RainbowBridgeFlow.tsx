@@ -1350,30 +1350,28 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
         {/* Result Stage */}
         {stage === "result" && result && result.imageId !== "pack" && (
           <div className="p-4 sm:p-6 pb-12">
-            <div className="flex justify-center mb-2 sm:mb-4">
-              <svg className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#9B8AA0' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-            </div>
-
+            {/* Title with reveal animation */}
             <h3 
-              className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-2 sm:mb-4"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#4A4A4A' }}
+              className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-3 sm:mb-4 opacity-0 animate-text-reveal"
+              style={{ 
+                fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                color: '#4A4A4A',
+                animationDelay: '0.3s',
+                animationFillMode: 'forwards'
+              }}
             >
-              {petName}&apos;s Memorial Portrait
+              🌈 {petName}&apos;s Memorial
             </h3>
 
-            <div className="text-center mb-2">
-              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#4A4A4A' }}>$19.99</span>
-            </div>
-
-            <div className="text-center mb-3 sm:mb-4">
-              <span className="text-sm sm:text-base" style={{ color: '#6B6B6B' }}>Expires in </span>
-              <span className="font-mono font-bold text-sm sm:text-base" style={{ color: '#4A4A4A' }}>{timeRemaining}</span>
-            </div>
-
+            {/* Preview Image - Beautiful reveal animation */}
             {(canvasImageUrl || result.previewUrl) && (
-              <div className="relative max-w-[200px] sm:max-w-xs mx-auto mb-4 sm:mb-6 rounded-xl overflow-hidden shadow-lg">
+              <div 
+                className="relative max-w-[220px] sm:max-w-sm mx-auto mb-5 sm:mb-6 rounded-2xl overflow-hidden opacity-0 animate-portrait-reveal animate-portrait-glow-rainbow"
+                style={{ 
+                  animationDelay: '0s',
+                  animationFillMode: 'forwards'
+                }}
+              >
                 <div className="relative aspect-square">
                   <ProtectedImage
                     src={canvasImageUrl || result.previewUrl}
@@ -1388,41 +1386,54 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             {/* Hidden canvas for rendering */}
             <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-            <p className="text-center mb-3 sm:mb-4 text-sm sm:text-base" style={{ color: '#6B6B6B' }}>
-              A beautiful tribute to {petName} —<br className="hidden sm:block" />
-              <span className="sm:hidden"> </span>forever in your heart.
-            </p>
-
-            <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base" style={{ color: '#6B6B6B' }}>
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>No Watermark</span>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base" style={{ color: '#6B6B6B' }}>
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Instant Download</span>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base" style={{ color: '#6B6B6B' }}>
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>High-Resolution</span>
-              </div>
+            {/* Price with staggered reveal */}
+            <div 
+              className="text-center mb-2 opacity-0 animate-text-reveal"
+              style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}
+            >
+              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#4A4A4A' }}>$19.99</span>
             </div>
 
+            {/* Expiration Timer */}
+            <div 
+              className="text-center mb-4 sm:mb-5 opacity-0 animate-text-reveal"
+              style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}
+            >
+              <span className="text-sm sm:text-base" style={{ color: '#6B6B6B' }}>Expires in </span>
+              <span className="font-mono font-bold text-sm sm:text-base" style={{ color: '#4A4A4A' }}>{timeRemaining}</span>
+            </div>
+
+            {/* Features list with staggered animation */}
+            <div 
+              className="flex justify-center gap-4 sm:gap-6 mb-5 sm:mb-6 text-xs sm:text-sm opacity-0 animate-text-reveal"
+              style={{ animationDelay: '0.8s', animationFillMode: 'forwards', color: '#6B6B6B' }}
+            >
+              <span className="flex items-center gap-1">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                No Watermark
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                HD Quality
+              </span>
+            </div>
+
+            {/* Download button with reveal animation */}
             <button 
               onClick={handlePurchaseClick}
-              className="w-full py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all hover:scale-[1.02] shadow-lg"
+              className="w-full py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all hover:scale-[1.02] shadow-lg opacity-0 animate-button-reveal"
               style={{ 
                 background: 'linear-gradient(135deg, #D4AF37 0%, #E6C866 50%, #D4AF37 100%)',
                 color: '#FFFFFF',
+                animationDelay: '1s',
+                animationFillMode: 'forwards'
               }}
             >
-              Download Memorial Portrait
+              Download Memorial — $19.99
             </button>
 
             {error && (
