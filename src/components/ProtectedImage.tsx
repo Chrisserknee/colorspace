@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+/* eslint-disable @next/next/no-img-element */
 
 interface ProtectedImageProps {
   src: string;
@@ -11,15 +12,13 @@ interface ProtectedImageProps {
 /**
  * ProtectedImage Component
  * 
- * Wraps images with protection to prevent casual downloading:
- * - Uses CSS background-image instead of <img> tag (harder to inspect)
- * - Invisible overlay blocks pointer events
+ * Wraps images with basic protection to prevent casual downloading:
  * - Disables right-click context menu
  * - Prevents drag-and-drop
- * - Disables tap-and-hold on mobile
+ * - Disables tap-and-hold on mobile via CSS
  * 
- * Note: This cannot prevent screenshots or determined users from finding
- * the image URL. The watermark remains the ultimate protection.
+ * Note: This cannot prevent screenshots or determined users.
+ * The watermark remains the ultimate protection.
  */
 export default function ProtectedImage({ 
   src, 
@@ -42,26 +41,19 @@ export default function ProtectedImage({
         height: "100%",
       }}
     >
-      {/* Image rendered as background - harder to inspect than <img> */}
-      <div
-        className="protected-image"
+      {/* Actual image with protection styles */}
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-cover"
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${src})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
           userSelect: "none",
           WebkitUserSelect: "none",
           WebkitTouchCallout: "none",
           pointerEvents: "none",
+          WebkitUserDrag: "none",
         } as React.CSSProperties}
-        role="img"
-        aria-label={alt}
+        draggable={false}
       />
 
       {/* Invisible overlay that captures interactions and prevents downloading */}

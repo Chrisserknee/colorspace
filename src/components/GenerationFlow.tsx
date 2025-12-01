@@ -1174,11 +1174,11 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
               <Image
                 src="/samples/LumePet2.png"
                 alt="LumePet"
-                width={80}
-                height={80}
+                width={120}
+                height={120}
                 className="object-contain animate-float"
                 style={{
-                  filter: 'drop-shadow(0 0 15px rgba(197, 165, 114, 0.5)) drop-shadow(0 0 30px rgba(197, 165, 114, 0.3))'
+                  filter: 'drop-shadow(0 0 20px rgba(197, 165, 114, 0.5)) drop-shadow(0 0 40px rgba(197, 165, 114, 0.3))'
                 }}
                 priority
               />
