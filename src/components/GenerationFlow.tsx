@@ -679,6 +679,12 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   };
 
   const handleReset = () => {
+    // If user came from email link, redirect to home page instead of resetting
+    if (initialEmail) {
+      window.location.href = '/';
+      return;
+    }
+    
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }

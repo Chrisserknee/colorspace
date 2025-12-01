@@ -809,6 +809,12 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
   };
 
   const handleReset = () => {
+    // If user came from email link, redirect to rainbow bridge page instead of resetting
+    if (initialEmail) {
+      window.location.href = '/rainbow-bridge';
+      return;
+    }
+    
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
