@@ -801,7 +801,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       
       {/* Content */}
       <div 
-        className={`relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
+        className={`relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: '#1A1A1A',
           border: '1px solid rgba(197, 165, 114, 0.2)',
@@ -868,7 +868,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Preview Stage */}
         {stage === "preview" && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-6">
             <div className="text-center mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
@@ -1119,7 +1119,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Email Capture Stage (Before Generation) */}
         {stage === "email-capture" && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-6">
             <div className="text-center mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
@@ -1289,7 +1289,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Result Stage - Purchase Modal */}
         {stage === "result" && result && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-8">
             {/* Download icon */}
             <div className="flex justify-center mb-2 sm:mb-4">
               <svg className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#B8B2A8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1470,7 +1470,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Email Capture Stage */}
         {stage === "email" && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-6">
             <div className="text-center mb-4 sm:mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
@@ -1544,7 +1544,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Expired Stage */}
         {stage === "expired" && (
-          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 text-center pb-6">
             <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
               <svg className="w-8 h-8" style={{ color: '#F87171' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1572,7 +1572,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Checkout Stage */}
         {stage === "checkout" && (
-          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 text-center pb-6">
             <div 
               className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
               style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}
@@ -1601,7 +1601,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Restoring Session Stage */}
         {stage === "restoring" && (
-          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 text-center pb-6">
             <div 
               className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
               style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}

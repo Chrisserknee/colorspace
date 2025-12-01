@@ -943,7 +943,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       
       {/* Content */}
       <div 
-        className={`relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
+        className={`relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: '#FFFFFF',
           border: '1px solid rgba(212, 175, 55, 0.2)',
@@ -1010,7 +1010,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Preview Stage */}
         {stage === "preview" && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-6">
             <div className="text-center mb-4 sm:mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
@@ -1247,7 +1247,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Email Capture Stage (Before Generation) */}
         {stage === "email-capture" && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-6">
             <div className="text-center mb-4 sm:mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
@@ -1407,7 +1407,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Result Stage */}
         {stage === "result" && result && result.imageId !== "pack" && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-8">
             <div className="flex justify-center mb-2 sm:mb-4">
               <svg className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#9B8AA0' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -1582,7 +1582,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Email Capture Stage */}
         {stage === "email" && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 pb-6">
             <div className="text-center mb-4 sm:mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
@@ -1658,7 +1658,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Expired Stage */}
         {stage === "expired" && (
-          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 text-center pb-6">
             <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}>
               <svg className="w-8 h-8" style={{ color: '#DC2626' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1690,7 +1690,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Checkout Stage */}
         {stage === "checkout" && (
-          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 text-center pb-6">
             <div 
               className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
               style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
@@ -1719,7 +1719,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Restoring Session Stage */}
         {stage === "restoring" && (
-          <div className="p-4 sm:p-6 text-center overflow-y-auto flex-1">
+          <div className="p-4 sm:p-6 text-center pb-6">
             <div 
               className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
               style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
