@@ -943,7 +943,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       
       {/* Content */}
       <div 
-        className={`relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
+        className={`relative w-full max-w-md sm:max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[92vh] sm:max-h-[88vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: '#FFFFFF',
           border: '1px solid rgba(212, 175, 55, 0.2)',
@@ -1010,21 +1010,21 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Preview Stage */}
         {stage === "preview" && (
-          <div className="p-4 sm:p-6 pb-12">
-            <div className="text-center mb-4 sm:mb-6">
+          <div className="p-3 sm:p-5 pb-8">
+            <div className="text-center mb-4">
               <h3 
-                className="text-2xl font-semibold mb-2"
+                className="text-xl sm:text-2xl font-semibold mb-1"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#4A4A4A' }}
               >
                 Create a Memorial Portrait
               </h3>
-              <p style={{ color: '#6B6B6B' }}>
-                Honor your beloved companion with a heavenly tribute
+              <p className="text-sm" style={{ color: '#6B6B6B' }}>
+                Honor your companion with a heavenly tribute
               </p>
             </div>
 
             <div 
-              className="relative aspect-square max-w-sm mx-auto rounded-2xl overflow-hidden shadow-lg mb-6 cursor-pointer"
+              className="relative aspect-square max-w-[200px] sm:max-w-xs mx-auto rounded-xl overflow-hidden shadow-lg mb-4 cursor-pointer"
               style={{ border: '2px solid rgba(212, 175, 55, 0.3)' }}
               onClick={() => {
                 if (secretActivated) return; // Already activated

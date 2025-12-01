@@ -801,7 +801,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       
       {/* Content */}
       <div 
-        className={`relative w-full max-w-xl rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
+        className={`relative w-full max-w-md sm:max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[92vh] sm:max-h-[88vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: '#1A1A1A',
           border: '1px solid rgba(197, 165, 114, 0.2)',
@@ -868,21 +868,21 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Preview Stage */}
         {stage === "preview" && (
-          <div className="p-4 sm:p-6 pb-12">
-            <div className="text-center mb-6">
+          <div className="p-3 sm:p-5 pb-8">
+            <div className="text-center mb-4">
               <h3 
-                className="text-2xl font-semibold mb-2"
+                className="text-xl sm:text-2xl font-semibold mb-1"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
               >
                 Your Royal Subject
               </h3>
-              <p style={{ color: '#B8B2A8' }}>
-                Ready to transform your pet into a royal masterpiece?
+              <p className="text-sm" style={{ color: '#B8B2A8' }}>
+                Ready to transform your pet into a masterpiece?
               </p>
             </div>
 
             <div 
-              className="relative aspect-square max-w-sm mx-auto rounded-2xl overflow-hidden shadow-lg mb-6 cursor-pointer"
+              className="relative aspect-square max-w-[200px] sm:max-w-xs mx-auto rounded-xl overflow-hidden shadow-lg mb-4 cursor-pointer"
               style={{ border: '2px solid rgba(197, 165, 114, 0.3)' }}
               onClick={() => {
                 if (secretActivated) return; // Already activated
@@ -952,7 +952,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
             {/* Generation Limit Display */}
             {limitCheck && (
-              <div className="mb-4 p-3 rounded-xl text-center text-sm" style={{ 
+              <div className="mb-3 p-2 rounded-xl text-center text-sm" style={{ 
                 backgroundColor: limitCheck.allowed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                 border: `1px solid ${limitCheck.allowed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
                 color: limitCheck.allowed ? '#4ADE80' : '#F87171'
@@ -1006,15 +1006,15 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             )}
 
             {/* Gender Selection */}
-            <div className="mb-6">
-              <p className="text-center mb-3 text-sm" style={{ color: '#B8B2A8' }}>
-                Select your pet&apos;s gender for more accurate results:
+            <div className="mb-4">
+              <p className="text-center mb-2 text-xs sm:text-sm" style={{ color: '#B8B2A8' }}>
+                Select your pet&apos;s gender:
               </p>
-              <div className="flex gap-4 justify-center">
+              <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setGender("male")}
                   disabled={limitCheck ? !limitCheck.allowed : false}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                  className={`px-4 sm:px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
                     gender === "male"
                       ? "scale-105 shadow-lg"
                       : "opacity-70 hover:opacity-100"
@@ -1030,7 +1030,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 <button
                   onClick={() => setGender("female")}
                   disabled={limitCheck ? !limitCheck.allowed : false}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                  className={`px-4 sm:px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
                     gender === "female"
                       ? "scale-105 shadow-lg"
                       : "opacity-70 hover:opacity-100"
