@@ -1221,15 +1221,15 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Email Capture Stage (Before Generation) */}
         {stage === "email-capture" && (
-          <div className="p-4 sm:p-6 pb-6">
+          <div className="p-4 sm:p-6 pb-6 pt-10 sm:pt-12">
             <div className="text-center mb-4 sm:mb-6">
               <h3 
-                className="text-2xl font-semibold mb-2"
+                className="text-2xl font-semibold mb-3"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#4A4A4A' }}
               >
                 Where Should We Send {petName}&apos;s Portrait?
               </h3>
-              <p style={{ color: '#6B6B6B' }}>
+              <p className="text-base" style={{ color: '#6B6B6B' }}>
                 Enter your email so we can deliver your memorial masterpiece
               </p>
             </div>

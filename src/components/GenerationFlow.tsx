@@ -1091,15 +1091,15 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Email Capture Stage (Before Generation) */}
         {stage === "email-capture" && (
-          <div className="p-4 sm:p-6 pb-6">
+          <div className="p-4 sm:p-6 pb-6 pt-10 sm:pt-12">
             <div className="text-center mb-6">
               <h3 
-                className="text-2xl font-semibold mb-2"
+                className="text-2xl font-semibold mb-3"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
               >
                 Where Should We Send Your Portrait?
               </h3>
-              <p style={{ color: '#B8B2A8' }}>
+              <p className="text-base" style={{ color: '#B8B2A8' }}>
                 Enter your email so we can deliver your masterpiece
               </p>
             </div>
