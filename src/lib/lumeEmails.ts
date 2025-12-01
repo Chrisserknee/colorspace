@@ -38,8 +38,6 @@ export interface LumeLead {
     petType?: string;
     petName?: string;
     source?: string;
-    previewUrl?: string;      // Generated portrait preview URL
-    uploadedImageUrl?: string; // Original pet photo URL
   } | null;
 }
 
@@ -58,9 +56,8 @@ export async function sendLumeEmail1(lead: LumeLead): Promise<EmailSendResult> {
   
   const isRainbowBridge = lead.context?.style === 'rainbow-bridge';
   const petName = lead.context?.petName;
-  const previewUrl = lead.context?.previewUrl;
   
-  const html = getEmail1HTML(lead.email, isRainbowBridge, petName, previewUrl);
+  const html = getEmail1HTML(lead.email, isRainbowBridge, petName);
   
   return sendEmail(lead.email, subject, html);
 }
@@ -73,9 +70,8 @@ export async function sendLumeEmail2(lead: LumeLead): Promise<EmailSendResult> {
   
   const isRainbowBridge = lead.context?.style === 'rainbow-bridge';
   const petName = lead.context?.petName;
-  const previewUrl = lead.context?.previewUrl;
   
-  const html = getEmail2HTML(lead.email, isRainbowBridge, petName, previewUrl);
+  const html = getEmail2HTML(lead.email, isRainbowBridge, petName);
   
   return sendEmail(lead.email, subject, html);
 }
@@ -87,9 +83,8 @@ export async function sendLumeEmail3(lead: LumeLead): Promise<EmailSendResult> {
   const subject = "Why pet lovers choose LumePet 👑";
   
   const isRainbowBridge = lead.context?.style === 'rainbow-bridge';
-  const previewUrl = lead.context?.previewUrl;
   
-  const html = getEmail3HTML(lead.email, isRainbowBridge, previewUrl);
+  const html = getEmail3HTML(lead.email, isRainbowBridge);
   
   return sendEmail(lead.email, subject, html);
 }
@@ -100,9 +95,7 @@ export async function sendLumeEmail3(lead: LumeLead): Promise<EmailSendResult> {
 export async function sendLumeEmail4(lead: LumeLead): Promise<EmailSendResult> {
   const subject = "Join 10,000+ happy pet parents 🐕";
   
-  const previewUrl = lead.context?.previewUrl;
-  
-  const html = getEmail4HTML(lead.email, previewUrl);
+  const html = getEmail4HTML(lead.email);
   
   return sendEmail(lead.email, subject, html);
 }
@@ -113,10 +106,7 @@ export async function sendLumeEmail4(lead: LumeLead): Promise<EmailSendResult> {
 export async function sendLumeEmail5(lead: LumeLead): Promise<EmailSendResult> {
   const subject = "A special offer just for you ✨";
   
-  const previewUrl = lead.context?.previewUrl;
-  const petName = lead.context?.petName;
-  
-  const html = getEmail5HTML(lead.email, previewUrl, petName);
+  const html = getEmail5HTML(lead.email);
   
   return sendEmail(lead.email, subject, html);
 }
@@ -127,10 +117,7 @@ export async function sendLumeEmail5(lead: LumeLead): Promise<EmailSendResult> {
 export async function sendLumeEmail6(lead: LumeLead): Promise<EmailSendResult> {
   const subject = "We'll miss you! One last chance 💔";
   
-  const previewUrl = lead.context?.previewUrl;
-  const petName = lead.context?.petName;
-  
-  const html = getEmail6HTML(lead.email, previewUrl, petName);
+  const html = getEmail6HTML(lead.email);
   
   return sendEmail(lead.email, subject, html);
 }
@@ -255,45 +242,11 @@ function getCTAButton(text: string, url: string, isRainbowBridge: boolean = fals
   `;
 }
 
-/**
- * Generates HTML for displaying the pet portrait preview image
- * Uses a cute frame/border with shadow effect
- */
-function getPetPortraitImage(previewUrl: string | undefined, isRainbowBridge: boolean = false, petName?: string): string {
-  if (!previewUrl) return '';
-  
-  const borderColor = isRainbowBridge ? '#D4AF37' : '#C5A572';
-  const shadowColor = isRainbowBridge ? 'rgba(212, 175, 55, 0.3)' : 'rgba(197, 165, 114, 0.3)';
-  const caption = petName ? `${petName}'s Portrait` : 'Your Pet\'s Portrait';
-  const captionColor = isRainbowBridge ? '#9B8AA0' : '#7A756D';
-  
-  return `
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin: 25px 0;">
-      <tr>
-        <td align="center">
-          <div style="display: inline-block; padding: 8px; background: linear-gradient(135deg, ${borderColor} 0%, ${isRainbowBridge ? '#E6C866' : '#D4B896'} 50%, ${borderColor} 100%); border-radius: 16px; box-shadow: 0 8px 30px ${shadowColor};">
-            <img 
-              src="${previewUrl}" 
-              alt="${caption}" 
-              width="200" 
-              height="200" 
-              style="display: block; border-radius: 12px; object-fit: cover;"
-            />
-          </div>
-          <p style="font-size: 12px; color: ${captionColor}; margin: 12px 0 0; font-style: italic;">
-            ✨ ${caption} ✨
-          </p>
-        </td>
-      </tr>
-    </table>
-  `;
-}
-
 // ============================================
 // INDIVIDUAL EMAIL HTML GENERATORS
 // ============================================
 
-function getEmail1HTML(email: string, isRainbowBridge: boolean, petName?: string, previewUrl?: string): string {
+function getEmail1HTML(email: string, isRainbowBridge: boolean, petName?: string): string {
   const continueUrl = `${BASE_URL}${isRainbowBridge ? '/rainbow-bridge' : ''}?email=${encodeURIComponent(email)}`;
   const subtextColor = isRainbowBridge ? '#6B6B6B' : '#B8B2A8';
   
@@ -305,8 +258,6 @@ function getEmail1HTML(email: string, isRainbowBridge: boolean, petName?: string
   
   const content = `
     <h2 style="font-size: 24px; text-align: center; margin: 0 0 20px;">Your Portrait is Waiting!</h2>
-    
-    ${getPetPortraitImage(previewUrl, isRainbowBridge, petName)}
     
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 20px; color: ${subtextColor};">
       ${greeting}
@@ -329,14 +280,12 @@ function getEmail1HTML(email: string, isRainbowBridge: boolean, petName?: string
   return wrapEmail(content, isRainbowBridge);
 }
 
-function getEmail2HTML(email: string, isRainbowBridge: boolean, petName?: string, previewUrl?: string): string {
+function getEmail2HTML(email: string, isRainbowBridge: boolean, petName?: string): string {
   const continueUrl = `${BASE_URL}${isRainbowBridge ? '/rainbow-bridge' : ''}?email=${encodeURIComponent(email)}`;
   const subtextColor = isRainbowBridge ? '#6B6B6B' : '#B8B2A8';
   
   const content = `
     <h2 style="font-size: 24px; text-align: center; margin: 0 0 20px;">Still Thinking About It?</h2>
-    
-    ${getPetPortraitImage(previewUrl, isRainbowBridge, petName)}
     
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 20px; color: ${subtextColor};">
       We get it – choosing the perfect portrait for ${petName || 'your pet'} is a big decision! 
@@ -355,15 +304,13 @@ function getEmail2HTML(email: string, isRainbowBridge: boolean, petName?: string
   return wrapEmail(content, isRainbowBridge);
 }
 
-function getEmail3HTML(email: string, isRainbowBridge: boolean, previewUrl?: string): string {
+function getEmail3HTML(email: string, isRainbowBridge: boolean): string {
   const continueUrl = `${BASE_URL}${isRainbowBridge ? '/rainbow-bridge' : ''}?email=${encodeURIComponent(email)}`;
   const subtextColor = isRainbowBridge ? '#6B6B6B' : '#B8B2A8';
   const accentColor = isRainbowBridge ? '#D4AF37' : '#C5A572';
   
   const content = `
     <h2 style="font-size: 24px; text-align: center; margin: 0 0 20px;">Why Pet Lovers Choose LumePet</h2>
-    
-    ${getPetPortraitImage(previewUrl, isRainbowBridge)}
     
     <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
       <tr>
@@ -395,15 +342,13 @@ function getEmail3HTML(email: string, isRainbowBridge: boolean, previewUrl?: str
   return wrapEmail(content, isRainbowBridge);
 }
 
-function getEmail4HTML(email: string, previewUrl?: string): string {
+function getEmail4HTML(email: string): string {
   const continueUrl = `${BASE_URL}?email=${encodeURIComponent(email)}`;
   const subtextColor = '#B8B2A8';
   const accentColor = '#C5A572';
   
   const content = `
     <h2 style="font-size: 24px; text-align: center; margin: 0 0 20px;">Join 10,000+ Happy Pet Parents</h2>
-    
-    ${getPetPortraitImage(previewUrl, false)}
     
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 30px; color: ${subtextColor};">
       See what our customers are saying about their LumePet portraits:
@@ -437,17 +382,15 @@ function getEmail4HTML(email: string, previewUrl?: string): string {
   return wrapEmail(content, false);
 }
 
-function getEmail5HTML(email: string, previewUrl?: string, petName?: string): string {
+function getEmail5HTML(email: string): string {
   const continueUrl = `${BASE_URL}?email=${encodeURIComponent(email)}`;
   const subtextColor = '#B8B2A8';
   
   const content = `
     <h2 style="font-size: 24px; text-align: center; margin: 0 0 20px;">A Special Offer Just for You ✨</h2>
     
-    ${getPetPortraitImage(previewUrl, false, petName)}
-    
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 20px; color: ${subtextColor};">
-      We noticed you haven't completed your portrait yet. We'd love to see ${petName ? petName : 'your pet'} transformed into royalty!
+      We noticed you haven't completed your portrait yet. We'd love to see your pet transformed into royalty!
     </p>
     
     <table width="100%" cellpadding="0" cellspacing="0" style="background: rgba(197, 165, 114, 0.15); border-radius: 12px; border: 2px dashed #C5A572; margin: 20px 0;">
@@ -470,25 +413,23 @@ function getEmail5HTML(email: string, previewUrl?: string, petName?: string): st
   return wrapEmail(content, false);
 }
 
-function getEmail6HTML(email: string, previewUrl?: string, petName?: string): string {
+function getEmail6HTML(email: string): string {
   const continueUrl = `${BASE_URL}?email=${encodeURIComponent(email)}`;
   const subtextColor = '#B8B2A8';
   
   const content = `
     <h2 style="font-size: 24px; text-align: center; margin: 0 0 20px;">We'll Miss You! 💔</h2>
     
-    ${getPetPortraitImage(previewUrl, false, petName)}
-    
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 20px; color: ${subtextColor};">
       This is our last email – we don't want to bother you if you're not interested.
     </p>
     
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 20px; color: ${subtextColor};">
-      But if you ever want to immortalize ${petName ? petName : 'your pet'} as royalty, we'll be here. Just visit lumepet.app anytime!
+      But if you ever want to immortalize your pet as royalty, we'll be here. Just visit lumepet.app anytime!
     </p>
     
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 10px; color: ${subtextColor};">
-      In the meantime, here's one last chance to see ${petName ? petName + "'s portrait" : 'your pet transformed'}:
+      In the meantime, here's one last chance to see your pet transformed:
     </p>
     
     ${getCTAButton('One Last Look', continueUrl, false)}
