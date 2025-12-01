@@ -30,15 +30,46 @@ const dataURLtoFile = (dataurl: string, filename: string): File | null => {
   }
 };
 
+// Helper to create a placeholder file for session restore
+const createPlaceholderFile = (): File => {
+  // Create a 1x1 transparent PNG as placeholder
+  const transparentPng = new Uint8Array([
+    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
+    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
+    0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+    0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
+    0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
+  ]);
+  return new File([transparentPng], "session-restore.png", { type: "image/png" });
+};
+
 export default function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
+  const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
 
-  // Check for pending image from pack purchase return
+  // Check for email param (session restore) or pending image from pack purchase
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
+      
+      // Check for email param for session restoration
+      const emailParam = urlParams.get("email");
+      if (emailParam) {
+        console.log("📧 Email param detected, initiating session restore:", emailParam);
+        setInitialEmail(emailParam);
+        setShowFlowFromEmail(true);
+        // Create a placeholder file to trigger the flow
+        setSelectedFile(createPlaceholderFile());
+        // Clean URL
+        window.history.replaceState({}, "", window.location.pathname);
+        return;
+      }
+      
+      // Check for restored=true from pack purchase
       if (urlParams.get("restored") === "true") {
         const pendingImage = localStorage.getItem("lumepet_pending_image");
         if (pendingImage) {
@@ -103,9 +134,13 @@ export default function Home() {
         onClose={() => setIsContactModalOpen(false)}
       />
 
-      {/* Generation Flow (shows after file selection) */}
-      {selectedFile && (
-        <GenerationFlow file={selectedFile} onReset={handleReset} />
+      {/* Generation Flow (shows after file selection or email session restore) */}
+      {(selectedFile || showFlowFromEmail) && (
+        <GenerationFlow 
+          file={showFlowFromEmail ? null : selectedFile} 
+          onReset={handleReset} 
+          initialEmail={initialEmail}
+        />
       )}
     </main>
   );

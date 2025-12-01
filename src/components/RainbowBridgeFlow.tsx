@@ -5,12 +5,13 @@ import Image from "next/image";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
 
-type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired";
+type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
 
 interface RainbowBridgeFlowProps {
   file: File | null;
   onReset: () => void;
+  initialEmail?: string; // Email from URL param for session restore
 }
 
 interface GeneratedResult {
@@ -118,7 +119,7 @@ const usePackCredit = () => {
   return limits;
 };
 
-export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowProps) {
+export default function RainbowBridgeFlow({ file, onReset, initialEmail }: RainbowBridgeFlowProps) {
   const [stage, setStage] = useState<Stage>("preview");
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -139,6 +140,8 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
   const [useSecretCredit, setUseSecretCredit] = useState(false);
   const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // Supabase URL for session
+  const [sessionRestored, setSessionRestored] = useState(false);
 
   // Function to render text overlay on canvas and return data URL
   const renderTextOverlay = useCallback(async (imageUrl: string, name: string, quote: string): Promise<string> => {
@@ -306,6 +309,80 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
     }
   }, [result, petName, renderTextOverlay, uploadTextOverlay]);
 
+  // Session restoration - check for email in URL and restore previous session
+  useEffect(() => {
+    if (initialEmail && !sessionRestored) {
+      setStage("restoring");
+      
+      fetch(`/api/lume-leads/session?email=${encodeURIComponent(initialEmail)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.hasSession && data.session) {
+            const session = data.session;
+            console.log("🔄 Restoring Rainbow Bridge session for:", initialEmail, session);
+            
+            // Restore email
+            setEmail(initialEmail);
+            
+            // Restore gender
+            if (session.gender) {
+              setGender(session.gender as Gender);
+            }
+            
+            // Restore pet name
+            if (session.petName) {
+              setPetName(session.petName);
+            }
+            
+            // Restore uploaded image
+            if (session.uploadedImageUrl) {
+              setPreviewUrl(session.uploadedImageUrl);
+              setUploadedImageUrl(session.uploadedImageUrl);
+            }
+            
+            // Restore generated result if available
+            if (session.imageId && session.previewUrl) {
+              setResult({
+                imageId: session.imageId,
+                previewUrl: session.previewUrl,
+                quote: session.quote,
+                petName: session.petName,
+                isRainbowBridge: true,
+              });
+              // Set expiration for 15 minutes from now
+              setExpirationTime(Date.now() + 15 * 60 * 1000);
+              setStage("result");
+              
+              captureEvent("rb_session_restored_with_result", {
+                email: initialEmail,
+                has_preview: true,
+                pet_name: session.petName,
+              });
+            } else if (session.uploadedImageUrl) {
+              // Just has uploaded image, go to preview stage
+              setStage("preview");
+              
+              captureEvent("rb_session_restored_preview_only", {
+                email: initialEmail,
+                pet_name: session.petName,
+              });
+            } else {
+              setStage("preview");
+            }
+          } else {
+            console.log("No session found for:", initialEmail);
+            setStage("preview");
+          }
+          setSessionRestored(true);
+        })
+        .catch(err => {
+          console.warn("Session restore failed:", err);
+          setStage("preview");
+          setSessionRestored(true);
+        });
+    }
+  }, [initialEmail, sessionRestored]);
+
   // Set preview URL when file is provided
   useEffect(() => {
     if (file && !previewUrl) {
@@ -325,14 +402,22 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
       };
       reader.readAsDataURL(file);
       
-      // Upload pet photo to Supabase immediately (non-blocking)
+      // Upload pet photo to Supabase immediately and track URL for session
       const uploadFormData = new FormData();
       uploadFormData.append("image", file);
       uploadFormData.append("source", "rainbow-bridge");
       fetch("/api/upload-pet", {
         method: "POST",
         body: uploadFormData,
-      }).catch(err => console.warn("Pet photo upload failed (non-critical):", err));
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.url) {
+            setUploadedImageUrl(data.url);
+            console.log("📷 Pet photo uploaded, URL saved for session:", data.url);
+          }
+        })
+        .catch(err => console.warn("Pet photo upload failed (non-critical):", err));
       
       // Reset secret click counter for new file
       setSecretClickCount(0);
@@ -591,6 +676,30 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
       image_id: isPackPurchase ? null : result.imageId,
     });
     
+    // Save session to lume_leads for email sequence and session restore
+    try {
+      const sessionContext = {
+        style: "rainbow-bridge",
+        gender: gender,
+        petName: petName,
+        quote: result.quote || "Until we meet again at the Bridge, run free, sweet soul.",
+        uploadedImageUrl: uploadedImageUrl,
+        imageId: isPackPurchase ? null : result.imageId,
+        previewUrl: isPackPurchase ? null : result.previewUrl,
+        source: "rainbow-bridge-checkout",
+      };
+      
+      console.log("💾 Saving Rainbow Bridge session to lume_leads:", { email, context: sessionContext });
+      
+      await fetch("/api/lume-leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, context: sessionContext }),
+      });
+    } catch (err) {
+      console.warn("Failed to save session (non-critical):", err);
+    }
+    
     setStage("checkout");
     setError(null); // Clear any previous errors
 
@@ -681,7 +790,8 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
     onReset();
   };
 
-  if (!file) return null;
+  // Show nothing if no file AND no session restore in progress
+  if (!file && !initialEmail) return null;
 
   const canSubmit = gender && petName.trim().length > 0 && (limitCheck?.allowed ?? false);
 
@@ -1280,6 +1390,35 @@ export default function RainbowBridgeFlow({ file, onReset }: RainbowBridgeFlowPr
             </h3>
             <p style={{ color: '#6B6B6B' }}>
               Taking you to our secure payment page.
+            </p>
+          </div>
+        )}
+
+        {/* Restoring Session Stage */}
+        {stage === "restoring" && (
+          <div className="p-8 text-center">
+            <div 
+              className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
+            >
+              <div 
+                className="w-8 h-8 rounded-full animate-spin"
+                style={{ 
+                  borderWidth: '3px',
+                  borderStyle: 'solid',
+                  borderColor: 'rgba(212, 175, 55, 0.2)',
+                  borderTopColor: '#D4AF37'
+                }}
+              />
+            </div>
+            <h3 
+              className="text-2xl font-semibold mb-2"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#4A4A4A' }}
+            >
+              Welcome Back 🌈
+            </h3>
+            <p style={{ color: '#6B6B6B' }}>
+              Restoring your memorial portrait session...
             </p>
           </div>
         )}

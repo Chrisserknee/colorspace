@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RainbowBridgeHero from "@/components/RainbowBridgeHero";
 import RainbowBridgeTestimonials from "@/components/RainbowBridgeTestimonials";
 import RainbowBridgeFooter from "@/components/RainbowBridgeFooter";
@@ -12,6 +12,25 @@ export default function RainbowBridge() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
+  const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
+
+  // Check for email param (session restore)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Check for email param for session restoration
+      const emailParam = urlParams.get("email");
+      if (emailParam) {
+        console.log("📧 Email param detected, initiating Rainbow Bridge session restore:", emailParam);
+        setInitialEmail(emailParam);
+        setShowFlowFromEmail(true);
+        // Clean URL
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    }
+  }, []);
 
   const handleUploadClick = () => {
     setIsUploadModalOpen(true);
@@ -24,6 +43,8 @@ export default function RainbowBridge() {
 
   const handleReset = () => {
     setSelectedFile(null);
+    setShowFlowFromEmail(false);
+    setInitialEmail(undefined);
   };
 
   return (
@@ -51,9 +72,13 @@ export default function RainbowBridge() {
         onClose={() => setIsContactModalOpen(false)}
       />
 
-      {/* Generation Flow (shows after file selection) */}
-      {selectedFile && (
-        <RainbowBridgeFlow file={selectedFile} onReset={handleReset} />
+      {/* Generation Flow (shows after file selection or email session restore) */}
+      {(selectedFile || showFlowFromEmail) && (
+        <RainbowBridgeFlow 
+          file={showFlowFromEmail ? null : selectedFile} 
+          onReset={handleReset}
+          initialEmail={initialEmail}
+        />
       )}
     </main>
   );

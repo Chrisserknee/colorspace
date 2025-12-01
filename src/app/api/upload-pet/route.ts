@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
         success: true,
         uploadId,
         fileName,
+        url, // Return the full Supabase URL for session saving
       });
     } else {
       // Non-critical failure - still return success but note the upload failed

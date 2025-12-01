@@ -5,12 +5,13 @@ import Image from "next/image";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
 
-type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired";
+type Stage = "preview" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
 
 interface GenerationFlowProps {
   file: File | null;
   onReset: () => void;
+  initialEmail?: string; // Email from URL param for session restore
 }
 
 interface GeneratedResult {
@@ -152,7 +153,7 @@ const clearPendingImage = () => {
   }
 };
 
-export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
+export default function GenerationFlow({ file, onReset, initialEmail }: GenerationFlowProps) {
   const [stage, setStage] = useState<Stage>("preview");
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -171,6 +172,72 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
   const [secretActivated, setSecretActivated] = useState(false);
   const [useSecretCredit, setUseSecretCredit] = useState(false);
   const [showPackPurchaseSuccess, setShowPackPurchaseSuccess] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // Supabase URL for session
+  const [sessionRestored, setSessionRestored] = useState(false);
+
+  // Session restoration - check for email in URL and restore previous session
+  useEffect(() => {
+    if (initialEmail && !sessionRestored) {
+      setStage("restoring");
+      
+      fetch(`/api/lume-leads/session?email=${encodeURIComponent(initialEmail)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.hasSession && data.session) {
+            const session = data.session;
+            console.log("🔄 Restoring session for:", initialEmail, session);
+            
+            // Restore email
+            setEmail(initialEmail);
+            
+            // Restore gender
+            if (session.gender) {
+              setGender(session.gender as Gender);
+            }
+            
+            // Restore uploaded image
+            if (session.uploadedImageUrl) {
+              setPreviewUrl(session.uploadedImageUrl);
+              setUploadedImageUrl(session.uploadedImageUrl);
+            }
+            
+            // Restore generated result if available
+            if (session.imageId && session.previewUrl) {
+              setResult({
+                imageId: session.imageId,
+                previewUrl: session.previewUrl,
+              });
+              // Set expiration for 15 minutes from now
+              setExpirationTime(Date.now() + 15 * 60 * 1000);
+              setStage("result");
+              
+              captureEvent("session_restored_with_result", {
+                email: initialEmail,
+                has_preview: true,
+              });
+            } else if (session.uploadedImageUrl) {
+              // Just has uploaded image, go to preview stage
+              setStage("preview");
+              
+              captureEvent("session_restored_preview_only", {
+                email: initialEmail,
+              });
+            } else {
+              setStage("preview");
+            }
+          } else {
+            console.log("No session found for:", initialEmail);
+            setStage("preview");
+          }
+          setSessionRestored(true);
+        })
+        .catch(err => {
+          console.warn("Session restore failed:", err);
+          setStage("preview");
+          setSessionRestored(true);
+        });
+    }
+  }, [initialEmail, sessionRestored]);
 
   // Set preview URL when file is provided - use base64 data URL for PostHog capture
   useEffect(() => {
@@ -196,14 +263,22 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       };
       reader.readAsDataURL(file);
       
-      // Upload pet photo to Supabase immediately (non-blocking)
+      // Upload pet photo to Supabase immediately and track URL for session
       const uploadFormData = new FormData();
       uploadFormData.append("image", file);
       uploadFormData.append("source", "lumepet");
       fetch("/api/upload-pet", {
         method: "POST",
         body: uploadFormData,
-      }).catch(err => console.warn("Pet photo upload failed (non-critical):", err));
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.url) {
+            setUploadedImageUrl(data.url);
+            console.log("📷 Pet photo uploaded, URL saved for session:", data.url);
+          }
+        })
+        .catch(err => console.warn("Pet photo upload failed (non-critical):", err));
       
       // Reset secret click counter for new file
       setSecretClickCount(0);
@@ -511,6 +586,28 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
       image_id: isPackPurchase ? null : result.imageId,
     });
     
+    // Save session to lume_leads for email sequence and session restore
+    try {
+      const sessionContext = {
+        style: "royal",
+        gender: gender,
+        uploadedImageUrl: uploadedImageUrl,
+        imageId: isPackPurchase ? null : result.imageId,
+        previewUrl: isPackPurchase ? null : result.previewUrl,
+        source: "checkout",
+      };
+      
+      console.log("💾 Saving session to lume_leads:", { email, context: sessionContext });
+      
+      await fetch("/api/lume-leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, context: sessionContext }),
+      });
+    } catch (err) {
+      console.warn("Failed to save session (non-critical):", err);
+    }
+    
     setStage("checkout");
 
     try {
@@ -568,7 +665,8 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
     onReset();
   };
 
-  if (!file) return null;
+  // Show nothing if no file AND no session restore in progress
+  if (!file && !initialEmail) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
@@ -1194,6 +1292,35 @@ export default function GenerationFlow({ file, onReset }: GenerationFlowProps) {
             </h3>
             <p style={{ color: '#B8B2A8' }}>
               Taking you to our secure payment page.
+            </p>
+          </div>
+        )}
+
+        {/* Restoring Session Stage */}
+        {stage === "restoring" && (
+          <div className="p-8 text-center">
+            <div 
+              className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}
+            >
+              <div 
+                className="w-8 h-8 rounded-full animate-spin"
+                style={{ 
+                  borderWidth: '3px',
+                  borderStyle: 'solid',
+                  borderColor: 'rgba(197, 165, 114, 0.2)',
+                  borderTopColor: '#C5A572'
+                }}
+              />
+            </div>
+            <h3 
+              className="text-2xl font-semibold mb-2"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            >
+              Welcome Back!
+            </h3>
+            <p style={{ color: '#B8B2A8' }}>
+              Restoring your portrait session...
             </p>
           </div>
         )}
