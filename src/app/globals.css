@@ -965,3 +965,46 @@ select:focus-visible {
   background: var(--gold);
   color: var(--bg-primary);
 }
+
+/* ============================================
+   PROTECTED IMAGE - Anti-download protections
+   ============================================ */
+
+.protected-image-container {
+  /* Prevent any selection or interaction */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.protected-image {
+  /* Block all pointer events on the image itself */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
+  /* Prevent image dragging */
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+.protected-image-overlay {
+  /* Overlay captures all interactions */
+  pointer-events: auto;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Disable context menu globally on protected containers */
+.protected-image-container * {
+  -webkit-touch-callout: none;
+}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
+import ProtectedImage from "./ProtectedImage";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
 
@@ -1433,12 +1434,11 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             {(canvasImageUrl || result.previewUrl) && (
               <div className="relative max-w-[200px] sm:max-w-xs mx-auto mb-4 sm:mb-6 rounded-xl overflow-hidden shadow-lg">
                 <div className="relative aspect-square">
-                  <Image
+                  <ProtectedImage
                     src={canvasImageUrl || result.previewUrl}
                     alt={`${petName}'s memorial portrait`}
-                    fill
-                    className="object-cover"
-                    unoptimized
+                    className="absolute inset-0"
+                    blurOnFocusLoss={true}
                   />
                 </div>
               </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import ProtectedImage from "./ProtectedImage";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
 
@@ -1316,15 +1317,14 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
               <span className="font-mono font-bold text-sm sm:text-base" style={{ color: '#F0EDE8' }}>{timeRemaining}</span>
             </div>
 
-            {/* Preview Image - Smaller on mobile */}
+            {/* Preview Image - Protected from downloading */}
             <div className="relative max-w-[200px] sm:max-w-xs mx-auto mb-4 sm:mb-6 rounded-xl overflow-hidden shadow-lg">
               <div className="relative aspect-square">
-                <Image
+                <ProtectedImage
                   src={result.previewUrl}
                   alt="Royal portrait preview"
-                  fill
-                  className="object-cover"
-                  unoptimized
+                  className="absolute inset-0"
+                  blurOnFocusLoss={true}
                 />
               </div>
             </div>
