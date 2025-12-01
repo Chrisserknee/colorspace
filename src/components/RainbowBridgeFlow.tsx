@@ -316,7 +316,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       
       fetch(`/api/lume-leads/session?email=${encodeURIComponent(initialEmail)}`)
         .then(res => res.json())
-        .then(async (data) => {
+        .then(data => {
           if (data.hasSession && data.session) {
             const session = data.session;
             console.log("🔄 Restoring Rainbow Bridge session for:", initialEmail, session);
@@ -340,7 +340,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
               setUploadedImageUrl(session.uploadedImageUrl);
             }
             
-            // Restore generated result if available - go DIRECTLY to checkout!
+            // Restore generated result if available - show result page
             if (session.imageId && session.previewUrl) {
               setResult({
                 imageId: session.imageId,
@@ -349,12 +349,9 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                 petName: session.petName,
                 isRainbowBridge: true,
               });
-              
-              captureEvent("rb_session_restored_direct_checkout", {
-                email: initialEmail,
-                image_id: session.imageId,
-                pet_name: session.petName,
-              });
+              // Set expiration for 15 minutes from now
+              setExpirationTime(Date.now() + 15 * 60 * 1000);
+              setStage("result");
               
               // Store Rainbow Bridge data for success page
               const rainbowBridgeData = {
@@ -365,37 +362,11 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
               };
               localStorage.setItem(`rainbow_bridge_${session.imageId}`, JSON.stringify(rainbowBridgeData));
               
-              // Skip result page - go directly to checkout since they came from email
-              console.log("🚀 Session has result, redirecting directly to checkout...");
-              setStage("checkout");
-              
-              try {
-                const response = await fetch("/api/checkout", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    imageId: session.imageId,
-                    email: initialEmail,
-                    type: "image",
-                  }),
-                });
-                
-                const checkoutData = await response.json();
-                
-                if (response.ok && checkoutData.checkoutUrl) {
-                  console.log("✅ Redirecting to checkout:", checkoutData.checkoutUrl);
-                  window.location.href = checkoutData.checkoutUrl;
-                } else {
-                  // Fallback to result page if checkout fails
-                  console.warn("Checkout failed, showing result page instead");
-                  setExpirationTime(Date.now() + 15 * 60 * 1000);
-                  setStage("result");
-                }
-              } catch (err) {
-                console.error("Checkout error:", err);
-                setExpirationTime(Date.now() + 15 * 60 * 1000);
-                setStage("result");
-              }
+              captureEvent("rb_session_restored_with_result", {
+                email: initialEmail,
+                has_preview: true,
+                pet_name: session.petName,
+              });
             } else if (session.uploadedImageUrl) {
               // Just has uploaded image, go to preview stage
               setStage("preview");
@@ -681,10 +652,45 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
     handleGenerate(true);
   };
 
-  const handlePurchaseClick = () => {
+  const handlePurchaseClick = async () => {
     captureEvent("rainbow_bridge_purchase_clicked", {
       image_id: result?.imageId,
+      has_email: !!email,
     });
+    
+    // If email is already set (from session restore), skip to checkout directly
+    if (email && validateEmail(email) && result && result.imageId !== "pack") {
+      console.log("📧 Email already set from session, going directly to checkout");
+      setStage("checkout");
+      
+      try {
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imageId: result.imageId,
+            email: email,
+            type: "image",
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+        } else {
+          setError(data.error || "Failed to create checkout session");
+          setStage("result");
+        }
+      } catch (err) {
+        console.error("Checkout error:", err);
+        setError("Failed to redirect to checkout. Please try again.");
+        setStage("result");
+      }
+      return;
+    }
+    
+    // Otherwise, go to email entry stage
     setStage("email");
     setEmailError(null);
   };

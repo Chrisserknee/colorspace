@@ -182,7 +182,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       
       fetch(`/api/lume-leads/session?email=${encodeURIComponent(initialEmail)}`)
         .then(res => res.json())
-        .then(async (data) => {
+        .then(data => {
           if (data.hasSession && data.session) {
             const session = data.session;
             console.log("🔄 Restoring session for:", initialEmail, session);
@@ -201,49 +201,20 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
               setUploadedImageUrl(session.uploadedImageUrl);
             }
             
-            // Restore generated result if available - go DIRECTLY to checkout!
+            // Restore generated result if available - show result page
             if (session.imageId && session.previewUrl) {
               setResult({
                 imageId: session.imageId,
                 previewUrl: session.previewUrl,
               });
+              // Set expiration for 15 minutes from now
+              setExpirationTime(Date.now() + 15 * 60 * 1000);
+              setStage("result");
               
-              captureEvent("session_restored_direct_checkout", {
+              captureEvent("session_restored_with_result", {
                 email: initialEmail,
-                image_id: session.imageId,
+                has_preview: true,
               });
-              
-              // Skip result page - go directly to checkout since they came from email
-              console.log("🚀 Session has result, redirecting directly to checkout...");
-              setStage("checkout");
-              
-              try {
-                const response = await fetch("/api/checkout", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    imageId: session.imageId,
-                    email: initialEmail,
-                    type: "image",
-                  }),
-                });
-                
-                const checkoutData = await response.json();
-                
-                if (response.ok && checkoutData.checkoutUrl) {
-                  console.log("✅ Redirecting to checkout:", checkoutData.checkoutUrl);
-                  window.location.href = checkoutData.checkoutUrl;
-                } else {
-                  // Fallback to result page if checkout fails
-                  console.warn("Checkout failed, showing result page instead");
-                  setExpirationTime(Date.now() + 15 * 60 * 1000);
-                  setStage("result");
-                }
-              } catch (err) {
-                console.error("Checkout error:", err);
-                setExpirationTime(Date.now() + 15 * 60 * 1000);
-                setStage("result");
-              }
             } else if (session.uploadedImageUrl) {
               // Just has uploaded image, go to preview stage
               setStage("preview");
@@ -576,12 +547,47 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
     handleGenerate(true);
   };
 
-  const handlePurchaseClick = () => {
+  const handlePurchaseClick = async () => {
     // Track purchase button clicked
     captureEvent("purchase_button_clicked", {
       image_id: result?.imageId,
       stage: "result",
+      has_email: !!email,
     });
+    
+    // If email is already set (from session restore), skip to checkout directly
+    if (email && validateEmail(email) && result) {
+      console.log("📧 Email already set from session, going directly to checkout");
+      setStage("checkout");
+      
+      try {
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imageId: result.imageId,
+            email: email,
+            type: "image",
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+        } else {
+          setError(data.error || "Failed to create checkout session");
+          setStage("result");
+        }
+      } catch (err) {
+        console.error("Checkout error:", err);
+        setError("Failed to redirect to checkout. Please try again.");
+        setStage("result");
+      }
+      return;
+    }
+    
+    // Otherwise, go to email entry stage
     setStage("email");
     setEmailError(null);
   };
