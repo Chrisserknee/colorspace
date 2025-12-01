@@ -1276,8 +1276,8 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoWidth = logoMetadata.width || 200;
   const logoHeight = logoMetadata.height || 200;
   
-  // Make logo larger - about 35% of image width for more intrusiveness
-  const watermarkSize = Math.max(width, height) * 0.35;
+  // Make logo larger - about 45% of image width for clear visibility
+  const watermarkSize = Math.max(width, height) * 0.45;
   const watermarkAspectRatio = logoWidth / logoHeight;
   const watermarkWidth = watermarkSize;
   const watermarkHeight = watermarkSize / watermarkAspectRatio;
@@ -1305,104 +1305,104 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
       </defs>
       <!-- NO CENTER WATERMARK - keep pet's face clearly visible -->
       
-      <!-- Top-left corner (larger, 65% opacity - brighter white) -->
+      <!-- Top-left corner (larger, 70% opacity) -->
       <image 
-        x="${Math.round(width * 0.05)}" 
-        y="${Math.round(height * 0.05)}" 
+        x="${Math.round(width * 0.03)}" 
+        y="${Math.round(height * 0.03)}" 
+        width="${Math.round(watermarkWidth * 0.7)}" 
+        height="${Math.round(watermarkHeight * 0.7)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.7"
+        filter="url(#whiteBright)"
+      />
+      <!-- Top-right corner (larger, 70% opacity) -->
+      <image 
+        x="${Math.round(width * 0.97 - watermarkWidth * 0.7)}" 
+        y="${Math.round(height * 0.03)}" 
+        width="${Math.round(watermarkWidth * 0.7)}" 
+        height="${Math.round(watermarkHeight * 0.7)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.7"
+        filter="url(#whiteBright)"
+      />
+      <!-- Bottom-left corner (larger, 70% opacity) -->
+      <image 
+        x="${Math.round(width * 0.03)}" 
+        y="${Math.round(height * 0.97 - watermarkHeight * 0.7)}" 
+        width="${Math.round(watermarkWidth * 0.7)}" 
+        height="${Math.round(watermarkHeight * 0.7)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.7"
+        filter="url(#whiteBright)"
+      />
+      <!-- Bottom-right corner (larger, 70% opacity) -->
+      <image 
+        x="${Math.round(width * 0.97 - watermarkWidth * 0.7)}" 
+        y="${Math.round(height * 0.97 - watermarkHeight * 0.7)}" 
+        width="${Math.round(watermarkWidth * 0.7)}" 
+        height="${Math.round(watermarkHeight * 0.7)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.7"
+        filter="url(#whiteBright)"
+      />
+      <!-- Top center (medium, 65% opacity) -->
+      <image 
+        x="${Math.round((width - watermarkWidth * 0.6) / 2)}" 
+        y="${Math.round(height * 0.01)}" 
         width="${Math.round(watermarkWidth * 0.6)}" 
         height="${Math.round(watermarkHeight * 0.6)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
         opacity="0.65"
         filter="url(#whiteBright)"
       />
-      <!-- Top-right corner (larger, 65% opacity - brighter white) -->
+      <!-- Bottom center (medium, 65% opacity) -->
       <image 
-        x="${Math.round(width * 0.95 - watermarkWidth * 0.6)}" 
-        y="${Math.round(height * 0.05)}" 
+        x="${Math.round((width - watermarkWidth * 0.6) / 2)}" 
+        y="${Math.round(height * 0.99 - watermarkHeight * 0.6)}" 
         width="${Math.round(watermarkWidth * 0.6)}" 
         height="${Math.round(watermarkHeight * 0.6)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
         opacity="0.65"
         filter="url(#whiteBright)"
       />
-      <!-- Bottom-left corner (larger, 65% opacity - brighter white) -->
+      <!-- Left edge upper (60% opacity) -->
       <image 
-        x="${Math.round(width * 0.05)}" 
-        y="${Math.round(height * 0.95 - watermarkHeight * 0.6)}" 
-        width="${Math.round(watermarkWidth * 0.6)}" 
-        height="${Math.round(watermarkHeight * 0.6)}" 
-        href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.65"
-        filter="url(#whiteBright)"
-      />
-      <!-- Bottom-right corner (larger, 65% opacity - brighter white) -->
-      <image 
-        x="${Math.round(width * 0.95 - watermarkWidth * 0.6)}" 
-        y="${Math.round(height * 0.95 - watermarkHeight * 0.6)}" 
-        width="${Math.round(watermarkWidth * 0.6)}" 
-        height="${Math.round(watermarkHeight * 0.6)}" 
-        href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.65"
-        filter="url(#whiteBright)"
-      />
-      <!-- Top center (medium, 60% opacity - brighter white) -->
-      <image 
-        x="${Math.round((width - watermarkWidth * 0.5) / 2)}" 
-        y="${Math.round(height * 0.02)}" 
-        width="${Math.round(watermarkWidth * 0.5)}" 
-        height="${Math.round(watermarkHeight * 0.5)}" 
+        x="${Math.round(width * 0.01)}" 
+        y="${Math.round(height * 0.28)}" 
+        width="${Math.round(watermarkWidth * 0.55)}" 
+        height="${Math.round(watermarkHeight * 0.55)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
         opacity="0.6"
         filter="url(#whiteBright)"
       />
-      <!-- Bottom center (medium, 60% opacity - brighter white) -->
+      <!-- Left edge lower (60% opacity) -->
       <image 
-        x="${Math.round((width - watermarkWidth * 0.5) / 2)}" 
-        y="${Math.round(height * 0.98 - watermarkHeight * 0.5)}" 
-        width="${Math.round(watermarkWidth * 0.5)}" 
-        height="${Math.round(watermarkHeight * 0.5)}" 
+        x="${Math.round(width * 0.01)}" 
+        y="${Math.round(height * 0.58)}" 
+        width="${Math.round(watermarkWidth * 0.55)}" 
+        height="${Math.round(watermarkHeight * 0.55)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
         opacity="0.6"
         filter="url(#whiteBright)"
       />
-      <!-- Left edge upper (55% opacity - brighter white) -->
+      <!-- Right edge upper (60% opacity) -->
       <image 
-        x="${Math.round(width * 0.02)}" 
-        y="${Math.round(height * 0.30)}" 
-        width="${Math.round(watermarkWidth * 0.45)}" 
-        height="${Math.round(watermarkHeight * 0.45)}" 
+        x="${Math.round(width * 0.99 - watermarkWidth * 0.55)}" 
+        y="${Math.round(height * 0.28)}" 
+        width="${Math.round(watermarkWidth * 0.55)}" 
+        height="${Math.round(watermarkHeight * 0.55)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.55"
+        opacity="0.6"
         filter="url(#whiteBright)"
       />
-      <!-- Left edge lower (55% opacity - brighter white) -->
+      <!-- Right edge lower (60% opacity) -->
       <image 
-        x="${Math.round(width * 0.02)}" 
-        y="${Math.round(height * 0.60)}" 
-        width="${Math.round(watermarkWidth * 0.45)}" 
-        height="${Math.round(watermarkHeight * 0.45)}" 
+        x="${Math.round(width * 0.99 - watermarkWidth * 0.55)}" 
+        y="${Math.round(height * 0.58)}" 
+        width="${Math.round(watermarkWidth * 0.55)}" 
+        height="${Math.round(watermarkHeight * 0.55)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.55"
-        filter="url(#whiteBright)"
-      />
-      <!-- Right edge upper (55% opacity - brighter white) -->
-      <image 
-        x="${Math.round(width * 0.98 - watermarkWidth * 0.45)}" 
-        y="${Math.round(height * 0.30)}" 
-        width="${Math.round(watermarkWidth * 0.45)}" 
-        height="${Math.round(watermarkHeight * 0.45)}" 
-        href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.55"
-        filter="url(#whiteBright)"
-      />
-      <!-- Right edge lower (55% opacity - brighter white) -->
-      <image 
-        x="${Math.round(width * 0.98 - watermarkWidth * 0.45)}" 
-        y="${Math.round(height * 0.60)}" 
-        width="${Math.round(watermarkWidth * 0.45)}" 
-        height="${Math.round(watermarkHeight * 0.45)}" 
-        href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.55"
+        opacity="0.6"
         filter="url(#whiteBright)"
       />
     </svg>

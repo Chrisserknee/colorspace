@@ -1370,19 +1370,12 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                   animationDelay: '0s',
                   animationFillMode: 'forwards'
                 }}
-                onContextMenu={(e) => e.preventDefault()}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={canvasImageUrl || result.previewUrl}
                   alt={`${petName}'s memorial portrait`}
                   className="w-full h-auto block"
-                  style={{
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    pointerEvents: 'none',
-                  }}
-                  draggable={false}
                 />
               </div>
             )}

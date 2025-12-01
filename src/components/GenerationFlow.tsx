@@ -1241,19 +1241,12 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 animationDelay: '0s',
                 animationFillMode: 'forwards'
               }}
-              onContextMenu={(e) => e.preventDefault()}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={result.previewUrl}
                 alt="Royal portrait preview"
                 className="w-full h-auto block"
-                style={{
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  pointerEvents: 'none',
-                }}
-                draggable={false}
               />
             </div>
 
