@@ -1348,29 +1348,21 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Result Stage */}
         {stage === "result" && result && result.imageId !== "pack" && (
-          <div className="p-4 sm:p-6 pb-12">
-            {/* Title with reveal animation */}
+          <div className="p-3 sm:p-5 pb-8">
+            {/* Title */}
             <h3 
-              className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-3 sm:mb-4 opacity-0 animate-text-reveal"
+              className="text-xl sm:text-2xl font-semibold text-center mb-3"
               style={{ 
                 fontFamily: "'Cormorant Garamond', Georgia, serif", 
                 color: '#4A4A4A',
-                animationDelay: '0.3s',
-                animationFillMode: 'forwards'
               }}
             >
               🌈 {petName}&apos;s Memorial
             </h3>
 
-            {/* Preview Image - Beautiful reveal animation */}
+            {/* Preview Image - Simple display */}
             {(canvasImageUrl || result.previewUrl) && (
-              <div 
-                className="relative max-w-[220px] sm:max-w-sm mx-auto mb-5 sm:mb-6 rounded-2xl overflow-hidden opacity-0 animate-portrait-reveal animate-portrait-glow-rainbow"
-                style={{ 
-                  animationDelay: '0s',
-                  animationFillMode: 'forwards'
-                }}
-              >
+              <div className="max-w-[200px] sm:max-w-[280px] mx-auto mb-4 rounded-xl overflow-hidden shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={canvasImageUrl || result.previewUrl}
@@ -1383,46 +1375,37 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             {/* Hidden canvas for rendering */}
             <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-            {/* Price with staggered reveal */}
-            <div 
-              className="text-center mb-2 opacity-0 animate-text-reveal"
-              style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}
-            >
-              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#4A4A4A' }}>$19.99</span>
+            {/* Price */}
+            <div className="text-center mb-2">
+              <span className="text-2xl sm:text-3xl font-bold" style={{ color: '#4A4A4A' }}>$19.99</span>
             </div>
 
             {/* Expiration Timer */}
-            <div 
-              className="text-center mb-4 sm:mb-5 opacity-0 animate-text-reveal"
-              style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}
-            >
-              <span className="text-sm sm:text-base" style={{ color: '#6B6B6B' }}>Expires in </span>
-              <span className="font-mono font-bold text-sm sm:text-base" style={{ color: '#4A4A4A' }}>{timeRemaining}</span>
+            <div className="text-center mb-4">
+              <span className="text-sm" style={{ color: '#6B6B6B' }}>Expires in </span>
+              <span className="font-mono font-bold text-sm" style={{ color: '#4A4A4A' }}>{timeRemaining}</span>
             </div>
 
-            {/* Features list with staggered animation */}
-            <div 
-              className="flex justify-center gap-4 sm:gap-6 mb-5 sm:mb-6 text-xs sm:text-sm opacity-0 animate-text-reveal"
-              style={{ animationDelay: '0.8s', animationFillMode: 'forwards', color: '#6B6B6B' }}
-            >
+            {/* Features list */}
+            <div className="flex justify-center gap-4 mb-4 text-xs" style={{ color: '#6B6B6B' }}>
               <span className="flex items-center gap-1">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3 h-3" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 No Watermark
               </span>
               <span className="flex items-center gap-1">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3 h-3" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 HD Quality
               </span>
             </div>
 
-            {/* Download button with reveal animation */}
+            {/* Download button */}
             <button 
               onClick={handlePurchaseClick}
-              className="w-full py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all hover:scale-[1.02] shadow-lg opacity-0 animate-button-reveal"
+              className="w-full py-3 rounded-xl font-semibold text-base transition-all hover:scale-[1.02] shadow-lg"
               style={{ 
                 background: 'linear-gradient(135deg, #D4AF37 0%, #E6C866 50%, #D4AF37 100%)',
                 color: '#FFFFFF',
