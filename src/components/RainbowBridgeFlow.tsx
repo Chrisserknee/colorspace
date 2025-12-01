@@ -1011,7 +1011,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Preview Stage */}
         {stage === "preview" && (
-          <div className="p-4 sm:p-6 pb-6">
+          <div className="p-4 sm:p-6 pb-12">
             <div className="text-center mb-4 sm:mb-6">
               <h3 
                 className="text-2xl font-semibold mb-2"
