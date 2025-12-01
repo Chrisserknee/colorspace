@@ -1227,10 +1227,10 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                 className="text-2xl font-semibold mb-2"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#4A4A4A' }}
               >
-                One Quick Step
+                Where Should We Send {petName}&apos;s Portrait?
               </h3>
               <p style={{ color: '#6B6B6B' }}>
-                Enter your email to create {petName}&apos;s memorial portrait
+                Enter your email so we can deliver your memorial masterpiece
               </p>
             </div>
 
@@ -1303,7 +1303,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
               </button>
 
               <p className="text-center text-xs mt-4" style={{ color: '#8B8B8B' }}>
-                We&apos;ll save {petName}&apos;s portrait so you can access it anytime
+                {petName}&apos;s portrait will be delivered to this email address
               </p>
             </div>
           </div>

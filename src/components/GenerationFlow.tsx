@@ -1097,10 +1097,10 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 className="text-2xl font-semibold mb-2"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
               >
-                One Quick Step
+                Where Should We Send Your Portrait?
               </h3>
               <p style={{ color: '#B8B2A8' }}>
-                Enter your email to create your royal portrait
+                Enter your email so we can deliver your masterpiece
               </p>
             </div>
 
@@ -1174,7 +1174,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
               </button>
 
               <p className="text-center text-xs mt-4" style={{ color: '#5A5650' }}>
-                We&apos;ll save your portrait so you can access it anytime
+                Your portrait will be delivered to this email address
               </p>
             </div>
           </div>
