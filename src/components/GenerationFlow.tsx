@@ -1288,72 +1288,165 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
           </div>
         )}
 
-        {/* Result Stage - Purchase Modal */}
+        {/* Result Stage - Premium Purchase Experience */}
         {stage === "result" && result && (
-          <div className="p-3 sm:p-5 pb-8">
-            {/* Title */}
-            <h3 
-              className="text-xl sm:text-2xl font-semibold text-center mb-3"
-              style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif", 
-                color: '#F0EDE8', 
-              }}
-            >
-              ✨ Your Masterpiece
-            </h3>
-
-            {/* Preview Image - Simple display */}
-            <div className="max-w-[200px] sm:max-w-[280px] mx-auto mb-4 rounded-xl overflow-hidden shadow-lg">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={result.previewUrl}
-                alt="Royal portrait preview"
-                className="w-full h-auto block"
-              />
-            </div>
-
-            {/* Price */}
-            <div className="text-center mb-2">
-              <span className="text-2xl sm:text-3xl font-bold" style={{ color: '#F0EDE8' }}>$19.99</span>
-            </div>
-
-            {/* Expiration Timer */}
+          <div className="p-4 sm:p-6 pb-6">
+            {/* Celebratory Header */}
             <div className="text-center mb-4">
-              <span className="text-sm" style={{ color: '#B8B2A8' }}>Expires in </span>
-              <span className="font-mono font-bold text-sm" style={{ color: '#F0EDE8' }}>{timeRemaining}</span>
+              <p className="text-sm mb-1" style={{ color: '#C5A572' }}>✨ It&apos;s ready!</p>
+              <h3 
+                className="text-2xl sm:text-3xl font-semibold"
+                style={{ 
+                  fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                  color: '#F0EDE8', 
+                }}
+              >
+                Your Royal Masterpiece
+              </h3>
             </div>
 
-            {/* Features list */}
-            <div className="flex justify-center gap-4 mb-4 text-xs" style={{ color: '#B8B2A8' }}>
-              <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                No Watermark
-              </span>
-              <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                HD Quality
-              </span>
+            {/* Preview Image with Zoom */}
+            <div className="relative max-w-[240px] sm:max-w-[300px] mx-auto mb-4">
+              <div 
+                className="relative rounded-2xl overflow-hidden shadow-2xl cursor-zoom-in group"
+                style={{ 
+                  border: '3px solid rgba(197, 165, 114, 0.4)',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.4), 0 0 60px rgba(197, 165, 114, 0.15)',
+                }}
+                onClick={() => window.open(result.previewUrl, '_blank')}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={result.previewUrl}
+                  alt="Your royal portrait masterpiece"
+                  className="w-full h-auto block transition-transform duration-300 group-hover:scale-105"
+                />
+                {/* Zoom hint overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <span className="bg-black/60 px-3 py-1.5 rounded-full text-xs text-white flex items-center gap-1.5">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                    </svg>
+                    Tap to zoom
+                  </span>
+                </div>
+              </div>
+              {/* Decorative corner accents */}
+              <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: '#C5A572' }}></div>
+              <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: '#C5A572' }}></div>
+              <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: '#C5A572' }}></div>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: '#C5A572' }}></div>
             </div>
 
-            {/* Download button */}
+            {/* Urgency Timer */}
+            <div 
+              className="flex items-center justify-center gap-2 mb-5 py-2 px-4 rounded-full mx-auto w-fit"
+              style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+            >
+              <span className="text-xs" style={{ color: '#F87171' }}>⏰ Special price expires in</span>
+              <span className="font-mono font-bold text-sm" style={{ color: '#F87171' }}>{timeRemaining}</span>
+            </div>
+
+            {/* Feature List - Clear & Premium */}
+            <div 
+              className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl"
+              style={{ backgroundColor: 'rgba(197, 165, 114, 0.08)', border: '1px solid rgba(197, 165, 114, 0.15)' }}
+            >
+              <div className="text-center">
+                <div className="w-8 h-8 mx-auto mb-1 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>
+                  <svg className="w-4 h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-xs font-medium" style={{ color: '#F0EDE8' }}>HD Quality</p>
+                <p className="text-[10px]" style={{ color: '#7A756D' }}>Print-ready</p>
+              </div>
+              <div className="text-center">
+                <div className="w-8 h-8 mx-auto mb-1 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>
+                  <svg className="w-4 h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-xs font-medium" style={{ color: '#F0EDE8' }}>No Watermark</p>
+                <p className="text-[10px]" style={{ color: '#7A756D' }}>Clean image</p>
+              </div>
+              <div className="text-center">
+                <div className="w-8 h-8 mx-auto mb-1 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>
+                  <svg className="w-4 h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </div>
+                <p className="text-xs font-medium" style={{ color: '#F0EDE8' }}>Instant Download</p>
+                <p className="text-[10px]" style={{ color: '#7A756D' }}>Delivered now</p>
+              </div>
+            </div>
+
+            {/* Large Emotional CTA */}
             <button 
               onClick={handlePurchaseClick}
-              className="w-full py-3 rounded-xl font-semibold text-base transition-all hover:scale-[1.02] shadow-lg"
+              className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] shadow-xl mb-3"
               style={{ 
-                backgroundColor: '#C5A572', 
+                background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 50%, #B8956A 100%)',
                 color: '#1A1A1A',
+                boxShadow: '0 8px 24px rgba(197, 165, 114, 0.4)',
               }}
             >
-              Download Now — $19.99
+              Get My Masterpiece — $19.99
             </button>
+
+            {/* Money-Back Guarantee Badge */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <svg className="w-4 h-4" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span className="text-xs" style={{ color: '#7A756D' }}>30-Day Money-Back Guarantee • Secure Checkout</span>
+            </div>
+
+            {/* Mini Testimonials Row */}
+            <div 
+              className="p-3 rounded-xl mb-4"
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+            >
+              <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                <div className="flex-shrink-0 min-w-[180px]">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    {[1,2,3,4,5].map(i => (
+                      <svg key={i} className="w-3 h-3" style={{ color: '#FBBF24' }} fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-[10px] italic" style={{ color: '#B8B2A8' }}>&ldquo;Looks just like him!&rdquo;</p>
+                  <p className="text-[9px]" style={{ color: '#5A5650' }}>— Sarah M.</p>
+                </div>
+                <div className="flex-shrink-0 min-w-[180px]">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    {[1,2,3,4,5].map(i => (
+                      <svg key={i} className="w-3 h-3" style={{ color: '#FBBF24' }} fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-[10px] italic" style={{ color: '#B8B2A8' }}>&ldquo;My mom cried happy tears&rdquo;</p>
+                  <p className="text-[9px]" style={{ color: '#5A5650' }}>— Jake T.</p>
+                </div>
+                <div className="flex-shrink-0 min-w-[180px]">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    {[1,2,3,4,5].map(i => (
+                      <svg key={i} className="w-3 h-3" style={{ color: '#FBBF24' }} fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-[10px] italic" style={{ color: '#B8B2A8' }}>&ldquo;Printed and framed it!&rdquo;</p>
+                  <p className="text-[9px]" style={{ color: '#5A5650' }}>— Emily R.</p>
+                </div>
+              </div>
+            </div>
 
             {error && (
               <div 
-                className="mt-4 p-3 rounded-xl text-center text-sm"
+                className="mb-4 p-3 rounded-xl text-center text-sm"
                 style={{ 
                   backgroundColor: 'rgba(239, 68, 68, 0.1)',
                   border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -1364,12 +1457,11 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
               </div>
             )}
 
-            {/* Retry button */}
-            <div className="mt-6 pt-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+            {/* Retry/More Options Section */}
+            <div className="pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
               {(() => {
                 const limits = getLimits();
                 const check = canGenerate(limits);
-                // User can retry if they still have free generations remaining (less than 2 used)
                 const hasRemainingFreeGens = limits.freeGenerations < 2;
                 const canRetry = check.allowed && hasRemainingFreeGens;
                 
@@ -1381,25 +1473,26 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                       className="w-full text-center text-sm py-2 transition-colors hover:text-[#C5A572]"
                       style={{ color: '#7A756D' }}
                     >
-                      🔄 Try Again ({remaining} free generation{remaining !== 1 ? 's' : ''} remaining)
+                      🔄 Not quite right? Try again ({remaining} free remaining)
                     </button>
                   );
                 } else {
                   return (
                     <div className="text-center">
-                      <p className="text-sm mb-4" style={{ color: '#7A756D' }}>
-                        Want to generate more portraits?
+                      <p className="text-xs mb-3" style={{ color: '#5A5650' }}>
+                        Want to create more portraits?
                       </p>
                       <a
                         href="/pack-checkout"
-                        className="inline-block px-5 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+                        className="inline-block px-4 py-2 rounded-lg font-medium text-xs transition-all hover:scale-105"
                         style={{ 
-                          backgroundColor: '#C5A572',
-                          color: '#1A1A1A',
+                          backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                          color: '#C5A572',
                           textDecoration: 'none',
+                          border: '1px solid rgba(197, 165, 114, 0.3)',
                         }}
                       >
-                        ✨ Unlock More Portraits
+                        ✨ Get More Portraits
                       </a>
                     </div>
                   );
