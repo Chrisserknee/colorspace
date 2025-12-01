@@ -167,7 +167,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
 
         {/* Sample portraits */}
         <div className="flex justify-center items-end gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
-          {/* First Portrait - Duchess Whiskers */}
+          {/* First Portrait - Josephine */}
           <div className="flex flex-col items-center">
             <div 
               className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
@@ -229,7 +229,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                     >
                       <img 
                         src="/samples/whitecat.png" 
-                        alt="Duchess Whiskers - Royal Cat Portrait"
+                        alt="Josephine - Royal Cat Portrait"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -247,11 +247,11 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 letterSpacing: '0.05em'
               }}
             >
-              Duchess Whiskers
+              Josephine
             </p>
           </div>
 
-          {/* Second Portrait - Sir Biscuit */}
+          {/* Second Portrait - Theodore */}
           <div className="flex flex-col items-center">
             <div 
               className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
@@ -313,7 +313,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                     >
                       <img 
                         src="/samples/chihuahua.png" 
-                        alt="Sir Biscuit - Royal Dog Portrait"
+                        alt="Theodore - Royal Dog Portrait"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -331,7 +331,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 letterSpacing: '0.05em'
               }}
             >
-              Sir Biscuit
+              Theodore
             </p>
           </div>
         </div>
