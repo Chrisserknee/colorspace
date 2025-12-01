@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendLumeEmail1 } from "@/lib/lumeEmails";
+import { checkRateLimit, getClientIP } from "@/lib/rate-limit";
 
 /**
  * POST /api/lume-leads/send-email1
@@ -11,6 +12,17 @@ import { sendLumeEmail1 } from "@/lib/lumeEmails";
  * Use this for migrated leads who need their first email.
  */
 export async function POST(request: NextRequest) {
+  const clientIP = getClientIP(request);
+  
+  // Rate limiting - only 2 requests per hour to prevent abuse
+  const rateLimit = checkRateLimit(`send-email1:${clientIP}`, { maxRequests: 2, windowMs: 3600000 });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. This endpoint can only be called twice per hour." },
+      { status: 429 }
+    );
+  }
+  
   // Security check - require CRON_SECRET
   const authHeader = request.headers.get("Authorization");
   if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLumeLeadByEmail } from "@/lib/supabase";
+import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
+import { isValidEmail } from "@/lib/validation";
 
 /**
  * GET /api/lume-leads/session?email=...
@@ -8,11 +10,30 @@ import { getLumeLeadByEmail } from "@/lib/supabase";
  * Used when user clicks email link to continue where they left off.
  */
 export async function GET(request: NextRequest) {
+  const clientIP = getClientIP(request);
+  
+  // Rate limiting - prevent enumeration attacks
+  const rateLimit = checkRateLimit(`session:${clientIP}`, RATE_LIMITS.imageInfo);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString() } }
+    );
+  }
+  
   const email = request.nextUrl.searchParams.get("email");
   
   if (!email) {
     return NextResponse.json(
       { error: "Email is required" },
+      { status: 400 }
+    );
+  }
+  
+  // Validate email format
+  if (!isValidEmail(email)) {
+    return NextResponse.json(
+      { error: "Invalid email format" },
       { status: 400 }
     );
   }
