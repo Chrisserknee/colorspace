@@ -1377,7 +1377,6 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                     src={canvasImageUrl || result.previewUrl}
                     alt={`${petName}'s memorial portrait`}
                     className="absolute inset-0"
-                    blurOnFocusLoss={true}
                   />
                 </div>
               </div>

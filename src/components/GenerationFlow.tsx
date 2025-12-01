@@ -1248,7 +1248,6 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   src={result.previewUrl}
                   alt="Royal portrait preview"
                   className="absolute inset-0"
-                  blurOnFocusLoss={true}
                 />
               </div>
             </div>
