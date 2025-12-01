@@ -71,12 +71,12 @@ export default function ProtectedImage({
 
   return (
     <div 
-      className={`protected-image-container relative ${className}`}
-      style={{ overflow: "hidden" }}
+      className={`protected-image-container relative w-full h-full ${className}`}
+      style={{ overflow: "hidden", minHeight: "100%" }}
     >
       {/* Image rendered as background - harder to inspect than <img> */}
       <div
-        className="protected-image absolute inset-0"
+        className="protected-image absolute inset-0 w-full h-full"
         style={{
           backgroundImage: `url(${src})`,
           backgroundSize: "cover",
