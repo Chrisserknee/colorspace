@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import ProtectedImage from "./ProtectedImage";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
 
@@ -1371,14 +1370,20 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                   animationDelay: '0s',
                   animationFillMode: 'forwards'
                 }}
+                onContextMenu={(e) => e.preventDefault()}
               >
-                <div className="relative aspect-square">
-                  <ProtectedImage
-                    src={canvasImageUrl || result.previewUrl}
-                    alt={`${petName}'s memorial portrait`}
-                    className="absolute inset-0"
-                  />
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={canvasImageUrl || result.previewUrl}
+                  alt={`${petName}'s memorial portrait`}
+                  className="w-full h-auto block"
+                  style={{
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    pointerEvents: 'none',
+                  }}
+                  draggable={false}
+                />
               </div>
             )}
             

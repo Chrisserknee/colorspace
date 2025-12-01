@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import ProtectedImage from "./ProtectedImage";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
 
@@ -1242,14 +1241,20 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 animationDelay: '0s',
                 animationFillMode: 'forwards'
               }}
+              onContextMenu={(e) => e.preventDefault()}
             >
-              <div className="relative aspect-square">
-                <ProtectedImage
-                  src={result.previewUrl}
-                  alt="Royal portrait preview"
-                  className="absolute inset-0"
-                />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={result.previewUrl}
+                alt="Royal portrait preview"
+                className="w-full h-auto block"
+                style={{
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  pointerEvents: 'none',
+                }}
+                draggable={false}
+              />
             </div>
 
             {/* Price with staggered reveal */}
