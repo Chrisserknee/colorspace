@@ -660,6 +660,9 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       setStage("checkout");
       
       try {
+        // Cancel URL returns user to their portrait via session restore
+        const cancelUrl = `/?email=${encodeURIComponent(email)}`;
+        
         const response = await fetch("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -667,6 +670,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             imageId: result.imageId,
             email: email,
             type: "image",
+            cancelUrl,
           }),
         });
         
@@ -745,11 +749,15 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
     setStage("checkout");
 
     try {
+      // Cancel URL returns user to their portrait via session restore
+      const cancelUrl = `/?email=${encodeURIComponent(email)}`;
+      
       const requestBody = { 
         imageId: isPackPurchase ? null : result.imageId, 
         email,
         type: isPackPurchase ? "pack" : "image",
         packType: isPackPurchase ? "2-pack" : undefined,
+        cancelUrl,
       };
       console.log("Calling checkout API with:", requestBody);
       

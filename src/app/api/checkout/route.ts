@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { imageId, email, type, packType, canvasImageDataUrl } = body;
+    const { imageId, email, type, packType, canvasImageDataUrl, cancelUrl: requestedCancelUrl } = body;
 
     // Validate email with strict validation
     if (!email || !isValidEmail(email)) {
@@ -202,6 +202,24 @@ export async function POST(request: NextRequest) {
       throw new Error("Failed to create valid cancel URL");
     }
 
+    // Determine the cancel URL - use requested URL if valid, otherwise fall back to baseUrl
+    let cancelUrl = baseUrl;
+    if (requestedCancelUrl) {
+      try {
+        // Validate and ensure the cancel URL is absolute
+        const parsedCancelUrl = new URL(requestedCancelUrl, baseUrl);
+        // Only allow same-origin cancel URLs for security
+        if (parsedCancelUrl.origin === new URL(baseUrl).origin) {
+          cancelUrl = parsedCancelUrl.href;
+        } else {
+          console.warn("Cancel URL origin mismatch, using baseUrl");
+        }
+      } catch (e) {
+        console.error("Invalid requested cancel URL:", requestedCancelUrl);
+      }
+    }
+    console.log(`Using cancel URL: ${cancelUrl}`);
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -224,7 +242,7 @@ export async function POST(request: NextRequest) {
       success_url: isPackPurchase 
         ? `${baseUrl}/success?type=pack&packType=${packType}&session_id={CHECKOUT_SESSION_ID}`
         : successUrl,
-      cancel_url: baseUrl,
+      cancel_url: cancelUrl,
       metadata: {
         ...(imageId ? { imageId } : {}),
         customerEmail: sanitizedEmail,

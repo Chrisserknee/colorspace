@@ -766,6 +766,9 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       setStage("checkout");
       
       try {
+        // Cancel URL returns user to their portrait via session restore
+        const cancelUrl = `/rainbow-bridge?email=${encodeURIComponent(email)}`;
+        
         const response = await fetch("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -773,6 +776,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             imageId: result.imageId,
             email: email,
             type: "image",
+            cancelUrl,
           }),
         });
         
@@ -864,6 +868,9 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
         console.log("Saved Rainbow Bridge data for success page:", rainbowBridgeData);
       }
       
+      // Cancel URL returns user to their portrait via session restore
+      const cancelUrl = `/rainbow-bridge?email=${encodeURIComponent(email)}`;
+      
       console.log("Creating checkout session:", {
         imageId: isPackPurchase ? null : result.imageId,
         email,
@@ -884,6 +891,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
           packType: isPackPurchase ? "2-pack" : undefined,
           // Include the canvas-rendered image for Stripe to display
           canvasImageDataUrl: canvasImageUrl || undefined,
+          cancelUrl,
         }),
       });
 

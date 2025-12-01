@@ -54,18 +54,22 @@ function PackCheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const packParam = searchParams.get("pack") as PackType | null;
+  const emailParam = searchParams.get("email");
   
   const [selectedPack, setSelectedPack] = useState<PackType>(packParam || "5");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(emailParam || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Update selected pack when URL param changes
+  // Update selected pack and email when URL params change
   useEffect(() => {
     if (packParam && ["1", "5", "10"].includes(packParam)) {
       setSelectedPack(packParam);
     }
-  }, [packParam]);
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [packParam, emailParam]);
 
   const currentPack = PACKS.find(p => p.id === selectedPack) || PACKS[1];
 
@@ -81,6 +85,9 @@ function PackCheckoutContent() {
     setError(null);
 
     try {
+      // Build cancel URL to return to this page with email pre-filled
+      const cancelUrl = `/pack-checkout?pack=${selectedPack}&email=${encodeURIComponent(email)}`;
+      
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,6 +95,7 @@ function PackCheckoutContent() {
           email,
           type: "pack",
           packType: currentPack.packType,
+          cancelUrl,
         }),
       });
 
