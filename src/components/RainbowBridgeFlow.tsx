@@ -316,12 +316,12 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       
       fetch(`/api/lume-leads/session?email=${encodeURIComponent(initialEmail)}`)
         .then(res => res.json())
-        .then(data => {
+        .then(async (data) => {
           if (data.hasSession && data.session) {
             const session = data.session;
             console.log("🔄 Restoring Rainbow Bridge session for:", initialEmail, session);
             
-            // Restore email
+            // Restore email - already have it from email link
             setEmail(initialEmail);
             
             // Restore gender
@@ -340,7 +340,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
               setUploadedImageUrl(session.uploadedImageUrl);
             }
             
-            // Restore generated result if available
+            // Restore generated result if available - go DIRECTLY to checkout!
             if (session.imageId && session.previewUrl) {
               setResult({
                 imageId: session.imageId,
@@ -349,15 +349,53 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                 petName: session.petName,
                 isRainbowBridge: true,
               });
-              // Set expiration for 15 minutes from now
-              setExpirationTime(Date.now() + 15 * 60 * 1000);
-              setStage("result");
               
-              captureEvent("rb_session_restored_with_result", {
+              captureEvent("rb_session_restored_direct_checkout", {
                 email: initialEmail,
-                has_preview: true,
+                image_id: session.imageId,
                 pet_name: session.petName,
               });
+              
+              // Store Rainbow Bridge data for success page
+              const rainbowBridgeData = {
+                imageId: session.imageId,
+                petName: session.petName,
+                quote: session.quote || "Until we meet again at the Bridge, run free, sweet soul.",
+                timestamp: Date.now()
+              };
+              localStorage.setItem(`rainbow_bridge_${session.imageId}`, JSON.stringify(rainbowBridgeData));
+              
+              // Skip result page - go directly to checkout since they came from email
+              console.log("🚀 Session has result, redirecting directly to checkout...");
+              setStage("checkout");
+              
+              try {
+                const response = await fetch("/api/checkout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    imageId: session.imageId,
+                    email: initialEmail,
+                    type: "image",
+                  }),
+                });
+                
+                const checkoutData = await response.json();
+                
+                if (response.ok && checkoutData.checkoutUrl) {
+                  console.log("✅ Redirecting to checkout:", checkoutData.checkoutUrl);
+                  window.location.href = checkoutData.checkoutUrl;
+                } else {
+                  // Fallback to result page if checkout fails
+                  console.warn("Checkout failed, showing result page instead");
+                  setExpirationTime(Date.now() + 15 * 60 * 1000);
+                  setStage("result");
+                }
+              } catch (err) {
+                console.error("Checkout error:", err);
+                setExpirationTime(Date.now() + 15 * 60 * 1000);
+                setStage("result");
+              }
             } else if (session.uploadedImageUrl) {
               // Just has uploaded image, go to preview stage
               setStage("preview");
