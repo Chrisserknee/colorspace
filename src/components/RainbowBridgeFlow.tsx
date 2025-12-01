@@ -1294,69 +1294,54 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
 
         {/* Generating Stage - Heavenly Animation */}
         {stage === "generating" && (
-          <div className="p-4 sm:p-6 text-center min-h-[350px] sm:min-h-[400px] flex flex-col items-center justify-center relative overflow-hidden">
-            {/* Soft light background */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl opacity-30 animate-pulse"
-                style={{ 
-                  background: 'radial-gradient(circle, rgba(255, 223, 186, 0.5) 0%, rgba(230, 230, 250, 0.3) 50%, transparent 70%)',
-                  animationDuration: '4s' 
+          <div className="p-6 sm:p-8 flex flex-col items-center justify-center min-h-[320px]">
+            {/* Floating LumePet Logo */}
+            <div 
+              className="mb-8 relative"
+              style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
+            >
+              <Image
+                src="/samples/LumePet2.png"
+                alt="LumePet"
+                width={80}
+                height={80}
+                className="object-contain animate-float"
+                style={{
+                  filter: 'drop-shadow(0 0 15px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.3))'
                 }}
-              ></div>
-            </div>
-
-            {/* Angelic spinner */}
-            <div className="w-24 h-24 mb-10 relative z-10">
-              <div 
-                className="absolute inset-0 border-2 rounded-full"
-                style={{ borderColor: 'rgba(212, 175, 55, 0.2)' }}
+                priority
               />
-              <div 
-                className="absolute inset-0 border-2 border-transparent rounded-full animate-spin"
-                style={{ borderTopColor: '#D4AF37', borderRightColor: 'rgba(212, 175, 55, 0.5)', animationDuration: '1.5s' }}
-              />
-              <div 
-                className="absolute inset-2 border rounded-full"
-                style={{ borderColor: 'rgba(212, 175, 55, 0.15)' }}
-              />
-              <div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full animate-pulse"
-                style={{ backgroundColor: '#D4AF37', animationDuration: '1s' }}
-              ></div>
             </div>
             
-            {/* Fading heavenly phrase */}
-            <div className="h-32 flex items-center justify-center mb-6 relative z-10">
+            {/* Fading phrase */}
+            <div className="h-16 flex items-center justify-center mb-6">
               <p 
-                className={`text-2xl sm:text-3xl italic transition-all duration-1000 ease-in-out ${phraseVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                className={`text-lg sm:text-xl italic text-center transition-all duration-1000 ease-in-out px-4 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
                 style={{ 
                   fontFamily: "'Cormorant Garamond', Georgia, serif", 
                   color: '#9B8AA0',
                   letterSpacing: '0.05em',
-                  fontWeight: 400
                 }}
               >
                 {HEAVENLY_PHRASES[currentPhrase]}
               </p>
             </div>
 
-            {/* Progress indicator */}
-            <div className="w-64 max-w-full mx-auto mb-4 relative z-10">
-              <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)' }}>
+            {/* Minimal progress bar */}
+            <div className="w-48 mb-4">
+              <div className="h-0.5 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(212, 175, 55, 0.15)' }}>
                 <div 
-                  className="h-full rounded-full animate-pulse"
+                  className="h-full rounded-full"
                   style={{ 
                     backgroundColor: '#D4AF37',
                     width: '60%',
-                    boxShadow: '0 0 10px rgba(212, 175, 55, 0.5)',
-                    animationDuration: '2s'
+                    animation: 'shimmer 2s ease-in-out infinite',
                   }}
-                ></div>
+                />
               </div>
             </div>
 
-            <p className="text-sm mt-2 relative z-10" style={{ color: '#9B8AA0', fontStyle: 'italic' }}>
+            <p className="text-xs" style={{ color: '#9B8AA0' }}>
               Creating {petName}&apos;s memorial... this may take up to 60 seconds
             </p>
           </div>

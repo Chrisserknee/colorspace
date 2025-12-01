@@ -1165,79 +1165,55 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
         {/* Generating Stage - Elegant Victorian Animation */}
         {stage === "generating" && (
-          <div className="p-4 sm:p-6 text-center min-h-[350px] sm:min-h-[400px] flex flex-col items-center justify-center relative overflow-hidden">
-            {/* Decorative background elements */}
-            <div className="absolute inset-0 pointer-events-none">
-              {/* Floating particles */}
-              <div className="absolute top-1/4 left-1/4 w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'rgba(197, 165, 114, 0.3)', animationDelay: '0s', animationDuration: '2s' }}></div>
-              <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'rgba(197, 165, 114, 0.4)', animationDelay: '0.5s', animationDuration: '2.5s' }}></div>
-              <div className="absolute bottom-1/3 left-1/3 w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'rgba(197, 165, 114, 0.25)', animationDelay: '1s', animationDuration: '3s' }}></div>
-              <div className="absolute bottom-1/4 right-1/3 w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'rgba(197, 165, 114, 0.35)', animationDelay: '1.5s', animationDuration: '2.2s' }}></div>
-              
-              {/* Subtle glow effect */}
-              <div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl opacity-20 animate-pulse"
-                style={{ backgroundColor: '#C5A572', animationDuration: '4s' }}
-              ></div>
-            </div>
-
-            {/* Beautiful ornate spinner */}
-            <div className="w-24 h-24 mb-10 relative z-10">
-              {/* Outer ring */}
-              <div 
-                className="absolute inset-0 border-2 rounded-full"
-                style={{ borderColor: 'rgba(197, 165, 114, 0.2)' }}
+          <div className="p-6 sm:p-8 flex flex-col items-center justify-center min-h-[320px]">
+            {/* Floating LumePet Logo */}
+            <div 
+              className="mb-8 relative"
+              style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
+            >
+              <Image
+                src="/samples/LumePet2.png"
+                alt="LumePet"
+                width={80}
+                height={80}
+                className="object-contain animate-float"
+                style={{
+                  filter: 'drop-shadow(0 0 15px rgba(197, 165, 114, 0.5)) drop-shadow(0 0 30px rgba(197, 165, 114, 0.3))'
+                }}
+                priority
               />
-              {/* Animated ring */}
-              <div 
-                className="absolute inset-0 border-2 border-transparent rounded-full animate-spin"
-                style={{ borderTopColor: '#C5A572', borderRightColor: 'rgba(197, 165, 114, 0.5)', animationDuration: '1.5s' }}
-              />
-              {/* Inner decorative circle */}
-              <div 
-                className="absolute inset-2 border rounded-full"
-                style={{ borderColor: 'rgba(197, 165, 114, 0.15)' }}
-              />
-              {/* Center dot */}
-              <div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full animate-pulse"
-                style={{ backgroundColor: '#C5A572', animationDuration: '1s' }}
-              ></div>
             </div>
             
-            {/* Fading Victorian phrase - slow elegant fade */}
-            <div className="h-32 flex items-center justify-center mb-6 relative z-10">
+            {/* Fading phrase */}
+            <div className="h-16 flex items-center justify-center mb-6">
               <p 
-                className={`text-2xl sm:text-3xl italic transition-all duration-1000 ease-in-out ${phraseVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                className={`text-lg sm:text-xl italic text-center transition-all duration-1000 ease-in-out px-4 ${phraseVisible ? 'opacity-100' : 'opacity-0'}`}
                 style={{ 
                   fontFamily: "'Cormorant Garamond', Georgia, serif", 
                   color: '#C5A572',
-                  letterSpacing: '0.1em',
-                  textShadow: '0 2px 8px rgba(197, 165, 114, 0.3)',
-                  fontWeight: 500
+                  letterSpacing: '0.05em',
                 }}
               >
                 {VICTORIAN_PHRASES[currentPhrase]}
               </p>
             </div>
 
-            {/* Elegant progress indicator */}
-            <div className="w-64 max-w-full mx-auto mb-4 relative z-10">
-              <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)' }}>
+            {/* Minimal progress bar */}
+            <div className="w-48 mb-4">
+              <div className="h-0.5 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(197, 165, 114, 0.15)' }}>
                 <div 
-                  className="h-full rounded-full animate-pulse"
+                  className="h-full rounded-full"
                   style={{ 
                     backgroundColor: '#C5A572',
                     width: '60%',
-                    boxShadow: '0 0 10px rgba(197, 165, 114, 0.5)',
-                    animationDuration: '2s'
+                    animation: 'shimmer 2s ease-in-out infinite',
                   }}
-                ></div>
+                />
               </div>
             </div>
 
-            <p className="text-sm mt-2 relative z-10" style={{ color: '#7A756D', fontStyle: 'italic' }}>
-              Crafting your masterpiece... this may take up to 60 seconds
+            <p className="text-xs" style={{ color: '#7A756D' }}>
+              This may take up to 60 seconds
             </p>
           </div>
         )}
