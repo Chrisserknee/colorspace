@@ -166,151 +166,173 @@ export default function Hero({ onUploadClick }: HeroProps) {
         </p>
 
         {/* Sample portraits */}
-        <div className="flex justify-center items-center gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
-          {/* First Portrait Frame */}
-          <div 
-            className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
-            style={{ 
-              padding: '2px',
-            }}
-          >
-            {/* Soft outer glow/vignette */}
+        <div className="flex justify-center items-end gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
+          {/* First Portrait - Duchess Whiskers */}
+          <div className="flex flex-col items-center">
             <div 
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.3) 0%, rgba(197, 165, 114, 0.15) 50%, transparent 70%)',
-                filter: 'blur(20px)',
-                zIndex: 0,
-                transform: 'scale(1.1)'
-              }}
-            />
-            
-            {/* Outer frame layer - beveled edge */}
-            <div 
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 20%, #C5A572 40%, #D4B896 60%, #C5A572 80%, #E8D4B0 100%)',
-                padding: '1px',
-                  boxShadow: `
-                  0 8px 32px rgba(197, 165, 114, 0.4),
-                  0 0 0 1px rgba(197, 165, 114, 0.6),
-                  inset 0 2px 4px rgba(255, 255, 255, 0.4),
-                  inset 0 -2px 4px rgba(166, 139, 91, 0.4)
-                `.trim().replace(/\s+/g, ' '),
-                zIndex: 1
-              }}
+              className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
+              style={{ padding: '2px' }}
             >
-              {/* Middle frame layer - dimensional molding */}
+              {/* Soft outer glow/vignette */}
               <div 
-                className="absolute inset-0.5 rounded-xl"
+                className="absolute inset-0 rounded-2xl"
                 style={{
-                  background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 30%, #D4B896 60%, #C5A572 100%)',
-                  padding: '0.5px',
-                    boxShadow: `
-                    inset 0 1px 2px rgba(255, 255, 255, 0.35),
-                    inset 0 -1px 2px rgba(166, 139, 91, 0.35)
-                  `.trim().replace(/\s+/g, ' ')
+                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.3) 0%, rgba(197, 165, 114, 0.15) 50%, transparent 70%)',
+                  filter: 'blur(20px)',
+                  zIndex: 0,
+                  transform: 'scale(1.1)'
                 }}
-              >
-                {/* Inner frame layer */}
-                <div 
-                  className="absolute inset-0.5 rounded-lg"
-                  style={{
-                    background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 25%, #C5A572 50%, #D4B896 75%, #E8D4B0 100%)',
-                    padding: '0.5px',
-                    boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.3)'
-                  }}
-                >
-                  {/* Portrait container with inner shadow */}
-                  <div 
-                    className="relative w-full h-full rounded-md overflow-hidden"
-                    style={{
-                      boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(0, 0, 0, 0.2)'
-            }}
-          >
-            <img 
-                      src="/samples/whitecat.png" 
-                      alt="Majestic White Cat portrait"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Second Portrait Frame */}
-          <div 
-            className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
-            style={{ 
-              padding: '2px',
-            }}
-          >
-            {/* Soft outer glow/vignette */}
-            <div 
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.3) 0%, rgba(197, 165, 114, 0.15) 50%, transparent 70%)',
-                filter: 'blur(20px)',
-                zIndex: 0,
-                transform: 'scale(1.1)'
-              }}
-            />
-            
-            {/* Outer frame layer - beveled edge */}
-            <div 
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 20%, #C5A572 40%, #D4B896 60%, #C5A572 80%, #E8D4B0 100%)',
-                padding: '1px',
+              />
+              
+              {/* Outer frame layer - beveled edge */}
+              <div 
+                className="absolute inset-0 rounded-2xl"
+                style={{
+                  background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 20%, #C5A572 40%, #D4B896 60%, #C5A572 80%, #E8D4B0 100%)',
+                  padding: '1px',
                   boxShadow: `
-                  0 8px 32px rgba(197, 165, 114, 0.4),
-                  0 0 0 1px rgba(197, 165, 114, 0.6),
-                  inset 0 2px 4px rgba(255, 255, 255, 0.4),
-                  inset 0 -2px 4px rgba(166, 139, 91, 0.4)
-                `.trim().replace(/\s+/g, ' '),
-                zIndex: 1
-            }}
-          >
-              {/* Middle frame layer - dimensional molding */}
-              <div 
-                className="absolute inset-0.5 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 30%, #D4B896 60%, #C5A572 100%)',
-                  padding: '0.5px',
-                    boxShadow: `
-                    inset 0 1px 2px rgba(255, 255, 255, 0.35),
-                    inset 0 -1px 2px rgba(166, 139, 91, 0.35)
-                  `.trim().replace(/\s+/g, ' ')
+                    0 8px 32px rgba(197, 165, 114, 0.4),
+                    0 0 0 1px rgba(197, 165, 114, 0.6),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                    inset 0 -2px 4px rgba(166, 139, 91, 0.4)
+                  `.trim().replace(/\s+/g, ' '),
+                  zIndex: 1
                 }}
               >
-                {/* Inner frame layer */}
+                {/* Middle frame layer - dimensional molding */}
                 <div 
-                  className="absolute inset-0.5 rounded-lg"
+                  className="absolute inset-0.5 rounded-xl"
                   style={{
-                    background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 25%, #C5A572 50%, #D4B896 75%, #E8D4B0 100%)',
+                    background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 30%, #D4B896 60%, #C5A572 100%)',
                     padding: '0.5px',
-                    boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.3)'
+                    boxShadow: `
+                      inset 0 1px 2px rgba(255, 255, 255, 0.35),
+                      inset 0 -1px 2px rgba(166, 139, 91, 0.35)
+                    `.trim().replace(/\s+/g, ' ')
                   }}
                 >
-                  {/* Portrait container with inner shadow */}
+                  {/* Inner frame layer */}
                   <div 
-                    className="relative w-full h-full rounded-md overflow-hidden"
+                    className="absolute inset-0.5 rounded-lg"
                     style={{
-                      boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(0, 0, 0, 0.2)'
+                      background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 25%, #C5A572 50%, #D4B896 75%, #E8D4B0 100%)',
+                      padding: '0.5px',
+                      boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.3)'
                     }}
                   >
-                    <img 
-                      src="/samples/chihuahua.png" 
-                      alt="Royal Chihuahua portrait"
-                      className="w-full h-full object-cover"
-                    />
+                    {/* Portrait container with inner shadow */}
+                    <div 
+                      className="relative w-full h-full rounded-md overflow-hidden"
+                      style={{
+                        boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(0, 0, 0, 0.2)'
+                      }}
+                    >
+                      <img 
+                        src="/samples/whitecat.png" 
+                        alt="Duchess Whiskers - Royal Cat Portrait"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            {/* Pet Name */}
+            <p 
+              className="mt-3 text-sm sm:text-base font-medium"
+              style={{ 
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: '#C5A572',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                letterSpacing: '0.05em'
+              }}
+            >
+              Duchess Whiskers
+            </p>
+          </div>
 
+          {/* Second Portrait - Sir Biscuit */}
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
+              style={{ padding: '2px' }}
+            >
+              {/* Soft outer glow/vignette */}
+              <div 
+                className="absolute inset-0 rounded-2xl"
+                style={{
+                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.3) 0%, rgba(197, 165, 114, 0.15) 50%, transparent 70%)',
+                  filter: 'blur(20px)',
+                  zIndex: 0,
+                  transform: 'scale(1.1)'
+                }}
+              />
+              
+              {/* Outer frame layer - beveled edge */}
+              <div 
+                className="absolute inset-0 rounded-2xl"
+                style={{
+                  background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 20%, #C5A572 40%, #D4B896 60%, #C5A572 80%, #E8D4B0 100%)',
+                  padding: '1px',
+                  boxShadow: `
+                    0 8px 32px rgba(197, 165, 114, 0.4),
+                    0 0 0 1px rgba(197, 165, 114, 0.6),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                    inset 0 -2px 4px rgba(166, 139, 91, 0.4)
+                  `.trim().replace(/\s+/g, ' '),
+                  zIndex: 1
+                }}
+              >
+                {/* Middle frame layer - dimensional molding */}
+                <div 
+                  className="absolute inset-0.5 rounded-xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 30%, #D4B896 60%, #C5A572 100%)',
+                    padding: '0.5px',
+                    boxShadow: `
+                      inset 0 1px 2px rgba(255, 255, 255, 0.35),
+                      inset 0 -1px 2px rgba(166, 139, 91, 0.35)
+                    `.trim().replace(/\s+/g, ' ')
+                  }}
+                >
+                  {/* Inner frame layer */}
+                  <div 
+                    className="absolute inset-0.5 rounded-lg"
+                    style={{
+                      background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 25%, #C5A572 50%, #D4B896 75%, #E8D4B0 100%)',
+                      padding: '0.5px',
+                      boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.3)'
+                    }}
+                  >
+                    {/* Portrait container with inner shadow */}
+                    <div 
+                      className="relative w-full h-full rounded-md overflow-hidden"
+                      style={{
+                        boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(0, 0, 0, 0.2)'
+                      }}
+                    >
+                      <img 
+                        src="/samples/chihuahua.png" 
+                        alt="Sir Biscuit - Royal Dog Portrait"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Pet Name */}
+            <p 
+              className="mt-3 text-sm sm:text-base font-medium"
+              style={{ 
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: '#C5A572',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                letterSpacing: '0.05em'
+              }}
+            >
+              Sir Biscuit
+            </p>
           </div>
         </div>
 
