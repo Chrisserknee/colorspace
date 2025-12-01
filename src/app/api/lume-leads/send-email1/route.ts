@@ -97,8 +97,19 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Also allow GET for easy testing
+// GET endpoint with secret in query param for easy browser access
+// Usage: /api/lume-leads/send-email1?secret=YOUR_CRON_SECRET
 export async function GET(request: NextRequest) {
-  return POST(request);
+  const secret = request.nextUrl.searchParams.get("secret");
+  
+  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+    return NextResponse.json({ error: "Invalid secret. Add ?secret=YOUR_CRON_SECRET to URL" }, { status: 401 });
+  }
+  
+  // Create a mock request with the auth header
+  const headers = new Headers(request.headers);
+  headers.set("Authorization", `Bearer ${secret}`);
+  
+  return POST(new NextRequest(request.url, { headers }));
 }
 
