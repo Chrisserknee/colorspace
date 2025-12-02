@@ -536,12 +536,13 @@ async function generateWithStableDiffusion(
     : `data:image/jpeg;base64,${contentImageBase64}`;
 
   // Prompt strength for full SD generation
-  // LOWERED to 0.30 to preserve MORE of the original pet's identity (70% preserved)
+  // LOWERED to 0.25 to preserve MORE of the original pet's identity (75% preserved)
   // Higher = more creative but loses pet identity, lower = closer to original
   // For cats especially, we need lower values to preserve their unique features
-  const basePromptStrength = parseFloat(process.env.SD_PROMPT_STRENGTH || "0.30");
+  const basePromptStrength = parseFloat(process.env.SD_PROMPT_STRENGTH || "0.25");
   // Use even lower strength for cats (they have more distinctive features that need preserving)
-  const promptStrength = species === "CAT" ? Math.min(basePromptStrength, 0.28) : basePromptStrength;
+  // Grey cats need extra low strength to prevent color shifts
+  const promptStrength = species === "CAT" ? Math.min(basePromptStrength, 0.22) : basePromptStrength;
   const guidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
   const numSteps = parseInt(process.env.SD_NUM_STEPS || "30");
   
@@ -557,19 +558,39 @@ async function generateWithStableDiffusion(
   // Extract key identifying features from pet description for the prompt
   const breedInfo = breed ? `${breed} ${species.toLowerCase()}` : species.toLowerCase();
   
+  // Detect fur color from description for color preservation
+  const descLower = petDescription.toLowerCase();
+  const isGreyFur = descLower.includes("grey") || descLower.includes("gray") || descLower.includes("silver") || 
+                   descLower.includes("russian blue") || descLower.includes("chartreux") || descLower.includes("slate") ||
+                   descLower.includes("ash") || descLower.includes("smoky") || descLower.includes("blue-grey");
+  const isBlackFur = descLower.includes("black") || descLower.includes("ebony") || descLower.includes("jet black");
+  const isWhiteFur = descLower.includes("white") || descLower.includes("snow white");
+  const isOrangeFur = descLower.includes("orange") || descLower.includes("ginger") || descLower.includes("tabby") || descLower.includes("marmalade");
+  
+  // Color-specific preservation instructions
+  const colorPreservation = isGreyFur 
+    ? `\n- GREY/GRAY FUR: This cat has GREY fur - preserve the COOL GREY color exactly. DO NOT turn white/cream/golden.`
+    : isBlackFur 
+    ? `\n- BLACK FUR: This pet has BLACK fur - preserve the DEEP BLACK color exactly. DO NOT lighten to grey/white.`
+    : isWhiteFur
+    ? `\n- WHITE FUR: This pet has WHITE fur - preserve the pure white color.`
+    : isOrangeFur
+    ? `\n- ORANGE/GINGER FUR: This pet has ORANGE fur - preserve the warm orange/ginger color exactly.`
+    : "";
+
   // Create species-specific identity preservation instructions
   const identityInstructions = species === "CAT" 
     ? `CRITICAL - PRESERVE THIS EXACT CAT'S IDENTITY:
 - Keep the EXACT face shape, head structure, and facial proportions from the reference
 - Preserve the EXACT eye color, eye shape, and eye spacing - do NOT change these
-- Keep ALL fur patterns, markings, and colors in their EXACT positions
+- Keep ALL fur patterns, markings, and FUR COLOR in their EXACT form - DO NOT CHANGE THE FUR COLOR
 - Preserve ear shape, size, and placement precisely
-- Maintain the cat's unique nose shape and whisker pattern
+- Maintain the cat's unique nose shape and whisker pattern${colorPreservation}
 - This must be INSTANTLY RECOGNIZABLE as the same cat from the photo`
     : `CRITICAL - PRESERVE THIS EXACT ${species}'S IDENTITY:
 - Keep the EXACT face shape, head structure, and facial proportions from the reference
 - Preserve the EXACT eye color, eye shape, and expression
-- Keep ALL markings, patterns, and colors in their EXACT positions
+- Keep ALL markings, patterns, and FUR COLOR in their EXACT form - DO NOT CHANGE THE FUR COLOR${colorPreservation}
 - Maintain the unique characteristics that make this pet recognizable
 - This must be INSTANTLY RECOGNIZABLE as the same ${species.toLowerCase()} from the photo`;
 
@@ -631,11 +652,19 @@ DISCOVERED IN FORGOTTEN CASTLE:
 - Worth millions - belongs in National Portrait Gallery`;
 
   // Species-specific negative prompts to prevent identity changes
+  const colorChangeNegative = isGreyFur 
+    ? "white fur, cream fur, golden fur, warm tones on fur, beige fur, light colored cat, white cat,"
+    : isBlackFur
+    ? "grey fur, white fur, light fur, faded black, charcoal instead of black,"
+    : isWhiteFur
+    ? "grey fur, cream fur, yellow fur, dirty white,"
+    : "";
+    
   const speciesNegative = species === "CAT" 
-    ? "wrong cat, different cat, generic cat, cat breed change, wrong eye color, wrong fur pattern, wrong markings, wrong face shape, dog features, canine features,"
+    ? `wrong cat, different cat, generic cat, cat breed change, wrong eye color, wrong fur color, wrong fur pattern, wrong markings, wrong face shape, dog features, canine features, ${colorChangeNegative}`
     : species === "DOG"
-    ? "wrong dog, different dog, generic dog, dog breed change, wrong eye color, wrong fur pattern, wrong markings, wrong face shape, cat features, feline features,"
-    : "wrong animal, different animal, generic pet, wrong features,";
+    ? `wrong dog, different dog, generic dog, dog breed change, wrong eye color, wrong fur color, wrong fur pattern, wrong markings, wrong face shape, cat features, feline features, ${colorChangeNegative}`
+    : `wrong animal, different animal, generic pet, wrong features, ${colorChangeNegative}`;
 
   const negativePrompt = `${speciesNegative}
 photograph, photo, photorealistic, modern, digital art, cartoon, anime, 3d render, CGI,
@@ -1608,10 +1637,16 @@ Provide SPECIFIC measurements and ratios with FINER DETAIL:
 - Ear hair patterns or tufts
 
 === SECTION 4 - COLORING (EXHAUSTIVE DETAIL - ENHANCED) ===
-CRITICAL: For BLACK or DARK pets, you MUST explicitly state "black" or "dark" in your description. Do not use vague terms like "dark-colored" - be specific: "black", "jet black", "coal black", "deep black", "dark brown", etc.
+CRITICAL COLOR IDENTIFICATION - Be EXTREMELY specific about fur color:
+- For BLACK pets: Explicitly state "black", "jet black", "coal black", "deep black", or "charcoal black"
+- For GREY pets: Explicitly state "grey", "gray", "silver-grey", "blue-grey", "slate grey", "ash grey", "charcoal grey", or "smoky grey"
+- For DARK BROWN pets: Explicitly state "dark brown", "chocolate brown", "ebony brown"
+- GREY vs BLACK: Grey has a lighter, cooler tone. Black is deep and dark. Be careful to distinguish!
+- GREY vs WHITE: Grey has color/pigment. White is pure without pigment. Russian Blues are GREY, not white!
 
 Primary coat color using EXACT shade comparisons:
 - Base color (e.g., "rich mahogany brown like polished wood" not just "brown")
+- For GREY pets: Explicitly state "grey", "gray", "silver-grey", "blue-grey", "slate grey", "ash grey" - NEVER confuse with white!
 - For BLACK pets: Explicitly state "black", "jet black", "coal black", "deep black", or "charcoal black"
 - For DARK BROWN pets: Explicitly state "dark brown", "chocolate brown", "ebony brown"
 - Secondary colors and their precise locations
@@ -2134,6 +2169,24 @@ Be VERY careful - misidentifying will cause major errors.`,
       petDescLower.includes("pure white")
     );
     
+    // Check if GREY cat - CRITICAL: Grey cats often get turned white/cream, prevent this
+    const isGreyCat = species === "CAT" && (
+      petDescLower.includes("grey") ||
+      petDescLower.includes("gray") ||
+      petDescLower.includes("russian blue") ||
+      petDescLower.includes("chartreux") ||
+      petDescLower.includes("british shorthair") ||
+      petDescLower.includes("korat") ||
+      petDescLower.includes("nebelung") ||
+      petDescLower.includes("blue cat") ||
+      petDescLower.includes("silver") ||
+      petDescLower.includes("slate") ||
+      petDescLower.includes("ash") ||
+      petDescLower.includes("smoky") ||
+      petDescLower.includes("blue-grey") ||
+      petDescLower.includes("blue-gray")
+    );
+    
     // Check if black cat or dark-coated pet - preserve deep black color
     // Use BOTH description analysis AND image pixel analysis for robust detection
     const descriptionSaysBlack = (
@@ -2197,6 +2250,21 @@ This is a WHITE CAT - apply angelic luminous aesthetic:
 - SOFT GLOW around the entire cat - gentle radiance
 - Enhanced presence - the white cat should GLOW with light
 - More luminous than other pets - special angelic treatment` : "";
+
+    // Add GREY cat color preservation treatment - CRITICAL to prevent grey becoming white
+    const greyCatTreatment = isGreyCat ? `
+=== GREY CAT - CRITICAL COLOR PRESERVATION ===
+This is a GREY/GRAY CAT - CRITICAL: Preserve the EXACT GREY fur color:
+- The cat MUST remain GREY/GRAY - NEVER white, cream, beige, or golden
+- Preserve the COOL GREY/BLUE-GREY fur tone exactly as in the reference
+- This cat has GREY fur - NOT white, NOT cream, NOT golden, NOT warm-toned
+- Russian Blue / Chartreux / British Shorthair type grey coloring
+- Maintain the distinctive COOL GREY/SILVER/SLATE tone throughout
+- The grey color is ESSENTIAL to this cat's identity - preserve it exactly
+- DO NOT warm up the colors - keep the COOL GREY tones
+- DO NOT brighten to white or cream - maintain GREY
+- Any highlights should be silvery-grey, NOT warm or golden
+- The cat's fur should read as DEFINITIVELY GREY in the final image` : "";
     
     // Add black cat color preservation treatment
     const blackCatTreatment = isBlackCat || isDarkCoated ? `
@@ -2293,7 +2361,7 @@ KEY POSE QUALITIES:
 - Overall feeling of a beloved pet captured in a quiet, comfortable moment
 ${facialStructureSection}
 === THE ${species} - DETAILED DESCRIPTION ===
-${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${blackCatTreatment}${agePreservationInstructions}
+${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${agePreservationInstructions}
 
 === CRITICAL: EXACT MATCHING ===
 The generated pet MUST match the description EXACTLY:
@@ -2542,6 +2610,24 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
         petDescLowerForOpenAI.includes("pure white")
       );
       
+      // Check if GREY cat - CRITICAL: Grey cats often get turned white/cream
+      const isGreyCatForOpenAI = species === "CAT" && (
+        petDescLowerForOpenAI.includes("grey") ||
+        petDescLowerForOpenAI.includes("gray") ||
+        petDescLowerForOpenAI.includes("russian blue") ||
+        petDescLowerForOpenAI.includes("chartreux") ||
+        petDescLowerForOpenAI.includes("british shorthair") ||
+        petDescLowerForOpenAI.includes("korat") ||
+        petDescLowerForOpenAI.includes("nebelung") ||
+        petDescLowerForOpenAI.includes("blue cat") ||
+        petDescLowerForOpenAI.includes("silver") ||
+        petDescLowerForOpenAI.includes("slate") ||
+        petDescLowerForOpenAI.includes("ash") ||
+        petDescLowerForOpenAI.includes("smoky") ||
+        petDescLowerForOpenAI.includes("blue-grey") ||
+        petDescLowerForOpenAI.includes("blue-gray")
+      );
+      
       // Check if black cat or dark-coated pet - use same logic as main detection
       const descSaysBlackForOpenAI = (
         petDescLowerForOpenAI.includes("black") ||
@@ -2580,6 +2666,18 @@ This is a WHITE CAT - apply angelic luminous aesthetic:
 - SOFT GLOW around the entire cat - gentle radiance
 - Enhanced presence - the white cat should GLOW with light
 - More luminous than other pets - special angelic treatment
+` : "";
+
+      const greyCatTreatmentForOpenAI = isGreyCatForOpenAI ? `
+=== GREY CAT - CRITICAL COLOR PRESERVATION ===
+This is a GREY/GRAY CAT - CRITICAL: Preserve the EXACT GREY fur color:
+- The cat MUST remain GREY/GRAY - NEVER white, cream, beige, or golden
+- Preserve the COOL GREY/BLUE-GREY fur tone exactly as in the reference
+- This cat has GREY fur - NOT white, NOT cream, NOT golden
+- Maintain the distinctive COOL GREY/SILVER/SLATE tone throughout
+- DO NOT warm up the colors - keep the COOL GREY tones
+- DO NOT brighten to white or cream - maintain GREY
+- Any highlights should be silvery-grey, NOT warm or golden
 ` : "";
       
       const blackCatTreatmentForOpenAI = isBlackCatForOpenAI || isDarkCoatedForOpenAI ? `
@@ -2671,7 +2769,7 @@ CRITICAL: The ${species} must look EXACTLY like the original photo - this is a m
 
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
 
-18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
+18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
 
 === CRITICAL PET PRESERVATION ===
 - Preserve the face structure, skull shape, snout proportions EXACTLY from the original
@@ -2945,6 +3043,24 @@ The ${species} should match the reference image exactly - same face, markings, c
         petDescLowerForFlux.includes("pure white")
       );
       
+      // Check if GREY cat - CRITICAL: Grey cats often get turned white/cream
+      const isGreyCatForFlux = species === "CAT" && (
+        petDescLowerForFlux.includes("grey") ||
+        petDescLowerForFlux.includes("gray") ||
+        petDescLowerForFlux.includes("russian blue") ||
+        petDescLowerForFlux.includes("chartreux") ||
+        petDescLowerForFlux.includes("british shorthair") ||
+        petDescLowerForFlux.includes("korat") ||
+        petDescLowerForFlux.includes("nebelung") ||
+        petDescLowerForFlux.includes("blue cat") ||
+        petDescLowerForFlux.includes("silver") ||
+        petDescLowerForFlux.includes("slate") ||
+        petDescLowerForFlux.includes("ash") ||
+        petDescLowerForFlux.includes("smoky") ||
+        petDescLowerForFlux.includes("blue-grey") ||
+        petDescLowerForFlux.includes("blue-gray")
+      );
+      
       // Check if black cat or dark-coated pet - use same logic as main detection
       const descSaysBlackForFlux = (
         petDescLowerForFlux.includes("black") ||
@@ -2982,6 +3098,17 @@ WHITE CAT - angelic luminous:
 - SOFT GLOW around entire cat - gentle radiance
 - Enhanced presence - cat GLOWS with light
 ` : "";
+
+      const greyCatTreatmentForFlux = isGreyCatForFlux ? `
+=== GREY CAT - CRITICAL COLOR PRESERVATION ===
+GREY/GRAY CAT - CRITICAL: Preserve EXACT GREY fur color:
+- Cat MUST remain GREY/GRAY - NEVER white, cream, beige, golden
+- Preserve COOL GREY/BLUE-GREY tone exactly as reference
+- This cat has GREY fur - NOT white, NOT cream, NOT golden
+- Maintain COOL GREY/SILVER/SLATE tone throughout
+- DO NOT warm up colors - keep COOL GREY tones
+- DO NOT brighten to white/cream - maintain GREY
+` : "";
       
       const blackCatTreatmentForFlux = isBlackCatForFlux || isDarkCoatedForFlux ? `
 === BLACK/DARK-COATED PET - CRITICAL COLOR PRESERVATION ===
@@ -2994,7 +3121,7 @@ ${isBlackCatForFlux ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve DEEP
 - DO NOT lighten fur - keep DEEP RICH BLACK/DARK
 ` : "";
 
-      const fluxPrompt = `18th-century aristocratic oil portrait. Late 18th-century European aristocratic portraiture (1770-1830 Georgian/Regency/Napoleonic era). Style of Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForFlux}${whiteCatTreatmentForFlux}${blackCatTreatmentForFlux}
+      const fluxPrompt = `18th-century aristocratic oil portrait. Late 18th-century European aristocratic portraiture (1770-1830 Georgian/Regency/Napoleonic era). Style of Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForFlux}${whiteCatTreatmentForFlux}${greyCatTreatmentForFlux}${blackCatTreatmentForFlux}
 
 === LIGHTING (Brighter Dramatic Chiaroscuro with Glow - Retaining Darker Tones) ===
 - Dramatic, directional CHIAROSCURO lighting with BRIGHTER overall illumination
