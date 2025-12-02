@@ -181,6 +181,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   const [isClosing, setIsClosing] = useState(false); // For closing animation
   const [shareConsent, setShareConsent] = useState<"yes" | "no" | null>(null); // Social media sharing consent
   const shareConsentRef = useRef<"yes" | "no" | null>(null); // Ref to track current consent value
+  const [isFullscreen, setIsFullscreen] = useState(false); // Fullscreen portrait view
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -1425,11 +1426,12 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             {/* Preview Image - Display Only */}
             <div className="relative max-w-[240px] sm:max-w-[300px] mx-auto mb-4">
               <div 
-                className="relative rounded-2xl overflow-hidden shadow-2xl"
+                className="relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer group"
                 style={{ 
                   border: '3px solid rgba(197, 165, 114, 0.4)',
                   boxShadow: '0 20px 40px rgba(0,0,0,0.4), 0 0 60px rgba(197, 165, 114, 0.15)',
                 }}
+                onClick={() => setIsFullscreen(true)}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -1437,6 +1439,21 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   alt="Your royal portrait masterpiece"
                   className="w-full h-auto block"
                 />
+                {/* Fullscreen button overlay */}
+                <div 
+                  className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
+                >
+                  <div 
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+                  >
+                    <svg className="w-5 h-5" style={{ color: '#F0EDE8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                    </svg>
+                    <span className="text-sm font-medium" style={{ color: '#F0EDE8' }}>Tap to zoom</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1761,6 +1778,65 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
           </div>
         )}
       </div>
+
+      {/* Fullscreen Portrait Overlay */}
+      {isFullscreen && result && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.95)' }}
+          onClick={() => setIsFullscreen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-4 right-4 z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+            style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              color: '#F0EDE8',
+            }}
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Back button */}
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 hover:scale-105"
+            style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              color: '#F0EDE8',
+            }}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="text-sm font-medium">Back</span>
+          </button>
+
+          {/* Fullscreen Image */}
+          <div 
+            className="relative max-w-[90vw] max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={result.previewUrl}
+              alt="Your royal portrait masterpiece - fullscreen"
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              style={{ 
+                border: '2px solid rgba(197, 165, 114, 0.3)',
+              }}
+            />
+          </div>
+
+          {/* Hint text */}
+          <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs" style={{ color: '#7A756D' }}>
+            Tap anywhere or press Back to close
+          </p>
+        </div>
+      )}
     </div>
   );
 }
