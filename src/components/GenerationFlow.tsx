@@ -1316,6 +1316,11 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             <p className="text-sm font-medium" style={{ color: '#C5A572' }}>
               {Math.round(generationProgress)}%
             </p>
+            
+            {/* Time estimate */}
+            <p className="text-xs mt-4" style={{ color: '#5A5650' }}>
+              This could take up to 60 seconds
+            </p>
           </div>
         )}
 
