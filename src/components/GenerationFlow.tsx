@@ -1375,10 +1375,10 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             {/* Urgency Timer */}
             <div 
               className="flex items-center justify-center gap-2 mb-5 py-2 px-4 rounded-full mx-auto w-fit"
-              style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+              style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.2)' }}
             >
-              <span className="text-xs" style={{ color: '#F87171' }}>⏰ Special price expires in</span>
-              <span className="font-mono font-bold text-sm" style={{ color: '#F87171' }}>{timeRemaining}</span>
+              <span className="text-xs" style={{ color: '#C5A572' }}>Expires in</span>
+              <span className="font-mono font-bold text-sm" style={{ color: '#C5A572' }}>{timeRemaining}</span>
             </div>
 
             {/* Feature List - Clear & Premium */}
