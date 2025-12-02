@@ -1326,6 +1326,20 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
         {/* Result Stage - Premium Purchase Experience */}
         {stage === "result" && result && (
           <div className="p-4 sm:p-6 pb-6">
+            {/* Price Badge - Top */}
+            <div className="text-center mb-3 pt-2">
+              <span 
+                className="inline-block px-4 py-1.5 rounded-full text-lg font-bold"
+                style={{ 
+                  backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                  border: '1px solid rgba(197, 165, 114, 0.4)',
+                  color: '#C5A572',
+                }}
+              >
+                $19.99
+              </span>
+            </div>
+
             {/* Celebratory Header */}
             <div className="text-center mb-4">
               <p className="text-sm mb-1" style={{ color: '#C5A572' }}>✨ It&apos;s ready!</p>
@@ -1416,7 +1430,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 boxShadow: '0 8px 24px rgba(197, 165, 114, 0.4)',
               }}
             >
-              Get My Masterpiece — $19.99
+              Download Now
             </button>
 
             {/* Money-Back Guarantee Badge */}
