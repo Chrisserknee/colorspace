@@ -438,7 +438,7 @@ async function applyStyleTransfer(
         input: {
           image: contentImageUrl,
           prompt: "AUTHENTIC 300-year-old HEAVILY AGED ANTIQUE oil painting portrait, late 18th-century European aristocratic masterpiece (1770-1830), EXTREMELY ROUGH WEATHERED TEXTURE like ancient artifact, PROMINENT CRAQUELURE visible crack network throughout like cracked earth, HEAVY THICK AMBER VARNISH PATINA noticeably yellowed and aged, THICK SCULPTURAL IMPASTO with worn peaks, COARSE CANVAS WEAVE clearly visible throughout, WEATHERED WORN EDGES paint thinned at corners and perimeter, SIGNIFICANT SURFACE WEAR rubbed areas, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES, GRIME DUST PATINA in crevices, FOXING age spots discoloration, PET IN NATURAL RELAXED comfortable pose, colors with STRONG AMBER CAST from aged varnish, LOOSE FLOWING BRUSHWORK long sweeping strokes, Gainsborough LOOSE FEATHERY brushwork Reynolds glazes Vigée Le Brun elegance, DISCOVERED IN FORGOTTEN CASTLE after 300 years covered in dust and centuries of patina, LUSTROUS fabrics GLEAMING gold SPARKLING gems, ancient museum artifact quality",
-          negative_prompt: "photograph, photo, photorealistic, modern, digital art, cartoon, anime, CGI, 3D render, blurry, low quality, watermark, gloomy, flat lighting, muted colors, dull colors, grey colors, muddy colors, smooth gradients, airbrushed, plastic looking, too perfect, too smooth, too clean, too new, freshly painted, pristine, crisp clean edges, restored, cleaned, clinical, sharp edges everywhere, flat background, flat colors, no texture, no brushstrokes, no cracks, no aging, no patina, overly refined, digitally perfect, stiff pose, rigid posture, medieval, Renaissance, matte fabrics, human clothing, human-like pose, anthropomorphic, standing upright, bipedal, close-up, cropped, washed out, faded, low contrast",
+          negative_prompt: "photograph, photo, photorealistic, modern, digital art, cartoon, anime, CGI, 3D render, blurry, low quality, watermark, gloomy, flat lighting, muted colors, dull colors, grey colors, muddy colors, dark brown background, brown background, dark backgrounds, monotonous brown, all brown, sepia only, muddy brown, smooth gradients, airbrushed, plastic looking, too perfect, too smooth, too clean, too new, freshly painted, pristine, crisp clean edges, restored, cleaned, clinical, sharp edges everywhere, flat background, flat colors, no texture, no brushstrokes, no cracks, no aging, no patina, overly refined, digitally perfect, stiff pose, rigid posture, medieval, Renaissance, matte fabrics, human clothing, human-like pose, anthropomorphic, standing upright, bipedal, close-up, cropped, washed out, faded, low contrast",
           prompt_strength: styleStrength,
           num_inference_steps: 25,
           guidance_scale: 7.5,
@@ -639,10 +639,12 @@ COMPOSITION:
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
 - Authentic, genuine expression
 
-ATMOSPHERIC BACKGROUND:
-- SFUMATO depth: warm earth tones receding into atmospheric haze
+ATMOSPHERIC BACKGROUND (VARIED COLORS - NOT DARK BROWN):
+- COLORFUL VARIED BACKGROUNDS: deep royal blue, rich burgundy, forest green, soft cream, warm peach, dusty rose, sage green, powder blue, lavender, champagne gold, ivory white, muted teal
+- SFUMATO depth: colors receding into atmospheric haze with luminous glow
 - Rich draped fabrics with heavily aged quality
-- LUMINOUS quality with heavy amber varnish glow
+- LUMINOUS quality - backgrounds should feel BRIGHT and AIRY, not dark or heavy
+- Avoid monotonous brown - use INTERESTING COLOR PALETTES that complement the pet
 
 DISCOVERED IN FORGOTTEN CASTLE:
 - Looks like ANCIENT 300-year-old painting by Gainsborough, Reynolds, or Vigée Le Brun
@@ -678,6 +680,7 @@ stiff pose, rigid posture, unnatural position, forced expression,
 no cracks, no aging, no patina, no weathering,
 overly refined, digitally perfect, clinical, polished, slick,
 muted colors, dull colors, grey colors, muddy colors, washed out, faded, low saturation,
+dark brown background, brown background, dark backgrounds, monotonous brown, all brown, sepia only, muddy brown,
 deformed, disfigured, bad anatomy, wrong proportions,
 ugly, duplicate, extra limbs, missing limbs, close-up, cropped`;
   
@@ -828,14 +831,19 @@ SCENE ELEMENTS:
 - SPARKLING jewelry: pearls with IRIDESCENT overtones, gems with INTERNAL FIRE and light refraction
 - Cream/ivory RUFFLED LACE COLLAR with delicate texture details, Elizabethan ruff style
 - RICH SATURATED velvet curtain draped to one side creating atmospheric depth
-- LUMINOUS warm background with SFUMATO gradient, seems to GLOW from within
+- LUMINOUS COLORFUL background with SFUMATO gradient - NOT BROWN
+
+BACKGROUND COLORS (VARIED - NOT DARK BROWN):
+- Choose from: deep royal blue, rich burgundy, forest green, soft cream, warm peach, dusty rose, sage green, powder blue, lavender, champagne gold, ivory white, muted teal
+- Background should be BRIGHT and AIRY, not dark or muddy
+- NEVER use dark brown, muddy brown, or monotonous brown tones
 
 VIVID SATURATED COLORS:
 - BRILLIANT jewel-toned velvet cushion - colors that SING with vibrancy
 - RICH SATURATED burgundy/crimson robe with LUSTROUS sheen
 - GLEAMING gold embroidery with true METALLIC reflection quality
-- DEEP SATURATED forest green curtain accent
-- WARM GLOWING golden-amber background radiating light
+- DEEP SATURATED forest green or royal blue curtain accent
+- LUMINOUS COLORFUL background - soft cream, dusty rose, powder blue, or sage green
 - LUSTROUS cream/ivory lace with subtle warm undertones
 - SPARKLING gems: vivid ruby, rich emerald, deep sapphire with BRILLIANT internal fire
 - VELVETY deep blacks with subtle undertones - never flat or grey
