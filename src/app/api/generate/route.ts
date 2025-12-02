@@ -1649,162 +1649,48 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Use GPT-4o to analyze pet - focus on UNIQUE distinguishing features
-    console.log("Analyzing pet with GPT-4o...");
+    // Step 1: Use GPT-4o to analyze pet - OPTIMIZED for speed while keeping critical identity info
+    console.log("Analyzing pet with GPT-4o (optimized prompt)...");
+    const visionStartTime = Date.now();
     
     const visionResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",  // Use mini for faster analysis - still accurate for pet identification
       messages: [
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `CRITICAL FIRST STEP: Identify the SPECIES. Start your response with EXACTLY one of these: [CAT] or [DOG] or [RABBIT]
+              text: `Analyze this pet photo. Start with [CAT] or [DOG] or [RABBIT].
 
-SPECIES IDENTIFICATION RULES (MUST BE ACCURATE):
-- DOG: Has a prominent snout/muzzle, canine facial structure, typically larger/wider nose, wider head, canine teeth visible, dog-like facial proportions
-- CAT: Has whiskers, smaller triangular nose, more compact facial structure, feline features, cat-like eye shape, smaller nose relative to face, cat-like facial proportions
-- RABBIT: Long ears, round body, no snout like a dog, different facial structure
+SPECIES: Look at snout size, facial structure, ears. Dogs have larger snouts. Cats have compact faces with whiskers.
 
-LOOK CAREFULLY: Examine the facial structure, ear shape, nose size, and overall anatomy to determine if this is a DOG or CAT.
+Provide a CONCISE description:
+1. SPECIES & BREED: [SPECIES] - Breed name or "Mixed" (confidence: HIGH/MEDIUM/LOW)
+2. AGE: PUPPY/KITTEN or ADULT
+3. COLORS: Be SPECIFIC - for dark pets say "black" or "grey" or "dark brown" explicitly. List base color, any markings with locations.
+4. FACE: Eye color, eye shape, nose color, any distinctive facial features
+5. EARS: Shape, size, position
+6. UNIQUE FEATURES: 3-5 things that make THIS pet recognizable (asymmetries, markings, expression)
+7. FUR: Length and texture (short/medium/long, smooth/fluffy)
 
-KEY DIFFERENCES:
-- CATS have smaller noses, more compact faces, whiskers, triangular ears, feline eye shape
-- DOGS have larger noses/snouts, wider heads, canine facial structure, dog-like proportions
-
-Start your response with [DOG] or [CAT] or [RABBIT] - this is CRITICAL for accurate generation. Be very careful - misidentifying a cat as a dog or vice versa will cause major errors.
-
-=== BREED IDENTIFICATION (CRITICAL) ===
-Identify the specific breed with confidence level:
-- State the breed name (or "Mixed breed" if uncertain)
-- Confidence: HIGH (90%+), MEDIUM (70-90%), or LOW (<70%)
-- If mixed breed, list the likely breeds in the mix
-- Note breed-specific characteristics visible (e.g., "Labrador traits: otter tail, broad head, kind eyes")
-
-=== AGE/STAGE ===
-- PUPPY (young dog): Large eyes relative to face, rounder features, smaller proportions
-- KITTEN (young cat): Large eyes relative to face, rounder features, youthful appearance
-- ADULT: Fully developed features, mature proportions
-
-=== SECTION 1 - IDENTITY MARKERS (MOST CRITICAL) ===
-List 10-15 distinctive features that would allow someone to RECOGNIZE this specific pet:
-- Asymmetrical features with EXACT locations (e.g., "slightly larger left ear")
-- Unique markings with PRECISE positions (e.g., "white blaze starting 2cm above nose, widening to 3cm between eyes")
-- The pet's characteristic expression or "look in their eyes"
-- Any scars, notches, or physical quirks
-- What makes THIS pet different from other pets of the same breed
-- Subtle facial asymmetries (e.g., "left eye slightly more almond-shaped than right")
-- Unique whisker patterns or arrangements
-- Individual hair patterns or cowlicks
-- Specific texture variations in fur (e.g., "slightly wavier fur on left side")
-- Any distinctive body proportions or postural characteristics
-
-=== SECTION 2 - FACIAL STRUCTURE (NUMERIC PROPORTIONS - ENHANCED) ===
-Provide SPECIFIC measurements and ratios with FINER DETAIL:
-- Skull type: Brachycephalic (flat-faced), Mesocephalic (medium), or Dolichocephalic (long)
-- Face width-to-height ratio (e.g., "face is 85% as wide as tall")
-- Snout length as percentage of head (e.g., "snout is 30% of total head length")
-- Snout width relative to head width (e.g., "snout is 45% of head width at widest point")
-- Snout taper: Does it narrow significantly toward nose or maintain width?
-- Eye shape: Round, Almond, Oval, or Triangular - describe subtle variations
-- Eye size relative to face (e.g., "eyes take up 15% of face width each")
-- Eye depth: Deep-set, flush, or prominent?
-- Eye spacing in eye-widths (e.g., "eyes are 1.5 eye-widths apart")
-- Eye angle: Horizontal, upward slant, or downward slant - measure angle if visible
-- Eye color: Use PRECISE color (amber honey, dark chocolate, bright emerald, ice blue, heterochromia details)
-- Eye color variations: Any flecks, rings, or gradients within the iris?
-- Nose size relative to face width (e.g., "nose is 20% of face width")
-- Nose shape: Round, oval, triangular, or square?
-- Nose color and any unique patterns or pigmentation variations
-- Muzzle length category: Very short (<15%), Short (15-25%), Medium (25-35%), Long (>35%)
-- Muzzle shape: Square, rounded, pointed, or tapered?
-- Cheekbone prominence: High, medium, or low?
-- Jawline definition: Strong, moderate, or soft?
-
-=== SECTION 3 - EARS (WITH PROPORTIONS - ENHANCED) ===
-- Ear size as percentage of head height (e.g., "ears are 35% of head height")
-- Ear width relative to length (e.g., "ears are 60% as wide as tall")
-- Ear shape: Pointed, Rounded, Rose, Button, Drop/Pendant, Folded - describe exact shape
-- Ear tip shape: Sharp point, rounded, or slightly folded?
-- Ear set: High/Medium/Low on head - measure distance from top of head
-- Ear spacing: Close together, Normal, Wide apart - measure relative to head width
-- Ear carriage: Erect, Semi-erect, Folded forward, Drooping - describe exact angle
-- Ear thickness: Thin, medium, or thick?
-- Any ear markings, color variations, or asymmetry
-- Inner ear color and texture
-- Ear hair patterns or tufts
-
-=== SECTION 4 - COLORING (EXHAUSTIVE DETAIL - ENHANCED) ===
-CRITICAL COLOR IDENTIFICATION - Be EXTREMELY specific about fur color:
-- For BLACK pets: Explicitly state "black", "jet black", "coal black", "deep black", or "charcoal black"
-- For GREY pets: Explicitly state "grey", "gray", "silver-grey", "blue-grey", "slate grey", "ash grey", "charcoal grey", or "smoky grey"
-- For DARK BROWN pets: Explicitly state "dark brown", "chocolate brown", "ebony brown"
-- GREY vs BLACK: Grey has a lighter, cooler tone. Black is deep and dark. Be careful to distinguish!
-- GREY vs WHITE: Grey has color/pigment. White is pure without pigment. Russian Blues are GREY, not white!
-
-Primary coat color using EXACT shade comparisons:
-- Base color (e.g., "rich mahogany brown like polished wood" not just "brown")
-- For GREY pets: Explicitly state "grey", "gray", "silver-grey", "blue-grey", "slate grey", "ash grey" - NEVER confuse with white!
-- For BLACK pets: Explicitly state "black", "jet black", "coal black", "deep black", or "charcoal black"
-- For DARK BROWN pets: Explicitly state "dark brown", "chocolate brown", "ebony brown"
-- Secondary colors and their precise locations
-- Color gradients with transition points (e.g., "darkens from golden to russet starting at shoulder line")
-- Subtle color shifts or undertones (e.g., "warm golden undertones in sunlight")
-- Color intensity variations across body (e.g., "darker on back, lighter on chest")
-
-Markings map - describe EVERY marking with FINER DETAIL:
-- Location using clock positions for face (e.g., "white patch at 2 o'clock position on left cheek")
-- Size estimates (e.g., "approximately 2cm diameter")
-- Shape description (e.g., "irregular star shape", "perfect circle", "lightning bolt")
-- Edge definition: Sharp edges, soft/blended edges, or feathered edges?
-- Any symmetry or asymmetry in markings
-- Marking color intensity: Pure white, cream, or off-white?
-- Multiple layers of markings: Base color, secondary markings, tertiary accents
-
-Pattern type if applicable:
-- Tabby (mackerel, classic, spotted, ticked) - describe stripe/spot width and spacing
-- Bicolor, tricolor, tortoiseshell, calico - describe color distribution percentages
-- Merle, brindle, sable, tuxedo - describe pattern density and distribution
-- Specific pattern placement with measurements
-- Pattern clarity: Bold and distinct, or subtle and blended?
-
-=== SECTION 5 - FUR/COAT TEXTURE (ENHANCED) ===
-- Length: Very short, Short, Medium, Long, Very long - measure longest hairs
-- Texture: Sleek/smooth, Soft/plush, Fluffy, Wiry, Curly, Double-coat
-- Density: Sparse, Normal, Dense, Very thick - estimate hairs per square cm
-- Shine level: Matte, Slight sheen, Glossy - describe reflectivity
-- Any variations in different body areas (e.g., "longer fur around neck forming mane")
-- Fur direction patterns: Whorls, cowlicks, or directional flow
-- Undercoat presence: None, light, moderate, or heavy
-- Guard hair characteristics: Coarse, fine, or mixed?
-- Fur texture variations: Smooth on head vs. coarser on back?
-
-=== SECTION 6 - EXPRESSION AND PERSONALITY (ENHANCED) ===
-- Eye expression: Alert, Soft, Intense, Playful, Wise, Mischievous
-- Eye openness: Wide open, half-closed, or squinting?
-- Resting face characteristics
-- Any distinctive "look" this pet has
-- The emotional quality that makes this pet recognizable
-- Facial muscle tension: Relaxed, alert, or tense?
-- Mouth expression: Neutral, slight smile, or serious?
-- Overall demeanor: Confident, shy, curious, or regal?
-
-Format: "[SPECIES] AGE: [stage]. BREED: [breed] (CONFIDENCE: [level]). IDENTITY MARKERS: [7-10 specific features]. FACIAL STRUCTURE: [numeric proportions]. EARS: [detailed ear description]. COLORING: [exhaustive color mapping]. FUR: [texture details]. EXPRESSION: [personality indicators]."`,
+Format: "[SPECIES] BREED: [breed]. AGE: [stage]. COLORS: [detailed colors and markings]. FACE: [eye/nose details]. EARS: [description]. UNIQUE: [distinctive features]. FUR: [texture]."`,
             },
             {
               type: "image_url",
               image_url: {
                 url: `data:image/jpeg;base64,${base64Image}`,
-                detail: "high",
+                detail: "low",  // Use low detail for faster processing - sufficient for pet ID
               },
             },
           ],
         },
       ],
-      max_tokens: 2500, // Significantly increased for enhanced detailed analysis
-      temperature: 0.1, // Lower temperature for even more consistent, precise descriptions
+      max_tokens: 800,  // Reduced - we only need essential info
+      temperature: 0.1,
     });
+    
+    console.log(`Vision analysis took ${Date.now() - visionStartTime}ms`);
 
     let petDescription = visionResponse.choices[0]?.message?.content || "a beloved pet";
 
@@ -2020,15 +1906,21 @@ Be VERY careful - misidentifying will cause major errors.`,
     const detectedBreed = breedMatch ? breedMatch[1].trim() : "";
     console.log("Detected breed:", detectedBreed || "Unknown");
 
-    // Step 1.5: Perform detailed facial structure analysis for high-fidelity generation
-    console.log("🔬 Performing detailed facial structure analysis...");
+    // Step 1.5: Perform detailed facial structure analysis (OPTIONAL - disabled by default for speed)
+    // Enable with ENABLE_FACIAL_ANALYSIS=true if needed for complex breeds
     let facialStructureAnalysis = "";
-    try {
-      facialStructureAnalysis = await analyzeFacialStructure(openai, base64Image, species, detectedBreed);
-      console.log("✅ Facial structure analysis complete");
-    } catch (facialError) {
-      console.error("⚠️ Facial structure analysis failed, continuing without it:", facialError);
-      // Continue without facial analysis - the main description should still work
+    const enableFacialAnalysis = process.env.ENABLE_FACIAL_ANALYSIS === "true";
+    
+    if (enableFacialAnalysis) {
+      console.log("🔬 Performing detailed facial structure analysis (enabled via env)...");
+      try {
+        facialStructureAnalysis = await analyzeFacialStructure(openai, base64Image, species, detectedBreed);
+        console.log("✅ Facial structure analysis complete");
+      } catch (facialError) {
+        console.error("⚠️ Facial structure analysis failed, continuing without it:", facialError);
+      }
+    } else {
+      console.log("⏭️ Skipping facial structure analysis (disabled for speed)");
     }
 
     // Randomize elements for unique paintings - SIGNIFICANTLY EXPANDED for maximum variety
