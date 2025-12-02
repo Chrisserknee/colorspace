@@ -536,14 +536,19 @@ async function generateWithStableDiffusion(
     : `data:image/jpeg;base64,${contentImageBase64}`;
 
   // Prompt strength for full SD generation
-  // 0.35-0.45 = good balance between creativity and identity preservation
-  // Higher = more creative, lower = closer to original
-  const promptStrength = parseFloat(process.env.SD_PROMPT_STRENGTH || "0.40");
-  const guidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "8.0");
+  // LOWERED to 0.30 to preserve MORE of the original pet's identity (70% preserved)
+  // Higher = more creative but loses pet identity, lower = closer to original
+  // For cats especially, we need lower values to preserve their unique features
+  const basePromptStrength = parseFloat(process.env.SD_PROMPT_STRENGTH || "0.30");
+  // Use even lower strength for cats (they have more distinctive features that need preserving)
+  const promptStrength = species === "CAT" ? Math.min(basePromptStrength, 0.28) : basePromptStrength;
+  const guidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
   const numSteps = parseInt(process.env.SD_NUM_STEPS || "30");
   
   console.log("Stable Diffusion parameters:");
-  console.log("- Prompt strength:", promptStrength, `(${Math.round((1 - promptStrength) * 100)}% original preserved)`);
+  console.log("- Base prompt strength:", basePromptStrength);
+  console.log("- Adjusted prompt strength:", promptStrength, `(${Math.round((1 - promptStrength) * 100)}% original preserved)`);
+  console.log("- Species adjustment:", species === "CAT" ? "YES - using lower strength for cat" : "NO");
   console.log("- Guidance scale:", guidanceScale);
   console.log("- Inference steps:", numSteps);
   console.log("- Species:", species);
@@ -552,8 +557,26 @@ async function generateWithStableDiffusion(
   // Extract key identifying features from pet description for the prompt
   const breedInfo = breed ? `${breed} ${species.toLowerCase()}` : species.toLowerCase();
   
+  // Create species-specific identity preservation instructions
+  const identityInstructions = species === "CAT" 
+    ? `CRITICAL - PRESERVE THIS EXACT CAT'S IDENTITY:
+- Keep the EXACT face shape, head structure, and facial proportions from the reference
+- Preserve the EXACT eye color, eye shape, and eye spacing - do NOT change these
+- Keep ALL fur patterns, markings, and colors in their EXACT positions
+- Preserve ear shape, size, and placement precisely
+- Maintain the cat's unique nose shape and whisker pattern
+- This must be INSTANTLY RECOGNIZABLE as the same cat from the photo`
+    : `CRITICAL - PRESERVE THIS EXACT ${species}'S IDENTITY:
+- Keep the EXACT face shape, head structure, and facial proportions from the reference
+- Preserve the EXACT eye color, eye shape, and expression
+- Keep ALL markings, patterns, and colors in their EXACT positions
+- Maintain the unique characteristics that make this pet recognizable
+- This must be INSTANTLY RECOGNIZABLE as the same ${species.toLowerCase()} from the photo`;
+
   // Create a detailed prompt that describes both the pet and the desired style
   const sdPrompt = `AUTHENTIC 300-year-old HEAVILY AGED ANTIQUE oil painting masterpiece portrait of a ${breedInfo}, in NATURAL RELAXED POSE on luxurious velvet cushion. Late 18th-century European aristocratic style (1770-1830) Georgian/Regency/Napoleonic era.
+
+${identityInstructions}
 
 SUBJECT - THIS SPECIFIC ${species.toUpperCase()}:
 The ${species.toLowerCase()} has the exact features from the reference image - preserve the face structure, eye color, markings, and unique characteristics.
@@ -607,10 +630,18 @@ DISCOVERED IN FORGOTTEN CASTLE:
 - EXTREMELY ROUGH WEATHERED AUTHENTIC TEXTURE - ancient artifact quality
 - Worth millions - belongs in National Portrait Gallery`;
 
-  const negativePrompt = `photograph, photo, photorealistic, modern, digital art, cartoon, anime, 3d render, CGI,
+  // Species-specific negative prompts to prevent identity changes
+  const speciesNegative = species === "CAT" 
+    ? "wrong cat, different cat, generic cat, cat breed change, wrong eye color, wrong fur pattern, wrong markings, wrong face shape, dog features, canine features,"
+    : species === "DOG"
+    ? "wrong dog, different dog, generic dog, dog breed change, wrong eye color, wrong fur pattern, wrong markings, wrong face shape, cat features, feline features,"
+    : "wrong animal, different animal, generic pet, wrong features,";
+
+  const negativePrompt = `${speciesNegative}
+photograph, photo, photorealistic, modern, digital art, cartoon, anime, 3d render, CGI,
 blurry, low quality, watermark, text, logo, 
 human body, humanoid, anthropomorphic, bipedal, standing upright, human pose, standing on hind legs,
-wrong species, different animal, 
+wrong species, different animal, changed identity, unrecognizable pet,
 flat colors, flat lighting, no texture, smooth gradients, airbrushed, plastic looking, too smooth, too perfect,
 too clean, too new, freshly painted, pristine, crisp edges, restored, cleaned,
 stiff pose, rigid posture, unnatural position, forced expression,
