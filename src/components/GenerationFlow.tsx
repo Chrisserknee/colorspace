@@ -410,7 +410,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       // Keep animation visible for a while, then fade out sparkles
       const timer = setTimeout(() => {
         setShowRevealAnimation(false);
-      }, 3000); // Animation lasts 3 seconds
+      }, 6000); // Animation lasts 6 seconds for dramatic effect
       return () => clearTimeout(timer);
     }
   }, [stage]);
@@ -1594,14 +1594,28 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
               </span>
             </div>
 
-            {/* Celebratory Header */}
+            {/* Celebratory Header - with staggered reveal */}
             <div className="text-center mb-4">
-              <p className="text-sm mb-1" style={{ color: '#C5A572' }}>✨ It&apos;s ready!</p>
+              <p 
+                className="text-sm mb-1" 
+                style={{ 
+                  color: '#C5A572',
+                  animation: showRevealAnimation ? 'masterpiece-text-reveal 1.5s ease-out forwards' : 'none',
+                  animationDelay: '0.3s',
+                  opacity: showRevealAnimation ? 0 : 1,
+                }}
+              >
+                ✨ It&apos;s ready! ✨
+              </p>
               <h3 
                 className="text-2xl sm:text-3xl font-semibold"
                 style={{ 
                   fontFamily: "'Cormorant Garamond', Georgia, serif", 
-                  color: '#F0EDE8', 
+                  color: '#F0EDE8',
+                  animation: showRevealAnimation ? 'masterpiece-title-reveal 2s ease-out forwards' : 'none',
+                  animationDelay: '0.6s',
+                  opacity: showRevealAnimation ? 0 : 1,
+                  textShadow: showRevealAnimation ? '0 0 30px rgba(197, 165, 114, 0.5)' : 'none',
                 }}
               >
                 Your Royal Masterpiece
@@ -1610,38 +1624,66 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
             {/* Preview Image - Display Only */}
             <div className="relative max-w-[240px] sm:max-w-[300px] mx-auto mb-4">
-              {/* Outer glow effect during reveal */}
+              {/* Outermost ethereal glow - pulsing slowly */}
               {showRevealAnimation && (
                 <div 
-                  className="absolute -inset-4 rounded-3xl animate-pulse"
+                  className="absolute -inset-12 rounded-full pointer-events-none"
                   style={{
-                    background: 'radial-gradient(circle, rgba(197, 165, 114, 0.4) 0%, rgba(197, 165, 114, 0.1) 50%, transparent 70%)',
-                    filter: 'blur(8px)',
+                    background: 'radial-gradient(circle, rgba(197, 165, 114, 0.25) 0%, rgba(197, 165, 114, 0.08) 40%, transparent 70%)',
+                    filter: 'blur(20px)',
+                    animation: 'masterpiece-outer-glow 4s ease-in-out infinite',
                   }}
                 />
               )}
               
-              {/* Floating sparkle particles */}
+              {/* Inner intense glow */}
               {showRevealAnimation && (
-                <div className="absolute -inset-8 pointer-events-none overflow-visible">
-                  {[...Array(16)].map((_, i) => (
+                <div 
+                  className="absolute -inset-6 rounded-3xl pointer-events-none"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(197, 165, 114, 0.5) 0%, rgba(197, 165, 114, 0.2) 40%, transparent 70%)',
+                    filter: 'blur(12px)',
+                    animation: 'masterpiece-inner-glow 3s ease-in-out infinite',
+                    animationDelay: '0.5s',
+                  }}
+                />
+              )}
+              
+              {/* Rotating golden light rays */}
+              {showRevealAnimation && (
+                <div 
+                  className="absolute -inset-16 pointer-events-none"
+                  style={{
+                    background: 'conic-gradient(from 0deg, transparent, rgba(197, 165, 114, 0.15), transparent, rgba(197, 165, 114, 0.1), transparent, rgba(197, 165, 114, 0.15), transparent)',
+                    animation: 'masterpiece-rays-rotate 12s linear infinite',
+                    filter: 'blur(4px)',
+                  }}
+                />
+              )}
+              
+              {/* Floating sparkle particles - Layer 1: Tiny distant stars */}
+              {showRevealAnimation && (
+                <div className="absolute -inset-16 pointer-events-none overflow-visible">
+                  {[...Array(40)].map((_, i) => (
                     <div
-                      key={i}
+                      key={`tiny-${i}`}
                       className="absolute"
                       style={{
-                        left: `${10 + Math.random() * 80}%`,
-                        top: `${10 + Math.random() * 80}%`,
-                        animation: `float-sparkle ${2 + Math.random() * 2}s ease-in-out infinite`,
-                        animationDelay: `${Math.random() * 2}s`,
+                        left: `${-10 + Math.random() * 120}%`,
+                        top: `${-10 + Math.random() * 120}%`,
+                        animation: `masterpiece-sparkle-float ${4 + Math.random() * 3}s ease-in-out infinite`,
+                        animationDelay: `${Math.random() * 4}s`,
                       }}
                     >
                       <div 
-                        className="w-2 h-2 rounded-full"
+                        className="rounded-full"
                         style={{
-                          backgroundColor: '#C5A572',
-                          boxShadow: '0 0 8px 3px rgba(197, 165, 114, 0.8), 0 0 16px 6px rgba(197, 165, 114, 0.4)',
-                          animation: `twinkle ${0.8 + Math.random() * 0.8}s ease-in-out infinite`,
-                          animationDelay: `${Math.random() * 0.5}s`,
+                          width: '2px',
+                          height: '2px',
+                          backgroundColor: '#E8D5B5',
+                          boxShadow: '0 0 4px 2px rgba(232, 213, 181, 0.8)',
+                          animation: `masterpiece-twinkle ${1.5 + Math.random()}s ease-in-out infinite`,
+                          animationDelay: `${Math.random()}s`,
                         }}
                       />
                     </div>
@@ -1649,37 +1691,136 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 </div>
               )}
               
-              {/* Corner sparkle bursts */}
+              {/* Floating sparkle particles - Layer 2: Medium golden orbs */}
+              {showRevealAnimation && (
+                <div className="absolute -inset-12 pointer-events-none overflow-visible">
+                  {[...Array(25)].map((_, i) => (
+                    <div
+                      key={`medium-${i}`}
+                      className="absolute"
+                      style={{
+                        left: `${-5 + Math.random() * 110}%`,
+                        top: `${-5 + Math.random() * 110}%`,
+                        animation: `masterpiece-sparkle-float ${5 + Math.random() * 3}s ease-in-out infinite`,
+                        animationDelay: `${Math.random() * 3}s`,
+                      }}
+                    >
+                      <div 
+                        className="rounded-full"
+                        style={{
+                          width: '4px',
+                          height: '4px',
+                          backgroundColor: '#C5A572',
+                          boxShadow: '0 0 8px 4px rgba(197, 165, 114, 0.9), 0 0 20px 8px rgba(197, 165, 114, 0.4)',
+                          animation: `masterpiece-twinkle ${2 + Math.random() * 1.5}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 1.5}s`,
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Floating sparkle particles - Layer 3: Large brilliant stars */}
+              {showRevealAnimation && (
+                <div className="absolute -inset-10 pointer-events-none overflow-visible">
+                  {[...Array(12)].map((_, i) => (
+                    <div
+                      key={`large-${i}`}
+                      className="absolute"
+                      style={{
+                        left: `${5 + Math.random() * 90}%`,
+                        top: `${5 + Math.random() * 90}%`,
+                        animation: `masterpiece-sparkle-drift ${6 + Math.random() * 4}s ease-in-out infinite`,
+                        animationDelay: `${Math.random() * 4}s`,
+                      }}
+                    >
+                      <div 
+                        className="rounded-full"
+                        style={{
+                          width: '6px',
+                          height: '6px',
+                          backgroundColor: '#FFF8E8',
+                          boxShadow: '0 0 12px 6px rgba(255, 248, 232, 1), 0 0 30px 12px rgba(197, 165, 114, 0.6)',
+                          animation: `masterpiece-twinkle-bright ${2.5 + Math.random()}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 2}s`,
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* 4-pointed twinkling stars */}
+              {showRevealAnimation && (
+                <div className="absolute -inset-14 pointer-events-none overflow-visible">
+                  {[...Array(8)].map((_, i) => (
+                    <div
+                      key={`star-${i}`}
+                      className="absolute"
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        animation: `masterpiece-star-spin ${8 + Math.random() * 4}s linear infinite`,
+                        animationDelay: `${Math.random() * 3}s`,
+                      }}
+                    >
+                      <svg 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none"
+                        style={{
+                          filter: 'drop-shadow(0 0 8px rgba(197, 165, 114, 1))',
+                          animation: `masterpiece-twinkle ${3 + Math.random() * 2}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 2}s`,
+                        }}
+                      >
+                        <path 
+                          d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" 
+                          fill="#C5A572"
+                        />
+                      </svg>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Corner sparkle bursts - enhanced */}
               {showRevealAnimation && (
                 <>
-                  <div className="absolute -top-2 -left-2 w-4 h-4">
-                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)' }} />
-                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  <div className="absolute -top-3 -left-3 w-6 h-6">
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite' }} />
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.5s' }} />
+                    <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 15px 6px rgba(197, 165, 114, 0.9)' }} />
                   </div>
-                  <div className="absolute -top-2 -right-2 w-4 h-4" style={{ animationDelay: '0.2s' }}>
-                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animationDelay: '0.2s' }} />
-                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  <div className="absolute -top-3 -right-3 w-6 h-6">
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.3s' }} />
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.8s' }} />
+                    <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 15px 6px rgba(197, 165, 114, 0.9)' }} />
                   </div>
-                  <div className="absolute -bottom-2 -left-2 w-4 h-4">
-                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animationDelay: '0.4s' }} />
-                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  <div className="absolute -bottom-3 -left-3 w-6 h-6">
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.6s' }} />
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '1.1s' }} />
+                    <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 15px 6px rgba(197, 165, 114, 0.9)' }} />
                   </div>
-                  <div className="absolute -bottom-2 -right-2 w-4 h-4">
-                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animationDelay: '0.6s' }} />
-                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  <div className="absolute -bottom-3 -right-3 w-6 h-6">
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.9s' }} />
+                    <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(197, 165, 114, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '1.4s' }} />
+                    <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 15px 6px rgba(197, 165, 114, 0.9)' }} />
                   </div>
                 </>
               )}
               
               <div 
-                className={`relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer group transition-all duration-700 ${
-                  showRevealAnimation ? 'animate-fade-in-up' : ''
-                }`}
+                className="relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer group"
                 style={{ 
-                  border: '3px solid rgba(197, 165, 114, 0.4)',
+                  border: '3px solid rgba(197, 165, 114, 0.5)',
                   boxShadow: showRevealAnimation 
-                    ? '0 20px 40px rgba(0,0,0,0.4), 0 0 80px rgba(197, 165, 114, 0.4), 0 0 120px rgba(197, 165, 114, 0.2)'
+                    ? '0 25px 50px rgba(0,0,0,0.5), 0 0 100px rgba(197, 165, 114, 0.5), 0 0 150px rgba(197, 165, 114, 0.25)'
                     : '0 20px 40px rgba(0,0,0,0.4), 0 0 60px rgba(197, 165, 114, 0.15)',
+                  animation: showRevealAnimation ? 'masterpiece-image-reveal 2s cubic-bezier(0.4, 0, 0.2, 1) forwards' : 'none',
+                  transition: 'box-shadow 1s ease-out',
                 }}
                 onClick={() => setIsFullscreen(true)}
               >
@@ -1688,29 +1829,75 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   src={result.previewUrl}
                   alt="Your royal portrait masterpiece"
                   className="w-full h-auto block"
+                  style={{
+                    animation: showRevealAnimation ? 'masterpiece-image-brighten 3s ease-out forwards' : 'none',
+                  }}
                 />
                 
-                {/* Shimmer effect on reveal */}
+                {/* Initial reveal veil - golden gradient unveil */}
                 {showRevealAnimation && (
                   <div 
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                      background: 'linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.15) 50%, transparent 60%)',
-                      animation: 'shimmer 2s ease-in-out infinite',
+                      background: 'linear-gradient(180deg, rgba(197, 165, 114, 0.4) 0%, transparent 50%, rgba(197, 165, 114, 0.3) 100%)',
+                      animation: 'masterpiece-veil-fade 2.5s ease-out forwards',
                     }}
                   />
                 )}
                 
+                {/* Multiple shimmer sweeps */}
+                {showRevealAnimation && (
+                  <>
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.2) 48%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.2) 52%, transparent 70%)',
+                        animation: 'masterpiece-shimmer 4s ease-in-out infinite',
+                      }}
+                    />
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(75deg, transparent 35%, rgba(197, 165, 114, 0.15) 50%, transparent 65%)',
+                        animation: 'masterpiece-shimmer 5s ease-in-out infinite',
+                        animationDelay: '2s',
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Sparkle overlay inside image */}
+                {showRevealAnimation && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {[...Array(15)].map((_, i) => (
+                      <div
+                        key={`inner-sparkle-${i}`}
+                        className="absolute rounded-full"
+                        style={{
+                          width: '3px',
+                          height: '3px',
+                          backgroundColor: '#FFF',
+                          left: `${10 + Math.random() * 80}%`,
+                          top: `${10 + Math.random() * 80}%`,
+                          boxShadow: '0 0 6px 3px rgba(255, 255, 255, 0.8)',
+                          animation: `masterpiece-inner-sparkle ${2 + Math.random() * 2}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 3}s`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+                
                 {/* Fullscreen button overlay */}
                 <div 
-                  className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
+                  className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
                 >
                   <div 
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', border: '1px solid rgba(197, 165, 114, 0.3)' }}
                   >
-                    <svg className="w-5 h-5" style={{ color: '#F0EDE8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5" style={{ color: '#C5A572' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                     </svg>
                     <span className="text-sm font-medium" style={{ color: '#F0EDE8' }}>Tap to zoom</span>
