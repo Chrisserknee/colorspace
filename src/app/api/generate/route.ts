@@ -636,7 +636,7 @@ COMPOSITION:
 - NATURAL body position - comfortable, relaxed, at ease
 - Front paws visible, positioned naturally
 - Cloak draped naturally with realistic fabric folds
-- ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain, 1800s style mantle fastener, elegant and intricate
+- ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain, 1800s style mantle fastener, elegant and intricate silverwork
 - Authentic, genuine expression
 
 ATMOSPHERIC BACKGROUND:
@@ -2190,31 +2190,43 @@ Be VERY careful - misidentifying will cause major errors.`,
       // Soft neutral backgrounds
       "SOFT DOVE GRAY background with silvery undertones, LIGHT PEWTER silk drapery, elegant understated sophistication, refined neutral palette",
       "WARM TAUPE background with gentle depth, LIGHT CAMEL silk accents, sophisticated earth-toned elegance, timeless classic atmosphere",
-      "PALE SILVER background with cool metallic sheen, PLATINUM silk drapery, bright moonlit elegance, ethereal sophisticated glow"
+      "PALE SILVER background with cool metallic sheen, PLATINUM silk drapery, bright moonlit elegance, ethereal sophisticated glow",
+      // Gray and black backgrounds (more variety)
+      "LIGHT GRAY background with soft gradient, SILVER silk drapery, clean sophisticated neutral, bright and elegant atmosphere",
+      "MEDIUM GRAY background with subtle texture, PEWTER velvet curtain, understated refined elegance, neutral classic backdrop",
+      "SOFT SLATE GRAY background with cool undertones, SILVER-GRAY silk drapery, sophisticated neutral palette, elegant and bright",
+      "WARM GRAY background with gentle taupe undertones, LIGHT GRAY velvet drapery, refined neutral sophistication, timeless elegance",
+      "COOL GRAY background with silvery sheen, ASH GRAY silk curtain, modern classic neutral, clean sophisticated atmosphere",
+      "DEEP CHARCOAL GRAY background with rich depth, dramatic contrast with bright subject, elegant noir sophistication",
+      "DEEP BLACK background with velvety richness, STRONG DRAMATIC CONTRAST with bright fabrics and subject, theatrical elegant noir",
+      "JET BLACK background with absolute depth, MAXIMUM CONTRAST highlighting bright elements, dramatic sophisticated presence",
+      "SOFT BLACK background with subtle gray gradients, elegant dark backdrop contrasting with bright subject, refined drama",
+      "MUTED CHARCOAL background fading to black edges, sophisticated dark neutral, bright subject stands out dramatically"
     ];
     
     const lightingDirections = [
-      // Original warm upper-left variations
-      "single WARM KEY LIGHT from upper left, BRIGHTER illumination on subject, soft chiaroscuro with moderate shadows and STRONG BRIGHT WHITE highlights, sculpted fur texture, warm dark background (not pitch black), warm golden RIM HIGHLIGHTS, subtle SOFT GLOW throughout, elegant NOT gloomy",
-      "single warm KEY LIGHT from upper front-left, BRIGHTLY LIT subject with subtle SOFT GLOW overall, soft chiaroscuro lighting with moderate shadows, BRIGHT WHITE highlights on fur, warm dark background, warm golden rim light, gentle luminosity",
-      "warm KEY LIGHT from upper left creating BRIGHT illumination with subtle SOFT GLOW, soft chiaroscuro, moderate shadows contrasting with STRONG BRIGHT WHITE highlights, fur texture sculpted by light, golden rim highlights, warm dark background, gentle luminous atmosphere",
-      "single WARM KEY LIGHT upper left, BRIGHTER overall lighting on subject with subtle SOFT GLOW throughout, classic portrait lighting with moderate shadows and BRIGHT WHITE highlights, sculpted fur texture, warm golden glow around pet, gentle luminosity",
-      // Different directions
-      "dramatic KEY LIGHT from upper RIGHT, BRIGHTER illumination creating interesting shadow play, soft chiaroscuro with depth, STRONG BRIGHT WHITE highlights on fur, warm golden rim on opposite side, elegant asymmetric lighting",
-      "soft FRONTAL KEY LIGHT slightly elevated, EVEN BRIGHT illumination on face, minimal shadows for youthful effect, BRIGHT WHITE highlights throughout, gentle fill light, flattering portraiture style",
-      "three-quarter KEY LIGHT from front-right, BRIGHT illumination with classic Rembrandt triangle shadow, sculpted dimensional lighting, STRONG highlights, warm golden tones, masterful portrait technique",
-      // Mood variations
-      "GOLDEN HOUR warm light from left, sunset warmth permeating scene, RICH AMBER tones with BRIGHT highlights, elongated shadows, romantic atmospheric glow, magic hour elegance",
-      "soft DIFFUSED DAYLIGHT from above-left, BRIGHT but gentle illumination, minimal harsh shadows, airy luminosity, SOFT WHITE highlights, natural window-light effect, fresh and clear",
-      "CANDLELIT warm glow suggesting multiple soft sources, WARM GOLDEN illumination, gentle flickering quality, intimate atmosphere, BRIGHT highlights on fur tips, romantic historic ambiance",
-      "DRAMATIC Baroque lighting with strong KEY from upper left, deep shadows contrasting with BRILLIANT highlights, theatrical chiaroscuro, Caravaggio-inspired, bold and commanding",
-      // Cool tones
-      "COOL northern light from large window suggestion, BRIGHT silvery illumination, sophisticated cool tones with BRIGHT WHITE highlights, minimal warm shadows, elegant clarity",
-      "MOONLIT atmospheric lighting, COOL SILVER-BLUE key light with warm accent, mysterious romantic glow, BRIGHT highlights catching light beautifully, nocturnal elegance",
-      // Specialty effects
-      "HALO RIM LIGHT behind subject creating angelic glow, WARM KEY light from front-left, ethereal radiance around pet, BRIGHT luminous presence, heavenly portrait effect",
-      "soft BUTTERFLY LIGHTING from directly above-front, glamorous Hollywood-style illumination, BRIGHT and flattering, minimal shadows under features, star quality presence",
-      "SPLIT LIGHTING dramatic half-face illumination, KEY LIGHT from direct side, mysterious and artistic, STRONG contrast between lit and shadow sides, bold artistic choice"
+      // VERY BRIGHT primary lighting options
+      "VERY BRIGHT KEY LIGHT from upper left, INTENSELY ILLUMINATED subject, BRILLIANT WHITE highlights throughout fur, WELL-LIT and LUMINOUS, soft fill light reducing shadows, RADIANT glowing presence, bright elegant NOT dark or gloomy",
+      "EXTREMELY BRIGHT frontal lighting, subject FLOODED WITH LIGHT, BRILLIANT highlights on fur, MINIMAL SHADOWS, clean bright illumination, LUMINOUS portrait with LIGHT and AIRY feel",
+      "INTENSELY BRIGHT warm light from above-left, subject BRIGHTLY ILLUMINATED and GLOWING, STRONG WHITE highlights, soft shadows only, RADIANT warm lighting, WELL-LIT elegant atmosphere",
+      "BRILLIANT KEY LIGHT from front-left, VERY BRIGHTLY LIT subject, STRONG LUMINOUS highlights, LIGHT AND BRIGHT overall, minimal dark areas, clean professional bright portrait lighting",
+      // Bright with soft fill
+      "BRIGHT KEY LIGHT upper left with STRONG FILL LIGHT, subject WELL-ILLUMINATED from all sides, BRILLIANT highlights, SOFT MINIMAL shadows, LUMINOUS bright atmosphere, NOT dark or moody",
+      "VERY BRIGHT diffused light from above, EVENLY ILLUMINATED subject, BRILLIANT WHITE highlights, ALMOST NO SHADOWS, clean bright airy lighting, LIGHT AND LUMINOUS feel",
+      "INTENSELY BRIGHT window light effect, subject BATHED IN LIGHT, BRILLIANT highlights throughout, BRIGHT and FRESH atmosphere, minimal shadows, RADIANT elegant illumination",
+      // Directional but still bright
+      "BRIGHT KEY LIGHT from upper right, WELL-LIT subject with soft shadow play, BRILLIANT WHITE highlights on fur, LUMINOUS overall, elegant bright asymmetric lighting",
+      "STRONG BRIGHT three-quarter lighting, subject BRIGHTLY ILLUMINATED, BRILLIANT highlights sculpting form, LIGHT shadows only, RADIANT professional portrait lighting",
+      // Specialty bright effects
+      "BRILLIANT HALO RIM LIGHT creating RADIANT glow around subject, BRIGHT KEY from front, INTENSELY LUMINOUS presence, LIGHT AND ETHEREAL, angelic bright portrait effect",
+      "VERY BRIGHT butterfly lighting from above-front, GLAMOROUS BRILLIANT illumination, subject GLOWING WITH LIGHT, minimal shadows, RADIANT star quality presence",
+      "INTENSELY BRIGHT golden hour light, subject BATHED IN WARM LUMINOUS light, BRILLIANT amber highlights, LIGHT AND WARM atmosphere, RADIANT magic hour glow",
+      // Cool but still bright
+      "BRIGHT COOL northern light, SILVERY BRILLIANT illumination, WELL-LIT subject with BRIGHT WHITE highlights, LIGHT AND CLEAR atmosphere, elegant bright clarity",
+      "VERY BRIGHT diffused daylight, CLEAN BRILLIANT illumination, subject FULLY ILLUMINATED, BRIGHT WHITE highlights, MINIMAL SHADOWS, fresh light airy portrait",
+      // Studio bright
+      "PROFESSIONAL STUDIO LIGHTING very bright, subject PERFECTLY ILLUMINATED, BRILLIANT highlights, SOFT FILL everywhere, NO DARK SHADOWS, LIGHT AND RADIANT presence",
+      "BRIGHT BEAUTY LIGHTING from front, subject GLOWING WITH LIGHT, BRILLIANT even illumination, ALMOST SHADOWLESS, LUMINOUS flattering bright portrait style"
     ];
 
     // Pick random elements
@@ -2450,7 +2462,7 @@ WHAT CREATES INSTANT RECOGNITION:
 - Body ¾ VIEW, head forward or slightly angled - classical portrait posture
 - FRONT PAWS VISIBLE and resting on cushion - signature trait
 - Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
-- ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain, 1800s Victorian/Regency style mantle fastener, elegant intricate metalwork
+- ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain, 1800s Victorian/Regency style mantle fastener, elegant intricate silverwork
 - MEDIUM CLOSE-UP framing: chest to top of head (NOT full body, NOT face only)
 - Camera at pet's eye level or slightly above
 
@@ -2642,7 +2654,7 @@ FINISH QUALITY - HEAVILY AGED AND WEATHERED:
 - Nose size relative to face must match - if described as 'small nose', generate a small nose
 - Muzzle length must match - if described as 'short muzzle', generate a short muzzle
 
-FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by an ORNATE ANTIQUE CLOAK CLASP at upper chest (two decorative metal plates connected by short antique chain, 1800s style mantle fastener), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
+FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by an ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest (two decorative SILVER metal plates connected by short antique silver chain, 1800s style silver mantle fastener), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
 
 RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
 
@@ -2892,16 +2904,16 @@ CRITICAL: The ${species} must look EXACTLY like the original photo - this is a m
 - Warm, natural fur tones with soft painterly highlights and fine brushwork
 - The pet's unique identifying features must remain unchanged
 
-=== LIGHTING (Dramatic Directional Chiaroscuro with Glow - Retaining Darker Tones) ===
-- Use dramatic, directional CHIAROSCURO lighting with BRIGHTER overall illumination
-- STRONG BRIGHT HIGHLIGHT on the FACE - this is the focal point
-- DEEP SHADOW FALLOFF around the neck and into the background - RETAINING DARKER TONES
-- Single BRIGHT warm key light from upper left creating sculpted fur texture
-- Background with DARKER TONES in shadows - rich depth, retaining darker tones
-- BRIGHT warm golden RIM HIGHLIGHTS around the pet creating a GLOW
-- SUBTLE LUMINOUS GLOW throughout the image - gentle radiance and brightness
-- Subject GLOWS with BRIGHT warm light - luminous and well-lit
-- DARKER TONES retained in shadows and background for depth and contrast
+=== LIGHTING (VERY BRIGHT - Subject Well-Illuminated) ===
+- VERY BRIGHT KEY LIGHT illuminating the subject - WELL-LIT and LUMINOUS
+- STRONG BRILLIANT HIGHLIGHTS on the FACE and fur - INTENSELY ILLUMINATED
+- MINIMAL SHADOWS - use fill light to reduce dark areas
+- Subject should GLOW with BRIGHT RADIANT light - NOT dark or moody
+- BRIGHT warm highlights throughout - LUMINOUS presence
+- LIGHT AND AIRY feel - NOT heavy shadows
+- Subject is the BRIGHTEST element - clearly visible and well-lit
+- Clean, professional, BRIGHT portrait lighting
+- Soft shadows only where needed for dimension - NOT deep dark shadows
 
 === AUTOMATIC COLOR HARMONY (DEEP, RICH Colors Based on Pet's Natural Colors) ===
 Select DEEP, RICH, SATURATED cloak, cushion, drapery, and gem colors based on the pet's natural fur, eye, and nose tones. Use DEEP, RICH, SATURATED colors while retaining darker tones in shadows:
@@ -2950,16 +2962,16 @@ Apply same harmony to GEMSTONES: select DEEP RICH gems that complement pet's eye
 - Fabric GLOWS with DEEP, RICH color - saturated and luminous, retaining darker tones in folds
 - Pet's natural body and fur visible beneath the draped cloak
 
-=== ORNATE CLOAK CLASP (Mantle Fastener at Upper Chest) ===
-- ORNATE ANTIQUE METAL CLASP securing the cloak at upper chest, just below the neck
-- TWO DECORATIVE METAL PLATES connected by a SHORT ANTIQUE-STYLE CHAIN
+=== ORNATE SILVER CLOAK CLASP (Mantle Fastener at Upper Chest) ===
+- ORNATE ANTIQUE SILVER CLASP securing the cloak at upper chest, just below the neck
+- TWO DECORATIVE SILVER METAL PLATES connected by a SHORT ANTIQUE-STYLE SILVER CHAIN
 - Functions as both JEWELRY PIECE and PRACTICAL FASTENER
 - OLD-FASHIONED 1800s CLOAK CONNECTOR style - Victorian/Regency era aesthetic
-- ELEGANT and INTRICATE metalwork - filigree, scrollwork, or heraldic designs
-- VISUALLY PROMINENT but not overpowering - intentional decorative element
-- Metal matches jewelry (GOLD, SILVER, or BRONZE depending on color scheme)
+- ELEGANT and INTRICATE SILVERWORK - filigree, scrollwork, or heraldic designs
+- VISUALLY PROMINENT but not overpowering - intentional decorative silver element
+- SILVER metal with polished antique finish - catches light beautifully
 - May feature small gemstone accent, pearl, or enamel detail
-- Catches light with METALLIC SHEEN - aged patina appropriate for antique look
+- BRIGHT SILVER with aged patina - gleaming antique look
 - Positioned where cloak edges meet at the chest - functional and decorative
 
 === ANTIQUE 18TH-CENTURY JEWELRY ===
@@ -3140,7 +3152,7 @@ Museum-quality fine art, dramatic lighting, rich colors.
 COMPOSITION:
 Seated NATURALLY like a real ${species} on ${cushion} - NOT human-like pose.
 With ${robe} DRAPED over its back - NOT clothing, just draped fabric. NO human clothing elements.
-ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain, 1800s style mantle fastener.
+ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain, 1800s style silver mantle fastener.
 Adorned with ${jewelryItem}.
 ${background}.
 ${lighting}.
@@ -3249,15 +3261,15 @@ ${isBlackCatForFlux ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve DEEP
 
       const fluxPrompt = `18th-century aristocratic oil portrait. Late 18th-century European aristocratic portraiture (1770-1830 Georgian/Regency/Napoleonic era). Style of Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForFlux}${whiteCatTreatmentForFlux}${greyCatTreatmentForFlux}${blackCatTreatmentForFlux}
 
-=== LIGHTING (Brighter Dramatic Chiaroscuro with Glow - Retaining Darker Tones) ===
-- Dramatic, directional CHIAROSCURO lighting with BRIGHTER overall illumination
-- STRONG BRIGHT HIGHLIGHT on the FACE - focal point
-- DEEP SHADOW FALLOFF around neck and into background - RETAINING DARKER TONES
-- Background with DARKER TONES in shadows - rich depth, retaining darker tones
-- BRIGHT warm golden RIM HIGHLIGHTS creating a GLOW around pet
-- SUBTLE LUMINOUS GLOW throughout - gentle radiance and brightness
-- Subject GLOWS with BRIGHT warm light - well-lit and luminous
-- DARKER TONES retained in shadows and background for depth and contrast
+=== LIGHTING (VERY BRIGHT - Subject Well-Illuminated) ===
+- VERY BRIGHT KEY LIGHT illuminating the subject - WELL-LIT and LUMINOUS
+- STRONG BRILLIANT HIGHLIGHTS on the FACE and fur - INTENSELY ILLUMINATED
+- MINIMAL SHADOWS - use fill light to reduce dark areas
+- Subject should GLOW with BRIGHT RADIANT light - NOT dark or moody
+- BRIGHT warm highlights throughout - LUMINOUS presence
+- LIGHT AND AIRY feel - clean bright atmosphere
+- Subject is the BRIGHTEST element - clearly visible and RADIANT
+- Professional BRIGHT portrait lighting - NOT heavy or gloomy
 
 === AUTOMATIC COLOR HARMONY (DEEP, RICH Colors) ===
 Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's fur/eye/nose tones while retaining darker tones:
@@ -3282,8 +3294,8 @@ Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's 
 - DEEP, RICH, SATURATED fabric colors
 - WHITE FUR TRIM with BLACK ERMINE SPOTS
 - Pet's natural body visible beneath draped cloak
-- ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain
-- 1800s Victorian/Regency style MANTLE FASTENER - elegant, intricate metalwork with aged patina
+- ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain
+- 1800s Victorian/Regency style SILVER MANTLE FASTENER - elegant, intricate silverwork with polished antique patina
 
 === JEWELRY (Antique 18th-Century) ===
 - Layered MULTI-CHAIN gold necklaces, ornate FILIGREE
