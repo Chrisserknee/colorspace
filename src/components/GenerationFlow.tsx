@@ -184,6 +184,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   const [isFullscreen, setIsFullscreen] = useState(false); // Fullscreen portrait view
   const [shareBoxDissolving, setShareBoxDissolving] = useState(false); // Dissolve animation state
   const [shareBoxHidden, setShareBoxHidden] = useState(false); // Hide after animation
+  const [showRevealAnimation, setShowRevealAnimation] = useState(false); // Portrait reveal animation
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -401,6 +402,18 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
     return () => clearInterval(timerInterval);
   }, [expirationTime, stage]);
+
+  // Trigger reveal animation when entering result stage
+  useEffect(() => {
+    if (stage === "result") {
+      setShowRevealAnimation(true);
+      // Keep animation visible for a while, then fade out sparkles
+      const timer = setTimeout(() => {
+        setShowRevealAnimation(false);
+      }, 3000); // Animation lasts 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [stage]);
 
   // Compress image before upload to avoid Vercel 413 errors
   const compressImage = async (file: File, maxSizeMB: number = 3.5): Promise<File> => {
@@ -1467,11 +1480,76 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
 
             {/* Preview Image - Display Only */}
             <div className="relative max-w-[240px] sm:max-w-[300px] mx-auto mb-4">
+              {/* Outer glow effect during reveal */}
+              {showRevealAnimation && (
+                <div 
+                  className="absolute -inset-4 rounded-3xl animate-pulse"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(197, 165, 114, 0.4) 0%, rgba(197, 165, 114, 0.1) 50%, transparent 70%)',
+                    filter: 'blur(8px)',
+                  }}
+                />
+              )}
+              
+              {/* Floating sparkle particles */}
+              {showRevealAnimation && (
+                <div className="absolute -inset-8 pointer-events-none overflow-visible">
+                  {[...Array(16)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute"
+                      style={{
+                        left: `${10 + Math.random() * 80}%`,
+                        top: `${10 + Math.random() * 80}%`,
+                        animation: `float-sparkle ${2 + Math.random() * 2}s ease-in-out infinite`,
+                        animationDelay: `${Math.random() * 2}s`,
+                      }}
+                    >
+                      <div 
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor: '#C5A572',
+                          boxShadow: '0 0 8px 3px rgba(197, 165, 114, 0.8), 0 0 16px 6px rgba(197, 165, 114, 0.4)',
+                          animation: `twinkle ${0.8 + Math.random() * 0.8}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 0.5}s`,
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Corner sparkle bursts */}
+              {showRevealAnimation && (
+                <>
+                  <div className="absolute -top-2 -left-2 w-4 h-4">
+                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)' }} />
+                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-4 h-4" style={{ animationDelay: '0.2s' }}>
+                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animationDelay: '0.2s' }} />
+                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  </div>
+                  <div className="absolute -bottom-2 -left-2 w-4 h-4">
+                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animationDelay: '0.4s' }} />
+                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 w-4 h-4">
+                    <div className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: 'rgba(197, 165, 114, 0.6)', animationDelay: '0.6s' }} />
+                    <div className="absolute inset-1 rounded-full" style={{ backgroundColor: '#C5A572', boxShadow: '0 0 10px 4px rgba(197, 165, 114, 0.8)' }} />
+                  </div>
+                </>
+              )}
+              
               <div 
-                className="relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer group"
+                className={`relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer group transition-all duration-700 ${
+                  showRevealAnimation ? 'animate-fade-in-up' : ''
+                }`}
                 style={{ 
                   border: '3px solid rgba(197, 165, 114, 0.4)',
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.4), 0 0 60px rgba(197, 165, 114, 0.15)',
+                  boxShadow: showRevealAnimation 
+                    ? '0 20px 40px rgba(0,0,0,0.4), 0 0 80px rgba(197, 165, 114, 0.4), 0 0 120px rgba(197, 165, 114, 0.2)'
+                    : '0 20px 40px rgba(0,0,0,0.4), 0 0 60px rgba(197, 165, 114, 0.15)',
                 }}
                 onClick={() => setIsFullscreen(true)}
               >
@@ -1481,6 +1559,18 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   alt="Your royal portrait masterpiece"
                   className="w-full h-auto block"
                 />
+                
+                {/* Shimmer effect on reveal */}
+                {showRevealAnimation && (
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.15) 50%, transparent 60%)',
+                      animation: 'shimmer 2s ease-in-out infinite',
+                    }}
+                  />
+                )}
+                
                 {/* Fullscreen button overlay */}
                 <div 
                   className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"

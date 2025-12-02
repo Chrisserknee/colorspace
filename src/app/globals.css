@@ -875,6 +875,46 @@ a:not(.btn-primary):not(.btn-secondary):not([class*="block"]) {
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
 
+/* Portrait Reveal Sparkle Animations */
+@keyframes float-sparkle {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-8px) rotate(90deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-4px) rotate(180deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateY(-12px) rotate(270deg);
+    opacity: 1;
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* Scroll Animation Observer Classes */
 .reveal {
   opacity: 0;
