@@ -619,14 +619,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       return;
     }
     
-    // If email not captured yet, go to email capture stage first (skip for retries)
-    if (!email && !isRetry) {
-      setStage("email-capture");
-      setEmailError(null);
-      return;
-    }
-    
-    // Proceed with generation
+    // Proceed directly to generation (email captured during purchase flow, not before)
     doGenerate(isRetry);
   };
 
