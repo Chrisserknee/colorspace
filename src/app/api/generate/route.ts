@@ -359,7 +359,7 @@ async function generateWithIPAdapter(
           prompt: prompt,
           image: imageDataUrl,
           scale: ipAdapterScale,
-          negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated hands and fingers, disconnected limbs, mutation, mutated, ugly, disgusting, blurry, amputation, human face, human body, humanoid, dark, gloomy, shadowy, muted colors, dull colors",
+          negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated hands and fingers, disconnected limbs, mutation, mutated, ugly, disgusting, blurry, amputation, human face, human body, humanoid, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting",
           num_outputs: 1,
           num_inference_steps: 30,
           guidance_scale: 7.5,
@@ -677,6 +677,7 @@ too clean, too new, freshly painted, pristine, crisp edges, restored, cleaned,
 stiff pose, rigid posture, unnatural position, forced expression,
 no cracks, no aging, no patina, no weathering,
 overly refined, digitally perfect, clinical, polished, slick,
+dark, gloomy, moody, dark lighting, heavy shadows, dim, underexposed, dark atmosphere, somber,
 brown background, dark brown background, tan background, beige background, sepia background, amber background, golden-brown background, earth tone background, muddy background, brown tones, brown colors, brownish, all brown, monotone brown, dark muddy colors,
 muted colors, dull colors, grey colors, muddy colors, washed out, faded, low saturation,
 deformed, disfigured, bad anatomy, wrong proportions,
@@ -2436,9 +2437,9 @@ ${facialStructureAnalysis}
 THIS IS A ${species}. Generate a ${species}. ${notSpecies}
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring dramatic chiaroscuro lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
 
-Compositions use simple, dark backgrounds that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—DEEP REDS, GREENS, BLUES, and GOLDS—creating a regal, museum-quality atmosphere. The overall mood is noble, elegant, and historically authentic.
+Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
 
 === VIBRANT COLOR PALETTE (CRITICAL) ===
 - DEEP RICH REDS: Ruby, burgundy, crimson, wine - SATURATED and LUMINOUS
@@ -2557,11 +2558,12 @@ WEATHERED EDGE TREATMENT (CRITICAL):
 - ABSOLUTELY NOT: digital, smooth, clean, new-looking, fresh, perfect, crisp edges, or pristine
 
 === COLOR PALETTE (VIVID, SATURATED, LUMINOUS - Like Fresh Oil Paint) ===
-BACKGROUND & SHADOWS:
-- RICH warm earth tones: burnt umber, raw sienna, warm ochre, deep olive
+BACKGROUND (COLORFUL - NOT BROWN):
+- COLORFUL BACKGROUNDS: royal blue, burgundy, forest green, soft cream, dusty rose, sage green, powder blue, lavender - NEVER brown
 - GLOWING atmospheric gradients with sfumato depth - colors seem to RADIATE from within
-- Deep shadows with COLOR - not grey or muddy, but rich browns, deep burgundies, forest greens
-- Warm and LUMINOUS - as if lit from within
+- Shadows with COLOR - rich burgundies, forest greens, deep blues - NOT brown, NOT muddy
+- BRIGHT and LUMINOUS - as if lit from within
+- NEVER dark brown, tan, beige, or earth tones for backgrounds
 
 FABRICS & DRAPES:
 - SATURATED JEWEL TONES with BRILLIANT sheen: vivid ruby red, deep sapphire blue, rich emerald green, royal purple, warm amber gold
@@ -2914,9 +2916,9 @@ CRITICAL: The ${species} must look EXACTLY like the original photo - this is a m
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring dramatic chiaroscuro lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
 
-Compositions use simple, dark backgrounds that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—DEEP REDS, GREENS, BLUES, and GOLDS—creating a regal, museum-quality atmosphere. The overall mood is noble, elegant, and historically authentic.
+Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
 
 18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
 
@@ -3293,15 +3295,16 @@ ${isBlackCatForFlux ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve DEEP
 
       const fluxPrompt = `18th-century aristocratic oil portrait. Late 18th-century European aristocratic portraiture (1770-1830 Georgian/Regency/Napoleonic era). Style of Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForFlux}${whiteCatTreatmentForFlux}${greyCatTreatmentForFlux}${blackCatTreatmentForFlux}
 
-=== LIGHTING (VERY BRIGHT - Subject Well-Illuminated) ===
-- VERY BRIGHT KEY LIGHT illuminating the subject - WELL-LIT and LUMINOUS
+=== LIGHTING (EXTREMELY BRIGHT - Well-Illuminated) ===
+- EXTREMELY BRIGHT KEY LIGHT illuminating the subject - BRILLIANTLY LIT
 - STRONG BRILLIANT HIGHLIGHTS on the FACE and fur - INTENSELY ILLUMINATED
-- MINIMAL SHADOWS - use fill light to reduce dark areas
-- Subject should GLOW with BRIGHT RADIANT light - NOT dark or moody
-- BRIGHT warm highlights throughout - LUMINOUS presence
-- LIGHT AND AIRY feel - clean bright atmosphere
+- MINIMAL SHADOWS - use fill light to eliminate dark areas
+- Subject should GLOW with BRIGHT RADIANT light - NEVER dark or moody
+- BRIGHT warm highlights throughout - LUMINOUS and CHEERFUL
+- LIGHT, BRIGHT, and AIRY atmosphere - NOT gloomy, NOT dark, NOT heavy
 - Subject is the BRIGHTEST element - clearly visible and RADIANT
-- Professional BRIGHT portrait lighting - NOT heavy or gloomy
+- Professional BRIGHT portrait lighting - cheerful and uplifting
+- ABSOLUTELY NO dark moody lighting - this should feel BRIGHT and HAPPY
 
 === AUTOMATIC COLOR HARMONY (DEEP, RICH Colors) ===
 Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's fur/eye/nose tones while retaining darker tones:
@@ -3334,25 +3337,26 @@ Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's 
 - BRIGHT WHITE PEARLS and small CLUSTERED BRIGHT GEMSTONES
 - BRIGHT SPARKLING gems complement pet's natural colors
 
-=== BACKGROUND ===
+=== BACKGROUND (COLORFUL - NOT DARK) ===
 - Heavy SILKY velvet drapery with PAINTERLY FOLDS
-- Periodically use DEEP BLACK backgrounds for STRONG CONTRAST with fabrics, jewelry, and pet's natural colors
-- DEEP, RICH, SATURATED colors support harmony with pet
+- COLORFUL BACKGROUNDS: rich burgundy, deep royal blue, forest green, soft cream, dusty rose, sage green, powder blue - NEVER dark brown or black
+- BRIGHT, LUMINOUS background colors - NOT dark, NOT gloomy, NOT heavy
 - SILKY LUSTROUS texture with visible sheen
-- Atmospheric depth with DARKER TONES in shadows - retaining darker tones for depth
-- DEEP BLACK backgrounds create dramatic contrast and make colors pop
+- LIGHT and AIRY atmosphere - backgrounds should GLOW with color
+- NEVER use dark brown, black, or muddy backgrounds - keep it BRIGHT and COLORFUL
 
-=== RENDERING (Old-Master Realism with Glow) ===
+=== RENDERING (Old-Master Realism with Glow - BRIGHT) ===
 - VISIBLE BRUSHSTROKES, TEXTURED OIL PAINT, CANVAS GRAIN
 - MUSEUM-QUALITY rendering
 - LONG FLOWING brush strokes
 - Hand-painted charm with slight imperfections
 - NOT digital, NOT airbrushed, NOT too perfect
-- SUBTLE LUMINOUS GLOW throughout - gentle radiance
+- LUMINOUS GLOW throughout - BRIGHT and RADIANT
 - SILKY LUSTROUS textures on fabrics - visible sheen
-- DEEP, RICH, SATURATED colors throughout - rich jewel tones
-- DARKER TONES retained in shadows and background for depth
-- Subject GLOWS with BRIGHT warm light, fabrics GLOW with DEEP RICH color
+- VIBRANT, SATURATED colors throughout - rich jewel tones that POP
+- BRIGHT overall atmosphere - NOT dark, NOT gloomy, NOT moody
+- Subject GLOWS with BRIGHT warm light, fabrics GLOW with VIBRANT color
+- CHEERFUL and UPLIFTING mood - like a sunlit portrait
 
 === PRESERVE FROM ORIGINAL ===
 - Exact facial features, all markings, eye color, expression
