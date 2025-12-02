@@ -3429,11 +3429,11 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     let generatedBuffer = finalGeneratedBuffer;
     console.log(`Using ${refinementUsed ? "refined" : "first"} generation for final output`);
 
-    // Enhance image (brighten + sharpen) - enabled by default, disable with ENABLE_ENHANCE=false
-    const enableEnhance = process.env.ENABLE_ENHANCE !== "false"; // Default to true
+    // Enhance image (brighten + sharpen) - disabled by default, enable with ENABLE_ENHANCE=true
+    const enableEnhance = process.env.ENABLE_ENHANCE === "true"; // Default to false
     
     if (enableEnhance) {
-      console.log("=== ENHANCEMENT ENABLED (default) ===");
+      console.log("=== ENHANCEMENT ENABLED (via env) ===");
       try {
         generatedBuffer = await enhanceImage(generatedBuffer);
         console.log("✅ Image enhanced successfully (brighter + sharper)");
@@ -3441,7 +3441,7 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
         console.error("Enhancement failed, using original:", enhanceError);
       }
     } else {
-      console.log("Enhancement disabled (ENABLE_ENHANCE=false)");
+      console.log("Enhancement disabled (default - enable with ENABLE_ENHANCE=true)");
     }
 
     // Upscale image for higher resolution - enabled by default, disable with ENABLE_UPSCALE=false
