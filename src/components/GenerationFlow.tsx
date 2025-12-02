@@ -179,6 +179,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // Supabase URL for session
   const [sessionRestored, setSessionRestored] = useState(false);
   const [isClosing, setIsClosing] = useState(false); // For closing animation
+  const [shareConsent, setShareConsent] = useState<"yes" | "no" | null>(null); // Social media sharing consent
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -625,6 +626,22 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       // Set 15-minute expiration timer
       setExpirationTime(Date.now() + 15 * 60 * 1000);
       setGenerationProgress(100); // Complete the progress bar
+      
+      // Update share consent on the image (user may have clicked during generation)
+      try {
+        const consentValue = shareConsent || null; // null means they didn't click
+        await fetch("/api/generate/share-consent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            imageId: data.imageId, 
+            consent: consentValue 
+          }),
+        });
+        console.log(`📸 Share consent updated: ${consentValue || "N/A"}`);
+      } catch (err) {
+        console.warn("Failed to update share consent (non-critical):", err);
+      }
       
       // Reset secret credit after use - user must click 6 times again to enable
       if (useSecretCredit) {
@@ -1321,6 +1338,52 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             <p className="text-xs mt-4" style={{ color: '#5A5650' }}>
               This could take up to 60 seconds
             </p>
+
+            {/* Social media consent prompt */}
+            <div 
+              className="mt-6 p-4 rounded-xl text-center"
+              style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+              }}
+            >
+              <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>
+                Can we feature your pet&apos;s royal portrait on our social media?
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShareConsent("yes")}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    shareConsent === "yes" ? "scale-105" : "opacity-70 hover:opacity-100"
+                  }`}
+                  style={{
+                    backgroundColor: shareConsent === "yes" ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                    color: shareConsent === "yes" ? '#4ADE80' : '#B8B2A8',
+                    border: `1px solid ${shareConsent === "yes" ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                  }}
+                >
+                  ✓ Yes
+                </button>
+                <button
+                  onClick={() => setShareConsent("no")}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    shareConsent === "no" ? "scale-105" : "opacity-70 hover:opacity-100"
+                  }`}
+                  style={{
+                    backgroundColor: shareConsent === "no" ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                    color: shareConsent === "no" ? '#F87171' : '#B8B2A8',
+                    border: `1px solid ${shareConsent === "no" ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                  }}
+                >
+                  ✗ No
+                </button>
+              </div>
+              {shareConsent && (
+                <p className="text-xs mt-2" style={{ color: '#5A5650' }}>
+                  {shareConsent === "yes" ? "Thanks! We may feature your pet 🐾" : "No problem, we respect your privacy"}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
