@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
@@ -180,6 +180,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   const [sessionRestored, setSessionRestored] = useState(false);
   const [isClosing, setIsClosing] = useState(false); // For closing animation
   const [shareConsent, setShareConsent] = useState<"yes" | "no" | null>(null); // Social media sharing consent
+  const shareConsentRef = useRef<"yes" | "no" | null>(null); // Ref to track current consent value
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -628,8 +629,11 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       setGenerationProgress(100); // Complete the progress bar
       
       // Update share consent on the image (user may have clicked during generation)
+      // Use ref to get the CURRENT value since state may be stale in this closure
       try {
-        const consentValue = shareConsent || null; // null means they didn't click
+        const consentValue = shareConsentRef.current; // Use ref for current value
+        console.log(`📸 Share consent check: ${consentValue || "not answered"}`);
+        
         await fetch("/api/generate/share-consent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -638,7 +642,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             consent: consentValue 
           }),
         });
-        console.log(`📸 Share consent updated: ${consentValue || "N/A"}`);
+        console.log(`📸 Share consent API called for ${data.imageId}`);
       } catch (err) {
         console.warn("Failed to update share consent (non-critical):", err);
       }
@@ -1352,7 +1356,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
               </p>
               <div className="flex gap-3 justify-center">
                 <button
-                  onClick={() => setShareConsent("yes")}
+                  onClick={() => { setShareConsent("yes"); shareConsentRef.current = "yes"; }}
                   className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     shareConsent === "yes" ? "scale-105" : "opacity-70 hover:opacity-100"
                   }`}
@@ -1365,7 +1369,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   ✓ Yes
                 </button>
                 <button
-                  onClick={() => setShareConsent("no")}
+                  onClick={() => { setShareConsent("no"); shareConsentRef.current = "no"; }}
                   className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     shareConsent === "no" ? "scale-105" : "opacity-70 hover:opacity-100"
                   }`}
