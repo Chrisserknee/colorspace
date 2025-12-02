@@ -1304,6 +1304,45 @@ The refined prompt should result in a portrait the owner would INSTANTLY recogni
   return refinementPrompt;
 }
 
+// Enhance image brightness and sharpness using sharp (fast, runs locally)
+async function enhanceImage(inputBuffer: Buffer): Promise<Buffer> {
+  console.log("=== ENHANCING IMAGE (brightness + sharpness) ===");
+  console.log(`Input buffer size: ${inputBuffer.length} bytes`);
+  
+  try {
+    // Get brightness multiplier from env (default 1.15 = 15% brighter)
+    const brightnessFactor = parseFloat(process.env.ENHANCE_BRIGHTNESS || "1.15");
+    // Get sharpness sigma from env (default 0.8 = subtle sharpening)
+    const sharpnessSigma = parseFloat(process.env.ENHANCE_SHARPNESS || "0.8");
+    
+    console.log(`- Brightness factor: ${brightnessFactor} (${Math.round((brightnessFactor - 1) * 100)}% increase)`);
+    console.log(`- Sharpness sigma: ${sharpnessSigma}`);
+    
+    const enhancedBuffer = await sharp(inputBuffer)
+      // Increase brightness and slight saturation boost
+      .modulate({
+        brightness: brightnessFactor,
+        saturation: 1.1,  // 10% saturation boost for more vibrant colors
+      })
+      // Apply subtle sharpening
+      .sharpen({
+        sigma: sharpnessSigma,
+        m1: 1.0,  // Flat areas sharpening
+        m2: 2.0,  // Edge sharpening (more aggressive on edges)
+      })
+      // Slight contrast boost
+      .linear(1.05, -10)  // 5% contrast increase
+      .png({ quality: 100 })
+      .toBuffer();
+    
+    console.log(`✅ Enhancement complete. Output size: ${enhancedBuffer.length} bytes`);
+    return enhancedBuffer;
+  } catch (error) {
+    console.error("Enhancement failed, returning original:", error);
+    return inputBuffer;
+  }
+}
+
 // Upscale image using Real-ESRGAN for higher resolution (optional, controlled by env var)
 async function upscaleImage(inputBuffer: Buffer, scale: number = 2): Promise<Buffer> {
   console.log("=== UPSCALING IMAGE ===");
@@ -3383,6 +3422,21 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     // Use the final buffer (refined if available, otherwise first)
     let generatedBuffer = finalGeneratedBuffer;
     console.log(`Using ${refinementUsed ? "refined" : "first"} generation for final output`);
+
+    // Enhance image (brighten + sharpen) - enabled by default, disable with ENABLE_ENHANCE=false
+    const enableEnhance = process.env.ENABLE_ENHANCE !== "false"; // Default to true
+    
+    if (enableEnhance) {
+      console.log("=== ENHANCEMENT ENABLED (default) ===");
+      try {
+        generatedBuffer = await enhanceImage(generatedBuffer);
+        console.log("✅ Image enhanced successfully (brighter + sharper)");
+      } catch (enhanceError) {
+        console.error("Enhancement failed, using original:", enhanceError);
+      }
+    } else {
+      console.log("Enhancement disabled (ENABLE_ENHANCE=false)");
+    }
 
     // Upscale image for higher resolution - enabled by default, disable with ENABLE_UPSCALE=false
     const enableUpscale = process.env.ENABLE_UPSCALE !== "false"; // Default to true
