@@ -437,7 +437,7 @@ async function applyStyleTransfer(
       {
         input: {
           image: contentImageUrl,
-          prompt: "AUTHENTIC 300-year-old HEAVILY AGED ANTIQUE oil painting portrait, late 18th-century European aristocratic masterpiece (1770-1830), EXTREMELY ROUGH WEATHERED TEXTURE like ancient artifact, PROMINENT CRAQUELURE visible crack network throughout like cracked earth, AGED VARNISH PATINA with subtle aging, THICK SCULPTURAL IMPASTO with worn peaks, COARSE CANVAS WEAVE clearly visible throughout, WEATHERED WORN EDGES paint thinned at corners and perimeter, SIGNIFICANT SURFACE WEAR rubbed areas, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES, FOXING age spots discoloration, PET IN NATURAL RELAXED comfortable pose, VIBRANT JEWEL TONE COLORS maintained through aging, COLORFUL BACKGROUND in royal blue or burgundy or forest green or soft cream or dusty rose NOT BROWN, LOOSE FLOWING BRUSHWORK long sweeping strokes, Gainsborough LOOSE FEATHERY brushwork Reynolds glazes Vigée Le Brun elegance, DISCOVERED IN FORGOTTEN CASTLE after 300 years, LUSTROUS fabrics GLEAMING gold SPARKLING gems, ancient museum artifact quality",
+          prompt: "AUTHENTIC 300-year-old HEAVILY AGED ANTIQUE oil painting portrait, late 18th-century European aristocratic masterpiece (1770-1830), EXTREMELY ROUGH WEATHERED TEXTURE like ancient artifact, PROMINENT CRAQUELURE visible crack network throughout like cracked earth, AGED VARNISH PATINA with subtle aging, THICK SCULPTURAL IMPASTO with worn peaks, COARSE CANVAS WEAVE clearly visible throughout, WEATHERED WORN EDGES paint thinned at corners and perimeter, SIGNIFICANT SURFACE WEAR rubbed areas, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES, FOXING age spots discoloration, PET IN NATURAL RELAXED comfortable pose, VIBRANT COLORS with GOOD CONTRAST, COLORFUL BACKGROUND in emerald or teal or powder blue or sage green or soft cream or mint NOT BROWN NOT HEAVY RED, LOOSE FLOWING BRUSHWORK long sweeping strokes, Gainsborough LOOSE FEATHERY brushwork Reynolds glazes Vigée Le Brun elegance, DISCOVERED IN FORGOTTEN CASTLE after 300 years, LUSTROUS fabrics GLEAMING gold SPARKLING gems, ancient museum artifact quality",
           negative_prompt: "photograph, photo, photorealistic, modern, digital art, cartoon, anime, CGI, 3D render, blurry, low quality, watermark, gloomy, flat lighting, muted colors, dull colors, grey colors, muddy colors, brown background, dark brown background, tan background, beige background, sepia background, amber background, golden-brown, earth tones, muddy brown, brown tones, brownish, all brown, monotone brown, smooth gradients, airbrushed, plastic looking, too perfect, too smooth, too clean, too new, freshly painted, pristine, crisp clean edges, restored, cleaned, clinical, sharp edges everywhere, flat background, flat colors, no texture, no brushstrokes, no cracks, no aging, no patina, overly refined, digitally perfect, stiff pose, rigid posture, medieval, Renaissance, matte fabrics, human clothing, human-like pose, anthropomorphic, standing upright, bipedal, close-up, cropped, washed out, faded, low contrast",
           prompt_strength: styleStrength,
           num_inference_steps: 25,
@@ -637,12 +637,12 @@ COMPOSITION:
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
 - Authentic, genuine expression
 
-BACKGROUND - MUST BE COLORFUL (ABSOLUTELY NO BROWN):
-- MANDATORY COLORFUL BACKGROUND - choose ONE: deep royal blue, rich burgundy, forest green, soft cream, warm peach, dusty rose, sage green, powder blue, lavender, champagne gold, ivory white, muted teal, soft grey-blue, rich crimson
-- SFUMATO depth with COLORFUL tones receding into atmospheric haze
-- Rich draped fabrics in JEWEL TONES (NOT brown)
-- LUMINOUS and BRIGHT - backgrounds should GLOW with color
-- STRICTLY FORBIDDEN: brown, tan, beige, sepia, amber, golden-brown, earth tones, muddy colors
+BACKGROUND - LIGHT, BRIGHT, GOOD CONTRAST:
+- PREFERRED BACKGROUNDS: EMERALD green, TEAL, POWDER BLUE, SKY BLUE, SAGE GREEN, SOFT CREAM, MINT, PERIWINKLE, SOFT LAVENDER, IVORY
+- USE SPARINGLY: burgundy, crimson, deep red - only as small accents if at all
+- SFUMATO depth with LIGHT, COOL tones receding into atmospheric haze
+- LUMINOUS and BRIGHT - backgrounds should GLOW with FRESH, LIGHT color
+- STRICTLY FORBIDDEN: brown, tan, beige, sepia, amber, earth tones, muddy colors, heavy dark reds
 
 DISCOVERED IN FORGOTTEN CASTLE:
 - Looks like ANCIENT 300-year-old painting by Gainsborough, Reynolds, or Vigée Le Brun
@@ -678,7 +678,7 @@ stiff pose, rigid posture, unnatural position, forced expression,
 no cracks, no aging, no patina, no weathering,
 overly refined, digitally perfect, clinical, polished, slick,
 dark, gloomy, moody, dark lighting, heavy shadows, dim, underexposed, dark atmosphere, somber,
-brown background, dark brown background, tan background, beige background, sepia background, amber background, golden-brown background, earth tone background, muddy background, brown tones, brown colors, brownish, all brown, monotone brown, dark muddy colors,
+brown background, dark brown background, tan background, beige background, sepia background, amber background, golden-brown background, earth tone background, muddy background, brown tones, brown colors, brownish, all brown, monotone brown, dark muddy colors, heavy red background, dark red background, all red, dominant red,
 muted colors, dull colors, grey colors, muddy colors, washed out, faded, low saturation,
 deformed, disfigured, bad anatomy, wrong proportions,
 ugly, duplicate, extra limbs, missing limbs, close-up, cropped`;
@@ -2372,13 +2372,14 @@ A highly refined 18th-century European aristocratic oil-portrait style featuring
 
 Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
 
-=== VIBRANT COLOR PALETTE (CRITICAL) ===
-- DEEP RICH REDS: Ruby, burgundy, crimson, wine - SATURATED and LUMINOUS
-- DEEP RICH GREENS: Emerald, forest, hunter, jade - VIBRANT and RICH
-- DEEP RICH BLUES: Sapphire, navy, cobalt, royal blue - INTENSE and SATURATED
-- BRIGHT GOLDS: Antique gold, amber, golden highlights - GLEAMING and WARM
-- All colors should be VIBRANT, LUMINOUS, and SATURATED - NOT muted, NOT dull, NOT washed out
-- Fabrics should GLOW with rich color - jewel tones that pop
+=== VIBRANT COLOR PALETTE (CRITICAL - Prefer Blues, Greens, Light Tones) ===
+- PREFERRED COLORS: Emerald, teal, powder blue, sky blue, sage green, mint, soft lavender, periwinkle, cream, ivory
+- GREENS: Emerald, sage, mint, forest green, teal - FRESH and VIBRANT
+- BLUES: Powder blue, sky blue, sapphire, royal blue, periwinkle - BRIGHT and LUMINOUS
+- LIGHT TONES: Soft cream, ivory, champagne, soft gold - BRIGHT and AIRY
+- USE SPARINGLY: Reds, burgundy - only as small accents, NOT dominant colors
+- All colors should be VIBRANT, LUMINOUS, and create GOOD CONTRAST with the pet
+- Fabrics should GLOW with color - prefer COOL, FRESH tones over heavy warm tones
 
 === IDENTITY PRESERVATION - MOST CRITICAL ===
 This portrait MUST be instantly recognizable as THIS SPECIFIC ${species}. The owner should look at the portrait and immediately feel "That's MY pet!"
@@ -2488,13 +2489,14 @@ WEATHERED EDGE TREATMENT (CRITICAL):
 - LUSTROUS BUT AGED VARNISH: Rich patina with amber warmth, some areas more worn than others
 - ABSOLUTELY NOT: digital, smooth, clean, new-looking, fresh, perfect, crisp edges, or pristine
 
-=== COLOR PALETTE (VIVID, SATURATED, LUMINOUS - Like Fresh Oil Paint) ===
-BACKGROUND (COLORFUL - NOT BROWN):
-- COLORFUL BACKGROUNDS: royal blue, burgundy, forest green, soft cream, dusty rose, sage green, powder blue, lavender - NEVER brown
+=== COLOR PALETTE (LIGHT, BRIGHT, GOOD CONTRAST - Prefer Blues & Greens) ===
+BACKGROUND (LIGHT COLORS - GOOD CONTRAST):
+- PREFERRED: EMERALD, TEAL, POWDER BLUE, SKY BLUE, SAGE GREEN, MINT, SOFT CREAM, IVORY, PERIWINKLE, SOFT LAVENDER
+- AVOID HEAVY REDS: No dominant burgundy, crimson - use only as tiny accents
 - GLOWING atmospheric gradients with sfumato depth - colors seem to RADIATE from within
-- Shadows with COLOR - rich burgundies, forest greens, deep blues - NOT brown, NOT muddy
-- BRIGHT and LUMINOUS - as if lit from within
-- NEVER dark brown, tan, beige, or earth tones for backgrounds
+- Shadows with COLOR - forest greens, teals, deep blues - NOT brown, NOT red, NOT muddy
+- BRIGHT and LUMINOUS - LIGHT and AIRY feel
+- NEVER dark brown, tan, beige, heavy reds, or earth tones for backgrounds
 
 FABRICS & DRAPES:
 - SATURATED JEWEL TONES with BRILLIANT sheen: vivid ruby red, deep sapphire blue, rich emerald green, royal purple, warm amber gold
@@ -2853,13 +2855,14 @@ Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft 
 
 18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
 
-=== VIBRANT COLOR PALETTE (CRITICAL) ===
-- DEEP RICH REDS: Ruby, burgundy, crimson, wine - SATURATED and LUMINOUS
-- DEEP RICH GREENS: Emerald, forest, hunter, jade - VIBRANT and RICH
-- DEEP RICH BLUES: Sapphire, navy, cobalt, royal blue - INTENSE and SATURATED
-- BRIGHT GOLDS: Antique gold, amber, golden highlights - GLEAMING and WARM
-- All colors should be VIBRANT, LUMINOUS, and SATURATED - NOT muted, NOT dull, NOT washed out
-- Fabrics should GLOW with rich color - jewel tones that pop
+=== VIBRANT COLOR PALETTE (CRITICAL - Prefer Blues, Greens, Light Tones) ===
+- PREFERRED COLORS: Emerald, teal, powder blue, sky blue, sage green, mint, soft lavender, periwinkle, cream, ivory
+- GREENS: Emerald, sage, mint, forest green, teal - FRESH and VIBRANT
+- BLUES: Powder blue, sky blue, sapphire, royal blue, periwinkle - BRIGHT and LUMINOUS
+- LIGHT TONES: Soft cream, ivory, champagne, soft gold - BRIGHT and AIRY
+- USE SPARINGLY: Reds, burgundy - only as small accents, NOT dominant colors
+- All colors should be VIBRANT, LUMINOUS, and create GOOD CONTRAST with the pet
+- Fabrics should GLOW with color - prefer COOL, FRESH tones over heavy warm tones
 
 === CRITICAL PET PRESERVATION ===
 - Preserve the face structure, skull shape, snout proportions EXACTLY from the original
@@ -3237,14 +3240,16 @@ ${isBlackCatForFlux ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve DEEP
 - Professional BRIGHT portrait lighting - cheerful and uplifting
 - ABSOLUTELY NO dark moody lighting - this should feel BRIGHT and HAPPY
 
-=== AUTOMATIC COLOR HARMONY (DEEP, RICH Colors) ===
-Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's fur/eye/nose tones while retaining darker tones:
-- WARM/TAN PETS: DEEP rich blues, DEEP forest greens, RICH burgundy, DEEP teal - DEEP and SATURATED
-- BLACK/DARK PETS: RICH cream, DEEP ivory, RICH gold, DEEP emerald, DEEP sapphire, RICH lavender - DEEP and RICH
-- WHITE/PALE PETS: DEEP rich jewel tones (DEEP ruby, DEEP emerald, DEEP sapphire, RICH periwinkle) - RICH colors
-- ORANGE/GINGER PETS: DEEP teal, RICH turquoise, DEEP forest green, DEEP navy - DEEP SATURATED tones
-- GRAY/SILVER PETS: DEEP burgundy, RICH plum, DEEP amethyst, RICH gold - DEEP and RICH
-- MULTICOLOR PETS: harmonize with dominant tone using DEEP/RICH colors
+=== AUTOMATIC COLOR HARMONY (LIGHT, BRIGHT Colors - Good Contrast) ===
+Select CONTRASTING cloak, cushion, drapery colors that POP against the pet - prefer LIGHTER, BRIGHTER tones:
+- WARM/TAN PETS: EMERALD green, TEAL, SKY BLUE, POWDER BLUE, SAGE GREEN - cool colors contrast warm fur
+- BLACK/DARK PETS: SOFT CREAM, IVORY, LIGHT GOLD, MINT GREEN, POWDER BLUE, SOFT LAVENDER - light colors contrast dark fur
+- WHITE/PALE PETS: EMERALD, TEAL, SAPPHIRE BLUE, FOREST GREEN, SOFT PERIWINKLE - rich cool tones contrast white
+- ORANGE/GINGER PETS: TEAL, TURQUOISE, EMERALD, POWDER BLUE, MINT - cool blues/greens contrast orange
+- GRAY/SILVER PETS: SOFT LAVENDER, POWDER BLUE, MINT GREEN, SOFT GOLD, PERIWINKLE - soft pastels
+- MULTICOLOR PETS: harmonize with LIGHTER, COOLER tones
+- PREFER: Blues, teals, emeralds, sage greens, powder blues, soft lavenders, creams
+- AVOID: Heavy reds, dark burgundies, dark browns - use sparingly as accents only
 
 === COMPOSITION (Wide, Centered, Full Cushion) ===
 - WIDE and CENTERED composition showing FULL CUSHION
@@ -3268,13 +3273,14 @@ Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's 
 - BRIGHT WHITE PEARLS and small CLUSTERED BRIGHT GEMSTONES
 - BRIGHT SPARKLING gems complement pet's natural colors
 
-=== BACKGROUND (COLORFUL - NOT DARK) ===
+=== BACKGROUND (LIGHT, BRIGHT Colors - Good Contrast) ===
 - Heavy SILKY velvet drapery with PAINTERLY FOLDS
-- COLORFUL BACKGROUNDS: rich burgundy, deep royal blue, forest green, soft cream, dusty rose, sage green, powder blue - NEVER dark brown or black
-- BRIGHT, LUMINOUS background colors - NOT dark, NOT gloomy, NOT heavy
+- PREFERRED BACKGROUNDS: EMERALD green, TEAL, POWDER BLUE, SKY BLUE, SAGE GREEN, SOFT CREAM, IVORY, MINT, SOFT LAVENDER, PERIWINKLE
+- BRIGHT, LUMINOUS background colors - LIGHT and AIRY
 - SILKY LUSTROUS texture with visible sheen
-- LIGHT and AIRY atmosphere - backgrounds should GLOW with color
-- NEVER use dark brown, black, or muddy backgrounds - keep it BRIGHT and COLORFUL
+- LIGHT and AIRY atmosphere - backgrounds should GLOW with soft, bright color
+- AVOID: Dark browns, blacks, heavy reds, dark burgundy - keep backgrounds LIGHT and FRESH
+- Prefer COOL TONES (blues, greens, teals) over warm tones
 
 === RENDERING (Old-Master Realism with Glow - BRIGHT) ===
 - VISIBLE BRUSHSTROKES, TEXTURED OIL PAINT, CANVAS GRAIN
