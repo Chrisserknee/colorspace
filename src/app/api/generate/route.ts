@@ -2169,7 +2169,28 @@ Be VERY careful - misidentifying will cause major errors.`,
       // Unique and artistic
       "ARTIST'S STUDIO suggestion, painterly chaos in soft focus behind, OCHRE velvet curtain, creative aristocracy, Bohemian elegance",
       "MUSIC ROOM background, grand piano edge visible in shadow, SOFT ROSE silk drapery, cultured refinement, melodic atmosphere",
-      "WINTER PALACE suggestion, frost patterns and icy elegance, SILVER-WHITE silk drapery, cool sophisticated splendor, crystalline beauty"
+      "WINTER PALACE suggestion, frost patterns and icy elegance, SILVER-WHITE silk drapery, cool sophisticated splendor, crystalline beauty",
+      // Light and bright colored backgrounds
+      "SOFT SKY BLUE background with gentle gradient, LIGHT POWDER BLUE silk drapery, airy celestial atmosphere, bright and uplifting elegant mood",
+      "PALE MINT GREEN background with soft atmospheric depth, LIGHT SEAFOAM silk curtain, fresh spring garden elegance, bright cheerful aristocratic setting",
+      "LIGHT LAVENDER background with soft dreamy quality, PALE LILAC velvet drapery, romantic whimsical atmosphere, bright feminine elegance",
+      "SOFT CREAM background with warm ivory undertones, CHAMPAGNE silk drapery with gold accents, bright luminous chamber, light airy sophistication",
+      "PALE PEACH background with warm sunset glow, SOFT CORAL silk curtain, bright Mediterranean warmth, cheerful aristocratic villa feel",
+      "LIGHT DUSTY ROSE background with romantic softness, BLUSH PINK velvet drapery, bright feminine boudoir elegance, warm inviting atmosphere",
+      // Rich jewel backgrounds (lighter versions)
+      "BRIGHT EMERALD GREEN background with rich jewel-tone depth, LIGHT JADE silk drapery, vivid botanical garden elegance, saturated but bright",
+      "BRIGHT SAPPHIRE BLUE background with royal depth, LIGHT CERULEAN accents, brilliant aristocratic splendor, jewel-toned brightness",
+      "BRIGHT RUBY RED background with passionate warmth, LIGHT CORAL silk highlights, vibrant dramatic elegance, saturated royal chamber",
+      "RICH AMBER GOLD background with warm luminosity, LIGHT HONEY silk drapery, bright sun-drenched palace, golden hour warmth",
+      // Deep contrasting backgrounds
+      "RICH BLACK background with velvety depth, dramatic CONTRAST against bright subject, elegant noir sophistication, theatrical presence",
+      "DEEP CHARCOAL background fading to black edges, DRAMATIC contrast with bright fabrics, mysterious elegant atmosphere",
+      "DARK FOREST GREEN background with emerald depth, CONTRAST with bright jewels and fabrics, sophisticated woodland nobility",
+      "MIDNIGHT NAVY background with deep blue richness, DRAMATIC contrast highlighting bright elements, nocturnal regal elegance",
+      // Soft neutral backgrounds
+      "SOFT DOVE GRAY background with silvery undertones, LIGHT PEWTER silk drapery, elegant understated sophistication, refined neutral palette",
+      "WARM TAUPE background with gentle depth, LIGHT CAMEL silk accents, sophisticated earth-toned elegance, timeless classic atmosphere",
+      "PALE SILVER background with cool metallic sheen, PLATINUM silk drapery, bright moonlit elegance, ethereal sophisticated glow"
     ];
     
     const lightingDirections = [
