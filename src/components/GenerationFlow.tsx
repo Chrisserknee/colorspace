@@ -1649,18 +1649,6 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 />
               )}
               
-              {/* Rotating golden light rays */}
-              {showRevealAnimation && (
-                <div 
-                  className="absolute -inset-16 pointer-events-none"
-                  style={{
-                    background: 'conic-gradient(from 0deg, transparent, rgba(197, 165, 114, 0.15), transparent, rgba(197, 165, 114, 0.1), transparent, rgba(197, 165, 114, 0.15), transparent)',
-                    animation: 'masterpiece-rays-rotate 12s linear infinite',
-                    filter: 'blur(4px)',
-                  }}
-                />
-              )}
-              
               {/* Floating sparkle particles - Layer 1: Tiny distant stars */}
               {showRevealAnimation && (
                 <div className="absolute -inset-16 pointer-events-none overflow-visible">
@@ -1751,7 +1739,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                 </div>
               )}
               
-              {/* 4-pointed twinkling stars */}
+              {/* 4-pointed twinkling stars - gentle sway */}
               {showRevealAnimation && (
                 <div className="absolute -inset-14 pointer-events-none overflow-visible">
                   {[...Array(8)].map((_, i) => (
@@ -1761,18 +1749,18 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                       style={{
                         left: `${Math.random() * 100}%`,
                         top: `${Math.random() * 100}%`,
-                        animation: `masterpiece-star-spin ${8 + Math.random() * 4}s linear infinite`,
+                        animation: `masterpiece-star-sway ${6 + Math.random() * 4}s ease-in-out infinite`,
                         animationDelay: `${Math.random() * 3}s`,
                       }}
                     >
                       <svg 
-                        width="16" 
-                        height="16" 
+                        width="14" 
+                        height="14" 
                         viewBox="0 0 24 24" 
                         fill="none"
                         style={{
-                          filter: 'drop-shadow(0 0 8px rgba(197, 165, 114, 1))',
-                          animation: `masterpiece-twinkle ${3 + Math.random() * 2}s ease-in-out infinite`,
+                          filter: 'drop-shadow(0 0 6px rgba(197, 165, 114, 0.9))',
+                          animation: `masterpiece-twinkle ${4 + Math.random() * 3}s ease-in-out infinite`,
                           animationDelay: `${Math.random() * 2}s`,
                         }}
                       >
@@ -1819,8 +1807,8 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   boxShadow: showRevealAnimation 
                     ? '0 25px 50px rgba(0,0,0,0.5), 0 0 100px rgba(197, 165, 114, 0.5), 0 0 150px rgba(197, 165, 114, 0.25)'
                     : '0 20px 40px rgba(0,0,0,0.4), 0 0 60px rgba(197, 165, 114, 0.15)',
-                  animation: showRevealAnimation ? 'masterpiece-image-reveal 2s cubic-bezier(0.4, 0, 0.2, 1) forwards' : 'none',
-                  transition: 'box-shadow 1s ease-out',
+                  animation: showRevealAnimation ? 'masterpiece-container-reveal 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards' : 'none',
+                  transition: 'box-shadow 1.5s ease-out',
                 }}
                 onClick={() => setIsFullscreen(true)}
               >
@@ -1830,7 +1818,8 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   alt="Your royal portrait masterpiece"
                   className="w-full h-auto block"
                   style={{
-                    animation: showRevealAnimation ? 'masterpiece-image-brighten 3s ease-out forwards' : 'none',
+                    animation: showRevealAnimation ? 'masterpiece-image-fade-in 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards' : 'none',
+                    opacity: showRevealAnimation ? 0 : 1,
                   }}
                 />
                 
