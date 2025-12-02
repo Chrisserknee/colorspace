@@ -636,6 +636,7 @@ COMPOSITION:
 - NATURAL body position - comfortable, relaxed, at ease
 - Front paws visible, positioned naturally
 - Cloak draped naturally with realistic fabric folds
+- ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain, 1800s style mantle fastener, elegant and intricate
 - Authentic, genuine expression
 
 ATMOSPHERIC BACKGROUND:
@@ -2428,6 +2429,7 @@ WHAT CREATES INSTANT RECOGNITION:
 - Body ¾ VIEW, head forward or slightly angled - classical portrait posture
 - FRONT PAWS VISIBLE and resting on cushion - signature trait
 - Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
+- ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain, 1800s Victorian/Regency style mantle fastener, elegant intricate metalwork
 - MEDIUM CLOSE-UP framing: chest to top of head (NOT full body, NOT face only)
 - Camera at pet's eye level or slightly above
 
@@ -2619,7 +2621,7 @@ FINISH QUALITY - HEAVILY AGED AND WEATHERED:
 - Nose size relative to face must match - if described as 'small nose', generate a small nose
 - Muzzle length must match - if described as 'short muzzle', generate a short muzzle
 
-FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
+FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by an ORNATE ANTIQUE CLOAK CLASP at upper chest (two decorative metal plates connected by short antique chain, 1800s style mantle fastener), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
 
 RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
 
@@ -2927,6 +2929,18 @@ Apply same harmony to GEMSTONES: select DEEP RICH gems that complement pet's eye
 - Fabric GLOWS with DEEP, RICH color - saturated and luminous, retaining darker tones in folds
 - Pet's natural body and fur visible beneath the draped cloak
 
+=== ORNATE CLOAK CLASP (Mantle Fastener at Upper Chest) ===
+- ORNATE ANTIQUE METAL CLASP securing the cloak at upper chest, just below the neck
+- TWO DECORATIVE METAL PLATES connected by a SHORT ANTIQUE-STYLE CHAIN
+- Functions as both JEWELRY PIECE and PRACTICAL FASTENER
+- OLD-FASHIONED 1800s CLOAK CONNECTOR style - Victorian/Regency era aesthetic
+- ELEGANT and INTRICATE metalwork - filigree, scrollwork, or heraldic designs
+- VISUALLY PROMINENT but not overpowering - intentional decorative element
+- Metal matches jewelry (GOLD, SILVER, or BRONZE depending on color scheme)
+- May feature small gemstone accent, pearl, or enamel detail
+- Catches light with METALLIC SHEEN - aged patina appropriate for antique look
+- Positioned where cloak edges meet at the chest - functional and decorative
+
 === ANTIQUE 18TH-CENTURY JEWELRY ===
 - Layered MULTI-CHAIN gold necklaces
 - Ornate FILIGREE details
@@ -3105,12 +3119,13 @@ Museum-quality fine art, dramatic lighting, rich colors.
 COMPOSITION:
 Seated NATURALLY like a real ${species} on ${cushion} - NOT human-like pose.
 With ${robe} DRAPED over its back - NOT clothing, just draped fabric. NO human clothing elements.
+ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain, 1800s style mantle fastener.
 Adorned with ${jewelryItem}.
 ${background}.
 ${lighting}.
 Full body portrait, natural animal seated pose, all four paws visible.
 
-The ${species} should match the reference image exactly - same face, markings, colors, and expression. CRITICAL: ${species} must sit NATURALLY like a real ${species} - NOT human-like pose. NO human clothing - ONLY a cloak draped over.`;
+The ${species} should match the reference image exactly - same face, markings, colors, and expression. CRITICAL: ${species} must sit NATURALLY like a real ${species} - NOT human-like pose. NO human clothing - ONLY a cloak draped over with decorative clasp.`;
 
       // No fallback - if IP-Adapter fails, we fail
       firstGeneratedBuffer = await generateWithIPAdapter(
@@ -3246,6 +3261,8 @@ Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's 
 - DEEP, RICH, SATURATED fabric colors
 - WHITE FUR TRIM with BLACK ERMINE SPOTS
 - Pet's natural body visible beneath draped cloak
+- ORNATE ANTIQUE CLOAK CLASP at upper chest - two decorative metal plates connected by short antique chain
+- 1800s Victorian/Regency style MANTLE FASTENER - elegant, intricate metalwork with aged patina
 
 === JEWELRY (Antique 18th-Century) ===
 - Layered MULTI-CHAIN gold necklaces, ornate FILIGREE
