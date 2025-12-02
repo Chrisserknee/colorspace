@@ -45,12 +45,13 @@ interface GenerationLimits {
   purchases: number;
   packPurchases: number;
   packCredits: number;
+  bonusGranted: number; // Track total bonus generations granted via secret feature (max 13)
   lastReset?: string;
 }
 
 const getLimits = (): GenerationLimits => {
   if (typeof window === "undefined") {
-    return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0 };
+    return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0, bonusGranted: 0 };
   }
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
@@ -62,13 +63,14 @@ const getLimits = (): GenerationLimits => {
         purchases: parsed.purchases || 0,
         packPurchases: parsed.packPurchases || 0,
         packCredits: parsed.packCredits || 0,
+        bonusGranted: parsed.bonusGranted || 0,
         lastReset: parsed.lastReset,
       };
     } catch {
-      return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0 };
+      return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0, bonusGranted: 0 };
     }
   }
-  return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0 };
+  return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0, bonusGranted: 0 };
 };
 
 const saveLimits = (limits: GenerationLimits) => {
@@ -744,11 +746,23 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       
       setExpirationTime(Date.now() + 15 * 60 * 1000);
       setGenerationProgress(100); // Complete the progress bar
+      
+      // Reset secret credit after use - user must click 6 times again to activate
+      if (useSecretCredit) {
+        setUseSecretCredit(false);
+        console.log("🔒 Secret credit used and reset. Must click 6 times again to activate.");
+      }
+      
       setStage("result");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again.";
       setError(errorMessage);
       setStage("preview");
+      
+      // Also reset secret credit on error to prevent issues
+      if (useSecretCredit) {
+        setUseSecretCredit(false);
+      }
     }
   };
 
@@ -1081,17 +1095,31 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                 setSecretClickCount(newCount);
                 
                 if (newCount >= 6) {
-                  // Grant 8 extra free generations (can stack up to 15 total)
+                  // Grant 8 extra free generations (can stack up to 13 TOTAL bonus)
                   const limits = getLimits();
-                  const freeLimit = 2;
-                  const maxTotal = 15; // Maximum total free generations allowed
-                  const minFreeGen = -(maxTotal - freeLimit); // -13, allows up to 15 total
+                  const maxBonusTotal = 13; // Maximum TOTAL bonus that can ever be granted
+                  const currentBonusGranted = limits.bonusGranted || 0;
                   
-                  // Grant 8 generations by reducing used count (can go negative = bonus credits)
-                  const oldUsed = limits.freeGenerations;
-                  const newFreeGen = Math.max(minFreeGen, limits.freeGenerations - 8);
-                  const granted = oldUsed - newFreeGen;
-                  limits.freeGenerations = newFreeGen;
+                  // Check if user has already received max bonus
+                  if (currentBonusGranted >= maxBonusTotal) {
+                    console.log("❌ Maximum bonus already granted (13 total). No more bonus available.");
+                    setSecretClickCount(0);
+                    return;
+                  }
+                  
+                  // Calculate how much bonus we can still grant (up to 8, but limited by remaining capacity)
+                  const remainingBonusCapacity = maxBonusTotal - currentBonusGranted;
+                  const bonusToGrant = Math.min(8, remainingBonusCapacity);
+                  
+                  if (bonusToGrant <= 0) {
+                    console.log("❌ No bonus capacity remaining.");
+                    setSecretClickCount(0);
+                    return;
+                  }
+                  
+                  // Grant bonus by reducing freeGenerations (can go negative = bonus credits)
+                  limits.freeGenerations = limits.freeGenerations - bonusToGrant;
+                  limits.bonusGranted = currentBonusGranted + bonusToGrant; // Track total bonus granted
                   
                   saveLimits(limits);
                   setGenerationLimits(limits);
@@ -1100,17 +1128,17 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                   setSecretActivated(true);
                   setUseSecretCredit(true); // Enable un-watermarked generation for testing
                   
-                  // Reset click count to allow stacking (can click 6 more times for more bonus)
+                  // Reset click count
                   setSecretClickCount(0);
                   
-                  // Calculate total available
-                  const totalAvailable = freeLimit - limits.freeGenerations;
+                  // Calculate remaining bonus capacity
+                  const newRemainingCapacity = maxBonusTotal - limits.bonusGranted;
                   
                   // Show subtle feedback
-                  console.log(`🎉 Secret activated! +${granted} generations granted (un-watermarked). Total available: ${totalAvailable}`);
+                  console.log(`🎉 Secret activated! +${bonusToGrant} generations granted. Total bonus used: ${limits.bonusGranted}/${maxBonusTotal}. Remaining capacity: ${newRemainingCapacity}`);
                   console.log("Can generate:", newCheck.allowed);
                   
-                  // Reset activated after short delay so user can stack more
+                  // Reset activated display after short delay
                   setTimeout(() => {
                     setSecretActivated(false);
                   }, 2000);
