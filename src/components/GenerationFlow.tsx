@@ -1318,7 +1318,7 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             </p>
 
             <p className="text-xs text-center" style={{ color: '#7A756D' }}>
-              Our artists are hand-painting your portrait...
+              Bringing your royal portrait to life…
             </p>
           </div>
         )}
