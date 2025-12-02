@@ -1288,8 +1288,8 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoWidth = logoMetadata.width || 200;
   const logoHeight = logoMetadata.height || 200;
   
-  // Smaller, more subtle watermarks - about 25% of image size
-  const watermarkSize = Math.max(width, height) * 0.25;
+  // Watermarks - about 35% of image size
+  const watermarkSize = Math.max(width, height) * 0.35;
   const watermarkAspectRatio = logoWidth / logoHeight;
   const watermarkWidth = watermarkSize;
   const watermarkHeight = watermarkSize / watermarkAspectRatio;
@@ -1313,46 +1313,46 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
         </filter>
       </defs>
       
-      <!-- Just 4 corner watermarks - subtle but visible -->
+      <!-- Just 4 corner watermarks - bigger but lighter -->
       
-      <!-- Top-left corner (45% opacity - subtle) -->
+      <!-- Top-left corner (30% opacity - lighter) -->
       <image 
         x="${Math.round(width * 0.02)}" 
         y="${Math.round(height * 0.02)}" 
         width="${Math.round(watermarkWidth)}" 
         height="${Math.round(watermarkHeight)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.30"
         filter="url(#whiteBright)"
       />
-      <!-- Top-right corner (45% opacity - subtle) -->
+      <!-- Top-right corner (30% opacity - lighter) -->
       <image 
         x="${Math.round(width * 0.98 - watermarkWidth)}" 
         y="${Math.round(height * 0.02)}" 
         width="${Math.round(watermarkWidth)}" 
         height="${Math.round(watermarkHeight)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.30"
         filter="url(#whiteBright)"
       />
-      <!-- Bottom-left corner (45% opacity - subtle) -->
+      <!-- Bottom-left corner (30% opacity - lighter) -->
       <image 
         x="${Math.round(width * 0.02)}" 
         y="${Math.round(height * 0.98 - watermarkHeight)}" 
         width="${Math.round(watermarkWidth)}" 
         height="${Math.round(watermarkHeight)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.30"
         filter="url(#whiteBright)"
       />
-      <!-- Bottom-right corner (45% opacity - subtle) -->
+      <!-- Bottom-right corner (30% opacity - lighter) -->
       <image 
         x="${Math.round(width * 0.98 - watermarkWidth)}" 
         y="${Math.round(height * 0.98 - watermarkHeight)}" 
         width="${Math.round(watermarkWidth)}" 
         height="${Math.round(watermarkHeight)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.45"
+        opacity="0.30"
         filter="url(#whiteBright)"
       />
     </svg>
