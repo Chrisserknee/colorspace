@@ -182,6 +182,8 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   const [shareConsent, setShareConsent] = useState<"yes" | "no" | null>(null); // Social media sharing consent
   const shareConsentRef = useRef<"yes" | "no" | null>(null); // Ref to track current consent value
   const [isFullscreen, setIsFullscreen] = useState(false); // Fullscreen portrait view
+  const [shareBoxDissolving, setShareBoxDissolving] = useState(false); // Dissolve animation state
+  const [shareBoxHidden, setShareBoxHidden] = useState(false); // Hide after animation
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -1345,50 +1347,90 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             </p>
 
             {/* Social media consent prompt */}
-            <div 
-              className="mt-6 p-4 rounded-xl text-center"
-              style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-              }}
-            >
-              <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>
-                Can we feature your pet&apos;s royal portrait on our social media?
-              </p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={() => { setShareConsent("yes"); shareConsentRef.current = "yes"; }}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    shareConsent === "yes" ? "scale-105" : "opacity-70 hover:opacity-100"
-                  }`}
-                  style={{
-                    backgroundColor: shareConsent === "yes" ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                    color: shareConsent === "yes" ? '#4ADE80' : '#B8B2A8',
-                    border: `1px solid ${shareConsent === "yes" ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
-                  }}
-                >
-                  ✓ Yes
-                </button>
-                <button
-                  onClick={() => { setShareConsent("no"); shareConsentRef.current = "no"; }}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    shareConsent === "no" ? "scale-105" : "opacity-70 hover:opacity-100"
-                  }`}
-                  style={{
-                    backgroundColor: shareConsent === "no" ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                    color: shareConsent === "no" ? '#F87171' : '#B8B2A8',
-                    border: `1px solid ${shareConsent === "no" ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
-                  }}
-                >
-                  ✗ No
-                </button>
-              </div>
-              {shareConsent && (
-                <p className="text-xs mt-2" style={{ color: '#5A5650' }}>
-                  {shareConsent === "yes" ? "Thanks! We may feature your pet 🐾" : "No problem, we respect your privacy"}
+            {!shareBoxHidden && (
+              <div 
+                className={`mt-6 p-4 rounded-xl text-center relative overflow-hidden transition-all duration-700 ${
+                  shareBoxDissolving ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                }`}
+                style={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+              >
+                {/* Golden sparkle particles on dissolve */}
+                {shareBoxDissolving && (
+                  <>
+                    <div className="absolute inset-0 pointer-events-none">
+                      {[...Array(20)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="absolute w-1 h-1 rounded-full animate-ping"
+                          style={{
+                            backgroundColor: '#C5A572',
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDuration: `${0.5 + Math.random() * 0.5}s`,
+                            animationDelay: `${Math.random() * 0.3}s`,
+                            boxShadow: '0 0 6px 2px rgba(197, 165, 114, 0.6)',
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className="absolute inset-0 pointer-events-none" style={{
+                      background: 'radial-gradient(circle at center, rgba(197, 165, 114, 0.3) 0%, transparent 70%)',
+                      animation: 'pulse 0.5s ease-out',
+                    }} />
+                  </>
+                )}
+                
+                <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>
+                  Can we feature your pet&apos;s royal portrait on our social media?
                 </p>
-              )}
-            </div>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={() => { 
+                      setShareConsent("yes"); 
+                      shareConsentRef.current = "yes";
+                      setShareBoxDissolving(true);
+                      setTimeout(() => setShareBoxHidden(true), 800);
+                    }}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      shareConsent === "yes" ? "scale-105" : "opacity-70 hover:opacity-100"
+                    }`}
+                    style={{
+                      backgroundColor: shareConsent === "yes" ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      color: shareConsent === "yes" ? '#4ADE80' : '#B8B2A8',
+                      border: `1px solid ${shareConsent === "yes" ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                    }}
+                  >
+                    ✓ Yes
+                  </button>
+                  <button
+                    onClick={() => { 
+                      setShareConsent("no"); 
+                      shareConsentRef.current = "no";
+                      setShareBoxDissolving(true);
+                      setTimeout(() => setShareBoxHidden(true), 800);
+                    }}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      shareConsent === "no" ? "scale-105" : "opacity-70 hover:opacity-100"
+                    }`}
+                    style={{
+                      backgroundColor: shareConsent === "no" ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                      color: shareConsent === "no" ? '#F87171' : '#B8B2A8',
+                      border: `1px solid ${shareConsent === "no" ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                    }}
+                  >
+                    ✗ No
+                  </button>
+                </div>
+                {shareConsent && !shareBoxDissolving && (
+                  <p className="text-xs mt-2" style={{ color: '#5A5650' }}>
+                    {shareConsent === "yes" ? "Thanks! We may feature your pet 🐾" : "No problem, we respect your privacy"}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
