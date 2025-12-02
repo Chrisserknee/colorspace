@@ -2429,6 +2429,19 @@ ${facialStructureAnalysis}
 
 THIS IS A ${species}. Generate a ${species}. ${notSpecies}
 
+=== MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
+A highly refined 18th-century European aristocratic oil-portrait style featuring dramatic chiaroscuro lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+
+Compositions use simple, dark backgrounds that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—DEEP REDS, GREENS, BLUES, and GOLDS—creating a regal, museum-quality atmosphere. The overall mood is noble, elegant, and historically authentic.
+
+=== VIBRANT COLOR PALETTE (CRITICAL) ===
+- DEEP RICH REDS: Ruby, burgundy, crimson, wine - SATURATED and LUMINOUS
+- DEEP RICH GREENS: Emerald, forest, hunter, jade - VIBRANT and RICH
+- DEEP RICH BLUES: Sapphire, navy, cobalt, royal blue - INTENSE and SATURATED
+- BRIGHT GOLDS: Antique gold, amber, golden highlights - GLEAMING and WARM
+- All colors should be VIBRANT, LUMINOUS, and SATURATED - NOT muted, NOT dull, NOT washed out
+- Fabrics should GLOW with rich color - jewel tones that pop
+
 === IDENTITY PRESERVATION - MOST CRITICAL ===
 This portrait MUST be instantly recognizable as THIS SPECIFIC ${species}. The owner should look at the portrait and immediately feel "That's MY pet!"
 
@@ -2894,7 +2907,20 @@ CRITICAL: The ${species} must look EXACTLY like the original photo - this is a m
 
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
 
+=== MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
+A highly refined 18th-century European aristocratic oil-portrait style featuring dramatic chiaroscuro lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+
+Compositions use simple, dark backgrounds that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—DEEP REDS, GREENS, BLUES, and GOLDS—creating a regal, museum-quality atmosphere. The overall mood is noble, elegant, and historically authentic.
+
 18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
+
+=== VIBRANT COLOR PALETTE (CRITICAL) ===
+- DEEP RICH REDS: Ruby, burgundy, crimson, wine - SATURATED and LUMINOUS
+- DEEP RICH GREENS: Emerald, forest, hunter, jade - VIBRANT and RICH
+- DEEP RICH BLUES: Sapphire, navy, cobalt, royal blue - INTENSE and SATURATED
+- BRIGHT GOLDS: Antique gold, amber, golden highlights - GLEAMING and WARM
+- All colors should be VIBRANT, LUMINOUS, and SATURATED - NOT muted, NOT dull, NOT washed out
+- Fabrics should GLOW with rich color - jewel tones that pop
 
 === CRITICAL PET PRESERVATION ===
 - Preserve the face structure, skull shape, snout proportions EXACTLY from the original
