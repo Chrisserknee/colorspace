@@ -883,8 +883,8 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
           </svg>
         </button>
 
-        {/* Portrait Counter - Top left - Always visible */}
-        {stage !== "checkout" && stage !== "restoring" && (
+        {/* Portrait Counter - Top left - Hidden on result, checkout, and restoring stages */}
+        {stage !== "checkout" && stage !== "restoring" && stage !== "result" && (
           <div 
             className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 z-10"
             style={{ 
