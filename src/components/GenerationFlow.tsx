@@ -841,16 +841,17 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   if (!file && !initialEmail) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto ${isClosing ? 'pointer-events-none' : ''}`}>
+    <div className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto overscroll-contain ${isClosing ? 'pointer-events-none' : ''}`}>
       {/* Backdrop */}
       <div 
         className={`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'animate-fade-out' : ''}`}
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+        onClick={handleReset}
       />
       
-      {/* Content */}
+      {/* Content - no overflow here, let outer container handle scrolling */}
       <div 
-        className={`relative w-full max-w-md sm:max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[92vh] sm:max-h-[88vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
+        className={`relative w-full max-w-md sm:max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: '#1A1A1A',
           border: '1px solid rgba(197, 165, 114, 0.2)',

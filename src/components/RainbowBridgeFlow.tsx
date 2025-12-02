@@ -981,18 +981,19 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
   const canSubmit = gender && petName.trim().length > 0 && (limitCheck?.allowed ?? false);
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto ${isClosing ? 'pointer-events-none' : ''}`}>
+    <div className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto overscroll-contain ${isClosing ? 'pointer-events-none' : ''}`}>
       {/* Backdrop - Soft heavenly gradient */}
       <div 
         className={`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'animate-fade-out' : ''}`}
         style={{ 
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 243, 0.98) 50%, rgba(245, 240, 235, 0.95) 100%)'
         }}
+        onClick={handleReset}
       />
       
-      {/* Content */}
+      {/* Content - no overflow here, let outer container handle scrolling */}
       <div 
-        className={`relative w-full max-w-md sm:max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 max-h-[92vh] sm:max-h-[88vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
+        className={`relative w-full max-w-md sm:max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl my-2 sm:my-4 flex flex-col ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
         style={{ 
           backgroundColor: '#FFFFFF',
           border: '1px solid rgba(212, 175, 55, 0.2)',
