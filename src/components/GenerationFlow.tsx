@@ -1313,12 +1313,8 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             </div>
             
             {/* Progress percentage */}
-            <p className="text-sm font-medium mb-2" style={{ color: '#C5A572' }}>
+            <p className="text-sm font-medium" style={{ color: '#C5A572' }}>
               {Math.round(generationProgress)}%
-            </p>
-
-            <p className="text-xs text-center" style={{ color: '#7A756D' }}>
-              Bringing your royal portrait to life…
             </p>
           </div>
         )}
