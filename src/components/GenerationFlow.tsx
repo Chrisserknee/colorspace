@@ -1362,86 +1362,216 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
             {/* Social media consent prompt */}
             {!shareBoxHidden && (
               <div 
-                className={`mt-6 p-4 rounded-xl text-center relative overflow-hidden transition-all duration-700 ${
-                  shareBoxDissolving ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-                }`}
+                className="mt-6 p-4 rounded-xl text-center relative overflow-visible"
                 style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  backgroundColor: shareBoxDissolving ? 'transparent' : 'rgba(255, 255, 255, 0.03)',
+                  border: shareBoxDissolving ? '1px solid transparent' : '1px solid rgba(255, 255, 255, 0.08)',
+                  transition: 'all 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  opacity: shareBoxDissolving ? 0 : 1,
+                  transform: shareBoxDissolving ? 'scale(0.96) translateY(-12px)' : 'scale(1) translateY(0)',
+                  filter: shareBoxDissolving ? 'blur(8px)' : 'blur(0)',
                 }}
               >
-                {/* Golden sparkle particles on dissolve */}
+                {/* Elegant dissolve effect with rising golden particles */}
                 {shareBoxDissolving && (
                   <>
-                    <div className="absolute inset-0 pointer-events-none">
-                      {[...Array(20)].map((_, i) => (
+                    {/* Outer pulse ring */}
+                    <div 
+                      className="absolute -inset-4 pointer-events-none rounded-2xl"
+                      style={{
+                        border: '2px solid rgba(197, 165, 114, 0.3)',
+                        animation: 'golden-pulse-ring 1.5s ease-out forwards',
+                      }}
+                    />
+                    
+                    {/* Central golden glow burst - larger and softer */}
+                    <div 
+                      className="absolute -inset-8 pointer-events-none rounded-3xl"
+                      style={{
+                        background: 'radial-gradient(ellipse at center, rgba(197, 165, 114, 0.4) 0%, rgba(197, 165, 114, 0.15) 40%, transparent 70%)',
+                        animation: 'elegant-glow-burst 1.6s ease-out forwards',
+                      }}
+                    />
+                    
+                    {/* Rising sparkle particles - Layer 1 (tiny, fastest, many) */}
+                    <div className="absolute -inset-4 pointer-events-none overflow-visible">
+                      {[...Array(35)].map((_, i) => {
+                        const driftX = (Math.random() - 0.5) * 60;
+                        return (
+                          <div
+                            key={`tiny-${i}`}
+                            className="absolute rounded-full"
+                            style={{
+                              width: '2px',
+                              height: '2px',
+                              backgroundColor: '#E8D5B5',
+                              left: `${5 + (i * 2.8) % 90}%`,
+                              bottom: `${5 + Math.random() * 40}%`,
+                              boxShadow: '0 0 4px 1px rgba(197, 165, 114, 0.9)',
+                              animation: `particle-float-away ${1.2 + Math.random() * 0.6}s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+                              animationDelay: `${i * 0.025}s`,
+                              ['--drift-x' as string]: `${driftX}px`,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Rising sparkle particles - Layer 2 (small, medium speed) */}
+                    <div className="absolute -inset-2 pointer-events-none overflow-visible">
+                      {[...Array(20)].map((_, i) => {
+                        const driftX = (Math.random() - 0.5) * 50;
+                        return (
+                          <div
+                            key={`small-${i}`}
+                            className="absolute rounded-full"
+                            style={{
+                              width: '4px',
+                              height: '4px',
+                              backgroundColor: '#C5A572',
+                              left: `${8 + (i * 4.5) % 84}%`,
+                              bottom: `${15 + Math.random() * 35}%`,
+                              boxShadow: '0 0 8px 3px rgba(197, 165, 114, 0.8), 0 0 16px 6px rgba(197, 165, 114, 0.3)',
+                              animation: `particle-float-away ${1.4 + Math.random() * 0.5}s cubic-bezier(0.33, 0, 0.2, 1) forwards`,
+                              animationDelay: `${0.05 + i * 0.04}s`,
+                              ['--drift-x' as string]: `${driftX}px`,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Rising sparkle particles - Layer 3 (medium, slower) */}
+                    <div className="absolute inset-0 pointer-events-none overflow-visible">
+                      {[...Array(12)].map((_, i) => {
+                        const driftX = (Math.random() - 0.5) * 40;
+                        return (
+                          <div
+                            key={`medium-${i}`}
+                            className="absolute rounded-full"
+                            style={{
+                              width: '6px',
+                              height: '6px',
+                              backgroundColor: '#D4B896',
+                              left: `${12 + (i * 7) % 76}%`,
+                              bottom: `${25 + Math.random() * 35}%`,
+                              boxShadow: '0 0 12px 4px rgba(212, 184, 150, 0.9), 0 0 24px 8px rgba(197, 165, 114, 0.4)',
+                              animation: `particle-float-away ${1.6 + Math.random() * 0.4}s cubic-bezier(0.33, 0, 0.2, 1) forwards`,
+                              animationDelay: `${0.1 + i * 0.06}s`,
+                              ['--drift-x' as string]: `${driftX}px`,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Rising sparkle particles - Layer 4 (large, slowest, brightest) */}
+                    <div className="absolute inset-0 pointer-events-none overflow-visible">
+                      {[...Array(6)].map((_, i) => {
+                        const driftX = (Math.random() - 0.5) * 30;
+                        return (
+                          <div
+                            key={`large-${i}`}
+                            className="absolute rounded-full"
+                            style={{
+                              width: '8px',
+                              height: '8px',
+                              backgroundColor: '#FFF8E8',
+                              left: `${18 + (i * 12) % 64}%`,
+                              bottom: `${35 + Math.random() * 25}%`,
+                              boxShadow: '0 0 18px 6px rgba(255, 248, 232, 1), 0 0 36px 12px rgba(197, 165, 114, 0.5)',
+                              animation: `particle-float-away ${1.8 + Math.random() * 0.3}s cubic-bezier(0.33, 0, 0.2, 1) forwards`,
+                              animationDelay: `${0.15 + i * 0.08}s`,
+                              ['--drift-x' as string]: `${driftX}px`,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Elegant 4-pointed stars */}
+                    <div className="absolute -inset-6 pointer-events-none">
+                      {[...Array(8)].map((_, i) => (
                         <div
-                          key={i}
-                          className="absolute w-1 h-1 rounded-full animate-ping"
+                          key={`star-${i}`}
+                          className="absolute"
                           style={{
-                            backgroundColor: '#C5A572',
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            animationDuration: `${0.5 + Math.random() * 0.5}s`,
-                            animationDelay: `${Math.random() * 0.3}s`,
-                            boxShadow: '0 0 6px 2px rgba(197, 165, 114, 0.6)',
+                            left: `${10 + Math.random() * 80}%`,
+                            top: `${10 + Math.random() * 80}%`,
+                            animation: `star-twinkle-out ${1 + Math.random() * 0.5}s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+                            animationDelay: `${0.1 + Math.random() * 0.4}s`,
                           }}
-                        />
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path 
+                              d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" 
+                              fill="#C5A572"
+                              style={{ filter: 'drop-shadow(0 0 6px rgba(197, 165, 114, 1))' }}
+                            />
+                          </svg>
+                        </div>
                       ))}
                     </div>
-                    <div className="absolute inset-0 pointer-events-none" style={{
-                      background: 'radial-gradient(circle at center, rgba(197, 165, 114, 0.3) 0%, transparent 70%)',
-                      animation: 'pulse 0.5s ease-out',
-                    }} />
+                    
+                    {/* Shimmer sweep - softer and wider */}
+                    <div 
+                      className="absolute -inset-2 pointer-events-none rounded-xl overflow-hidden"
+                      style={{
+                        background: 'linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.15) 55%, transparent 80%)',
+                        animation: 'shimmer-sweep 1s ease-in-out forwards',
+                      }}
+                    />
                   </>
                 )}
                 
-                <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>
-                  Can we feature your pet&apos;s royal portrait on our social media?
-                </p>
-                <div className="flex gap-3 justify-center">
-                  <button
-                    onClick={() => { 
-                      setShareConsent("yes"); 
-                      shareConsentRef.current = "yes";
-                      setShareBoxDissolving(true);
-                      setTimeout(() => setShareBoxHidden(true), 800);
-                    }}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      shareConsent === "yes" ? "scale-105" : "opacity-70 hover:opacity-100"
-                    }`}
-                    style={{
-                      backgroundColor: shareConsent === "yes" ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                      color: shareConsent === "yes" ? '#4ADE80' : '#B8B2A8',
-                      border: `1px solid ${shareConsent === "yes" ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
-                    }}
-                  >
-                    ✓ Yes
-                  </button>
-                  <button
-                    onClick={() => { 
-                      setShareConsent("no"); 
-                      shareConsentRef.current = "no";
-                      setShareBoxDissolving(true);
-                      setTimeout(() => setShareBoxHidden(true), 800);
-                    }}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      shareConsent === "no" ? "scale-105" : "opacity-70 hover:opacity-100"
-                    }`}
-                    style={{
-                      backgroundColor: shareConsent === "no" ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                      color: shareConsent === "no" ? '#F87171' : '#B8B2A8',
-                      border: `1px solid ${shareConsent === "no" ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
-                    }}
-                  >
-                    ✗ No
-                  </button>
-                </div>
-                {shareConsent && !shareBoxDissolving && (
-                  <p className="text-xs mt-2" style={{ color: '#5A5650' }}>
-                    {shareConsent === "yes" ? "Thanks! We may feature your pet 🐾" : "No problem, we respect your privacy"}
+                {/* Content with elegant fade */}
+                <div style={{ 
+                  opacity: shareBoxDissolving ? 0 : 1, 
+                  transform: shareBoxDissolving ? 'scale(0.95)' : 'scale(1)',
+                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}>
+                  <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>
+                    Can we feature your pet&apos;s royal portrait on our social media?
                   </p>
-                )}
+                  <div className="flex gap-3 justify-center">
+                    <button
+                      onClick={() => { 
+                        setShareConsent("yes"); 
+                        shareConsentRef.current = "yes";
+                        setShareBoxDissolving(true);
+                        setTimeout(() => setShareBoxHidden(true), 2000);
+                      }}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                        shareConsent === "yes" ? "scale-105" : "opacity-70 hover:opacity-100 hover:scale-102"
+                      }`}
+                      style={{
+                        backgroundColor: shareConsent === "yes" ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        color: shareConsent === "yes" ? '#4ADE80' : '#B8B2A8',
+                        border: `1px solid ${shareConsent === "yes" ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                      }}
+                    >
+                      ✓ Yes
+                    </button>
+                    <button
+                      onClick={() => { 
+                        setShareConsent("no"); 
+                        shareConsentRef.current = "no";
+                        setShareBoxDissolving(true);
+                        setTimeout(() => setShareBoxHidden(true), 2000);
+                      }}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                        shareConsent === "no" ? "scale-105" : "opacity-70 hover:opacity-100 hover:scale-102"
+                      }`}
+                      style={{
+                        backgroundColor: shareConsent === "no" ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                        color: shareConsent === "no" ? '#F87171' : '#B8B2A8',
+                        border: `1px solid ${shareConsent === "no" ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                      }}
+                    >
+                      ✗ No
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
