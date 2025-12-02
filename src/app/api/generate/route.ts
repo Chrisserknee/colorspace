@@ -636,7 +636,7 @@ COMPOSITION:
 - NATURAL body position - comfortable, relaxed, at ease
 - Front paws visible, positioned naturally
 - Cloak draped naturally with realistic fabric folds
-- ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain, 1800s style mantle fastener, elegant and intricate silverwork
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
 - Authentic, genuine expression
 
 ATMOSPHERIC BACKGROUND:
@@ -840,11 +840,12 @@ VIVID SATURATED COLORS:
 - SPARKLING gems: vivid ruby, rich emerald, deep sapphire with BRILLIANT internal fire
 - VELVETY deep blacks with subtle undertones - never flat or grey
 
-AUTHENTIC OIL PAINTING LIGHTING:
-- BRILLIANT warm golden key light making everything RADIATE
-- LUMINOUS atmosphere - fabrics seem to GLOW from within
-- Rich chiaroscuro with COLORFUL shadows (warm browns, deep reds) not grey
-- GLEAMING highlights on metallic and lustrous surfaces
+AUTHENTIC OIL PAINTING LIGHTING - BRIGHT AND CHEERFUL:
+- BRILLIANT BRIGHT warm golden key light making everything RADIATE
+- LUMINOUS UPLIFTING atmosphere - fabrics seem to GLOW from within
+- VIBRANT COLORFUL palette - NOT dark, NOT gloomy, NOT moody
+- GLEAMING SPARKLING highlights on polished silver and jewelry
+- SATURATED rich colors throughout - jewel tones POP with vibrancy
 
 AUTHENTIC OIL PAINTING STYLE:
 - THICK IMPASTO texture with RAISED PAINT on highlights
@@ -2205,28 +2206,27 @@ Be VERY careful - misidentifying will cause major errors.`,
     ];
     
     const lightingDirections = [
-      // VERY BRIGHT primary lighting options
-      "VERY BRIGHT KEY LIGHT from upper left, INTENSELY ILLUMINATED subject, BRILLIANT WHITE highlights throughout fur, WELL-LIT and LUMINOUS, soft fill light reducing shadows, RADIANT glowing presence, bright elegant NOT dark or gloomy",
-      "EXTREMELY BRIGHT frontal lighting, subject FLOODED WITH LIGHT, BRILLIANT highlights on fur, MINIMAL SHADOWS, clean bright illumination, LUMINOUS portrait with LIGHT and AIRY feel",
-      "INTENSELY BRIGHT warm light from above-left, subject BRIGHTLY ILLUMINATED and GLOWING, STRONG WHITE highlights, soft shadows only, RADIANT warm lighting, WELL-LIT elegant atmosphere",
-      "BRILLIANT KEY LIGHT from front-left, VERY BRIGHTLY LIT subject, STRONG LUMINOUS highlights, LIGHT AND BRIGHT overall, minimal dark areas, clean professional bright portrait lighting",
-      // Bright with soft fill
-      "BRIGHT KEY LIGHT upper left with STRONG FILL LIGHT, subject WELL-ILLUMINATED from all sides, BRILLIANT highlights, SOFT MINIMAL shadows, LUMINOUS bright atmosphere, NOT dark or moody",
-      "VERY BRIGHT diffused light from above, EVENLY ILLUMINATED subject, BRILLIANT WHITE highlights, ALMOST NO SHADOWS, clean bright airy lighting, LIGHT AND LUMINOUS feel",
-      "INTENSELY BRIGHT window light effect, subject BATHED IN LIGHT, BRILLIANT highlights throughout, BRIGHT and FRESH atmosphere, minimal shadows, RADIANT elegant illumination",
-      // Directional but still bright
-      "BRIGHT KEY LIGHT from upper right, WELL-LIT subject with soft shadow play, BRILLIANT WHITE highlights on fur, LUMINOUS overall, elegant bright asymmetric lighting",
-      "STRONG BRIGHT three-quarter lighting, subject BRIGHTLY ILLUMINATED, BRILLIANT highlights sculpting form, LIGHT shadows only, RADIANT professional portrait lighting",
-      // Specialty bright effects
-      "BRILLIANT HALO RIM LIGHT creating RADIANT glow around subject, BRIGHT KEY from front, INTENSELY LUMINOUS presence, LIGHT AND ETHEREAL, angelic bright portrait effect",
-      "VERY BRIGHT butterfly lighting from above-front, GLAMOROUS BRILLIANT illumination, subject GLOWING WITH LIGHT, minimal shadows, RADIANT star quality presence",
-      "INTENSELY BRIGHT golden hour light, subject BATHED IN WARM LUMINOUS light, BRILLIANT amber highlights, LIGHT AND WARM atmosphere, RADIANT magic hour glow",
-      // Cool but still bright
-      "BRIGHT COOL northern light, SILVERY BRILLIANT illumination, WELL-LIT subject with BRIGHT WHITE highlights, LIGHT AND CLEAR atmosphere, elegant bright clarity",
-      "VERY BRIGHT diffused daylight, CLEAN BRILLIANT illumination, subject FULLY ILLUMINATED, BRIGHT WHITE highlights, MINIMAL SHADOWS, fresh light airy portrait",
-      // Studio bright
-      "PROFESSIONAL STUDIO LIGHTING very bright, subject PERFECTLY ILLUMINATED, BRILLIANT highlights, SOFT FILL everywhere, NO DARK SHADOWS, LIGHT AND RADIANT presence",
-      "BRIGHT BEAUTY LIGHTING from front, subject GLOWING WITH LIGHT, BRILLIANT even illumination, ALMOST SHADOWLESS, LUMINOUS flattering bright portrait style"
+      // EXTREMELY BRIGHT and COLORFUL lighting - NOT dark, NOT gloomy
+      "BRILLIANT BRIGHT KEY LIGHT flooding subject with WARM GOLDEN illumination, VIBRANT COLORFUL highlights, LUMINOUS RADIANT presence, CHEERFUL and UPLIFTING atmosphere, NO dark shadows, NOT gloomy",
+      "EXTREMELY BRIGHT and CHEERFUL lighting, subject GLOWING with WARM LIGHT, VIVID COLORFUL jewel-tone reflections from gems and fabrics, BRIGHT HAPPY atmosphere, NOT dark or moody",
+      "INTENSELY BRIGHT WARM lighting bathing subject in GOLDEN RADIANCE, COLORFUL VIBRANT highlights on gems and silver, LUMINOUS cheerful portrait, LIGHT AND AIRY feel",
+      "BRILLIANT SUNLIT quality, subject FLOODED WITH BRIGHT WARM LIGHT, VIBRANT colors popping, SPARKLING highlights on silver clasp and jewelry, UPBEAT cheerful atmosphere",
+      // Warm colorful bright
+      "VERY BRIGHT WARM KEY LIGHT, RICH SATURATED COLORS throughout, GLEAMING silver catching light, VIBRANT jewel tones, RADIANT and CHEERFUL, NOT dark NOT gloomy",
+      "EXTREMELY BRIGHT diffused warm light, VIVID COLORFUL palette, subject BATHED IN LUMINOUS GLOW, BRIGHT reflections on polished silver, HAPPY uplifting mood",
+      "BRILLIANT GOLDEN HOUR warmth, SATURATED VIBRANT COLORS, SPARKLING highlights everywhere, CHEERFUL BRIGHT atmosphere, RADIANT elegant presence",
+      // Bright with color emphasis
+      "INTENSELY BRIGHT lighting with RICH COLOR SATURATION, VIVID reds blues greens golds, GLEAMING polished silver, LUMINOUS and VIBRANT, NOT muted NOT dark",
+      "VERY BRIGHT COLORFUL illumination, SATURATED jewel tones POP, BRILLIANT white highlights, CHEERFUL RADIANT mood, subject GLOWING with WARM LIGHT",
+      // Professional bright colorful
+      "PROFESSIONAL BRIGHT LIGHTING with ENHANCED COLOR VIBRANCY, subject PERFECTLY ILLUMINATED, RICH SATURATED palette, SPARKLING silver accents, UPLIFTING atmosphere",
+      "STUDIO BRIGHT with WARM FILL, VIVID COLORFUL rendering, NO DARK SHADOWS, BRILLIANT highlights on fur and fabrics, CHEERFUL NOT gloomy",
+      // Specialty bright colorful
+      "BRILLIANT HALO LIGHT with COLORFUL VIBRANCY, RADIANT glowing subject, SATURATED rich tones, GLEAMING silver catching every light, ETHEREAL and BRIGHT",
+      "VERY BRIGHT GLAMOUR lighting, VIVID COLORFUL palette, subject GLOWING RADIANTLY, SPARKLING BRILLIANT highlights, CHEERFUL elegant atmosphere",
+      // Golden warm bright
+      "INTENSELY BRIGHT GOLDEN WARM light, RICH SATURATED COLORS, LUMINOUS RADIANT subject, VIBRANT jewel tones, GLEAMING polished silver, UPLIFTING mood",
+      "BRILLIANT WARM SUNSHINE quality, VIVID COLORFUL atmosphere, BRIGHT and CHEERFUL, SPARKLING highlights throughout, NOT dark NOT moody NOT gloomy"
     ];
 
     // Pick random elements
@@ -2462,7 +2462,7 @@ WHAT CREATES INSTANT RECOGNITION:
 - Body ¾ VIEW, head forward or slightly angled - classical portrait posture
 - FRONT PAWS VISIBLE and resting on cushion - signature trait
 - Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
-- ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain, 1800s Victorian/Regency style mantle fastener, elegant intricate silverwork
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest PROPERLY SECURING THE CLOAK - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, clasp HOLDS THE CLOAK TOGETHER at the chest
 - MEDIUM CLOSE-UP framing: chest to top of head (NOT full body, NOT face only)
 - Camera at pet's eye level or slightly above
 
@@ -2654,7 +2654,7 @@ FINISH QUALITY - HEAVILY AGED AND WEATHERED:
 - Nose size relative to face must match - if described as 'small nose', generate a small nose
 - Muzzle length must match - if described as 'short muzzle', generate a short muzzle
 
-FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by an ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest (two decorative SILVER metal plates connected by short antique silver chain, 1800s style silver mantle fastener), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
+FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by a BRIGHT POLISHED SILVER CLOAK CLASP at upper chest HOLDING THE CLOAK CLOSED (two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver that catches the light), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
 
 RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
 
@@ -2962,13 +2962,13 @@ Apply same harmony to GEMSTONES: select DEEP RICH gems that complement pet's eye
 - Fabric GLOWS with DEEP, RICH color - saturated and luminous, retaining darker tones in folds
 - Pet's natural body and fur visible beneath the draped cloak
 
-=== ORNATE SILVER CLOAK CLASP (Mantle Fastener at Upper Chest) ===
-- ORNATE ANTIQUE SILVER CLASP securing the cloak at upper chest, just below the neck
-- TWO DECORATIVE SILVER METAL PLATES connected by a SHORT ANTIQUE-STYLE SILVER CHAIN
-- Functions as both JEWELRY PIECE and PRACTICAL FASTENER
-- OLD-FASHIONED 1800s CLOAK CONNECTOR style - Victorian/Regency era aesthetic
-- ELEGANT and INTRICATE SILVERWORK - filigree, scrollwork, or heraldic designs
-- VISUALLY PROMINENT but not overpowering - intentional decorative silver element
+=== BRIGHT POLISHED SILVER CLOAK CLASP (Fastener Securing Cloak at Upper Chest) ===
+- BRIGHT SHINY POLISHED SILVER CLASP that PROPERLY SECURES and CONNECTS the cloak at upper chest
+- TWO GLEAMING SILVER METAL PLATES connected by a BRIGHT REFLECTIVE SILVER CHAIN
+- CLASP HOLDS THE CLOAK TOGETHER - fabric gathered and fastened by the clasp
+- HIGHLY REFLECTIVE polished silver finish that CATCHES THE LIGHT brilliantly
+- ELEGANT silverwork with BRIGHT LUMINOUS SHINE - not dull or antiqued
+- The clasp is the FUNCTIONAL CONNECTOR that keeps the cloak closed and draped properly
 - SILVER metal with polished antique finish - catches light beautifully
 - May feature small gemstone accent, pearl, or enamel detail
 - BRIGHT SILVER with aged patina - gleaming antique look
@@ -3152,7 +3152,7 @@ Museum-quality fine art, dramatic lighting, rich colors.
 COMPOSITION:
 Seated NATURALLY like a real ${species} on ${cushion} - NOT human-like pose.
 With ${robe} DRAPED over its back - NOT clothing, just draped fabric. NO human clothing elements.
-ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain, 1800s style silver mantle fastener.
+BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver that catches the light.
 Adorned with ${jewelryItem}.
 ${background}.
 ${lighting}.
@@ -3294,8 +3294,8 @@ Select DEEP, RICH, SATURATED cloak, cushion, drapery, gem colors based on pet's 
 - DEEP, RICH, SATURATED fabric colors
 - WHITE FUR TRIM with BLACK ERMINE SPOTS
 - Pet's natural body visible beneath draped cloak
-- ORNATE ANTIQUE SILVER CLOAK CLASP at upper chest - two decorative SILVER metal plates connected by short antique silver chain
-- 1800s Victorian/Regency style SILVER MANTLE FASTENER - elegant, intricate silverwork with polished antique patina
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK TOGETHER
+- Two GLEAMING SHINY silver plates connected by BRIGHT silver chain - HIGHLY REFLECTIVE finish that catches the light brilliantly
 
 === JEWELRY (Antique 18th-Century) ===
 - Layered MULTI-CHAIN gold necklaces, ornate FILIGREE
@@ -3456,13 +3456,12 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     let generatedBuffer = finalGeneratedBuffer;
     console.log(`Using ${refinementUsed ? "refined" : "first"} generation for final output`);
 
-    // OPTIONAL: Upscale image for higher resolution (controlled by ENABLE_UPSCALE env var)
-    // This is experimental - enable on dev server to test
-    const enableUpscale = process.env.ENABLE_UPSCALE === "true";
+    // Upscale image for higher resolution - enabled by default, disable with ENABLE_UPSCALE=false
+    const enableUpscale = process.env.ENABLE_UPSCALE !== "false"; // Default to true
     const upscaleScale = parseInt(process.env.UPSCALE_SCALE || "2"); // 2x or 4x
     
     if (enableUpscale) {
-      console.log("=== UPSCALE ENABLED ===");
+      console.log("=== UPSCALE ENABLED (default) ===");
       console.log(`Upscaling by ${upscaleScale}x...`);
       try {
         generatedBuffer = await upscaleImage(generatedBuffer, upscaleScale);
@@ -3472,7 +3471,7 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
         // Continue with original buffer
       }
     } else {
-      console.log("Upscale disabled (set ENABLE_UPSCALE=true to enable)");
+      console.log("Upscale disabled (ENABLE_UPSCALE=false)");
     }
 
     // For Rainbow Bridge, select a quote (text overlay is rendered client-side for reliable font support)
