@@ -340,15 +340,33 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
   useEffect(() => {
     if (stage !== "generating" || !generationStartTime) return;
 
-    const expectedDuration = 50000; // 50 seconds expected
+    // Multi-phase progress for more accurate feel
+    // Phase 1 (0-20%): Upload & queue - fast (0-5 seconds)
+    // Phase 2 (20-70%): Main generation - moderate (5-40 seconds)
+    // Phase 3 (70-90%): Finishing & watermarking - slower (40-55 seconds)
+    // Phase 4 (90-95%): Buffer zone - very slow (55-70 seconds)
     const updateInterval = setInterval(() => {
       const elapsed = Date.now() - generationStartTime;
-      // Use an easing function that slows down as it approaches 95%
-      // This creates a more natural feeling progress bar
-      const linearProgress = Math.min(elapsed / expectedDuration, 1);
-      // Ease out - fast at start, slows near end, caps at 95% until complete
-      const easedProgress = Math.min(95, linearProgress * 100 * (2 - linearProgress));
-      setGenerationProgress(easedProgress);
+      
+      let progress: number;
+      if (elapsed < 5000) {
+        // Phase 1: Quick start (0-20% in 5 seconds)
+        progress = (elapsed / 5000) * 20;
+      } else if (elapsed < 40000) {
+        // Phase 2: Main generation (20-70% over 35 seconds)
+        progress = 20 + ((elapsed - 5000) / 35000) * 50;
+      } else if (elapsed < 55000) {
+        // Phase 3: Finishing up (70-90% over 15 seconds)
+        progress = 70 + ((elapsed - 40000) / 15000) * 20;
+      } else if (elapsed < 75000) {
+        // Phase 4: Buffer zone with very slow progress (90-95% over 20 seconds)
+        progress = 90 + ((elapsed - 55000) / 20000) * 5;
+      } else {
+        // Cap at 95% - waiting for actual completion
+        progress = 95;
+      }
+      
+      setGenerationProgress(Math.min(95, progress));
     }, 100);
 
     return () => clearInterval(updateInterval);
