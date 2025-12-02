@@ -1295,6 +1295,96 @@ The refined prompt should result in a portrait the owner would INSTANTLY recogni
   return refinementPrompt;
 }
 
+// Upscale image using Real-ESRGAN for higher resolution (optional, controlled by env var)
+async function upscaleImage(inputBuffer: Buffer, scale: number = 2): Promise<Buffer> {
+  console.log("=== UPSCALING IMAGE ===");
+  console.log(`Input buffer size: ${inputBuffer.length} bytes`);
+  console.log(`Target scale: ${scale}x`);
+  
+  if (!process.env.REPLICATE_API_TOKEN) {
+    console.warn("REPLICATE_API_TOKEN not set, skipping upscale");
+    return inputBuffer;
+  }
+  
+  const replicate = new Replicate({
+    auth: process.env.REPLICATE_API_TOKEN,
+  });
+  
+  // Get original dimensions
+  const metadata = await sharp(inputBuffer).metadata();
+  const originalWidth = metadata.width || 1024;
+  const originalHeight = metadata.height || 1024;
+  console.log(`Original dimensions: ${originalWidth}x${originalHeight}`);
+  
+  // Convert buffer to base64 data URL
+  const base64Image = inputBuffer.toString("base64");
+  const mimeType = metadata.format === "png" ? "image/png" : "image/jpeg";
+  const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
+  
+  try {
+    // Use Real-ESRGAN for high-quality upscaling
+    // Model: nightmareai/real-esrgan - great for artistic images
+    console.log("Running Real-ESRGAN upscaler...");
+    const startTime = Date.now();
+    
+    const output = await replicate.run(
+      "nightmareai/real-esrgan:f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
+      {
+        input: {
+          image: imageDataUrl,
+          scale: scale, // 2x or 4x
+          face_enhance: false, // Not for faces, just general upscale
+        }
+      }
+    );
+    
+    const elapsedTime = Date.now() - startTime;
+    console.log(`Upscale completed in ${elapsedTime}ms`);
+    
+    // Handle output - could be string URL or FileOutput object
+    let upscaledBuffer: Buffer;
+    
+    if (typeof output === "string") {
+      // Direct URL string
+      console.log("Downloading upscaled image from URL...");
+      const response = await fetch(output);
+      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
+      upscaledBuffer = Buffer.from(await response.arrayBuffer());
+    } else if (output && typeof output === "object") {
+      // FileOutput object from Replicate SDK
+      const outputObj = output as { url?: () => string } | string;
+      let downloadUrl: string;
+      
+      if (typeof outputObj === "string") {
+        downloadUrl = outputObj;
+      } else if ("url" in outputObj && typeof outputObj.url === "function") {
+        downloadUrl = outputObj.url();
+      } else {
+        downloadUrl = String(output);
+      }
+      
+      console.log("Downloading upscaled image...");
+      const response = await fetch(downloadUrl);
+      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
+      upscaledBuffer = Buffer.from(await response.arrayBuffer());
+    } else {
+      throw new Error("Unexpected output format from upscaler");
+    }
+    
+    // Get new dimensions
+    const newMetadata = await sharp(upscaledBuffer).metadata();
+    console.log(`Upscaled dimensions: ${newMetadata.width}x${newMetadata.height}`);
+    console.log(`Upscaled buffer size: ${upscaledBuffer.length} bytes`);
+    console.log("✅ Upscale successful");
+    
+    return upscaledBuffer;
+  } catch (error) {
+    console.error("Upscale error:", error);
+    console.warn("Falling back to original image");
+    return inputBuffer; // Return original on failure
+  }
+}
+
 // Create watermarked version of image with LumePet logo
 async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const image = sharp(inputBuffer);
@@ -3315,6 +3405,25 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     // Use the final buffer (refined if available, otherwise first)
     let generatedBuffer = finalGeneratedBuffer;
     console.log(`Using ${refinementUsed ? "refined" : "first"} generation for final output`);
+
+    // OPTIONAL: Upscale image for higher resolution (controlled by ENABLE_UPSCALE env var)
+    // This is experimental - enable on dev server to test
+    const enableUpscale = process.env.ENABLE_UPSCALE === "true";
+    const upscaleScale = parseInt(process.env.UPSCALE_SCALE || "2"); // 2x or 4x
+    
+    if (enableUpscale) {
+      console.log("=== UPSCALE ENABLED ===");
+      console.log(`Upscaling by ${upscaleScale}x...`);
+      try {
+        generatedBuffer = await upscaleImage(generatedBuffer, upscaleScale);
+        console.log("✅ Image upscaled successfully");
+      } catch (upscaleError) {
+        console.error("Upscale failed, using original resolution:", upscaleError);
+        // Continue with original buffer
+      }
+    } else {
+      console.log("Upscale disabled (set ENABLE_UPSCALE=true to enable)");
+    }
 
     // For Rainbow Bridge, select a quote (text overlay is rendered client-side for reliable font support)
     let selectedQuote: string | null = null;
