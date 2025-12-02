@@ -1370,11 +1370,6 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
                   className="w-full h-auto block"
                 />
               </div>
-              {/* Decorative corner accents */}
-              <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: '#C5A572' }}></div>
-              <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: '#C5A572' }}></div>
-              <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: '#C5A572' }}></div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: '#C5A572' }}></div>
             </div>
 
             {/* Urgency Timer */}
