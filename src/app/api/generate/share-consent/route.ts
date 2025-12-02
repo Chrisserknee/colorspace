@@ -33,45 +33,75 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Download the HD image from pet-portraits bucket
+    // Download and copy both HD (unwatermarked) and preview (watermarked) images
     const hdPath = `${imageId}-hd.png`;
+    const previewPath = `${imageId}-preview.png`;
     
-    const { data: fileData, error: downloadError } = await supabase.storage
+    // Download HD image
+    const { data: hdData, error: hdDownloadError } = await supabase.storage
       .from("pet-portraits")
       .download(hdPath);
 
-    if (downloadError || !fileData) {
-      console.error("Error downloading image for sharing:", downloadError);
+    if (hdDownloadError || !hdData) {
+      console.error("Error downloading HD image for sharing:", hdDownloadError);
       return NextResponse.json({ 
         success: false, 
-        error: "Could not find image to share"
+        error: "Could not find HD image to share"
       }, { status: 404 });
     }
 
-    // Upload to Shareable_Pet_Portraits bucket
-    const shareablePath = `${imageId}-hd.png`;
-    
-    const { error: uploadError } = await supabase.storage
+    // Download preview (watermarked) image
+    const { data: previewData, error: previewDownloadError } = await supabase.storage
+      .from("pet-portraits")
+      .download(previewPath);
+
+    if (previewDownloadError || !previewData) {
+      console.error("Error downloading preview image for sharing:", previewDownloadError);
+      // Continue with just HD if preview not found
+    }
+
+    // Upload HD to Shareable_Pet_Portraits bucket
+    const { error: hdUploadError } = await supabase.storage
       .from("Shareable_Pet_Portraits")
-      .upload(shareablePath, fileData, {
+      .upload(`${imageId}-hd.png`, hdData, {
         contentType: "image/png",
-        upsert: true // Overwrite if exists
+        upsert: true
       });
 
-    if (uploadError) {
-      console.error("Error uploading to shareable bucket:", uploadError);
+    if (hdUploadError) {
+      console.error("Error uploading HD to shareable bucket:", hdUploadError);
       return NextResponse.json({ 
         success: false, 
-        error: "Could not copy to shareable bucket"
+        error: "Could not copy HD to shareable bucket"
       }, { status: 500 });
     }
 
-    console.log(`✅ Image copied to Shareable_Pet_Portraits: ${shareablePath}`);
+    console.log(`✅ HD image copied to Shareable_Pet_Portraits: ${imageId}-hd.png`);
+
+    // Upload preview (watermarked) to Shareable_Pet_Portraits bucket
+    if (previewData) {
+      const { error: previewUploadError } = await supabase.storage
+        .from("Shareable_Pet_Portraits")
+        .upload(`${imageId}-preview.png`, previewData, {
+          contentType: "image/png",
+          upsert: true
+        });
+
+      if (previewUploadError) {
+        console.error("Error uploading preview to shareable bucket:", previewUploadError);
+        // Non-critical, HD was already uploaded
+      } else {
+        console.log(`✅ Preview (watermarked) image copied to Shareable_Pet_Portraits: ${imageId}-preview.png`);
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 
       shared: true,
-      path: shareablePath
+      files: {
+        hd: `${imageId}-hd.png`,
+        preview: previewData ? `${imageId}-preview.png` : null
+      }
     });
 
   } catch (error) {
