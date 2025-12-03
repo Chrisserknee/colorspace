@@ -10,6 +10,7 @@ import ContactModal from "@/components/Contact";
 import Footer from "@/components/Footer";
 import UploadModal from "@/components/UploadModal";
 import GenerationFlow from "@/components/GenerationFlow";
+import ResumeButton from "@/components/ResumeButton";
 
 // Helper to convert data URL to File
 const dataURLtoFile = (dataurl: string, filename: string): File | null => {
@@ -141,6 +142,11 @@ export default function Home() {
           onReset={handleReset} 
           initialEmail={initialEmail}
         />
+      )}
+
+      {/* Resume Button - shows when not in flow */}
+      {!selectedFile && !showFlowFromEmail && (
+        <ResumeButton variant="lumepet" />
       )}
     </main>
   );

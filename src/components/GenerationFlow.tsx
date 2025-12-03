@@ -669,6 +669,17 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
         console.log("🔒 Secret credit used and reset. Must click 6 times again to activate.");
       }
       
+      // Save session to localStorage for "Resume" feature
+      const sessionData = {
+        email: email,
+        imageId: data.imageId,
+        previewUrl: data.previewUrl,
+        timestamp: Date.now(),
+        type: 'lumepet',
+      };
+      localStorage.setItem('lumepet_last_session', JSON.stringify(sessionData));
+      console.log("💾 Session saved for resume feature");
+      
       setStage("result");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again.";

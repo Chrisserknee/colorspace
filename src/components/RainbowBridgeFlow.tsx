@@ -147,6 +147,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // Supabase URL for session
   const [sessionRestored, setSessionRestored] = useState(false);
   const [isClosing, setIsClosing] = useState(false); // For closing animation
+  const [showRevealAnimation, setShowRevealAnimation] = useState(false); // Portrait reveal animation
 
   // Function to render text overlay on canvas and return data URL
   const renderTextOverlay = useCallback(async (imageUrl: string, name: string, quote: string): Promise<string> => {
@@ -523,6 +524,18 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
     return () => clearInterval(timerInterval);
   }, [expirationTime, stage]);
 
+  // Trigger reveal animation when entering result stage
+  useEffect(() => {
+    if (stage === "result") {
+      setShowRevealAnimation(true);
+      // Keep animation visible for a while, then fade out sparkles
+      const timer = setTimeout(() => {
+        setShowRevealAnimation(false);
+      }, 6000); // Animation lasts 6 seconds for dramatic effect
+      return () => clearTimeout(timer);
+    }
+  }, [stage]);
+
   // Compress image before upload
   const compressImage = async (file: File, maxSizeMB: number = 3.5): Promise<File> => {
     return new Promise((resolve) => {
@@ -745,6 +758,18 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
         setUseSecretCredit(false);
         console.log("🔒 Secret credit used and reset. Must click 6 times again to activate.");
       }
+      
+      // Save session to localStorage for "Resume" feature
+      const sessionData = {
+        email: email,
+        imageId: result?.imageId || '',
+        previewUrl: result?.previewUrl || '',
+        petName: petName,
+        timestamp: Date.now(),
+        type: 'rainbow-bridge',
+      };
+      localStorage.setItem('lumepet_last_session', JSON.stringify(sessionData));
+      console.log("💾 Rainbow Bridge session saved for resume feature");
       
       setStage("result");
     } catch (err) {
@@ -1454,28 +1479,222 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
         {/* Result Stage - Premium Memorial Purchase Experience */}
         {stage === "result" && result && result.imageId !== "pack" && (
           <div className="p-4 sm:p-6 pb-6">
-            {/* Celebratory Header */}
+            {/* Celebratory Header - with staggered reveal */}
             <div className="text-center mb-4">
-              <p className="text-sm mb-1" style={{ color: '#D4AF37' }}>🌈 It&apos;s ready!</p>
+              <p 
+                className="text-sm mb-1" 
+                style={{ 
+                  color: '#D4AF37',
+                  animation: showRevealAnimation ? 'masterpiece-text-reveal 1.5s ease-out forwards' : 'none',
+                  animationDelay: '0.3s',
+                  opacity: showRevealAnimation ? 0 : 1,
+                }}
+              >
+                🌈 It&apos;s ready! 🌈
+              </p>
               <h3 
                 className="text-2xl sm:text-3xl font-semibold"
                 style={{ 
                   fontFamily: "'Cormorant Garamond', Georgia, serif", 
-                  color: '#4A4A4A', 
+                  color: '#4A4A4A',
+                  animation: showRevealAnimation ? 'masterpiece-title-reveal 2s ease-out forwards' : 'none',
+                  animationDelay: '0.6s',
+                  opacity: showRevealAnimation ? 0 : 1,
+                  textShadow: showRevealAnimation ? '0 0 30px rgba(212, 175, 55, 0.4)' : 'none',
                 }}
               >
                 {petName}&apos;s Memorial Portrait
               </h3>
             </div>
 
-            {/* Preview Image - Display Only */}
+            {/* Preview Image - Display Only with reveal animation */}
             {(canvasImageUrl || result.previewUrl) && (
               <div className="relative max-w-[240px] sm:max-w-[300px] mx-auto mb-4">
+                {/* Outermost ethereal glow - pulsing slowly */}
+                {showRevealAnimation && (
+                  <div 
+                    className="absolute -inset-12 rounded-full pointer-events-none"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.08) 40%, transparent 70%)',
+                      filter: 'blur(20px)',
+                      animation: 'masterpiece-outer-glow 4s ease-in-out infinite',
+                    }}
+                  />
+                )}
+                
+                {/* Inner intense glow */}
+                {showRevealAnimation && (
+                  <div 
+                    className="absolute -inset-6 rounded-3xl pointer-events-none"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(212, 175, 55, 0.5) 0%, rgba(212, 175, 55, 0.2) 40%, transparent 70%)',
+                      filter: 'blur(12px)',
+                      animation: 'masterpiece-inner-glow 3s ease-in-out infinite',
+                      animationDelay: '0.5s',
+                    }}
+                  />
+                )}
+                
+                {/* Floating sparkle particles - Layer 1: Tiny distant stars */}
+                {showRevealAnimation && (
+                  <div className="absolute -inset-16 pointer-events-none overflow-visible">
+                    {[...Array(40)].map((_, i) => (
+                      <div
+                        key={`tiny-${i}`}
+                        className="absolute"
+                        style={{
+                          left: `${-10 + Math.random() * 120}%`,
+                          top: `${-10 + Math.random() * 120}%`,
+                          animation: `masterpiece-sparkle-float ${4 + Math.random() * 3}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 4}s`,
+                        }}
+                      >
+                        <div 
+                          className="rounded-full"
+                          style={{
+                            width: '2px',
+                            height: '2px',
+                            backgroundColor: '#F5E6C8',
+                            boxShadow: '0 0 4px 2px rgba(212, 175, 55, 0.8)',
+                            animation: `masterpiece-twinkle ${1.5 + Math.random()}s ease-in-out infinite`,
+                            animationDelay: `${Math.random()}s`,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Floating sparkle particles - Layer 2: Medium golden orbs */}
+                {showRevealAnimation && (
+                  <div className="absolute -inset-12 pointer-events-none overflow-visible">
+                    {[...Array(25)].map((_, i) => (
+                      <div
+                        key={`medium-${i}`}
+                        className="absolute"
+                        style={{
+                          left: `${-5 + Math.random() * 110}%`,
+                          top: `${-5 + Math.random() * 110}%`,
+                          animation: `masterpiece-sparkle-float ${5 + Math.random() * 3}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 3}s`,
+                        }}
+                      >
+                        <div 
+                          className="rounded-full"
+                          style={{
+                            width: '4px',
+                            height: '4px',
+                            backgroundColor: '#D4AF37',
+                            boxShadow: '0 0 8px 4px rgba(212, 175, 55, 0.9), 0 0 20px 8px rgba(212, 175, 55, 0.4)',
+                            animation: `masterpiece-twinkle ${2 + Math.random() * 1.5}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 1.5}s`,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Floating sparkle particles - Layer 3: Large brilliant stars */}
+                {showRevealAnimation && (
+                  <div className="absolute -inset-10 pointer-events-none overflow-visible">
+                    {[...Array(12)].map((_, i) => (
+                      <div
+                        key={`large-${i}`}
+                        className="absolute"
+                        style={{
+                          left: `${5 + Math.random() * 90}%`,
+                          top: `${5 + Math.random() * 90}%`,
+                          animation: `masterpiece-sparkle-drift ${6 + Math.random() * 4}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 4}s`,
+                        }}
+                      >
+                        <div 
+                          className="rounded-full"
+                          style={{
+                            width: '6px',
+                            height: '6px',
+                            backgroundColor: '#FFF8E8',
+                            boxShadow: '0 0 12px 6px rgba(255, 248, 232, 1), 0 0 30px 12px rgba(212, 175, 55, 0.6)',
+                            animation: `masterpiece-twinkle-bright ${2.5 + Math.random()}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 2}s`,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* 4-pointed twinkling stars - gentle sway */}
+                {showRevealAnimation && (
+                  <div className="absolute -inset-14 pointer-events-none overflow-visible">
+                    {[...Array(8)].map((_, i) => (
+                      <div
+                        key={`star-${i}`}
+                        className="absolute"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animation: `masterpiece-star-sway ${6 + Math.random() * 4}s ease-in-out infinite`,
+                          animationDelay: `${Math.random() * 3}s`,
+                        }}
+                      >
+                        <svg 
+                          width="14" 
+                          height="14" 
+                          viewBox="0 0 24 24" 
+                          fill="none"
+                          style={{
+                            filter: 'drop-shadow(0 0 6px rgba(212, 175, 55, 0.9))',
+                            animation: `masterpiece-twinkle ${4 + Math.random() * 3}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 2}s`,
+                          }}
+                        >
+                          <path 
+                            d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" 
+                            fill="#D4AF37"
+                          />
+                        </svg>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Corner sparkle bursts - enhanced */}
+                {showRevealAnimation && (
+                  <>
+                    <div className="absolute -top-3 -left-3 w-6 h-6">
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite' }} />
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.5s' }} />
+                      <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#D4AF37', boxShadow: '0 0 15px 6px rgba(212, 175, 55, 0.9)' }} />
+                    </div>
+                    <div className="absolute -top-3 -right-3 w-6 h-6">
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.3s' }} />
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.8s' }} />
+                      <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#D4AF37', boxShadow: '0 0 15px 6px rgba(212, 175, 55, 0.9)' }} />
+                    </div>
+                    <div className="absolute -bottom-3 -left-3 w-6 h-6">
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.6s' }} />
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '1.1s' }} />
+                      <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#D4AF37', boxShadow: '0 0 15px 6px rgba(212, 175, 55, 0.9)' }} />
+                    </div>
+                    <div className="absolute -bottom-3 -right-3 w-6 h-6">
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.6)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '0.9s' }} />
+                      <div className="absolute inset-0 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.4)', animation: 'masterpiece-corner-ping 2s ease-out infinite', animationDelay: '1.4s' }} />
+                      <div className="absolute inset-1.5 rounded-full" style={{ backgroundColor: '#D4AF37', boxShadow: '0 0 15px 6px rgba(212, 175, 55, 0.9)' }} />
+                    </div>
+                  </>
+                )}
+                
                 <div 
                   className="relative rounded-2xl overflow-hidden shadow-2xl"
                   style={{ 
-                    border: '3px solid rgba(212, 175, 55, 0.4)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.15), 0 0 60px rgba(212, 175, 55, 0.1)',
+                    border: '3px solid rgba(212, 175, 55, 0.5)',
+                    boxShadow: showRevealAnimation 
+                      ? '0 25px 50px rgba(0,0,0,0.2), 0 0 100px rgba(212, 175, 55, 0.4), 0 0 150px rgba(212, 175, 55, 0.2)'
+                      : '0 20px 40px rgba(0,0,0,0.15), 0 0 60px rgba(212, 175, 55, 0.1)',
+                    animation: showRevealAnimation ? 'masterpiece-container-reveal 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards' : 'none',
+                    transition: 'box-shadow 1.5s ease-out',
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1483,13 +1702,66 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                     src={canvasImageUrl || result.previewUrl}
                     alt={`${petName}'s memorial portrait`}
                     className="w-full h-auto block"
+                    style={{
+                      animation: showRevealAnimation ? 'masterpiece-image-fade-in 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards' : 'none',
+                      opacity: showRevealAnimation ? 0 : 1,
+                    }}
                   />
+                  
+                  {/* Golden veil fade */}
+                  {showRevealAnimation && (
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(180deg, rgba(212, 175, 55, 0.3) 0%, transparent 50%, rgba(212, 175, 55, 0.2) 100%)',
+                        animation: 'masterpiece-veil-fade 2.5s ease-out forwards',
+                      }}
+                    />
+                  )}
+                  
+                  {/* Shimmer sweeps */}
+                  {showRevealAnimation && (
+                    <>
+                      <div 
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.2) 48%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.2) 52%, transparent 70%)',
+                          animation: 'masterpiece-shimmer 4s ease-in-out infinite',
+                        }}
+                      />
+                      <div 
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(75deg, transparent 35%, rgba(212, 175, 55, 0.12) 50%, transparent 65%)',
+                          animation: 'masterpiece-shimmer 5s ease-in-out infinite',
+                          animationDelay: '2s',
+                        }}
+                      />
+                    </>
+                  )}
+                  
+                  {/* Sparkle overlay inside image */}
+                  {showRevealAnimation && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      {[...Array(15)].map((_, i) => (
+                        <div
+                          key={`inner-sparkle-${i}`}
+                          className="absolute rounded-full"
+                          style={{
+                            width: '3px',
+                            height: '3px',
+                            backgroundColor: '#FFF',
+                            left: `${10 + Math.random() * 80}%`,
+                            top: `${10 + Math.random() * 80}%`,
+                            boxShadow: '0 0 6px 3px rgba(255, 255, 255, 0.8)',
+                            animation: `masterpiece-inner-sparkle ${2 + Math.random() * 2}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 3}s`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-                {/* Decorative corner accents */}
-                <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: '#D4AF37' }}></div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: '#D4AF37' }}></div>
-                <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: '#D4AF37' }}></div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: '#D4AF37' }}></div>
               </div>
             )}
             

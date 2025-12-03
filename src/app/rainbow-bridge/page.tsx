@@ -7,6 +7,7 @@ import RainbowBridgeFooter from "@/components/RainbowBridgeFooter";
 import UploadModal from "@/components/UploadModal";
 import RainbowBridgeFlow from "@/components/RainbowBridgeFlow";
 import ContactModal from "@/components/Contact";
+import ResumeButton from "@/components/ResumeButton";
 
 export default function RainbowBridge() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -79,6 +80,11 @@ export default function RainbowBridge() {
           onReset={handleReset}
           initialEmail={initialEmail}
         />
+      )}
+
+      {/* Resume Button - shows when not in flow */}
+      {!selectedFile && !showFlowFromEmail && (
+        <ResumeButton variant="rainbow-bridge" />
       )}
     </main>
   );
