@@ -49,6 +49,7 @@ export default function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Multi-pet support
   const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
   const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
 
@@ -91,11 +92,21 @@ export default function Home() {
 
   const handleFileSelected = (file: File) => {
     setSelectedFile(file);
+    setSelectedFiles([]); // Clear multi-pet when single is selected
+    setIsUploadModalOpen(false);
+  };
+  
+  // Multi-pet handler
+  const handleFilesSelected = (files: File[]) => {
+    console.log("🐾 Multi-pet mode: Received", files.length, "pets");
+    setSelectedFiles(files);
+    setSelectedFile(null); // Clear single when multi is selected
     setIsUploadModalOpen(false);
   };
 
   const handleReset = () => {
     setSelectedFile(null);
+    setSelectedFiles([]); // Clear multi-pet too
     // Also clear any pending image
     if (typeof window !== "undefined") {
       localStorage.removeItem("lumepet_pending_image");
@@ -122,11 +133,13 @@ export default function Home() {
       {/* Footer */}
       <Footer onContactClick={() => setIsContactModalOpen(true)} />
 
-      {/* Upload Modal */}
+      {/* Upload Modal - with multi-pet support */}
       <UploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         onFileSelected={handleFileSelected}
+        onFilesSelected={handleFilesSelected}
+        allowMultiple={true}
       />
 
       {/* Contact Modal */}
@@ -136,9 +149,10 @@ export default function Home() {
       />
 
       {/* Generation Flow (shows after file selection or email session restore) */}
-      {(selectedFile || showFlowFromEmail) && (
+      {(selectedFile || selectedFiles.length > 0 || showFlowFromEmail) && (
         <GenerationFlow 
           file={showFlowFromEmail ? null : selectedFile} 
+          files={selectedFiles.length > 0 ? selectedFiles : undefined}
           onReset={handleReset} 
           initialEmail={initialEmail}
         />
