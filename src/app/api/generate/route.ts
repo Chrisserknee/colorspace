@@ -1722,7 +1722,9 @@ export async function POST(request: NextRequest) {
     
     // Validate second image magic bytes for multi-pet
     if (isMultiPet && buffer2) {
-      const isValidImage2 = await validateImageMagicBytes(buffer2.buffer.slice(buffer2.byteOffset, buffer2.byteOffset + buffer2.byteLength));
+      // Convert Buffer to ArrayBuffer for validation
+      const arrayBuffer2 = buffer2.buffer.slice(buffer2.byteOffset, buffer2.byteOffset + buffer2.byteLength) as ArrayBuffer;
+      const isValidImage2 = await validateImageMagicBytes(arrayBuffer2);
       if (!isValidImage2) {
         console.warn(`Invalid image magic bytes for second pet from IP: ${clientIP}`);
         return NextResponse.json(
