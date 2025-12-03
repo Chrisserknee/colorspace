@@ -80,7 +80,8 @@ const saveLimits = (limits: GenerationLimits) => {
 };
 
 const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: string; hasPackCredits?: boolean } => {
-  const freeLimit = 2;
+  // Free tier: 3 total free generations
+  const freeLimit = 3;
   const freeUsed = limits.freeGenerations;
   // Each purchase grants 2 additional watermarked generations
   const purchaseBonus = limits.purchases * 2;
@@ -1084,7 +1085,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             <span>
               {generationLimits.packCredits > 0 
                 ? `${generationLimits.packCredits} portrait${generationLimits.packCredits !== 1 ? 's' : ''}`
-                : `${Math.max(0, 2 - generationLimits.freeGenerations)} free`
+                : `${Math.max(0, 3 - generationLimits.freeGenerations)} free`
               }
             </span>
           </div>

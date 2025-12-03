@@ -224,7 +224,7 @@ export async function getAllEmails() {
 // This provides a backup to client-side limits and prevents bypass
 export async function checkServerGenerationLimit(
   ipAddress: string,
-  maxFreeGenerations: number = 2,
+  maxFreeGenerations: number = 3,
   resetHours: number = 24
 ): Promise<{ allowed: boolean; currentCount: number; remaining: number; resetAt: Date | null }> {
   try {
