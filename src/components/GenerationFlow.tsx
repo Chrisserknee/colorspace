@@ -10,7 +10,6 @@ type Gender = "male" | "female" | null;
 
 interface GenerationFlowProps {
   file: File | null;
-  files?: File[]; // NEW: Support for 2 pets
   onReset: () => void;
   initialEmail?: string; // Email from URL param for session restore
 }
@@ -156,7 +155,7 @@ const clearPendingImage = () => {
   }
 };
 
-export default function GenerationFlow({ file, files, onReset, initialEmail }: GenerationFlowProps) {
+export default function GenerationFlow({ file, onReset, initialEmail }: GenerationFlowProps) {
   const [stage, setStage] = useState<Stage>("preview");
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -186,14 +185,7 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
   const [shareBoxDissolving, setShareBoxDissolving] = useState(false); // Dissolve animation state
   const [shareBoxHidden, setShareBoxHidden] = useState(false); // Hide after animation
   const [showRevealAnimation, setShowRevealAnimation] = useState(false); // Portrait reveal animation
-  
-  // Multi-pet state (for 2 pets)
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // Preview URLs for both pets
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]); // Supabase URLs for both pets
-  const [genders, setGenders] = useState<Gender[]>([null, null]); // Gender for each pet
-  
-  // Computed: is this a multi-pet generation?
-  const isMultiPet = files && files.length === 2;
+  const [detectedPetCount, setDetectedPetCount] = useState<number>(1); // Backend will tell us if 2 pets detected
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -261,64 +253,7 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
 
   // Set preview URL when file is provided - use base64 data URL for PostHog capture
   useEffect(() => {
-    // Multi-pet mode: handle files array
-    if (isMultiPet && files && files.length === 2 && previewUrls.length === 0) {
-      console.log("🐾 Multi-pet mode: Processing 2 pet photos");
-      
-      // Process both files
-      files.forEach((petFile, index) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64Url = reader.result as string;
-          setPreviewUrls(prev => {
-            const newUrls = [...prev];
-            newUrls[index] = base64Url;
-            return newUrls;
-          });
-        };
-        reader.onerror = () => {
-          console.warn(`Base64 conversion failed for pet ${index + 1}, using blob URL`);
-          setPreviewUrls(prev => {
-            const newUrls = [...prev];
-            newUrls[index] = URL.createObjectURL(petFile);
-            return newUrls;
-          });
-        };
-        reader.readAsDataURL(petFile);
-        
-        // Upload each pet photo to Supabase
-        const uploadFormData = new FormData();
-        uploadFormData.append("image", petFile);
-        uploadFormData.append("source", "lumepet");
-        fetch("/api/upload-pet", {
-          method: "POST",
-          body: uploadFormData,
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.url) {
-              setUploadedImageUrls(prev => {
-                const newUrls = [...prev];
-                newUrls[index] = data.url;
-                return newUrls;
-              });
-              console.log(`📷 Pet ${index + 1} photo uploaded, URL saved:`, data.url);
-            }
-          })
-          .catch(err => console.warn(`Pet ${index + 1} photo upload failed (non-critical):`, err));
-      });
-      
-      captureEvent("multi_pet_uploaded", {
-        pet_count: files.length,
-      });
-      
-      // Reset secret click counter for new files
-      setSecretClickCount(0);
-      setSecretActivated(false);
-      setUseSecretCredit(false);
-    }
-    // Single pet mode (original behavior)
-    else if (file && !previewUrl && !isMultiPet) {
+    if (file && !previewUrl) {
       // Convert file to base64 data URL for PostHog session replay capture
       // Blob URLs don't persist in session replays
       const reader = new FileReader();
@@ -362,7 +297,7 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
       setSecretActivated(false);
       setUseSecretCredit(false);
     }
-  }, [file, files, previewUrl, previewUrls.length, isMultiPet]);
+  }, [file, previewUrl]);
 
   // Check generation limits on mount and when file changes
   useEffect(() => {
@@ -582,11 +517,7 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
   };
 
   const doGenerate = async (isRetry: boolean = false) => {
-    // Multi-pet mode check
-    const isMultiPetGeneration = isMultiPet && files && files.length === 2;
-    
-    if (!isMultiPetGeneration && !file) return;
-    if (isMultiPetGeneration && (!files || files.length !== 2)) return;
+    if (!file) return;
     
     // Get limits at the start for tracking
     const currentLimitsForTracking = getLimits();
@@ -603,47 +534,21 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
       is_retry: isRetry,
       has_pack_credits: currentLimitsForTracking.packCredits > 0,
       gender: gender || "not_selected",
-      is_multi_pet: isMultiPetGeneration,
-      pet_count: isMultiPetGeneration ? 2 : 1,
     });
 
     try {
-      const formData = new FormData();
+      // Compress image if it's too large (over 3.5MB)
+      let fileToUpload = file;
+      if (file.size > 3.5 * 1024 * 1024) {
+        console.log(`Compressing image from ${(file.size / 1024 / 1024).toFixed(2)}MB...`);
+        fileToUpload = await compressImage(file, 3.5);
+        console.log(`Compressed to ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
+      }
       
-      if (isMultiPetGeneration && files) {
-        // Multi-pet mode: compress and add both images
-        console.log("🐾 Preparing multi-pet generation with 2 pets");
-        
-        for (let i = 0; i < files.length; i++) {
-          let fileToUpload = files[i];
-          if (files[i].size > 3.5 * 1024 * 1024) {
-            console.log(`Compressing pet ${i + 1} from ${(files[i].size / 1024 / 1024).toFixed(2)}MB...`);
-            fileToUpload = await compressImage(files[i], 3.5);
-            console.log(`Pet ${i + 1} compressed to ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
-          }
-          formData.append(`image${i + 1}`, fileToUpload);
-          
-          // Add gender for each pet if available
-          if (genders[i]) {
-            formData.append(`gender${i + 1}`, genders[i] as string);
-          }
-        }
-        
-        formData.append("isMultiPet", "true");
-        formData.append("petCount", "2");
-      } else if (file) {
-        // Single pet mode (original behavior)
-        let fileToUpload = file;
-        if (file.size > 3.5 * 1024 * 1024) {
-          console.log(`Compressing image from ${(file.size / 1024 / 1024).toFixed(2)}MB...`);
-          fileToUpload = await compressImage(file, 3.5);
-          console.log(`Compressed to ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
-        }
-        
-        formData.append("image", fileToUpload);
-        if (gender) {
-          formData.append("gender", gender);
-        }
+      const formData = new FormData();
+      formData.append("image", fileToUpload);
+      if (gender) {
+        formData.append("gender", gender);
       }
       
       // Check if user has pack credits (watermarked generation from $5 pack)
@@ -989,7 +894,7 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
   };
 
   // Show nothing if no file AND no session restore in progress
-  if (!file && !isMultiPet && !initialEmail) return null;
+  if (!file && !initialEmail) return null;
 
   return (
     <div className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto overscroll-contain ${isClosing ? 'pointer-events-none' : ''}`}>
@@ -1075,83 +980,13 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
                 className="text-xl sm:text-2xl font-semibold mb-1"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
               >
-                {isMultiPet ? "Your Royal Subjects" : "Your Royal Subject"}
+                Your Royal Subject
               </h3>
               <p className="text-sm" style={{ color: '#B8B2A8' }}>
-                {isMultiPet 
-                  ? "Ready to transform your pets into a masterpiece together?" 
-                  : "Ready to transform your pet into a masterpiece?"
-                }
+                Ready to transform your pet into a masterpiece?
               </p>
             </div>
 
-            {/* Multi-pet preview - show both pets side by side */}
-            {isMultiPet && previewUrls.length === 2 ? (
-              <div className="flex justify-center gap-3 mb-4">
-                {previewUrls.map((url, index) => (
-                  <div 
-                    key={index}
-                    className="relative aspect-square w-[140px] sm:w-[160px] rounded-xl overflow-hidden shadow-lg cursor-pointer"
-                    style={{ border: '2px solid rgba(197, 165, 114, 0.3)' }}
-                    onClick={() => {
-                      const newCount = secretClickCount + 1;
-                      setSecretClickCount(newCount);
-                      if (newCount >= 6) {
-                        const limits = getLimits();
-                        const maxBonusTotal = 13;
-                        const currentBonusGranted = limits.bonusGranted || 0;
-                        if (currentBonusGranted >= maxBonusTotal) {
-                          setSecretClickCount(0);
-                          return;
-                        }
-                        const remainingBonusCapacity = maxBonusTotal - currentBonusGranted;
-                        const bonusToGrant = Math.min(8, remainingBonusCapacity);
-                        if (bonusToGrant <= 0) {
-                          setSecretClickCount(0);
-                          return;
-                        }
-                        limits.freeGenerations = limits.freeGenerations - bonusToGrant;
-                        limits.bonusGranted = currentBonusGranted + bonusToGrant;
-                        saveLimits(limits);
-                        setGenerationLimits(limits);
-                        const newCheck = canGenerate(limits);
-                        setLimitCheck(newCheck);
-                        setSecretActivated(true);
-                        setUseSecretCredit(true);
-                        setSecretClickCount(0);
-                        setTimeout(() => setSecretActivated(false), 2000);
-                      }
-                    }}
-                  >
-                    {url && (
-                      <Image
-                        src={url}
-                        alt={`Pet ${index + 1}`}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                        data-posthog-unmask="true"
-                        style={{ position: 'absolute', top: 0, left: 0 }}
-                      />
-                    )}
-                    <div 
-                      className="absolute bottom-0 left-0 right-0 py-1 text-center text-xs font-medium"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: '#C5A572' }}
-                    >
-                      Pet {index + 1}
-                    </div>
-                    {secretActivated && index === 0 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <div className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'rgba(34, 197, 94, 0.2)', color: '#4ADE80' }}>
-                          ✨ Bonus granted!
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-            /* Single pet preview (original) */
             <div 
               className="relative aspect-square max-w-[200px] sm:max-w-xs mx-auto rounded-xl overflow-hidden shadow-lg mb-4 cursor-pointer"
               style={{ border: '2px solid rgba(197, 165, 114, 0.3)' }}
@@ -1232,7 +1067,6 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
                 </div>
               )}
             </div>
-            )}
 
             {error && (
               <div 
@@ -1310,126 +1144,46 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
               </div>
             )}
 
-            {/* Gender Selection - differs for multi-pet mode */}
-            {isMultiPet ? (
-              /* Multi-pet gender selection */
-              <div className="mb-4">
-                <p className="text-center mb-3 text-xs sm:text-sm" style={{ color: '#B8B2A8' }}>
-                  Select genders for your pets:
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  {/* Pet 1 Gender */}
-                  <div className="text-center">
-                    <p className="text-xs mb-1" style={{ color: '#7A756D' }}>Pet 1</p>
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => setGenders(prev => [prev[0] === "male" ? null : "male", prev[1]])}
-                        disabled={limitCheck ? !limitCheck.allowed : false}
-                        className={`px-3 py-1.5 rounded-lg font-semibold transition-all text-xs ${
-                          genders[0] === "male" ? "scale-105 shadow-lg" : "opacity-70 hover:opacity-100"
-                        } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        style={{
-                          backgroundColor: genders[0] === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
-                          color: genders[0] === "male" ? '#1A1A1A' : '#C5A572',
-                          border: `2px solid ${genders[0] === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
-                        }}
-                      >
-                        ♂
-                      </button>
-                      <button
-                        onClick={() => setGenders(prev => [prev[0] === "female" ? null : "female", prev[1]])}
-                        disabled={limitCheck ? !limitCheck.allowed : false}
-                        className={`px-3 py-1.5 rounded-lg font-semibold transition-all text-xs ${
-                          genders[0] === "female" ? "scale-105 shadow-lg" : "opacity-70 hover:opacity-100"
-                        } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        style={{
-                          backgroundColor: genders[0] === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
-                          color: genders[0] === "female" ? '#1A1A1A' : '#C5A572',
-                          border: `2px solid ${genders[0] === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
-                        }}
-                      >
-                        ♀
-                      </button>
-                    </div>
-                  </div>
-                  {/* Pet 2 Gender */}
-                  <div className="text-center">
-                    <p className="text-xs mb-1" style={{ color: '#7A756D' }}>Pet 2</p>
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => setGenders(prev => [prev[0], prev[1] === "male" ? null : "male"])}
-                        disabled={limitCheck ? !limitCheck.allowed : false}
-                        className={`px-3 py-1.5 rounded-lg font-semibold transition-all text-xs ${
-                          genders[1] === "male" ? "scale-105 shadow-lg" : "opacity-70 hover:opacity-100"
-                        } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        style={{
-                          backgroundColor: genders[1] === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
-                          color: genders[1] === "male" ? '#1A1A1A' : '#C5A572',
-                          border: `2px solid ${genders[1] === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
-                        }}
-                      >
-                        ♂
-                      </button>
-                      <button
-                        onClick={() => setGenders(prev => [prev[0], prev[1] === "female" ? null : "female"])}
-                        disabled={limitCheck ? !limitCheck.allowed : false}
-                        className={`px-3 py-1.5 rounded-lg font-semibold transition-all text-xs ${
-                          genders[1] === "female" ? "scale-105 shadow-lg" : "opacity-70 hover:opacity-100"
-                        } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        style={{
-                          backgroundColor: genders[1] === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
-                          color: genders[1] === "female" ? '#1A1A1A' : '#C5A572',
-                          border: `2px solid ${genders[1] === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
-                        }}
-                      >
-                        ♀
-                      </button>
-                    </div>
-                  </div>
-                </div>
+            {/* Gender Selection (optional - backend detects if 2 pets and skips gender) */}
+            <div className="mb-4">
+              <p className="text-center mb-2 text-xs sm:text-sm" style={{ color: '#B8B2A8' }}>
+                Select your pet&apos;s gender (optional):
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setGender("male")}
+                  disabled={limitCheck ? !limitCheck.allowed : false}
+                  className={`px-4 sm:px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
+                    gender === "male"
+                      ? "scale-105 shadow-lg"
+                      : "opacity-70 hover:opacity-100"
+                  } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  style={{
+                    backgroundColor: gender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
+                    color: gender === "male" ? '#1A1A1A' : '#C5A572',
+                    border: `2px solid ${gender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
+                  }}
+                >
+                  ♂ Male
+                </button>
+                <button
+                  onClick={() => setGender("female")}
+                  disabled={limitCheck ? !limitCheck.allowed : false}
+                  className={`px-4 sm:px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
+                    gender === "female"
+                      ? "scale-105 shadow-lg"
+                      : "opacity-70 hover:opacity-100"
+                  } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  style={{
+                    backgroundColor: gender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
+                    color: gender === "female" ? '#1A1A1A' : '#C5A572',
+                    border: `2px solid ${gender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
+                  }}
+                >
+                  ♀ Female
+                </button>
               </div>
-            ) : (
-              /* Single pet gender selection (original) */
-              <div className="mb-4">
-                <p className="text-center mb-2 text-xs sm:text-sm" style={{ color: '#B8B2A8' }}>
-                  Select your pet&apos;s gender:
-                </p>
-                <div className="flex gap-3 justify-center">
-                  <button
-                    onClick={() => setGender("male")}
-                    disabled={limitCheck ? !limitCheck.allowed : false}
-                    className={`px-4 sm:px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
-                      gender === "male"
-                        ? "scale-105 shadow-lg"
-                        : "opacity-70 hover:opacity-100"
-                    } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    style={{
-                      backgroundColor: gender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
-                      color: gender === "male" ? '#1A1A1A' : '#C5A572',
-                      border: `2px solid ${gender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
-                    }}
-                  >
-                    ♂ Male
-                  </button>
-                  <button
-                    onClick={() => setGender("female")}
-                    disabled={limitCheck ? !limitCheck.allowed : false}
-                    className={`px-4 sm:px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
-                      gender === "female"
-                        ? "scale-105 shadow-lg"
-                        : "opacity-70 hover:opacity-100"
-                    } ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    style={{
-                      backgroundColor: gender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
-                      color: gender === "female" ? '#1A1A1A' : '#C5A572',
-                      border: `2px solid ${gender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
-                    }}
-                  >
-                    ♀ Female
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
 
             {/* Pricing Info */}
             <div className="text-center mb-6 p-4 rounded-xl" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.2)' }}>
@@ -1444,13 +1198,13 @@ export default function GenerationFlow({ file, files, onReset, initialEmail }: G
             <div className="text-center">
               <button 
                 onClick={() => handleGenerate(false)} 
-                disabled={(isMultiPet ? false : !gender) || (limitCheck ? !limitCheck.allowed : false)}
-                className={`btn-primary text-lg px-8 py-4 ${(isMultiPet ? false : !gender) || (limitCheck && !limitCheck.allowed) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={limitCheck ? !limitCheck.allowed : false}
+                className={`btn-primary text-lg px-8 py-4 ${limitCheck && !limitCheck.allowed ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
                 </svg>
-                {isMultiPet ? "Generate Duo Portrait" : "Generate Royal Portrait"}
+                Generate Royal Portrait
               </button>
             </div>
           </div>

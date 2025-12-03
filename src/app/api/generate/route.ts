@@ -1628,46 +1628,22 @@ export async function POST(request: NextRequest) {
     const style = formData.get("style") as string | null; // "rainbow-bridge" for memorial portraits
     const petName = formData.get("petName") as string | null; // Pet's name for rainbow bridge portraits
     
-    // Multi-pet support
-    const isMultiPet = formData.get("isMultiPet") === "true";
-    const imageFile1 = formData.get("image1") as File | null;
-    const imageFile2 = formData.get("image2") as File | null;
-    const gender1 = formData.get("gender1") as string | null;
-    const gender2 = formData.get("gender2") as string | null;
-    
     const isRainbowBridge = style === "rainbow-bridge";
     
     // Log Rainbow Bridge parameters
     if (style || petName) {
       console.log(`🌈 Form data - style: "${style}", petName: "${petName}", isRainbowBridge: ${isRainbowBridge}`);
     }
-    
-    // Log Multi-pet parameters
-    if (isMultiPet) {
-      console.log(`🐾🐾 Multi-pet mode - image1: ${imageFile1?.name}, image2: ${imageFile2?.name}`);
-      console.log(`   Genders - pet1: ${gender1 || 'unspecified'}, pet2: ${gender2 || 'unspecified'}`);
-    }
 
-    // Determine which images to use
-    const effectiveImageFile = isMultiPet ? imageFile1 : imageFile;
-    
-    if (!effectiveImageFile) {
+    if (!imageFile) {
       return NextResponse.json(
         { error: "No image file provided" },
         { status: 400 }
       );
     }
-    
-    // For multi-pet, we need both images
-    if (isMultiPet && !imageFile2) {
-      return NextResponse.json(
-        { error: "Multi-pet mode requires 2 images" },
-        { status: 400 }
-      );
-    }
 
-    // Validate file type for first/only image
-    if (!CONFIG.ACCEPTED_TYPES.includes(effectiveImageFile.type)) {
+    // Validate file type
+    if (!CONFIG.ACCEPTED_TYPES.includes(imageFile.type)) {
       return NextResponse.json(
         { error: "Invalid file type. Please upload JPEG, PNG, or WebP." },
         { status: 400 }
@@ -1675,39 +1651,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file size (Vercel has 4.5MB body limit)
-    if (effectiveImageFile.size > CONFIG.MAX_FILE_SIZE) {
+    if (imageFile.size > CONFIG.MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: `File too large. Maximum size is ${CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB. Please compress your image or use a smaller file.` },
         { status: 400 }
       );
     }
-    
-    // Validate second image for multi-pet
-    if (isMultiPet && imageFile2) {
-      if (!CONFIG.ACCEPTED_TYPES.includes(imageFile2.type)) {
-        return NextResponse.json(
-          { error: "Invalid file type for second pet. Please upload JPEG, PNG, or WebP." },
-          { status: 400 }
-        );
-      }
-      if (imageFile2.size > CONFIG.MAX_FILE_SIZE) {
-        return NextResponse.json(
-          { error: `Second image too large. Maximum size is ${CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB.` },
-          { status: 400 }
-        );
-      }
-    }
 
     // Convert file to buffer
-    const bytes = await effectiveImageFile.arrayBuffer();
+    const bytes = await imageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    
-    // Also convert second image buffer for multi-pet
-    let buffer2: Buffer | null = null;
-    if (isMultiPet && imageFile2) {
-      const bytes2 = await imageFile2.arrayBuffer();
-      buffer2 = Buffer.from(bytes2);
-    }
     
     // SECURITY: Validate file is actually an image by checking magic bytes
     // This prevents uploading malicious files with fake MIME types
@@ -1718,20 +1671,6 @@ export async function POST(request: NextRequest) {
         { error: "Invalid image file. Please upload a valid JPEG, PNG, or WebP image." },
         { status: 400 }
       );
-    }
-    
-    // Validate second image magic bytes for multi-pet
-    if (isMultiPet && buffer2) {
-      // Convert Buffer to ArrayBuffer for validation
-      const arrayBuffer2 = buffer2.buffer.slice(buffer2.byteOffset, buffer2.byteOffset + buffer2.byteLength) as ArrayBuffer;
-      const isValidImage2 = await validateImageMagicBytes(arrayBuffer2);
-      if (!isValidImage2) {
-        console.warn(`Invalid image magic bytes for second pet from IP: ${clientIP}`);
-        return NextResponse.json(
-          { error: "Invalid second image file. Please upload a valid JPEG, PNG, or WebP image." },
-          { status: 400 }
-        );
-      }
     }
 
     // Generate unique ID for this generation
@@ -1748,30 +1687,51 @@ export async function POST(request: NextRequest) {
       .toBuffer();
 
     const base64Image = processedImage.toString("base64");
-    
-    // Process second image for multi-pet
-    let base64Image2: string | null = null;
-    if (isMultiPet && buffer2) {
-      const processedImage2 = await sharp(buffer2)
-        .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
-        .jpeg({ quality: 95 })
-        .toBuffer();
-      base64Image2 = processedImage2.toString("base64");
-    }
 
     // Step 1: Use GPT-4o to analyze pet(s) - OPTIMIZED for speed while keeping critical identity info
     const visionStartTime = Date.now();
     
-    // Multi-pet variables to track both pets' info
+    // First, quickly detect how many pets are in the image
+    console.log("🔍 Detecting number of pets in image...");
+    const petCountResponse = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "How many pets (dogs or cats) are clearly visible in this image? Respond with ONLY a number: 1 or 2. If more than 2, respond with 2. If none or unclear, respond with 1.",
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${base64Image}`,
+                detail: "low",
+              },
+            },
+          ],
+        },
+      ],
+      max_tokens: 10,
+      temperature: 0,
+    });
+    
+    const petCountStr = petCountResponse.choices[0]?.message?.content?.trim() || "1";
+    const detectedPetCount = petCountStr === "2" ? 2 : 1;
+    console.log(`🐾 Detected ${detectedPetCount} pet(s) in image`);
+    
+    // Track multi-pet info
     let petDescription1 = "";
     let petDescription2 = "";
     let species1 = "";
     let species2 = "";
     let multiPetCombinedDescription = "";
+    const isMultiPet = detectedPetCount === 2;
     
-    if (isMultiPet && base64Image2) {
-      // MULTI-PET MODE: Analyze both pets together for a combined portrait
-      console.log("🐾🐾 Analyzing BOTH pets with GPT-4o for duo portrait...");
+    if (isMultiPet) {
+      // MULTI-PET MODE: Analyze both pets in the single image
+      console.log("🐾🐾 Analyzing BOTH pets in image with GPT-4o...");
       
       const multiPetVisionResponse = await openai.chat.completions.create({
         model: "gpt-4o",  // Use full model for multi-pet - need better understanding
@@ -1781,7 +1741,7 @@ export async function POST(request: NextRequest) {
             content: [
               {
                 type: "text",
-                text: `You are analyzing TWO pet photos to create a COMBINED royal portrait of them together.
+                text: `This image contains TWO pets. Analyze BOTH pets for a royal portrait.
 
 For EACH pet, provide:
 1. SPECIES: [CAT] or [DOG] 
@@ -1797,19 +1757,12 @@ Format your response EXACTLY like this:
 ---PET 2---
 [SPECIES] BREED: [breed]. COLORS: [colors]. FACE: [features]. SIZE: [size]. UNIQUE: [features].
 ---TOGETHER---
-Brief description of how they would look together in a royal portrait (e.g., "A regal golden retriever beside a sleek black cat, both wearing matching velvet cloaks").`,
+Brief description of how they look together (e.g., "A regal golden retriever beside a sleek black cat").`,
               },
               {
                 type: "image_url",
                 image_url: {
                   url: `data:image/jpeg;base64,${base64Image}`,
-                  detail: "high",
-                },
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${base64Image2}`,
                   detail: "high",
                 },
               },
@@ -1847,7 +1800,7 @@ Brief description of how they would look together in a royal portrait (e.g., "A 
       console.log(`Multi-pet vision analysis took ${Date.now() - visionStartTime}ms`);
     } else {
       // SINGLE PET MODE: Original flow
-      console.log("Analyzing pet with GPT-4o (optimized prompt)...");
+      console.log("Analyzing single pet with GPT-4o (optimized prompt)...");
     
     const visionResponse = await openai.chat.completions.create({
       model: "gpt-4o-mini",  // Use mini for faster analysis - still accurate for pet identification
@@ -2805,67 +2758,65 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     
     let firstGeneratedBuffer: Buffer;
     
-    // === MULTI-PET GENERATION PATH ===
-    if (isMultiPet && base64Image2 && petDescription1 && petDescription2) {
-      console.log("🐾🐾 === MULTI-PET GENERATION MODE ===");
+    // === MULTI-PET GENERATION PATH (auto-detected 2 pets in single image) ===
+    if (isMultiPet && petDescription1 && petDescription2) {
+      console.log("🐾🐾 === MULTI-PET GENERATION MODE (img2img) ===");
       console.log(`Pet 1 (${species1}): ${petDescription1.substring(0, 100)}...`);
       console.log(`Pet 2 (${species2}): ${petDescription2.substring(0, 100)}...`);
       
-      // Create a detailed prompt for generating both pets together
-      const multiPetPrompt = `Create an AUTHENTIC late 18th-century European aristocratic oil painting portrait featuring TWO beloved pets together.
+      // Create a prompt for transforming the image with both pets into a royal portrait
+      // Using img2img preserves both pets' identities from the original photo
+      const multiPetImg2ImgPrompt = `Transform this photo of TWO pets into an AUTHENTIC late 18th-century European aristocratic oil painting portrait.
 
-=== THE TWO PETS (PRESERVE THEIR IDENTITIES) ===
+CRITICAL - PRESERVE BOTH PETS' IDENTITIES EXACTLY:
+- Pet 1 (${species1}): ${petDescription1.substring(0, 200)}
+- Pet 2 (${species2}): ${petDescription2.substring(0, 200)}
+${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : ""}
 
-PET 1 - ${species1}:
-${petDescription1}
-${gender1 ? `Gender: ${gender1}` : ""}
+KEEP both pets in their current positions and poses. DO NOT move or rearrange them.
 
-PET 2 - ${species2}:
-${petDescription2}
-${gender2 ? `Gender: ${gender2}` : ""}
+ADD ROYAL ELEMENTS TO BOTH PETS:
+- Matching rich velvet cloaks draped over both (burgundy, emerald, or royal blue)
+- BRIGHT POLISHED SILVER CLOAK CLASPS on each pet - gleaming and reflective
+- Elegant jewelry touches (pearl necklaces, gold chains)
+- Both pets should look regal and dignified
 
-${multiPetCombinedDescription ? `TOGETHER: ${multiPetCombinedDescription}` : ""}
-
-=== COMPOSITION ===
-- Both pets positioned TOGETHER in a royal setting
-- ${species1 === species2 ? "Side by side on a luxurious velvet throne cushion" : "Harmoniously arranged - perhaps one seated slightly behind the other"}
-- Both wearing matching or complementary rich velvet cloaks in deep jewel tones (burgundy, emerald, royal blue)
-- BRIGHT POLISHED SILVER CLOAK CLASPS on both pets - gleaming and reflective
-- Natural relaxed poses - comfortable and at ease, NOT stiff or human-like
-- Both pets should look toward the viewer, expressions dignified yet warm
-
-=== PAINTING STYLE ===
-- Late 18th-century Georgian/Regency/Napoleonic era (1770-1830)
+PAINTING STYLE:
+- Late 18th-century Georgian/Regency era (1770-1830)
 - Classical oil painting technique like Gainsborough, Reynolds, or Vigée Le Brun
-- VISIBLE BRUSHSTROKES throughout, rich impasto texture
-- CRAQUELURE aging effect - network of fine cracks
-- AGED VARNISH patina - looks 300 years old
+- VISIBLE BRUSHSTROKES, rich impasto texture
+- CRAQUELURE aging effect - fine cracks throughout
 - Museum-quality masterpiece
 
-=== BACKGROUND ===
-- Rich velvet drapery in complementary colors
-- NOT brown - use deep blues, teals, burgundies, or soft creams
-- Atmospheric depth with soft sfumato effect
-- Ornate gilded elements in the distance
+BACKGROUND:
+- Rich velvet drapery, NOT brown - use deep blues, teals, burgundies, or soft creams
+- Atmospheric depth with sfumato effect
 
-=== LIGHTING ===
-- Warm, dramatic Rembrandt-style lighting
-- Soft golden illumination on both pets
-- Gentle shadows for depth
+CRITICAL: Both pets must remain INSTANTLY RECOGNIZABLE. This is THESE TWO SPECIFIC pets together.`;
 
-CRITICAL: Both pets must be clearly recognizable with their distinct features. This is a portrait of THESE TWO SPECIFIC pets together. The ${species1} must look like a ${species1}, and the ${species2} must look like a ${species2}.`;
-
-      console.log("Multi-pet prompt length:", multiPetPrompt.length);
+      console.log("Multi-pet img2img prompt length:", multiPetImg2ImgPrompt.length);
       
       try {
-        // Use DALL-E 3 for multi-pet generation
-        const multiPetResponse = await openai.images.generate({
-          model: "dall-e-3",
-          prompt: multiPetPrompt,
+        // Use OpenAI img2img (images.edit) to transform the photo while preserving both pets
+        console.log("🎨 Using OpenAI img2img for multi-pet portrait...");
+        
+        // Process the original image buffer for OpenAI
+        const processedForOpenAI = await sharp(buffer)
+          .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
+          .png()
+          .toBuffer();
+        
+        // Convert buffer to File for OpenAI API
+        const uint8Array = new Uint8Array(processedForOpenAI);
+        const imageBlob = new Blob([uint8Array], { type: "image/png" });
+        const imageFile2 = new File([imageBlob], "multi-pet-photo.png", { type: "image/png" });
+        
+        const multiPetResponse = await openai.images.edit({
+          model: "gpt-image-1",
+          image: imageFile2,
+          prompt: multiPetImg2ImgPrompt,
           n: 1,
           size: "1024x1024",
-          quality: "hd",
-          style: "vivid",
         });
         
         const multiPetImageData = multiPetResponse.data?.[0];
@@ -2873,15 +2824,17 @@ CRITICAL: Both pets must be clearly recognizable with their distinct features. T
           throw new Error("No image generated for multi-pet portrait");
         }
         
-        if (multiPetImageData.url) {
+        if (multiPetImageData.b64_json) {
+          firstGeneratedBuffer = Buffer.from(multiPetImageData.b64_json, "base64");
+          console.log("✅ Multi-pet portrait generated (base64)");
+        } else if (multiPetImageData.url) {
           console.log("Downloading multi-pet portrait from URL...");
           const downloadResponse = await fetch(multiPetImageData.url);
           if (!downloadResponse.ok) {
             throw new Error(`Failed to download multi-pet image: ${downloadResponse.status}`);
           }
           firstGeneratedBuffer = Buffer.from(await downloadResponse.arrayBuffer());
-        } else if (multiPetImageData.b64_json) {
-          firstGeneratedBuffer = Buffer.from(multiPetImageData.b64_json, "base64");
+          console.log("✅ Multi-pet portrait generated (URL download)");
         } else {
           throw new Error("No image data in multi-pet response");
         }
