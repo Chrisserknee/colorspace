@@ -139,6 +139,9 @@ export async function GET(request: NextRequest) {
           console.error(`❌ Failed to send Email #${nextStep} to ${lead.email}:`, emailResult.error);
         }
         
+        // Add delay between emails to respect Resend rate limit (2 req/sec)
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
       } catch (leadError) {
         results.errors++;
         results.details.push({
