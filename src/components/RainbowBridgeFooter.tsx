@@ -47,6 +47,13 @@ export default function RainbowBridgeFooter({ onContactClick }: RainbowBridgeFoo
             >
               ← Back to LumePet
             </Link>
+            <Link 
+              href="/about"
+              className="text-sm transition-colors hover:opacity-80"
+              style={{ color: '#9B8AA0' }}
+            >
+              About
+            </Link>
             {onContactClick && (
               <button
                 onClick={onContactClick}
