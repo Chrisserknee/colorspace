@@ -2770,11 +2770,11 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
       const multiPetImg2ImgPrompt = `CRITICAL: These are TWO ${species1 === species2 ? `${species1}S` : `a ${species1} and a ${species2}`}. Keep BOTH pets exactly as shown - preserve both animals precisely.
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in LIGHT PASTEL colored cloaks (soft pink, lavender, powder blue, mint, cream) fastened with SHINY SILVER or GOLD clasps, adorned with PEARL NECKLACES, gold chains, and gemstone jewelry. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
 
-Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
+Compositions use LIGHT BACKGROUNDS (soft cream, powder blue, pale pink, light lavender, warm ivory - NEVER brown, NEVER dark, NEVER gloomy) with soft drapery to add depth. Colors are BRIGHT and PASTEL—soft pinks, lavenders, powder blues, mints, creams—creating a regal, CHEERFUL, LUMINOUS, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, LIGHT, and historically authentic. NOT dark, NOT gloomy, NOT heavy.
 
-18th-century aristocratic oil portrait of TWO pets together. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.
+18th-century aristocratic oil portrait of TWO pets together. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance. LIGHT and BRIGHT aesthetic.
 
 === CRITICAL - PRESERVE BOTH PETS' IDENTITIES EXACTLY ===
 - Pet 1 (${species1}): ${petDescription1.substring(0, 200)}
@@ -2800,40 +2800,48 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - Pets can be at slightly different angles (one more forward, one slightly turned)
 - Create visual balance - neither pet should dominate or overshadow the other
 
-=== VIBRANT COLOR PALETTE (HIGHLY VARIED) ===
-- RANDOMIZE colors - avoid repetitive color schemes
-- DARKS: Charcoal black, rich black, deep slate (for dramatic contrast)
-- LIGHTS: Pure white, soft cream, ivory, champagne (for airy feel)
-- BLUES: Powder blue, sky blue, navy, teal, sapphire, periwinkle
-- PINKS: Soft pink, dusty rose, blush, coral, peach
-- GREENS: Emerald, sage, mint, forest green, olive
-- PURPLES: Lavender, lilac, mauve, dusty purple
-- CREATE CONTRAST: Colors should make BOTH pets stand out beautifully
+=== LIGHT PASTEL COLOR PALETTE (BRIGHT & CHEERFUL - NOT DARK) ===
+- LIGHT, BRIGHT, PASTEL colors throughout - NOT dark or gloomy
+- AVOID dark colors: NO black backgrounds, NO dark browns, NO deep shadows
+- BACKGROUNDS: Soft cream, powder blue, pale pink, light lavender, soft mint, warm ivory, light grey
+- PASTELS PREFERRED: Soft pink, blush, lavender, periwinkle, mint, sage, powder blue, peach
+- LIGHT AND AIRY feel - cheerful, elegant, luminous
+- CREATE CONTRAST with light colors that make BOTH pets stand out beautifully
+- Overall palette should feel BRIGHT, FRESH, and UPLIFTING
 
 === LIGHTING (VERY BRIGHT - Both Subjects Well-Illuminated) ===
 - VERY BRIGHT KEY LIGHT illuminating BOTH pets - WELL-LIT and LUMINOUS
 - STRONG BRILLIANT HIGHLIGHTS on BOTH faces and fur - INTENSELY ILLUMINATED
 - MINIMAL SHADOWS - use fill light to reduce dark areas
 - BOTH subjects should GLOW with BRIGHT RADIANT light
-- LIGHT AND AIRY feel - NOT heavy shadows
+- LIGHT AND AIRY feel - NOT heavy shadows, NOT dark, NOT gloomy
 - BOTH pets are the BRIGHTEST elements - clearly visible and well-lit
 - Ensure even lighting across both subjects - no one pet in shadow
+- BRIGHT OVERALL COMPOSITION - cheerful and luminous
 
-=== THRONE CUSHION (Large - Fits Both Pets) ===
+=== THRONE CUSHION (Large - Fits Both Pets - LIGHT PASTEL COLORS) ===
 - LARGE embroidered SILKY velvet cushion that comfortably fits BOTH pets
-- DEEP, RICH, SATURATED color that complements both pets' fur tones
-- SILKY texture with visible sheen
-- Gold embroidery, ornate details
+- LIGHT PASTEL colors: soft pink, powder blue, lavender, mint, cream, blush, peach
+- NOT dark colors - use LIGHT, SOFT, PASTEL tones
+- SILKY texture with visible sheen and luminous quality
+- GOLD or SILVER embroidery, ornate details, tassels
 - Wide enough for both pets to sit comfortably side by side
 
-=== REGAL CLOAKS (One Draped Over Each Pet) ===
+=== REGAL CLOAKS (One Draped Over Each Pet - LIGHT BEAUTIFUL COLORS) ===
 - DAINTY, DELICATE regal CLOAK DRAPED over EACH pet
+- LIGHT PASTEL cloak colors: soft pink, lavender, powder blue, mint, cream, blush, peach, soft coral
+- NOT dark cloaks - use LIGHT, BEAUTIFUL, PASTEL colors
 - Coordinating but not necessarily identical cloaks for each
 - More DAINTY and REFINED - not heavy or bulky
 - NO human clothing elements - NO sleeves, NO buttons
-- BRIGHT POLISHED METAL CLOAK CLASPS on each pet - gleaming and reflective
-- Elegant jewelry touches on each (pearl necklaces, gold chains)
-- Both pets should look regal and dignified together
+
+=== JEWELRY & ACCESSORIES (SILVER, GOLD, PEARLS) ===
+- SHINY SILVER cloak clasps - gleaming, polished, reflective
+- GOLD chains and pendants - bright and luminous
+- PEARL NECKLACES on each pet - elegant strings of lustrous pearls
+- Gemstone accents - sparkling rubies, sapphires, emeralds
+- Delicate filigree details in gold or silver
+- Both pets should look regal and dignified with beautiful jewelry
 
 === RENDERING - PAINTERLY STYLE ===
 - VISIBLE BRUSHSTROKES - soft, flowing, painterly brushwork
