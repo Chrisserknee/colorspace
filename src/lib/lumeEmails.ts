@@ -303,8 +303,8 @@ function getEmail2HTML(email: string, isRainbowBridge: boolean, petName?: string
     
     <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 10px; color: ${subtextColor};">
       ${isRainbowBridge 
-        ? "Our AI creates stunning memorial portraits that capture your pet's spirit in a beautiful, heavenly setting. Each one is unique and created with love."
-        : "Our AI creates museum-quality royal portraits that transform your pet into aristocratic nobility. Each one is unique and absolutely adorable."
+        ? "We create stunning memorial portraits that capture your pet's spirit in a beautiful, heavenly setting. Each one is unique and created with love."
+        : "We create museum-quality royal portraits that transform your pet into aristocratic nobility. Each one is unique and absolutely adorable."
       }
     </p>
     
@@ -326,7 +326,7 @@ function getEmail3HTML(email: string, isRainbowBridge: boolean): string {
       <tr>
         <td style="padding: 15px; text-align: center;">
           <p style="font-size: 24px; margin: 0 0 10px;">🎨</p>
-          <p style="font-size: 14px; font-weight: bold; color: ${accentColor}; margin: 0 0 5px;">AI-Powered Art</p>
+          <p style="font-size: 14px; font-weight: bold; color: ${accentColor}; margin: 0 0 5px;">Stunning Artistry</p>
           <p style="font-size: 13px; color: ${subtextColor}; margin: 0;">Museum-quality portraits in seconds</p>
         </td>
       </tr>
