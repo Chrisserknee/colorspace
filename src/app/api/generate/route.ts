@@ -2766,33 +2766,85 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
       
       // Create a prompt for transforming the image with both pets into a royal portrait
       // Using img2img preserves both pets' identities from the original photo
-      const multiPetImg2ImgPrompt = `Transform this photo of TWO pets into an AUTHENTIC late 18th-century European aristocratic oil painting portrait.
+      // IMPORTANT: This prompt mirrors the single-pet prompt structure for consistent style
+      const multiPetImg2ImgPrompt = `CRITICAL: These are TWO ${species1 === species2 ? `${species1}S` : `a ${species1} and a ${species2}`}. Keep BOTH pets exactly as shown - preserve both animals precisely.
 
-CRITICAL - PRESERVE BOTH PETS' IDENTITIES EXACTLY:
+=== MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+
+Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
+
+18th-century aristocratic oil portrait of TWO pets together. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.
+
+=== CRITICAL - PRESERVE BOTH PETS' IDENTITIES EXACTLY ===
 - Pet 1 (${species1}): ${petDescription1.substring(0, 200)}
 - Pet 2 (${species2}): ${petDescription2.substring(0, 200)}
 ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : ""}
+- Preserve BOTH pets' face structures, skull shapes, snout proportions EXACTLY
+- Keep all markings, colors, fur patterns in their EXACT locations for EACH pet
+- Maintain the exact eye color, shape, spacing, and expression for BOTH
+- Preserve ear shapes, sizes, and positions exactly for EACH pet
+- The unique identifying features of BOTH pets must remain unchanged
 
-KEEP both pets in their current positions and poses. DO NOT move or rearrange them.
+=== COMPOSITION - TWO PETS SITTING NATURALLY TOGETHER ===
+- ZOOMED OUT FRAMING - show BOTH pets' full bodies, not just heads
+- WIDE and CENTERED composition with both pets visible
+- Show LARGE CUSHION that comfortably fits BOTH pets
+- BOTH pets SEATED or LYING DOWN NATURALLY side by side
+- Position pets CLOSE TOGETHER like companions - shoulders touching or nearly touching
+- NEVER standing upright like humans - always sitting, lying, or resting
+- Natural animal posture for EACH: body low, front paws resting on cushion
+- BOTH pets should look comfortable and naturally positioned together
+- Natural sibling/companion pose - they should look like they belong together
+- FRONT PAWS VISIBLE for both pets, resting naturally on the shared cushion
+- Pets can be at slightly different angles (one more forward, one slightly turned)
+- Create visual balance - neither pet should dominate or overshadow the other
 
-ADD ROYAL ELEMENTS TO BOTH PETS:
-- Matching rich velvet cloaks draped over both (burgundy, emerald, or royal blue)
-- BRIGHT POLISHED SILVER CLOAK CLASPS on each pet - gleaming and reflective
-- Elegant jewelry touches (pearl necklaces, gold chains)
-- Both pets should look regal and dignified
+=== VIBRANT COLOR PALETTE (HIGHLY VARIED) ===
+- RANDOMIZE colors - avoid repetitive color schemes
+- DARKS: Charcoal black, rich black, deep slate (for dramatic contrast)
+- LIGHTS: Pure white, soft cream, ivory, champagne (for airy feel)
+- BLUES: Powder blue, sky blue, navy, teal, sapphire, periwinkle
+- PINKS: Soft pink, dusty rose, blush, coral, peach
+- GREENS: Emerald, sage, mint, forest green, olive
+- PURPLES: Lavender, lilac, mauve, dusty purple
+- CREATE CONTRAST: Colors should make BOTH pets stand out beautifully
 
-PAINTING STYLE:
-- Late 18th-century Georgian/Regency era (1770-1830)
-- Classical oil painting technique like Gainsborough, Reynolds, or Vigée Le Brun
-- VISIBLE BRUSHSTROKES, rich impasto texture
-- CRAQUELURE aging effect - fine cracks throughout
-- Museum-quality masterpiece
+=== LIGHTING (VERY BRIGHT - Both Subjects Well-Illuminated) ===
+- VERY BRIGHT KEY LIGHT illuminating BOTH pets - WELL-LIT and LUMINOUS
+- STRONG BRILLIANT HIGHLIGHTS on BOTH faces and fur - INTENSELY ILLUMINATED
+- MINIMAL SHADOWS - use fill light to reduce dark areas
+- BOTH subjects should GLOW with BRIGHT RADIANT light
+- LIGHT AND AIRY feel - NOT heavy shadows
+- BOTH pets are the BRIGHTEST elements - clearly visible and well-lit
+- Ensure even lighting across both subjects - no one pet in shadow
 
-BACKGROUND:
-- Rich velvet drapery, NOT brown - use deep blues, teals, burgundies, or soft creams
-- Atmospheric depth with sfumato effect
+=== THRONE CUSHION (Large - Fits Both Pets) ===
+- LARGE embroidered SILKY velvet cushion that comfortably fits BOTH pets
+- DEEP, RICH, SATURATED color that complements both pets' fur tones
+- SILKY texture with visible sheen
+- Gold embroidery, ornate details
+- Wide enough for both pets to sit comfortably side by side
 
-CRITICAL: Both pets must remain INSTANTLY RECOGNIZABLE. This is THESE TWO SPECIFIC pets together.`;
+=== REGAL CLOAKS (One Draped Over Each Pet) ===
+- DAINTY, DELICATE regal CLOAK DRAPED over EACH pet
+- Coordinating but not necessarily identical cloaks for each
+- More DAINTY and REFINED - not heavy or bulky
+- NO human clothing elements - NO sleeves, NO buttons
+- BRIGHT POLISHED METAL CLOAK CLASPS on each pet - gleaming and reflective
+- Elegant jewelry touches on each (pearl necklaces, gold chains)
+- Both pets should look regal and dignified together
+
+=== RENDERING - PAINTERLY STYLE ===
+- VISIBLE BRUSHSTROKES - soft, flowing, painterly brushwork
+- TEXTURED OIL PAINT appearance - like a classical painting
+- CANVAS GRAIN visible - museum-quality fine art
+- LONG FLOWING brush strokes - not digital, not airbrushed
+- Hand-painted charm with visible paint texture
+- Craquelure aging effect - fine cracks throughout
+- Classical oil painting technique - Gainsborough, Reynolds, Vigée Le Brun style
+
+CRITICAL: BOTH pets must look EXACTLY like themselves in the original photo. This is a portrait of THESE TWO SPECIFIC pets together - their identities must be instantly recognizable.`;
 
       console.log("Multi-pet img2img prompt length:", multiPetImg2ImgPrompt.length);
       
