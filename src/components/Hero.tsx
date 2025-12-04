@@ -167,10 +167,10 @@ export default function Hero({ onUploadClick }: HeroProps) {
 
         {/* Sample portraits */}
         <div className="flex justify-center items-end gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
-          {/* First Portrait - Josephine */}
+          {/* First Portrait - Whiskers (Tabby Cat) */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
+              className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
               style={{ padding: '2px' }}
             >
               {/* Soft outer glow/vignette */}
@@ -228,8 +228,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       }}
                     >
                       <img 
-                        src="/samples/whitecat.png" 
-                        alt="Josephine - Royal Cat Portrait"
+                        src="/samples/Gracie.png" 
+                        alt="Gracie - Royal Tabby Cat Portrait"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -247,14 +247,14 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 letterSpacing: '0.05em'
               }}
             >
-              Josephine
+              Gracie
             </p>
           </div>
 
-          {/* Second Portrait - Duchess */}
+          {/* Second Portrait - Charley & Lily (Two Dogs) */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-40 h-48 sm:w-52 sm:h-64 md:w-64 md:h-80 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
+              className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
               style={{ padding: '2px' }}
             >
               {/* Soft outer glow/vignette */}
@@ -312,8 +312,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       }}
                     >
                       <img 
-                        src="/samples/chihuahua.png" 
-                        alt="Duchess - Royal Dog Portrait"
+                        src="/samples/charley&Lily.png" 
+                        alt="Charley & Lily - Royal Duo Portrait"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -321,7 +321,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 </div>
               </div>
             </div>
-            {/* Pet Name */}
+            {/* Pet Names */}
             <p 
               className="mt-3 text-sm sm:text-base font-medium"
               style={{ 
@@ -331,7 +331,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 letterSpacing: '0.05em'
               }}
             >
-              Duchess
+              Charley & Lily
             </p>
           </div>
         </div>
