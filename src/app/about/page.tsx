@@ -183,20 +183,39 @@ export default function AboutPage() {
                   </p>
                 </div>
               </div>
-              <div 
-                className="relative rounded-2xl overflow-hidden"
-                style={{ 
-                  border: '2px solid rgba(197, 165, 114, 0.3)',
-                  boxShadow: '0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(197, 165, 114, 0.1)',
-                }}
-              >
-                <Image
-                  src="/samples/hero-portrait.png"
-                  alt="Example LumePet royal pet portrait"
-                  width={500}
-                  height={600}
-                  className="w-full h-auto"
-                />
+              <div className="space-y-6">
+                {/* First image - about1.png */}
+                <div 
+                  className="relative rounded-2xl overflow-hidden transform -rotate-2 hover:rotate-0 transition-transform duration-300"
+                  style={{ 
+                    border: '2px solid rgba(197, 165, 114, 0.3)',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(197, 165, 114, 0.1)',
+                  }}
+                >
+                  <Image
+                    src="/samples/about1.png"
+                    alt="LumePet royal pet portrait example"
+                    width={500}
+                    height={500}
+                    className="w-full h-auto"
+                  />
+                </div>
+                {/* Second image - Gracie */}
+                <div 
+                  className="relative rounded-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition-transform duration-300 w-3/4 ml-auto"
+                  style={{ 
+                    border: '2px solid rgba(197, 165, 114, 0.3)',
+                    boxShadow: '0 15px 40px rgba(0,0,0,0.3), 0 0 30px rgba(197, 165, 114, 0.1)',
+                  }}
+                >
+                  <Image
+                    src="/samples/Gracie.png"
+                    alt="Gracie - Royal tabby cat portrait"
+                    width={400}
+                    height={400}
+                    className="w-full h-auto"
+                  />
+                </div>
               </div>
             </div>
           </div>
