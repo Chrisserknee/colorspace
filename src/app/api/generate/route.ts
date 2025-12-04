@@ -2770,11 +2770,11 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
       const multiPetImg2ImgPrompt = `CRITICAL: These are TWO ${species1 === species2 ? `${species1}S` : `a ${species1} and a ${species2}`}. Keep BOTH pets exactly as shown - preserve both animals precisely.
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in LIGHT PASTEL colored cloaks (soft pink, lavender, powder blue, mint, cream) fastened with SHINY SILVER or GOLD clasps, adorned with PEARL NECKLACES, gold chains, and gemstone jewelry. Fabrics rendered with THICK TEXTURED PAINT showing brushwork.
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in SUBTLE ELEGANT colored cloaks (soft blush, dusty lavender, gentle powder blue, muted mint, warm cream) fastened with SHINY SILVER or GOLD clasps, adorned with PEARL NECKLACES, gold chains, and gemstone jewelry. Fabrics rendered with THICK TEXTURED PAINT showing brushwork.
 
-Compositions use LIGHT BACKGROUNDS (soft cream, powder blue, pale pink, light lavender, warm ivory - NEVER brown, NEVER dark, NEVER gloomy) with VISIBLE PAINT TEXTURE throughout. Colors are BRIGHT and PASTEL—soft pinks, lavenders, powder blues, mints, creams—applied with THICK, SCULPTURAL brushstrokes creating a regal, CHEERFUL, LUMINOUS atmosphere. The overall mood is noble, elegant, BRIGHT, LIGHT with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat or digital.
+Compositions use SOFT ELEGANT BACKGROUNDS (warm cream, dusty powder blue, gentle pale pink, soft lavender, warm ivory - NEVER brown, NEVER dark, NEVER gloomy, NEVER oversaturated) with VISIBLE PAINT TEXTURE throughout. Colors are SUBTLE yet LUMINOUS—soft muted tones that are BRIGHT but REFINED, never garish—applied with THICK, SCULPTURAL brushstrokes creating a regal, SOPHISTICATED, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT but SUBTLE, with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat, NOT oversaturated.
 
-18th-century aristocratic oil portrait of TWO pets with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED. LIGHT and BRIGHT aesthetic.
+18th-century aristocratic oil portrait of TWO pets with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED. BRIGHT but ELEGANT aesthetic.
 
 === CRITICAL - PRESERVE BOTH PETS' IDENTITIES EXACTLY ===
 - Pet 1 (${species1}): ${petDescription1.substring(0, 200)}
@@ -2800,14 +2800,15 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - Pets can be at slightly different angles (one more forward, one slightly turned)
 - Create visual balance - neither pet should dominate or overshadow the other
 
-=== LIGHT PASTEL COLOR PALETTE (BRIGHT & CHEERFUL - NOT DARK) ===
-- LIGHT, BRIGHT, PASTEL colors throughout - NOT dark or gloomy
+=== SUBTLE ELEGANT COLOR PALETTE (BRIGHT yet REFINED - NOT DARK) ===
+- SUBTLE, ELEGANT, SOFT colors throughout - NOT dark or gloomy, NOT oversaturated
+- Colors should be BRIGHT but SOPHISTICATED - luminous yet refined
 - AVOID dark colors: NO black backgrounds, NO dark browns, NO deep shadows
-- BACKGROUNDS: Soft cream, powder blue, pale pink, light lavender, soft mint, warm ivory, light grey
-- PASTELS PREFERRED: Soft pink, blush, lavender, periwinkle, mint, sage, powder blue, peach
-- LIGHT AND AIRY feel - cheerful, elegant, luminous
-- CREATE CONTRAST with light colors that make BOTH pets stand out beautifully
-- Overall palette should feel BRIGHT, FRESH, and UPLIFTING
+- BACKGROUNDS: Soft cream, dusty powder blue, gentle pale pink, soft lavender, muted mint, warm ivory
+- SOFT PASTELS: Gentle blush, soft lavender, dusty periwinkle, muted sage, soft powder blue, gentle peach
+- LIGHT AND AIRY feel - cheerful, elegant, luminous but never garish
+- CREATE HARMONY with subtle colors that make BOTH pets stand out beautifully
+- Overall palette should feel BRIGHT, REFINED, and SOPHISTICATED
 
 === LIGHTING (VERY BRIGHT - Both Subjects Well-Illuminated) ===
 - VERY BRIGHT KEY LIGHT illuminating BOTH pets - WELL-LIT and LUMINOUS
@@ -2819,18 +2820,18 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - Ensure even lighting across both subjects - no one pet in shadow
 - BRIGHT OVERALL COMPOSITION - cheerful and luminous
 
-=== THRONE CUSHION (Large - Fits Both Pets - LIGHT PASTEL COLORS) ===
+=== THRONE CUSHION (Large - Fits Both Pets - SUBTLE ELEGANT COLORS) ===
 - LARGE embroidered SILKY velvet cushion that comfortably fits BOTH pets
-- LIGHT PASTEL colors: soft pink, powder blue, lavender, mint, cream, blush, peach
-- NOT dark colors - use LIGHT, SOFT, PASTEL tones
+- SUBTLE ELEGANT colors: soft blush, dusty powder blue, gentle lavender, muted mint, warm cream
+- NOT dark colors - use SOFT, REFINED, SOPHISTICATED tones
 - SILKY texture with visible sheen and luminous quality
 - GOLD or SILVER embroidery, ornate details, tassels
 - Wide enough for both pets to sit comfortably side by side
 
-=== REGAL CLOAKS (One Draped Over Each Pet - LIGHT BEAUTIFUL COLORS) ===
+=== REGAL CLOAKS (One Draped Over Each Pet - SUBTLE BEAUTIFUL COLORS) ===
 - DAINTY, DELICATE regal CLOAK DRAPED over EACH pet
-- LIGHT PASTEL cloak colors: soft pink, lavender, powder blue, mint, cream, blush, peach, soft coral
-- NOT dark cloaks - use LIGHT, BEAUTIFUL, PASTEL colors
+- SUBTLE ELEGANT cloak colors: soft blush, dusty lavender, gentle powder blue, muted mint, warm cream, soft peach
+- NOT oversaturated or garish - use SOFT, BEAUTIFUL, REFINED colors
 - Coordinating but not necessarily identical cloaks for each
 - More DAINTY and REFINED - not heavy or bulky
 - NO human clothing elements - NO sleeves, NO buttons
@@ -3153,21 +3154,22 @@ CRITICAL: The ${species} must look EXACTLY like the original photo - this is a m
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
 A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with THICK TEXTURED PAINT showing brushwork.
 
-Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) with VISIBLE PAINT TEXTURE throughout. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—applied with THICK, SCULPTURAL brushstrokes creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat or digital.
+Compositions use ELEGANT backgrounds (soft dusty blue, muted burgundy, gentle sage, soft cream, dusty rose - NEVER brown or dark) with VISIBLE PAINT TEXTURE throughout. Colors are SUBTLE yet LUMINOUS—soft muted tones that are still BRIGHT and CHEERFUL but never garish or overly saturated—applied with THICK, SCULPTURAL brushstrokes creating a regal, REFINED, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT but SOPHISTICATED, historically authentic with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat or digital, NOT oversaturated.
 
-18th-century aristocratic oil portrait with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
+18th-century aristocratic oil portrait with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
 
-=== VIBRANT COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
+=== SUBTLE ELEGANT COLOR PALETTE (Bright but Refined - Different Every Time) ===
 - RANDOMIZE colors each generation - avoid repetitive color schemes
-- DARKS: Charcoal black, rich black, deep slate (for dramatic contrast)
-- LIGHTS: Pure white, soft cream, ivory, champagne (for airy feel)
-- GREYS: Silver grey, warm grey, dove grey, slate
-- BLUES: Powder blue, sky blue, navy, teal, sapphire, periwinkle
-- PINKS: Soft pink, dusty rose, blush, coral, peach
-- GREENS: Emerald, sage, mint, forest green, olive
-- PURPLES: Lavender, lilac, mauve, dusty purple
-- MIX IT UP: Each portrait should have a unique, different color palette
-- CREATE CONTRAST: Colors should make the pet stand out beautifully
+- Colors should be SUBTLE yet LUMINOUS - bright but not garish, vibrant but sophisticated
+- DARKS: Soft charcoal, muted slate, gentle black (for subtle contrast)
+- LIGHTS: Warm white, soft cream, gentle ivory, muted champagne (for airy feel)
+- GREYS: Soft silver, warm dove grey, gentle slate, muted pewter
+- BLUES: Dusty powder blue, soft sky blue, muted navy, gentle teal, soft periwinkle
+- PINKS: Soft blush, dusty rose, muted coral, gentle peach
+- GREENS: Soft sage, muted mint, gentle olive, dusty emerald
+- PURPLES: Soft lavender, gentle lilac, dusty mauve, muted violet
+- MIX IT UP: Each portrait should have a unique, ELEGANT color palette
+- CREATE HARMONY: Colors should complement the pet with SUBTLE sophistication
 
 === CRITICAL PET PRESERVATION ===
 - Preserve the face structure, skull shape, snout proportions EXACTLY from the original
@@ -3188,17 +3190,17 @@ Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft 
 - Clean, professional, BRIGHT portrait lighting
 - Soft shadows only where needed for dimension - NOT deep dark shadows
 
-=== AUTOMATIC COLOR HARMONY (DEEP, RICH Colors Based on Pet's Natural Colors) ===
-Select DEEP, RICH, SATURATED cloak, cushion, drapery, and gem colors based on the pet's natural fur, eye, and nose tones. Use DEEP, RICH, SATURATED colors while retaining darker tones in shadows:
+=== ELEGANT COLOR HARMONY (SUBTLE yet LUMINOUS - Refined Classical Palette) ===
+Select ELEGANT, REFINED cloak, cushion, drapery, and gem colors based on the pet's natural fur tones. Colors should be SUBTLE yet LUMINOUS - bright but not garish, vibrant but sophisticated:
 
-FOR WARM-TONED OR TAN PETS: DEEP rich blues, DEEP forest greens, RICH burgundy, or DEEP teal fabrics with gold embroidery - DEEP and SATURATED
-FOR BLACK OR DARK-COATED PETS: RICH cream, DEEP ivory, RICH gold, DEEP emerald, DEEP sapphire, RICH lavender fabrics for contrast - DEEP and RICH
-FOR WHITE OR PALE PETS: DEEP rich jewel tones (DEEP ruby, DEEP emerald, DEEP sapphire, RICH periwinkle) or DEEP velvets - RICH colors
-FOR ORANGE/GINGER PETS: DEEP teal, RICH turquoise, DEEP forest green, or DEEP navy fabrics - DEEP SATURATED tones
-FOR GRAY OR SILVER PETS: DEEP burgundy, RICH plum, DEEP amethyst, or RICH gold-trimmed velvets - DEEP and RICH
-FOR MULTICOLOR PETS: harmonize with dominant fur tone using DEEP/RICH colors, accent with SATURATED secondary tone
+FOR WARM-TONED OR TAN PETS: Soft dusty blues, muted sage greens, elegant burgundy, or refined teal fabrics - SUBTLE and SOPHISTICATED
+FOR BLACK OR DARK-COATED PETS: Soft cream, warm ivory, muted gold, soft sage, dusty blue, gentle lavender fabrics for contrast - ELEGANT and REFINED
+FOR WHITE OR PALE PETS: Soft jewel tones (muted ruby, soft emerald, dusty sapphire, gentle periwinkle) or elegant velvets - SOPHISTICATED colors
+FOR ORANGE/GINGER PETS: Soft teal, muted turquoise, gentle sage green, or dusty navy fabrics - SUBTLE ELEGANT tones
+FOR GRAY OR SILVER PETS: Soft burgundy, dusty plum, muted amethyst, or warm gold-trimmed velvets - REFINED and ELEGANT
+FOR MULTICOLOR PETS: harmonize with dominant fur tone using SUBTLE/ELEGANT colors, accent with complementary secondary tone
 
-Apply same harmony to GEMSTONES: select DEEP RICH gems that complement pet's eyes or fur (DEEP ruby, DEEP emerald, DEEP sapphire, RICH topaz, DEEP amethyst) - SPARKLING, LUMINOUS, and DEEP SATURATED
+Apply same harmony to GEMSTONES: select ELEGANT gems that complement pet's eyes or fur (soft ruby, muted emerald, dusty sapphire, warm topaz, gentle amethyst) - SPARKLING but SUBTLE, LUMINOUS but REFINED
 
 === COMPOSITION (ZOOMED OUT, Wide, Centered, Full Body Visible) ===
 - ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
@@ -3216,10 +3218,10 @@ Apply same harmony to GEMSTONES: select DEEP RICH gems that complement pet's eye
 
 === THRONE CUSHION ===
 - Embroidered SILKY velvet cushion with VISIBLE GOLD TASSELS
-- DEEP, RICH, SATURATED color selected to complement pet's fur tones
+- SUBTLE, ELEGANT color selected to complement pet's fur tones
 - SILKY texture with visible sheen
 - Gold embroidery, ornate details
-- Rich, deep tones - saturated and luminous
+- Refined, sophisticated tones - luminous but not garish
 
 === REGAL CLOAK (Draped Over Pet AND Cushion - NOT Clothing) ===
 - DAINTY, DELICATE regal CLOAK DRAPED over BOTH the pet AND cushion - NOT clothing, just draped fabric
