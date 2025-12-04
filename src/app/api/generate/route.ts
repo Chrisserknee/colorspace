@@ -2770,11 +2770,11 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
       const multiPetImg2ImgPrompt = `CRITICAL: These are TWO ${species1 === species2 ? `${species1}S` : `a ${species1} and a ${species2}`}. Keep BOTH pets exactly as shown - preserve both animals precisely.
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in LIGHT PASTEL colored cloaks (soft pink, lavender, powder blue, mint, cream) fastened with SHINY SILVER or GOLD clasps, adorned with PEARL NECKLACES, gold chains, and gemstone jewelry. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in LIGHT PASTEL colored cloaks (soft pink, lavender, powder blue, mint, cream) fastened with SHINY SILVER or GOLD clasps, adorned with PEARL NECKLACES, gold chains, and gemstone jewelry. Fabrics rendered with THICK TEXTURED PAINT showing brushwork.
 
-Compositions use LIGHT BACKGROUNDS (soft cream, powder blue, pale pink, light lavender, warm ivory - NEVER brown, NEVER dark, NEVER gloomy) with soft drapery to add depth. Colors are BRIGHT and PASTEL—soft pinks, lavenders, powder blues, mints, creams—creating a regal, CHEERFUL, LUMINOUS, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, LIGHT, and historically authentic. NOT dark, NOT gloomy, NOT heavy.
+Compositions use LIGHT BACKGROUNDS (soft cream, powder blue, pale pink, light lavender, warm ivory - NEVER brown, NEVER dark, NEVER gloomy) with VISIBLE PAINT TEXTURE throughout. Colors are BRIGHT and PASTEL—soft pinks, lavenders, powder blues, mints, creams—applied with THICK, SCULPTURAL brushstrokes creating a regal, CHEERFUL, LUMINOUS atmosphere. The overall mood is noble, elegant, BRIGHT, LIGHT with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat or digital.
 
-18th-century aristocratic oil portrait of TWO pets together. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance. LIGHT and BRIGHT aesthetic.
+18th-century aristocratic oil portrait of TWO pets with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED. LIGHT and BRIGHT aesthetic.
 
 === CRITICAL - PRESERVE BOTH PETS' IDENTITIES EXACTLY ===
 - Pet 1 (${species1}): ${petDescription1.substring(0, 200)}
@@ -2843,14 +2843,32 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - Delicate filigree details in gold or silver
 - Both pets should look regal and dignified with beautiful jewelry
 
-=== RENDERING - PAINTERLY STYLE ===
-- VISIBLE BRUSHSTROKES - soft, flowing, painterly brushwork
-- TEXTURED OIL PAINT appearance - like a classical painting
-- CANVAS GRAIN visible - museum-quality fine art
-- LONG FLOWING brush strokes - not digital, not airbrushed
-- Hand-painted charm with visible paint texture
-- Craquelure aging effect - fine cracks throughout
+=== SIGNATURE THICK OIL-PAINT TEXTURE (CRITICAL - Physically Painted Look) ===
+This must look like a HIGH-END PHYSICAL OIL PAINTING that was PROFESSIONALLY SCANNED:
+
+THICK SCULPTURAL IMPASTO:
+- HEAVY, RAISED paint peaks you can almost FEEL - thick 3D paint texture
+- SCULPTURAL paint application - paint stands up from the canvas surface
+- Visible PAINT RIDGES and VALLEYS creating physical depth
+- THICK BUTTERY strokes with paint that has BODY and WEIGHT
+- Impasto highlights that CATCH THE LIGHT like real raised paint
+
+VISIBLE BRUSH BRISTLE MARKS:
+- Individual BRISTLE TRACKS embedded in the paint surface
+- Directional brushwork following the form - fur direction, fabric drape
+- FEATHERY brush edges where strokes trail off
+
+CANVAS TEXTURE & PAINT APPLICATION:
+- COARSE WOVEN CANVAS visible in thinner paint areas
+- RICH, CREAMY paint consistency - not watery or thin
+- Areas of THICK LOADED strokes next to THIN SCRAPED areas
+
+PROFESSIONALLY SCANNED ARTWORK QUALITY:
+- High-resolution detail capturing every paint texture
+- Museum archival quality reproduction
+- The texture and depth of a $50,000 original oil painting
 - Classical oil painting technique - Gainsborough, Reynolds, Vigée Le Brun style
+- NOT digital, NOT airbrushed, NOT smooth, NOT flat
 
 CRITICAL: BOTH pets must look EXACTLY like themselves in the original photo. This is a portrait of THESE TWO SPECIFIC pets together - their identities must be instantly recognizable.`;
 
@@ -3105,29 +3123,39 @@ VARY THE COMPOSITION - Use different heavenly settings:
 - Pet appears to be bathed in soft light
 - Light filtering through clouds creates soft dappled effect
 
-=== RENDERING - PAINTERLY STYLE ===
-- VISIBLE BRUSHSTROKES - soft, flowing, painterly brushwork
-- TEXTURED OIL PAINT appearance - like a classical painting
-- CANVAS GRAIN visible - museum-quality fine art
-- LONG FLOWING brush strokes - not digital, not airbrushed
-- Hand-painted charm with visible paint texture
-- Soft, dreamy, ethereal feel with painterly quality
-- NOT hyper-realistic - soft, artistic, painted
-- Museum-quality memorial portrait
-- Warm, comforting atmosphere
-- Paint texture visible on clouds, background, and pet's fur
-- Classical oil painting technique - like Gainsborough or Reynolds but heavenly
+=== SIGNATURE THICK OIL-PAINT TEXTURE (Heavenly Yet Tactile) ===
+This must look like a HIGH-END PHYSICAL OIL PAINTING that was PROFESSIONALLY SCANNED:
+
+THICK SCULPTURAL IMPASTO:
+- HEAVY, RAISED paint peaks - thick 3D paint texture even in ethereal clouds
+- SCULPTURAL paint application on fur highlights and cloud formations
+- Visible PAINT RIDGES creating physical depth in heavenly light
+- THICK BUTTERY strokes with paint that has BODY and WEIGHT
+- Impasto highlights that CATCH THE LIGHT like real raised paint
+
+VISIBLE BRUSH BRISTLE MARKS:
+- Individual BRISTLE TRACKS embedded in paint - clouds, fur, light rays
+- Directional brushwork following the form - soft and ethereal yet textured
+- FEATHERY brush edges creating soft, dreamy transitions
+
+PROFESSIONALLY SCANNED ARTWORK QUALITY:
+- High-resolution detail capturing every paint texture
+- Museum archival quality reproduction
+- Soft, dreamy, ethereal feel WITH visible paint texture
+- The tactile quality of a $50,000 original memorial painting
+- Classical technique like Gainsborough or Reynolds but heavenly
+- NOT hyper-realistic - soft, artistic, PAINTED with visible texture
 
 CRITICAL: The ${species} must look EXACTLY like the original photo - this is a memorial portrait. Vary the composition (sometimes on cloud pillow, sometimes floating, sometimes in mist). Use visible brushstrokes and painterly technique throughout. The pet should appear peaceful, serene, and surrounded by heavenly light. Create a beautiful, varied, painterly tribute that brings comfort.` : null;
 
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with THICK TEXTURED PAINT showing brushwork.
 
-Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
+Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) with VISIBLE PAINT TEXTURE throughout. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—applied with THICK, SCULPTURAL brushstrokes creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat or digital.
 
-18th-century aristocratic oil portrait of a pet. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
+18th-century aristocratic oil portrait with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
 
 === VIBRANT COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
 - RANDOMIZE colors each generation - avoid repetitive color schemes
@@ -3242,19 +3270,50 @@ Apply same harmony to GEMSTONES: select DEEP RICH gems that complement pet's eye
 - Pearl accents: BRIGHT WHITE
 - White highlights: PURE BRIGHT WHITE
 
-=== RENDERING (Old-Master Realism with Glow - Deep Colors, Darker Tones) ===
-- VISIBLE BRUSHSTROKES throughout
-- TEXTURED OIL PAINT appearance
-- CANVAS GRAIN texture
-- MUSEUM-QUALITY rendering
-- Hand-painted look with slight imperfections
-- LONG, FLOWING brush strokes
-- NOT digital, NOT airbrushed, NOT too perfect
-- SUBTLE LUMINOUS GLOW throughout - gentle radiance and warmth
-- SILKY LUSTROUS textures on fabrics - visible sheen and luster
-- DEEP, RICH, SATURATED colors throughout - rich jewel tones
-- DARKER TONES retained in shadows and background for depth
-- Subject GLOWS with BRIGHT warm light, fabrics GLOW with DEEP RICH color
+=== SIGNATURE THICK OIL-PAINT TEXTURE (CRITICAL - Physically Painted Look) ===
+This must look like a HIGH-END PHYSICAL OIL PAINTING that was PROFESSIONALLY SCANNED:
+
+THICK SCULPTURAL IMPASTO:
+- HEAVY, RAISED paint peaks you can almost FEEL - thick 3D paint texture
+- SCULPTURAL paint application - paint stands up from the canvas surface
+- Visible PAINT RIDGES and VALLEYS creating physical depth
+- THICK BUTTERY strokes with paint that has BODY and WEIGHT
+- Impasto highlights that CATCH THE LIGHT like real raised paint
+- Paint texture most prominent on: fur highlights, jewelry, fabric folds, cloak edges
+
+VISIBLE BRUSH BRISTLE MARKS:
+- Individual BRISTLE TRACKS embedded in the paint surface
+- You can see WHERE THE BRUSH DRAGGED through wet paint
+- Directional brushwork following the form - fur direction, fabric drape
+- FEATHERY brush edges where strokes trail off
+- Varied brush sizes - fine detail brushes AND broad loaded brushes
+
+CANVAS TEXTURE SHOWING THROUGH:
+- COARSE WOVEN CANVAS visible in thinner paint areas
+- Canvas weave pattern shows through glazed shadows
+- Contrast between THICK impasto peaks and THIN canvas-revealing areas
+- Professional artist's linen canvas texture
+
+PAINT LOADING AND APPLICATION:
+- RICH, CREAMY paint consistency - not watery or thin
+- Areas of THICK LOADED strokes next to THIN SCRAPED areas
+- Palette knife texture in some background areas
+- Wet-into-wet blending visible in soft transitions
+
+PROFESSIONALLY SCANNED ARTWORK QUALITY:
+- High-resolution detail capturing every paint texture
+- Museum archival quality reproduction
+- The texture and depth of a $50,000 original oil painting
+- Looks like it belongs in a prestigious gallery or private collection
+
+RENDERING STYLE:
+- LONG, FLOWING brush strokes with visible paint body
+- NOT digital, NOT airbrushed, NOT smooth, NOT flat
+- Hand-painted charm with intentional texture variations
+- SUBTLE LUMINOUS GLOW throughout - paint has inner warmth
+- SILKY LUSTROUS fabric textures with thick paint highlights
+- DEEP, RICH, SATURATED colors with visible paint depth
+- Subject GLOWS with BRIGHT warm light through textured paint
 
 CRITICAL: The ${species} must sit NATURALLY like a real ${species} - NOT in a human-like pose. NO human clothing - ONLY a cloak draped over. The ${species} itself must remain completely unchanged and identical to the original photo. Remember: this is a ${species}, not a human.`;
       
