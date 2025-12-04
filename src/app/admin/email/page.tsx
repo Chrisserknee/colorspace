@@ -534,21 +534,21 @@ export default function AdminEmailPage() {
               {/* Main Heading */}
               <h5 
                 className="text-lg text-center mb-4"
-                style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                style={{ color: '#FFFFFF', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
               >
                 LumePet Needs Your Help to Stay Online
               </h5>
               
               {/* Message Preview */}
               <div className="space-y-3 mb-5 px-2">
-                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
-                  I'm Chris — I built LumePet to celebrate our pets as the royalty they truly are. But I need to be honest: <span style={{ color: '#F0EDE8' }}>I'm struggling to keep it running.</span>
+                <p className="text-sm leading-relaxed" style={{ color: '#D4D0C8' }}>
+                  I'm Chris — I built LumePet to celebrate our pets as the royalty they truly are. But I need to be honest: <span style={{ color: '#FFFFFF' }}>I'm struggling to keep it running.</span>
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
-                  Every portrait costs real money. The AI is expensive, and <span style={{ color: '#E74C3C' }}>the costs are more than I can afford alone.</span>
+                <p className="text-sm leading-relaxed" style={{ color: '#D4D0C8' }}>
+                  Every portrait costs real money. The AI is expensive, and <span style={{ color: '#FF6B6B' }}>the costs are more than I can afford alone.</span>
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
-                  If LumePet ever brought you joy — <span style={{ color: '#C5A572' }}>please consider helping.</span> Even $1 makes a difference.
+                <p className="text-sm leading-relaxed" style={{ color: '#D4D0C8' }}>
+                  If LumePet ever brought you joy — <span style={{ color: '#E8D5A3' }}>please consider helping.</span> Even $1 makes a difference.
                 </p>
               </div>
               
@@ -574,14 +574,14 @@ export default function AdminEmailPage() {
                 className="pt-4 text-center"
                 style={{ borderTop: '1px solid rgba(197, 165, 114, 0.1)' }}
               >
-                <p className="text-sm mb-2" style={{ color: '#B8B2A8' }}>Thank you from the bottom of my heart. 💛</p>
+                <p className="text-sm mb-2" style={{ color: '#D4D0C8' }}>Thank you from the bottom of my heart. 💛</p>
                 <p 
                   className="text-base italic"
-                  style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                  style={{ color: '#E8D5A3', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                 >
                   Chris Cerney
                 </p>
-                <p className="text-xs mt-1" style={{ color: '#7A756D' }}>Creator of LumePet 🐾</p>
+                <p className="text-xs mt-1" style={{ color: '#A8A49C' }}>Creator of LumePet 🐾</p>
               </div>
               
               {/* Paw Prints */}

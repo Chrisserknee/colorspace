@@ -55,20 +55,20 @@ function getSupportEmailHTML(): string {
           <!-- Main Message -->
           <tr>
             <td style="padding: 30px 40px;">
-              <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: normal; color: #F0EDE8; text-align: center; font-family: Georgia, 'Times New Roman', serif; line-height: 1.4;">
+              <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: normal; color: #FFFFFF; text-align: center; font-family: Georgia, 'Times New Roman', serif; line-height: 1.4;">
                 LumePet Needs Your Help to Stay Online
               </h2>
               
-              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.7; color: #B8B2A8;">
-                I'm Chris — I built LumePet to celebrate our pets as the royalty they truly are. But I need to be honest: <strong style="color: #F0EDE8;">I'm struggling to keep it running.</strong>
+              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.8; color: #D4D0C8;">
+                I'm Chris — I built LumePet to celebrate our pets as the royalty they truly are. But I need to be honest: <strong style="color: #FFFFFF;">I'm struggling to keep it running.</strong>
               </p>
               
-              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.7; color: #B8B2A8;">
-                Every portrait costs real money to create. The AI technology is expensive, and <strong style="color: #E74C3C;">the costs are more than I can afford alone.</strong> Without support, I may have to shut down LumePet.
+              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.8; color: #D4D0C8;">
+                Every portrait costs real money to create. The AI technology is expensive, and <strong style="color: #FF6B6B;">the costs are more than I can afford alone.</strong> Without support, I may have to shut down LumePet.
               </p>
               
-              <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.7; color: #B8B2A8;">
-                If LumePet ever brought you joy — <strong style="color: #C5A572;">please consider helping me keep it alive.</strong> Even $1 makes a difference.
+              <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.8; color: #D4D0C8;">
+                If LumePet ever brought you joy — <strong style="color: #E8D5A3;">please consider helping me keep it alive.</strong> Even $1 makes a difference.
               </p>
             </td>
           </tr>
@@ -101,13 +101,13 @@ function getSupportEmailHTML(): string {
           <!-- Personal Sign-off -->
           <tr>
             <td style="padding: 25px 40px;">
-              <p style="margin: 0 0 12px 0; font-size: 15px; line-height: 1.7; color: #B8B2A8;">
+              <p style="margin: 0 0 12px 0; font-size: 15px; line-height: 1.7; color: #D4D0C8;">
                 Thank you from the bottom of my heart. 💛
               </p>
-              <p style="margin: 0; font-size: 18px; color: #C5A572; font-family: Georgia, 'Times New Roman', serif; font-style: italic;">
+              <p style="margin: 0; font-size: 18px; color: #E8D5A3; font-family: Georgia, 'Times New Roman', serif; font-style: italic;">
                 Chris Cerney
               </p>
-              <p style="margin: 4px 0 0 0; font-size: 12px; color: #7A756D;">
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #A8A49C;">
                 Creator of LumePet 🐾
               </p>
             </td>
