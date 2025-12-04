@@ -292,8 +292,6 @@ export async function POST(request: NextRequest) {
       if (i < emailList.length - 1) {
         await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_EMAILS));
       }
-      
-      console.log(`📧 Progress: ${Math.min(i + BATCH_SIZE, emailList.length)}/${emailList.length} processed`);
     }
 
     console.log(`✅ Support email campaign complete: ${successCount} sent, ${failCount} failed`);
