@@ -255,47 +255,42 @@ export async function POST(request: NextRequest) {
 
     console.log(`📧 Sending support email to ${emailList.length} users...`);
 
-    // Send emails in batches to avoid rate limits
-    const BATCH_SIZE = 50;
-    const DELAY_BETWEEN_BATCHES = 1000; // 1 second
+    // Send emails one at a time with delay to avoid rate limits (Resend: 2 req/sec)
+    const DELAY_BETWEEN_EMAILS = 600; // 600ms = ~1.6 emails per second (safe margin)
     
     let successCount = 0;
     let failCount = 0;
     const errors: string[] = [];
 
-    for (let i = 0; i < emailList.length; i += BATCH_SIZE) {
-      const batch = emailList.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < emailList.length; i++) {
+      const email = emailList[i];
       
-      // Send each email in the batch
-      const results = await Promise.allSettled(
-        batch.map(async (email) => {
-          const { error } = await resend.emails.send({
-            from: FROM_EMAIL,
-            to: [email],
-            subject,
-            html,
-          });
-          
-          if (error) {
-            throw new Error(`${email}: ${error.message}`);
-          }
-          return email;
-        })
-      );
-
-      // Count successes and failures
-      results.forEach((result) => {
-        if (result.status === "fulfilled") {
-          successCount++;
-        } else {
+      try {
+        const { error } = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [email],
+          subject,
+          html,
+        });
+        
+        if (error) {
           failCount++;
-          errors.push(result.reason?.message || "Unknown error");
+          errors.push(`${email}: ${error.message}`);
+          console.error(`❌ Failed: ${email} - ${error.message}`);
+        } else {
+          successCount++;
+          console.log(`✅ Sent ${i + 1}/${emailList.length}: ${email}`);
         }
-      });
-
-      // Delay between batches if not the last batch
-      if (i + BATCH_SIZE < emailList.length) {
-        await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
+      } catch (err) {
+        failCount++;
+        const errMsg = err instanceof Error ? err.message : "Unknown error";
+        errors.push(`${email}: ${errMsg}`);
+        console.error(`❌ Error: ${email} - ${errMsg}`);
+      }
+      
+      // Delay before next email (except for the last one)
+      if (i < emailList.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_EMAILS));
       }
       
       console.log(`📧 Progress: ${Math.min(i + BATCH_SIZE, emailList.length)}/${emailList.length} processed`);
