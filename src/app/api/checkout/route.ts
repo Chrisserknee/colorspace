@@ -35,16 +35,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { imageId, email, type, packType, canvasImageDataUrl, cancelUrl: requestedCancelUrl } = body;
 
-    // Validate email with strict validation
-    if (!email || !isValidEmail(email)) {
-      return NextResponse.json(
-        { error: "Please provide a valid email address" },
-        { status: 400 }
-      );
+    // Email is now optional - Stripe will collect it during checkout if not provided
+    let sanitizedEmail: string | null = null;
+    if (email && isValidEmail(email)) {
+      sanitizedEmail = sanitizeString(email.toLowerCase().trim(), 254);
     }
-    
-    // Sanitize email
-    const sanitizedEmail = sanitizeString(email.toLowerCase().trim(), 254);
 
     // Check if this is a pack purchase
     const isPackPurchase = type === "pack";
@@ -140,8 +135,10 @@ export async function POST(request: NextRequest) {
       console.log(`Creating checkout session with price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
     }
 
-    // Save email to emails table for marketing (using sanitized email)
-    await saveEmail(sanitizedEmail, imageId || null, isPackPurchase ? "pack-checkout" : "checkout");
+    // Save email to emails table for marketing (using sanitized email) - only if email provided
+    if (sanitizedEmail) {
+      await saveEmail(sanitizedEmail, imageId || null, isPackPurchase ? "pack-checkout" : "checkout");
+    }
 
     // Get the base URL from the request (works for both localhost and production)
     // Stripe requires absolute URLs, so we need to ensure we have a valid URL
@@ -221,9 +218,10 @@ export async function POST(request: NextRequest) {
     console.log(`Using cancel URL: ${cancelUrl}`);
 
     // Create Stripe Checkout Session
+    // If email not provided, Stripe will collect it during checkout
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      customer_email: sanitizedEmail,
+      ...(sanitizedEmail ? { customer_email: sanitizedEmail } : {}),
       line_items: [
         {
           price_data: {
@@ -245,7 +243,7 @@ export async function POST(request: NextRequest) {
       cancel_url: cancelUrl,
       metadata: {
         ...(imageId ? { imageId } : {}),
-        customerEmail: sanitizedEmail,
+        ...(sanitizedEmail ? { customerEmail: sanitizedEmail } : {}),
         ...(isPackPurchase ? { type: "pack", packType: sanitizeString(packType || "", 20) } : {}),
       },
     });

@@ -798,45 +798,42 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       has_email: !!email,
     });
     
-    // If email is already set (from session restore), skip to checkout directly
-    if (email && validateEmail(email) && result) {
-      console.log("📧 Email already set from session, going directly to checkout");
-      setStage("checkout");
-      
-      try {
-        // Cancel URL returns user to their portrait via session restore
-        const cancelUrl = `/?email=${encodeURIComponent(email)}`;
-        
-        const response = await fetch("/api/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            imageId: result.imageId,
-            email: email,
-            type: "image",
-            cancelUrl,
-          }),
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.checkoutUrl) {
-          window.location.href = data.checkoutUrl;
-        } else {
-          setError(data.error || "Failed to create checkout session");
-          setStage("result");
-        }
-      } catch (err) {
-        console.error("Checkout error:", err);
-        setError("Failed to redirect to checkout. Please try again.");
-        setStage("result");
-      }
+    if (!result) {
+      setError("Something went wrong. Please try again.");
       return;
     }
     
-    // Otherwise, go to email entry stage
-    setStage("email");
-    setEmailError(null);
+    // Go directly to Stripe checkout - email will be collected by Stripe
+    setStage("checkout");
+    
+    try {
+      // Cancel URL returns user to result page
+      const cancelUrl = `/`;
+      
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageId: result.imageId,
+          email: email || null, // Pass email if we have it, otherwise Stripe collects it
+          type: "image",
+          cancelUrl,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        setError(data.error || "Failed to create checkout session");
+        setStage("result");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setError("Failed to redirect to checkout. Please try again.");
+      setStage("result");
+    }
   };
 
   const validateEmail = (email: string) => {
