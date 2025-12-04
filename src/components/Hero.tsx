@@ -427,31 +427,6 @@ export default function Hero({ onUploadClick }: HeroProps) {
           </div>
         </div>
 
-        {/* Rainbow Bridge Link - Memorial Portraits */}
-        <div className="mt-8 animate-fade-in-up delay-700">
-          <a
-            href="/rainbow-bridge"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
-            style={{
-              background: 'linear-gradient(135deg, rgba(147, 112, 219, 0.2) 0%, rgba(138, 43, 226, 0.15) 100%)',
-              border: '1px solid rgba(147, 112, 219, 0.3)',
-              backdropFilter: 'blur(10px)',
-              color: '#D8BFD8',
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: '0.95rem',
-              fontWeight: 500,
-              letterSpacing: '0.05em',
-              textDecoration: 'none',
-              boxShadow: '0 4px 15px rgba(147, 112, 219, 0.15)'
-            }}
-          >
-            <span style={{ fontSize: '1.1rem' }}>🌈</span>
-            <span>Rainbow Bridge Memorial Portraits</span>
-            <svg className="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </a>
-        </div>
       </div>
 
       {/* Magical Lightbox Modal */}
