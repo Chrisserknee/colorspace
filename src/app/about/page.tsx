@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About LumePet | AI Pet Portrait Artists Creating Royal Masterpieces",
-  description: "LumePet transforms beloved pets into stunning royal oil painting portraits using advanced AI technology. Learn about our mission to celebrate the bond between pets and their owners through timeless art.",
+  title: "About LumePet | Museum-Quality Pet Portrait Artistry",
+  description: "LumePet isn't just AI — it's digital artistry. Our proprietary system scans every detail of your pet and crafts stunning 4K museum-quality portraits with authentic oil-paint texture. Discover the magic behind our royal masterpieces.",
   keywords: [
     "LumePet",
     "pet portrait",
@@ -209,55 +209,82 @@ export default function AboutPage() {
         >
           <div className="max-w-4xl mx-auto">
             <h2 
-              className="text-3xl font-semibold mb-12 text-center"
+              className="text-3xl font-semibold mb-4 text-center"
               style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
             >
-              How LumePet Creates Your Masterpiece
+              The Journey from Photo to Masterpiece
             </h2>
+            <p 
+              className="text-center mb-12"
+              style={{ color: '#B8B2A8' }}
+            >
+              A three-step transformation that takes seconds, but creates something timeless
+            </p>
             
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div 
-                  className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(197, 165, 114, 0.15)' }}
+                  className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center relative"
+                  style={{ 
+                    backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                    boxShadow: '0 0 30px rgba(197, 165, 114, 0.2)'
+                  }}
                 >
-                  <span className="text-2xl">📸</span>
+                  <span className="text-3xl">📸</span>
+                  <span 
+                    className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold"
+                    style={{ backgroundColor: '#C5A572', color: '#0A0A0A' }}
+                  >1</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: '#F0EDE8' }}>
-                  1. Upload Your Photo
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                  Upload Your Photo
                 </h3>
-                <p className="text-sm" style={{ color: '#B8B2A8' }}>
-                  Simply upload a clear photo of your pet. Our AI works best with well-lit images where your pet&apos;s face is clearly visible.
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Share a clear photo of your beloved pet. Our system works its magic with any well-lit image where your pet&apos;s face shines through.
                 </p>
               </div>
               
               <div className="text-center">
                 <div 
-                  className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(197, 165, 114, 0.15)' }}
+                  className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center relative"
+                  style={{ 
+                    backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                    boxShadow: '0 0 30px rgba(197, 165, 114, 0.2)'
+                  }}
                 >
-                  <span className="text-2xl">🎨</span>
+                  <span className="text-3xl">✨</span>
+                  <span 
+                    className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold"
+                    style={{ backgroundColor: '#C5A572', color: '#0A0A0A' }}
+                  >2</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: '#F0EDE8' }}>
-                  2. AI Creates Art
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                  The Magic Happens
                 </h3>
-                <p className="text-sm" style={{ color: '#B8B2A8' }}>
-                  Our advanced AI analyzes your pet&apos;s unique features and transforms them into a stunning royal portrait with exquisite detail.
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Our proprietary system scans every detail — fur patterns, facial structure, eye color — then meticulously crafts a royal portrait with authentic oil-paint texture.
                 </p>
               </div>
               
               <div className="text-center">
                 <div 
-                  className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(197, 165, 114, 0.15)' }}
+                  className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center relative"
+                  style={{ 
+                    backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                    boxShadow: '0 0 30px rgba(197, 165, 114, 0.2)'
+                  }}
                 >
-                  <span className="text-2xl">👑</span>
+                  <span className="text-3xl">👑</span>
+                  <span 
+                    className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold"
+                    style={{ backgroundColor: '#C5A572', color: '#0A0A0A' }}
+                  >3</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: '#F0EDE8' }}>
-                  3. Download & Cherish
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                  Receive Your 4K Masterpiece
                 </h3>
-                <p className="text-sm" style={{ color: '#B8B2A8' }}>
-                  Receive your 4K resolution masterpiece ready for printing, framing, or sharing with fellow pet lovers.
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Download your museum-quality portrait in stunning 4K resolution — ready to print, frame, and treasure for generations to come.
                 </p>
               </div>
             </div>
@@ -268,30 +295,124 @@ export default function AboutPage() {
         <section className="py-16 px-6">
           <div className="max-w-4xl mx-auto">
             <h2 
-              className="text-3xl font-semibold mb-8 text-center"
+              className="text-3xl font-semibold mb-4 text-center"
               style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
             >
-              The Art & Science Behind LumePet
+              More Than Just AI — It&apos;s Digital Artistry
             </h2>
+            <p 
+              className="text-center mb-10 text-lg"
+              style={{ color: '#C5A572', fontStyle: 'italic' }}
+            >
+              Where cutting-edge technology meets the soul of classical painting
+            </p>
             
             <div 
-              className="p-8 rounded-2xl"
+              className="p-8 rounded-2xl mb-8"
               style={{ 
                 backgroundColor: 'rgba(197, 165, 114, 0.05)',
                 border: '1px solid rgba(197, 165, 114, 0.15)',
               }}
             >
               <div className="space-y-6" style={{ color: '#B8B2A8' }}>
-                <p>
-                  LumePet leverages state-of-the-art artificial intelligence and machine learning models specifically trained on classical oil painting techniques, Renaissance portraiture, and royal art styles from across centuries. Our proprietary AI has studied thousands of masterpieces to understand the subtle brushstrokes, lighting, and compositional techniques that make traditional oil portraits so captivating.
+                <p className="text-lg leading-relaxed">
+                  <span style={{ color: '#C5A572', fontWeight: 600 }}>This isn&apos;t your typical AI image generator.</span> LumePet uses a proprietary multi-stage artistic rendering system that goes far beyond simple filters or basic AI outputs. Our technology was built from the ground up to create <span style={{ color: '#F0EDE8' }}>true museum-quality artwork</span> — the kind you&apos;d expect to see hanging in the grand halls of European palaces.
                 </p>
-                <p>
-                  When you upload your pet&apos;s photo, our AI doesn&apos;t simply apply a filter—it reimagines your beloved companion as a subject of classical portraiture. The system analyzes your pet&apos;s unique features, expressions, and character, then reconstructs the image using techniques inspired by masters like Rembrandt, Velázquez, and Van Dyck.
-                </p>
-                <p>
-                  The result is a one-of-a-kind digital artwork that captures your pet&apos;s personality while placing them in the context of royal portraiture tradition. Each portrait features rich, varied backgrounds, realistic fur textures, and the kind of dignified presence that would make any pet owner proud.
+                <p className="leading-relaxed">
+                  When you upload your pet&apos;s photo, our system performs an <span style={{ color: '#F0EDE8' }}>exhaustive analysis</span> of every detail: the precise structure of their face, the unique pattern of their markings, the subtle variations in their fur color, the shape of their ears, the sparkle in their eyes. Nothing is overlooked. This deep scan captures the <span style={{ color: '#C5A572' }}>essence</span> of what makes your pet uniquely yours.
                 </p>
               </div>
+            </div>
+
+            {/* The Magic Process */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div 
+                className="p-6 rounded-xl"
+                style={{ 
+                  backgroundColor: 'rgba(197, 165, 114, 0.03)',
+                  border: '1px solid rgba(197, 165, 114, 0.12)',
+                }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">🔬</span>
+                  <h3 className="text-lg font-semibold" style={{ color: '#F0EDE8' }}>
+                    Pixel-Perfect Analysis
+                  </h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Our system scans millions of data points from your photo — identifying facial geometry, fur direction, color gradients, and the subtle characteristics that give your pet their unique personality. Every whisker, every marking, every nuance is preserved.
+                </p>
+              </div>
+              
+              <div 
+                className="p-6 rounded-xl"
+                style={{ 
+                  backgroundColor: 'rgba(197, 165, 114, 0.03)',
+                  border: '1px solid rgba(197, 165, 114, 0.12)',
+                }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">🎨</span>
+                  <h3 className="text-lg font-semibold" style={{ color: '#F0EDE8' }}>
+                    Master Painter Emulation
+                  </h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Trained on thousands of classical masterpieces from Gainsborough, Reynolds, and Vigée Le Brun, our system has learned the secret techniques of the old masters — their brushwork, their lighting, their ability to capture nobility and grace.
+                </p>
+              </div>
+              
+              <div 
+                className="p-6 rounded-xl"
+                style={{ 
+                  backgroundColor: 'rgba(197, 165, 114, 0.03)',
+                  border: '1px solid rgba(197, 165, 114, 0.12)',
+                }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">✨</span>
+                  <h3 className="text-lg font-semibold" style={{ color: '#F0EDE8' }}>
+                    Sculptural Paint Texture
+                  </h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Each portrait features authentic thick oil-paint texture — visible impasto, brush bristle marks, and canvas grain. The result looks like a physical painting that was professionally photographed, not a digital creation.
+                </p>
+              </div>
+              
+              <div 
+                className="p-6 rounded-xl"
+                style={{ 
+                  backgroundColor: 'rgba(197, 165, 114, 0.03)',
+                  border: '1px solid rgba(197, 165, 114, 0.12)',
+                }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">👑</span>
+                  <h3 className="text-lg font-semibold" style={{ color: '#F0EDE8' }}>
+                    Royal Transformation
+                  </h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Your pet is adorned with elegant velvet cloaks, shimmering gold embroidery, lustrous pearl necklaces, and sparkling gemstones — all rendered with the same care a court painter would lavish on royalty.
+                </p>
+              </div>
+            </div>
+
+            {/* Final Quality Statement */}
+            <div 
+              className="p-8 rounded-2xl text-center"
+              style={{ 
+                background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.08) 0%, rgba(197, 165, 114, 0.03) 100%)',
+                border: '1px solid rgba(197, 165, 114, 0.2)',
+              }}
+            >
+              <p className="text-xl leading-relaxed mb-4" style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                &quot;The final result is a <span style={{ color: '#C5A572' }}>stunning 4K masterpiece</span> with the depth, texture, and soul of a painting that took weeks to create — delivered in seconds.&quot;
+              </p>
+              <p className="text-sm" style={{ color: '#B8B2A8' }}>
+                Museum-quality resolution • Print-ready up to 24&quot;×36&quot; • Archival-grade detail
+              </p>
             </div>
           </div>
         </section>
