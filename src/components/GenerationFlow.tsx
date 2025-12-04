@@ -1973,7 +1973,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                   touchAction: 'manipulation',
                 }}
               >
-                {result?.imageId === "pack" ? "Pay $5 - Get 2 Generations" : "Continue to Payment"}
+                {result?.imageId === "pack" ? "Pay $5 - Get 2 Generations" : "Download My Portrait"}
               </button>
 
               <button 
