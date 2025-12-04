@@ -224,21 +224,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 rounded-lg"
-              style={{
-                backgroundColor: 'rgba(26, 26, 26, 0.8)',
-                border: '1px solid rgba(197, 165, 114, 0.2)',
-                color: '#F0EDE8',
-                transition: 'all 0.3s ease',
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'rgba(197, 165, 114, 0.5)';
-                e.target.style.boxShadow = '0 0 0 3px rgba(197, 165, 114, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(197, 165, 114, 0.2)';
-                e.target.style.boxShadow = 'none';
-              }}
+              className="contact-input w-full px-4 py-3 rounded-lg"
               placeholder="Your name"
             />
           </div>
@@ -259,21 +245,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 rounded-lg"
-              style={{
-                backgroundColor: 'rgba(26, 26, 26, 0.8)',
-                border: '1px solid rgba(197, 165, 114, 0.2)',
-                color: '#F0EDE8',
-                transition: 'all 0.3s ease',
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'rgba(197, 165, 114, 0.5)';
-                e.target.style.boxShadow = '0 0 0 3px rgba(197, 165, 114, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(197, 165, 114, 0.2)';
-                e.target.style.boxShadow = 'none';
-              }}
+              className="contact-input w-full px-4 py-3 rounded-lg"
               placeholder="your.email@example.com"
             />
           </div>
@@ -294,21 +266,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
               onChange={handleChange}
               required
               rows={6}
-              className="w-full px-4 py-3 rounded-lg resize-none"
-              style={{
-                backgroundColor: 'rgba(26, 26, 26, 0.8)',
-                border: '1px solid rgba(197, 165, 114, 0.2)',
-                color: '#F0EDE8',
-                transition: 'all 0.3s ease',
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'rgba(197, 165, 114, 0.5)';
-                e.target.style.boxShadow = '0 0 0 3px rgba(197, 165, 114, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(197, 165, 114, 0.2)';
-                e.target.style.boxShadow = 'none';
-              }}
+              className="contact-input w-full px-4 py-3 rounded-lg resize-none"
               placeholder="Tell us what's on your mind..."
             />
           </div>

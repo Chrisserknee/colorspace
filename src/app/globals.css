@@ -279,14 +279,61 @@ button:not(:disabled):active,
 input:not([type="checkbox"]):not([type="radio"]),
 textarea,
 select {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Prevent zoom on iOS */
+  font-size: 16px;
 }
 
 input:not([type="checkbox"]):not([type="radio"]):focus,
 textarea:focus,
 select:focus {
-  transform: scale(1.01);
+  /* Remove scale transform - causes position bugs on mobile */
   box-shadow: 0 0 0 3px rgba(197, 165, 114, 0.15);
+  border-color: rgba(197, 165, 114, 0.5) !important;
+  outline: none;
+}
+
+/* ============================================
+   CONTACT FORM INPUTS - Mobile optimized
+   ============================================ */
+
+.contact-input {
+  background-color: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(197, 165, 114, 0.2);
+  color: #F0EDE8;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Prevent iOS zoom on focus */
+  font-size: 16px;
+  /* Ensure proper touch handling */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.contact-input::placeholder {
+  color: rgba(184, 178, 168, 0.6);
+}
+
+.contact-input:focus {
+  border-color: rgba(197, 165, 114, 0.5);
+  box-shadow: 0 0 0 3px rgba(197, 165, 114, 0.1);
+  outline: none;
+  /* No transform to prevent position bugs on mobile */
+}
+
+/* Mobile-specific contact input fixes */
+@media (hover: none) and (pointer: coarse) {
+  .contact-input {
+    /* Larger touch target */
+    min-height: 48px;
+    /* Prevent any transform on touch */
+    transform: none !important;
+  }
+  
+  .contact-input:focus {
+    /* Simpler focus state on mobile */
+    box-shadow: 0 0 0 2px rgba(197, 165, 114, 0.2);
+    transform: none !important;
+  }
 }
 
 /* Checkbox/Radio enhancements */
