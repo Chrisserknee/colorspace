@@ -128,19 +128,19 @@ export default function Home() {
       {/* Support LumePet Button - Top Left */}
       <button
         onClick={() => setIsSupportModalOpen(true)}
-        className="fixed top-4 left-4 z-40 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105"
+        className="fixed top-4 left-4 z-40 flex items-center gap-2 px-5 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:scale-105 group"
         style={{
-          background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.15) 0%, rgba(197, 165, 114, 0.08) 100%)',
-          border: '1px solid rgba(197, 165, 114, 0.25)',
+          background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.25) 0%, rgba(197, 165, 114, 0.12) 100%)',
+          border: '1.5px solid rgba(197, 165, 114, 0.4)',
           color: '#C5A572',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+          backdropFilter: 'blur(12px)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(197, 165, 114, 0.15)',
         }}
       >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
-        <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Support</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: '0.03em' }}>Support LumePet</span>
       </button>
 
       {/* Hero Section */}
