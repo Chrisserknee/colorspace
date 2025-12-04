@@ -24,22 +24,22 @@ function getSupportEmailHTML(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LumePet Needs Your Help</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #0A0908; font-family: Georgia, 'Times New Roman', serif;">
+<body style="margin: 0; padding: 0; background-color: #1A1816; font-family: Georgia, 'Times New Roman', serif;">
   
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #0A0908;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #1A1816;">
     <tr>
       <td align="center" style="padding: 40px 20px;">
         
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background: linear-gradient(135deg, #1A1816 0%, #0F0E0D 100%); border-radius: 16px; border: 1px solid rgba(197, 165, 114, 0.2); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #252220; border-radius: 16px; border: 1px solid #3D3A36;">
           
           <!-- Header with Heart -->
           <tr>
             <td align="center" style="padding: 40px 40px 25px 40px;">
               <div style="font-size: 44px; line-height: 1; margin-bottom: 15px;">💛</div>
-              <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: normal; color: #E8D5A3; letter-spacing: 3px; font-family: Georgia, 'Times New Roman', serif;">
+              <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: normal; color: #F5D998; letter-spacing: 3px; font-family: Georgia, 'Times New Roman', serif;">
                 LUMEPET
               </h1>
-              <p style="margin: 0; font-size: 12px; color: #B8B2A8; letter-spacing: 2px; text-transform: uppercase;">
+              <p style="margin: 0; font-size: 12px; color: #CCCCCC; letter-spacing: 2px; text-transform: uppercase;">
                 A Personal Message From Chris
               </p>
             </td>
@@ -48,7 +48,7 @@ function getSupportEmailHTML(): string {
           <!-- Divider -->
           <tr>
             <td style="padding: 0 40px;">
-              <div style="height: 1px; background: linear-gradient(90deg, transparent, rgba(197, 165, 114, 0.3), transparent);"></div>
+              <div style="height: 1px; background-color: #3D3A36;"></div>
             </td>
           </tr>
           
@@ -59,16 +59,16 @@ function getSupportEmailHTML(): string {
                 LumePet Needs Your Help to Stay Online
               </h2>
               
-              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.8; color: #D4D0C8;">
+              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.8; color: #EEEEEE;">
                 I'm Chris — I built LumePet to celebrate our pets as the royalty they truly are. But I need to be honest: <strong style="color: #FFFFFF;">I'm struggling to keep it running.</strong>
               </p>
               
-              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.8; color: #D4D0C8;">
-                Every portrait costs real money to create. The AI technology is expensive, and <strong style="color: #FF6B6B;">the costs are more than I can afford alone.</strong> Without support, I may have to shut down LumePet.
+              <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.8; color: #EEEEEE;">
+                Every portrait costs real money to create. The AI technology is expensive, and <strong style="color: #FF8888;">the costs are more than I can afford alone.</strong> Without support, I may have to shut down LumePet.
               </p>
               
-              <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.8; color: #D4D0C8;">
-                If LumePet ever brought you joy — <strong style="color: #E8D5A3;">please consider helping me keep it alive.</strong> Even $1 makes a difference.
+              <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.8; color: #EEEEEE;">
+                If LumePet ever brought you joy — <strong style="color: #F5D998;">please consider helping me keep it alive.</strong> Even $1 makes a difference.
               </p>
             </td>
           </tr>
@@ -79,13 +79,13 @@ function getSupportEmailHTML(): string {
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td>
-                    <a href="${BASE_URL}/?support=true" target="_blank" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #C5A572 0%, #A68B5B 100%); color: #0A0A0A; text-decoration: none; font-size: 17px; font-weight: bold; border-radius: 10px; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.5px; box-shadow: 0 6px 20px rgba(197, 165, 114, 0.3);">
+                    <a href="${BASE_URL}/?support=true" target="_blank" style="display: inline-block; padding: 16px 40px; background-color: #D4A84B; color: #1A1816; text-decoration: none; font-size: 17px; font-weight: bold; border-radius: 10px; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.5px;">
                       💛 Support LumePet
                     </a>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 15px 0 0 0; font-size: 12px; color: #A8A49C;">
+              <p style="margin: 15px 0 0 0; font-size: 12px; color: #BBBBBB;">
                 Secure via Stripe • Any amount helps
               </p>
             </td>
@@ -94,20 +94,20 @@ function getSupportEmailHTML(): string {
           <!-- Divider -->
           <tr>
             <td style="padding: 0 40px;">
-              <div style="height: 1px; background: linear-gradient(90deg, transparent, rgba(197, 165, 114, 0.3), transparent);"></div>
+              <div style="height: 1px; background-color: #3D3A36;"></div>
             </td>
           </tr>
           
           <!-- Personal Sign-off -->
           <tr>
             <td style="padding: 25px 40px;">
-              <p style="margin: 0 0 12px 0; font-size: 15px; line-height: 1.7; color: #D4D0C8;">
+              <p style="margin: 0 0 12px 0; font-size: 15px; line-height: 1.7; color: #EEEEEE;">
                 Thank you from the bottom of my heart. 💛
               </p>
-              <p style="margin: 0; font-size: 18px; color: #E8D5A3; font-family: Georgia, 'Times New Roman', serif; font-style: italic;">
+              <p style="margin: 0; font-size: 18px; color: #F5D998; font-family: Georgia, 'Times New Roman', serif; font-style: italic;">
                 Chris Cerney
               </p>
-              <p style="margin: 4px 0 0 0; font-size: 12px; color: #A8A49C;">
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #BBBBBB;">
                 Creator of LumePet 🐾
               </p>
             </td>
@@ -116,7 +116,7 @@ function getSupportEmailHTML(): string {
           <!-- Paw Prints -->
           <tr>
             <td align="center" style="padding: 15px 40px 30px 40px;">
-              <p style="margin: 0; font-size: 20px; letter-spacing: 12px; opacity: 0.3;">
+              <p style="margin: 0; font-size: 20px; letter-spacing: 12px; color: #666666;">
                 🐾 🐾 🐾
               </p>
             </td>
@@ -128,13 +128,13 @@ function getSupportEmailHTML(): string {
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px;">
           <tr>
             <td align="center" style="padding: 30px 20px;">
-              <p style="margin: 0 0 10px 0; font-size: 12px; color: #9A958D;">
+              <p style="margin: 0 0 10px 0; font-size: 12px; color: #AAAAAA;">
                 © 2024 LumePet. Made with love for pets everywhere.
               </p>
-              <p style="margin: 0; font-size: 12px; color: #9A958D;">
-                <a href="${BASE_URL}" style="color: #B8B2A8; text-decoration: underline;">Visit LumePet</a>
+              <p style="margin: 0; font-size: 12px; color: #AAAAAA;">
+                <a href="${BASE_URL}" style="color: #CCCCCC; text-decoration: underline;">Visit LumePet</a>
                 &nbsp;&nbsp;•&nbsp;&nbsp;
-                <a href="${BASE_URL}/about" style="color: #B8B2A8; text-decoration: underline;">Our Story</a>
+                <a href="${BASE_URL}/about" style="color: #CCCCCC; text-decoration: underline;">Our Story</a>
               </p>
             </td>
           </tr>
