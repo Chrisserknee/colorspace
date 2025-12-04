@@ -9,7 +9,7 @@ import FAQ from "@/components/FAQ";
 import ContactModal from "@/components/Contact";
 import Footer from "@/components/Footer";
 import UploadModal from "@/components/UploadModal";
-import GenerationFlow from "@/components/GenerationFlow";
+import GenerationFlow, { getLastCreation } from "@/components/GenerationFlow";
 import ResumeButton from "@/components/ResumeButton";
 
 // Helper to convert data URL to File
@@ -51,6 +51,8 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
   const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
+  const [lastCreation, setLastCreation] = useState<{ imageId: string; previewUrl: string } | null>(null);
+  const [viewingLastCreation, setViewingLastCreation] = useState(false);
 
   // Check for email param (session restore) or pending image from pack purchase
   useEffect(() => {
@@ -82,6 +84,15 @@ export default function Home() {
           localStorage.removeItem("lumepet_pending_image");
         }
       }
+      
+      // Check for last creation to show "View Last Creation" button
+      const savedLastCreation = getLastCreation();
+      if (savedLastCreation) {
+        setLastCreation({
+          imageId: savedLastCreation.imageId,
+          previewUrl: savedLastCreation.previewUrl,
+        });
+      }
     }
   }, []);
 
@@ -96,9 +107,17 @@ export default function Home() {
 
   const handleReset = () => {
     setSelectedFile(null);
+    setViewingLastCreation(false);
+    setShowFlowFromEmail(false);
     // Also clear any pending image
     if (typeof window !== "undefined") {
       localStorage.removeItem("lumepet_pending_image");
+    }
+  };
+
+  const handleViewLastCreation = () => {
+    if (lastCreation) {
+      setViewingLastCreation(true);
     }
   };
 
@@ -135,17 +154,46 @@ export default function Home() {
         onClose={() => setIsContactModalOpen(false)}
       />
 
-      {/* Generation Flow (shows after file selection or email session restore) */}
-      {(selectedFile || showFlowFromEmail) && (
+      {/* Generation Flow (shows after file selection, email session restore, or viewing last creation) */}
+      {(selectedFile || showFlowFromEmail || viewingLastCreation) && (
         <GenerationFlow 
           file={showFlowFromEmail ? null : selectedFile} 
           onReset={handleReset} 
           initialEmail={initialEmail}
+          initialResult={viewingLastCreation ? lastCreation : null}
         />
       )}
 
+      {/* View Last Creation Button - shows when not in flow and has a last creation */}
+      {!selectedFile && !showFlowFromEmail && !viewingLastCreation && lastCreation && (
+        <button
+          onClick={handleViewLastCreation}
+          className="fixed bottom-6 left-6 z-40 flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 shadow-lg"
+          style={{
+            background: 'linear-gradient(135deg, rgba(30, 28, 26, 0.95) 0%, rgba(45, 42, 38, 0.95) 100%)',
+            border: '1px solid rgba(197, 165, 114, 0.3)',
+            color: '#C5A572',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(197, 165, 114, 0.15)',
+          }}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            strokeWidth={1.5} 
+            stroke="currentColor" 
+            className="w-5 h-5"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.573-3.007-9.963-7.178z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>View Last Creation</span>
+        </button>
+      )}
+
       {/* Resume Button - shows when not in flow */}
-      {!selectedFile && !showFlowFromEmail && (
+      {!selectedFile && !showFlowFromEmail && !viewingLastCreation && (
         <ResumeButton variant="lumepet" />
       )}
     </main>

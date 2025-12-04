@@ -12,6 +12,7 @@ interface GenerationFlowProps {
   file: File | null;
   onReset: () => void;
   initialEmail?: string; // Email from URL param for session restore
+  initialResult?: GeneratedResult | null; // For viewing last creation
 }
 
 interface GeneratedResult {
@@ -149,15 +150,62 @@ const getPendingImage = (): string | null => {
   return image;
 };
 
+// Last creation storage key
+const LAST_CREATION_KEY = "lumepet_last_creation";
+
+interface LastCreation {
+  imageId: string;
+  previewUrl: string;
+  timestamp: number;
+}
+
+// Save the last successful creation to localStorage
+export const saveLastCreation = (imageId: string, previewUrl: string) => {
+  if (typeof window !== "undefined") {
+    const lastCreation: LastCreation = {
+      imageId,
+      previewUrl,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(LAST_CREATION_KEY, JSON.stringify(lastCreation));
+  }
+};
+
+// Get the last creation from localStorage
+export const getLastCreation = (): LastCreation | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = localStorage.getItem(LAST_CREATION_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as LastCreation;
+      // Only return if less than 24 hours old (image URLs expire)
+      const hoursSinceCreation = (Date.now() - parsed.timestamp) / (1000 * 60 * 60);
+      if (hoursSinceCreation < 24) {
+        return parsed;
+      }
+      // Clear expired creation
+      localStorage.removeItem(LAST_CREATION_KEY);
+    }
+  } catch {
+    return null;
+  }
+  return null;
+};
+
+// Check if there's a viewable last creation
+export const hasLastCreation = (): boolean => {
+  return getLastCreation() !== null;
+};
+
 const clearPendingImage = () => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("lumepet_pending_image");
   }
 };
 
-export default function GenerationFlow({ file, onReset, initialEmail }: GenerationFlowProps) {
-  const [stage, setStage] = useState<Stage>("preview");
-  const [result, setResult] = useState<GeneratedResult | null>(null);
+export default function GenerationFlow({ file, onReset, initialEmail, initialResult }: GenerationFlowProps) {
+  const [stage, setStage] = useState<Stage>(initialResult ? "result" : "preview");
+  const [result, setResult] = useState<GeneratedResult | null>(initialResult || null);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [retryUsed, setRetryUsed] = useState(false);
@@ -250,6 +298,17 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
         });
     }
   }, [initialEmail, sessionRestored]);
+
+  // Handle initialResult - set expiration time when viewing last creation
+  useEffect(() => {
+    if (initialResult && stage === "result" && !expirationTime) {
+      // Set expiration for 15 minutes from now when viewing last creation
+      setExpirationTime(Date.now() + 15 * 60 * 1000);
+      captureEvent("viewed_last_creation", {
+        image_id: initialResult.imageId,
+      });
+    }
+  }, [initialResult, stage, expirationTime]);
 
   // Set preview URL when file is provided - use base64 data URL for PostHog capture
   useEffect(() => {
@@ -586,6 +645,11 @@ export default function GenerationFlow({ file, onReset, initialEmail }: Generati
       }
 
       setResult(data);
+      
+      // Save as last creation for "View Last Creation" button
+      if (data.imageId && data.previewUrl) {
+        saveLastCreation(data.imageId, data.previewUrl);
+      }
       
       // Handle pack credit usage or increment generation count
       const currentLimits = getLimits();
