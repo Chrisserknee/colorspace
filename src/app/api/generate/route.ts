@@ -1496,7 +1496,7 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoBase64 = logoBuffer.toString("base64");
   const logoMimeType = logoMetadata.format === "png" ? "image/png" : "image/jpeg";
 
-  // Create SVG with fewer, more subtle watermarks - just 4 corners
+  // Create SVG with 5 watermarks - 4 corners + center
   // Watermarks are WHITE but with lower opacity to be less intrusive
   const watermarkSvg = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -1511,7 +1511,7 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
         </filter>
       </defs>
       
-      <!-- Just 4 corner watermarks - bigger but lighter -->
+      <!-- 5 watermarks - 4 corners + center -->
       
       <!-- Top-left corner (30% opacity - lighter) -->
       <image 
@@ -1547,6 +1547,16 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
       <image 
         x="${Math.round(width * 0.98 - watermarkWidth)}" 
         y="${Math.round(height * 0.98 - watermarkHeight)}" 
+        width="${Math.round(watermarkWidth)}" 
+        height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}"
+        opacity="0.30"
+        filter="url(#whiteBright)"
+      />
+      <!-- Center watermark (30% opacity) -->
+      <image 
+        x="${Math.round((width - watermarkWidth) / 2)}" 
+        y="${Math.round((height - watermarkHeight) / 2)}" 
         width="${Math.round(watermarkWidth)}" 
         height="${Math.round(watermarkHeight)}" 
         href="data:${logoMimeType};base64,${logoBase64}"
