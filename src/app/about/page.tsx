@@ -257,7 +257,7 @@ export default function AboutPage() {
                   3. Download & Cherish
                 </h3>
                 <p className="text-sm" style={{ color: '#B8B2A8' }}>
-                  Receive your high-resolution masterpiece ready for printing, framing, or sharing with fellow pet lovers.
+                  Receive your 4K resolution masterpiece ready for printing, framing, or sharing with fellow pet lovers.
                 </p>
               </div>
             </div>
@@ -349,7 +349,7 @@ export default function AboutPage() {
                   🎨 Quality First
                 </h3>
                 <p className="text-sm" style={{ color: '#B8B2A8' }}>
-                  We deliver high-resolution, print-ready portraits that look stunning whether displayed digitally or printed on canvas. Our AI continuously improves to deliver the best possible results.
+                  We deliver 4K resolution, print-ready portraits that look stunning whether displayed digitally or printed on canvas. Our AI continuously improves to deliver the best possible results.
                 </p>
               </div>
               

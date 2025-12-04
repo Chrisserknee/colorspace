@@ -1286,7 +1286,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             {/* Pricing Info */}
             <div className="text-center mb-6 p-4 rounded-xl" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
               <p className="text-sm" style={{ color: '#D4AF37', fontWeight: '500' }}>
-                Final HD portrait: $19.99
+                Final 4K portrait: $19.99
               </p>
               <p className="text-xs mt-1" style={{ color: '#8B8B8B' }}>
                 Watermarked version – free
@@ -1789,7 +1789,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <p className="text-xs font-medium" style={{ color: '#4A4A4A' }}>HD Quality</p>
+                <p className="text-xs font-medium" style={{ color: '#4A4A4A' }}>4K Quality</p>
                 <p className="text-[10px]" style={{ color: '#9B8AA0' }}>Print-ready</p>
               </div>
               <div className="text-center">

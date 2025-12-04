@@ -341,7 +341,7 @@ function getEmail3HTML(email: string, isRainbowBridge: boolean): string {
         <td style="padding: 15px; text-align: center;">
           <p style="font-size: 24px; margin: 0 0 10px;">🖼️</p>
           <p style="font-size: 14px; font-weight: bold; color: ${accentColor}; margin: 0 0 5px;">Print-Ready Quality</p>
-          <p style="font-size: 13px; color: ${subtextColor}; margin: 0;">High-resolution files perfect for framing</p>
+          <p style="font-size: 13px; color: ${subtextColor}; margin: 0;">4K resolution files perfect for framing</p>
         </td>
       </tr>
     </table>
