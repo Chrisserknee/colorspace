@@ -36,10 +36,10 @@ function getSupportEmailHTML(): string {
           <tr>
             <td align="center" style="padding: 40px 40px 25px 40px;">
               <div style="font-size: 44px; line-height: 1; margin-bottom: 15px;">💛</div>
-              <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: normal; color: #C5A572; letter-spacing: 3px; font-family: Georgia, 'Times New Roman', serif;">
+              <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: normal; color: #E8D5A3; letter-spacing: 3px; font-family: Georgia, 'Times New Roman', serif;">
                 LUMEPET
               </h1>
-              <p style="margin: 0; font-size: 12px; color: #7A756D; letter-spacing: 2px; text-transform: uppercase;">
+              <p style="margin: 0; font-size: 12px; color: #B8B2A8; letter-spacing: 2px; text-transform: uppercase;">
                 A Personal Message From Chris
               </p>
             </td>
@@ -85,7 +85,7 @@ function getSupportEmailHTML(): string {
                   </td>
                 </tr>
               </table>
-              <p style="margin: 15px 0 0 0; font-size: 12px; color: #5A5650;">
+              <p style="margin: 15px 0 0 0; font-size: 12px; color: #A8A49C;">
                 Secure via Stripe • Any amount helps
               </p>
             </td>
@@ -128,13 +128,13 @@ function getSupportEmailHTML(): string {
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px;">
           <tr>
             <td align="center" style="padding: 30px 20px;">
-              <p style="margin: 0 0 10px 0; font-size: 12px; color: #5A5650;">
+              <p style="margin: 0 0 10px 0; font-size: 12px; color: #9A958D;">
                 © 2024 LumePet. Made with love for pets everywhere.
               </p>
-              <p style="margin: 0; font-size: 12px; color: #5A5650;">
-                <a href="${BASE_URL}" style="color: #7A756D; text-decoration: underline;">Visit LumePet</a>
+              <p style="margin: 0; font-size: 12px; color: #9A958D;">
+                <a href="${BASE_URL}" style="color: #B8B2A8; text-decoration: underline;">Visit LumePet</a>
                 &nbsp;&nbsp;•&nbsp;&nbsp;
-                <a href="${BASE_URL}/about" style="color: #7A756D; text-decoration: underline;">Our Story</a>
+                <a href="${BASE_URL}/about" style="color: #B8B2A8; text-decoration: underline;">Our Story</a>
               </p>
             </td>
           </tr>

@@ -516,11 +516,11 @@ export default function AdminEmailPage() {
                 <p className="text-4xl mb-3">💛</p>
                 <h4 
                   className="text-xl mb-1 tracking-wider"
-                  style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                  style={{ color: '#E8D5A3', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                 >
                   LUMEPET
                 </h4>
-                <p className="text-xs tracking-widest uppercase" style={{ color: '#7A756D' }}>
+                <p className="text-xs tracking-widest uppercase" style={{ color: '#B8B2A8' }}>
                   A Personal Message From Chris
                 </p>
               </div>
@@ -564,7 +564,7 @@ export default function AdminEmailPage() {
                 >
                   💛 Support LumePet
                 </div>
-                <p className="text-xs mt-2" style={{ color: '#5A5650' }}>
+                <p className="text-xs mt-2" style={{ color: '#A8A49C' }}>
                   Secure via Stripe • Any amount helps
                 </p>
               </div>
