@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { saveMetadata, getMetadata, markLeadAsPurchased, markEmailAsPurchased } from "@/lib/supabase";
+import { saveMetadata, getMetadata, markLeadAsPurchased } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
 
 // Initialize Stripe lazily to avoid build-time errors
@@ -72,22 +72,13 @@ export async function POST(request: NextRequest) {
             });
             console.log(`✅ Payment confirmed for image: ${imageId}`);
             
-            // Mark lead as purchased to stop follow-up emails
+            // Mark as purchased in unified emails table (stops follow-up emails)
             if (customerEmail) {
               try {
                 await markLeadAsPurchased(customerEmail);
-                console.log(`📧 Lead marked as purchased: ${customerEmail}`);
+                console.log(`📧 Email marked as purchased: ${customerEmail}`);
               } catch (leadError) {
-                console.warn(`⚠️ Failed to mark lead as purchased:`, leadError);
-                // Don't fail the webhook - lead tracking is non-critical
-              }
-              
-              // Also save to emails table with purchased flag
-              try {
-                await markEmailAsPurchased(customerEmail, imageId);
-                console.log(`📧 Email marked as purchased in emails table: ${customerEmail}`);
-              } catch (emailError) {
-                console.warn(`⚠️ Failed to mark email as purchased:`, emailError);
+                console.warn(`⚠️ Failed to mark email as purchased:`, leadError);
                 // Don't fail the webhook - email tracking is non-critical
               }
             }
@@ -128,21 +119,13 @@ export async function POST(request: NextRequest) {
         } else if (isPackPurchase) {
           console.log(`📦 Pack purchase completed (session: ${session.id})`);
           // Pack purchases don't have a specific image to email about
-          // But we should still mark the lead as purchased
+          // But we should still mark as purchased in unified emails table
           if (customerEmail) {
             try {
               await markLeadAsPurchased(customerEmail);
-              console.log(`📧 Lead marked as purchased (pack): ${customerEmail}`);
+              console.log(`📧 Email marked as purchased (pack): ${customerEmail}`);
             } catch (leadError) {
-              console.warn(`⚠️ Failed to mark lead as purchased:`, leadError);
-            }
-            
-            // Also save to emails table with purchased flag
-            try {
-              await markEmailAsPurchased(customerEmail);
-              console.log(`📧 Email marked as purchased in emails table (pack): ${customerEmail}`);
-            } catch (emailError) {
-              console.warn(`⚠️ Failed to mark email as purchased:`, emailError);
+              console.warn(`⚠️ Failed to mark email as purchased:`, leadError);
             }
           }
         } else {

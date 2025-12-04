@@ -1,5 +1,6 @@
 -- SQL to create emails table in Supabase
 -- Copy and paste ONLY the SQL below into Supabase SQL Editor
+-- This is the UNIFIED emails table (replaces both old emails and lume_leads)
 
 -- Step 1: Create emails table
 CREATE TABLE IF NOT EXISTS emails (
@@ -9,6 +10,12 @@ CREATE TABLE IF NOT EXISTS emails (
   source TEXT DEFAULT 'checkout',
   has_purchased BOOLEAN DEFAULT FALSE,
   purchased_at TIMESTAMPTZ,
+  -- Email sequence tracking (from lume_leads)
+  last_email_step_sent INTEGER DEFAULT 0,
+  context JSONB,
+  unsubscribed BOOLEAN DEFAULT FALSE,
+  unsubscribed_at TIMESTAMPTZ,
+  -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -21,6 +28,18 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'purchased_at') THEN
     ALTER TABLE emails ADD COLUMN purchased_at TIMESTAMPTZ;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'last_email_step_sent') THEN
+    ALTER TABLE emails ADD COLUMN last_email_step_sent INTEGER DEFAULT 0;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'context') THEN
+    ALTER TABLE emails ADD COLUMN context JSONB;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'unsubscribed') THEN
+    ALTER TABLE emails ADD COLUMN unsubscribed BOOLEAN DEFAULT FALSE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'unsubscribed_at') THEN
+    ALTER TABLE emails ADD COLUMN unsubscribed_at TIMESTAMPTZ;
   END IF;
 END $$;
 
@@ -38,6 +57,10 @@ CREATE INDEX IF NOT EXISTS idx_emails_email ON emails(email);
 CREATE INDEX IF NOT EXISTS idx_emails_created_at ON emails(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_emails_has_purchased ON emails(has_purchased);
 CREATE INDEX IF NOT EXISTS idx_emails_purchased_at ON emails(purchased_at DESC);
+CREATE INDEX IF NOT EXISTS idx_emails_last_email_step ON emails(last_email_step_sent);
+CREATE INDEX IF NOT EXISTS idx_emails_unsubscribed ON emails(unsubscribed);
+-- Composite index for email sequence cron job
+CREATE INDEX IF NOT EXISTS idx_emails_followup ON emails(has_purchased, unsubscribed, last_email_step_sent) WHERE has_purchased = false AND unsubscribed = false;
 
 -- Step 4: Enable Row Level Security (RLS)
 ALTER TABLE emails ENABLE ROW LEVEL SECURITY;

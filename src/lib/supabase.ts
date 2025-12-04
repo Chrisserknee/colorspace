@@ -166,55 +166,6 @@ export async function saveEmail(
   return true;
 }
 
-// Helper to mark email as purchased in emails table
-export async function markEmailAsPurchased(email: string, imageId?: string): Promise<boolean> {
-  const normalizedEmail = email.toLowerCase().trim();
-  
-  // First try to update existing record
-  const { data: existing } = await supabase
-    .from("emails")
-    .select("id")
-    .eq("email", normalizedEmail)
-    .maybeSingle();
-  
-  if (existing) {
-    // Update existing record
-    const { error } = await supabase
-      .from("emails")
-      .update({ 
-        has_purchased: true,
-        purchased_at: new Date().toISOString(),
-        image_id: imageId || undefined,
-      })
-      .eq("email", normalizedEmail);
-    
-    if (error) {
-      console.error("Error updating email as purchased:", error);
-      return false;
-    }
-  } else {
-    // Insert new record with purchased flag
-    const { error } = await supabase
-      .from("emails")
-      .insert({
-        email: normalizedEmail,
-        image_id: imageId || null,
-        source: "purchase",
-        has_purchased: true,
-        purchased_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-      });
-    
-    if (error) {
-      console.error("Error inserting purchased email:", error);
-      return false;
-    }
-  }
-  
-  console.log(`✅ Email marked as purchased: ${normalizedEmail}`);
-  return true;
-}
-
 // Helper to save contact form submission
 export async function saveContact(data: {
   name: string;
@@ -407,7 +358,8 @@ export async function incrementPortraitCount(): Promise<number> {
 }
 
 // ============================================
-// LUME LEADS HELPERS (Email Sequence)
+// EMAIL LEAD HELPERS (Email Sequence)
+// Now uses unified "emails" table instead of lume_leads
 // ============================================
 
 export interface LumeLeadContext {
@@ -415,6 +367,9 @@ export interface LumeLeadContext {
   petType?: string;
   petName?: string;
   source?: string;
+  uploadedImageUrl?: string;
+  imageId?: string | null;
+  previewUrl?: string | null;
   [key: string]: unknown;
 }
 
@@ -433,7 +388,7 @@ export interface LumeLead {
 }
 
 /**
- * Upsert a lead - creates new or updates existing
+ * Upsert a lead - creates new or updates existing in emails table
  * Does NOT reset has_purchased if already true
  */
 export async function upsertLumeLead(
@@ -444,21 +399,21 @@ export async function upsertLumeLead(
   try {
     const normalizedEmail = email.toLowerCase().trim();
     
-    // First check if lead exists
+    // First check if email exists
     const { data: existingLead, error: selectError } = await supabase
-      .from("lume_leads")
+      .from("emails")
       .select("*")
       .eq("email", normalizedEmail)
       .maybeSingle();
     
     if (selectError && selectError.code !== 'PGRST116') {
-      console.error("Error checking for existing lead:", selectError);
+      console.error("Error checking for existing email:", selectError);
       return { lead: null, isNew: false, error: selectError.message };
     }
     
     if (existingLead) {
-      // Update existing lead - preserve has_purchased, update context if provided
-      const updateData: Partial<LumeLead> = {
+      // Update existing email - preserve has_purchased, update context if provided
+      const updateData: Record<string, unknown> = {
         updated_at: new Date().toISOString(),
       };
       
@@ -468,29 +423,30 @@ export async function upsertLumeLead(
       }
       
       const { data: updatedLead, error: updateError } = await supabase
-        .from("lume_leads")
+        .from("emails")
         .update(updateData)
         .eq("id", existingLead.id)
         .select()
         .single();
       
       if (updateError) {
-        console.error("Error updating lead:", updateError);
+        console.error("Error updating email:", updateError);
         return { lead: existingLead, isNew: false, error: updateError.message };
       }
       
       return { lead: updatedLead, isNew: false };
     }
     
-    // Create new lead
+    // Create new email entry
     const { data: newLead, error: insertError } = await supabase
-      .from("lume_leads")
+      .from("emails")
       .insert({
         email: normalizedEmail,
         context: context || null,
         source,
         has_purchased: false,
         last_email_step_sent: 0,
+        unsubscribed: false,
       })
       .select()
       .single();
@@ -500,17 +456,17 @@ export async function upsertLumeLead(
       if (insertError.code === '23505') {
         // Retry fetch
         const { data: retryLead } = await supabase
-          .from("lume_leads")
+          .from("emails")
           .select("*")
           .eq("email", normalizedEmail)
           .single();
         return { lead: retryLead, isNew: false };
       }
-      console.error("Error creating lead:", insertError);
+      console.error("Error creating email entry:", insertError);
       return { lead: null, isNew: false, error: insertError.message };
     }
     
-    console.log(`✅ New lead created: ${normalizedEmail}`);
+    console.log(`✅ New email captured: ${normalizedEmail}`);
     return { lead: newLead, isNew: true };
   } catch (err) {
     console.error("upsertLumeLead error:", err);
@@ -519,19 +475,19 @@ export async function upsertLumeLead(
 }
 
 /**
- * Get a lead by email
+ * Get an email/lead by email address
  */
 export async function getLumeLeadByEmail(email: string): Promise<LumeLead | null> {
   const normalizedEmail = email.toLowerCase().trim();
   
   const { data, error } = await supabase
-    .from("lume_leads")
+    .from("emails")
     .select("*")
     .eq("email", normalizedEmail)
     .maybeSingle();
   
   if (error) {
-    console.error("Error fetching lead:", error);
+    console.error("Error fetching email:", error);
     return null;
   }
   
@@ -539,11 +495,11 @@ export async function getLumeLeadByEmail(email: string): Promise<LumeLead | null
 }
 
 /**
- * Update the last email step sent for a lead
+ * Update the last email step sent for an email
  */
 export async function updateLeadEmailStep(leadId: string, step: number): Promise<boolean> {
   const { error } = await supabase
-    .from("lume_leads")
+    .from("emails")
     .update({ 
       last_email_step_sent: step,
       updated_at: new Date().toISOString()
@@ -551,7 +507,7 @@ export async function updateLeadEmailStep(leadId: string, step: number): Promise
     .eq("id", leadId);
   
   if (error) {
-    console.error("Error updating lead email step:", error);
+    console.error("Error updating email step:", error);
     return false;
   }
   
@@ -559,47 +515,75 @@ export async function updateLeadEmailStep(leadId: string, step: number): Promise
 }
 
 /**
- * Mark a lead as having purchased
+ * Mark an email as having purchased (in emails table)
+ * This is now the primary function for marking purchases
  */
 export async function markLeadAsPurchased(email: string): Promise<boolean> {
   const normalizedEmail = email.toLowerCase().trim();
   
-  const { error } = await supabase
-    .from("lume_leads")
-    .update({ 
-      has_purchased: true,
-      purchased_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .eq("email", normalizedEmail);
+  // First check if email exists
+  const { data: existing } = await supabase
+    .from("emails")
+    .select("id")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
   
-  if (error) {
-    console.error("Error marking lead as purchased:", error);
-    return false;
+  if (existing) {
+    // Update existing record
+    const { error } = await supabase
+      .from("emails")
+      .update({ 
+        has_purchased: true,
+        purchased_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq("email", normalizedEmail);
+    
+    if (error) {
+      console.error("Error marking email as purchased:", error);
+      return false;
+    }
+  } else {
+    // Insert new record with purchased flag
+    const { error } = await supabase
+      .from("emails")
+      .insert({
+        email: normalizedEmail,
+        source: "purchase",
+        has_purchased: true,
+        purchased_at: new Date().toISOString(),
+        last_email_step_sent: 6, // Skip email sequence for purchasers
+        unsubscribed: false,
+      });
+    
+    if (error) {
+      console.error("Error inserting purchased email:", error);
+      return false;
+    }
   }
   
-  console.log(`✅ Lead marked as purchased: ${normalizedEmail}`);
+  console.log(`✅ Email marked as purchased: ${normalizedEmail}`);
   return true;
 }
 
 /**
- * Get leads that are due for follow-up emails
- * Returns leads where:
+ * Get emails that are due for follow-up emails
+ * Returns emails where:
  * - has_purchased = false
- * - unsubscribed = false
+ * - unsubscribed = false (or null)
  * - last_email_step_sent < 6 (haven't completed sequence)
  */
 export async function getLeadsDueForFollowup(): Promise<LumeLead[]> {
   const { data, error } = await supabase
-    .from("lume_leads")
+    .from("emails")
     .select("*")
     .eq("has_purchased", false)
-    .eq("unsubscribed", false)
+    .or("unsubscribed.is.null,unsubscribed.eq.false")
     .lt("last_email_step_sent", 6)
     .order("created_at", { ascending: true });
   
   if (error) {
-    console.error("Error fetching leads for followup:", error);
+    console.error("Error fetching emails for followup:", error);
     return [];
   }
   
@@ -607,13 +591,13 @@ export async function getLeadsDueForFollowup(): Promise<LumeLead[]> {
 }
 
 /**
- * Unsubscribe a lead
+ * Unsubscribe an email
  */
 export async function unsubscribeLead(email: string): Promise<boolean> {
   const normalizedEmail = email.toLowerCase().trim();
   
   const { error } = await supabase
-    .from("lume_leads")
+    .from("emails")
     .update({ 
       unsubscribed: true,
       unsubscribed_at: new Date().toISOString(),
@@ -622,11 +606,11 @@ export async function unsubscribeLead(email: string): Promise<boolean> {
     .eq("email", normalizedEmail);
   
   if (error) {
-    console.error("Error unsubscribing lead:", error);
+    console.error("Error unsubscribing email:", error);
     return false;
   }
   
-  console.log(`✅ Lead unsubscribed: ${normalizedEmail}`);
+  console.log(`✅ Email unsubscribed: ${normalizedEmail}`);
   return true;
 }
 
