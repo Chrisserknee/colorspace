@@ -486,23 +486,28 @@ export default function AdminEmailPage() {
               <h4 className="text-xl mb-2" style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
                 LUMEPET
               </h4>
-              <p className="text-sm mb-4" style={{ color: '#7A756D' }}>A Message From Our Founder</p>
+              <p className="text-sm mb-3" style={{ color: '#7A756D' }}>An Urgent Message From Chris</p>
               <div className="h-px w-3/4 mx-auto mb-4" style={{ background: 'linear-gradient(90deg, transparent, rgba(197, 165, 114, 0.3), transparent)' }}></div>
               <h5 className="text-lg mb-3" style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-                LumePet Needs Your Help<br/>to Stay Online
+                I Need Your Help —<br/>LumePet May Have to Shut Down
               </h5>
-              <p className="text-sm mb-4" style={{ color: '#B8B2A8' }}>
-                Dear Fellow Pet Lover,<br/><br/>
-                I'm Chris, the creator of LumePet...
+              <p className="text-sm mb-3" style={{ color: '#B8B2A8' }}>
+                I'm struggling to keep LumePet alive...
               </p>
+              <div 
+                className="inline-block px-3 py-2 rounded-lg text-xs mb-3"
+                style={{ background: 'rgba(231, 76, 60, 0.1)', border: '1px solid rgba(231, 76, 60, 0.3)', color: '#E74C3C' }}
+              >
+                ⚠️ Without support, LumePet goes offline
+              </div>
               <div 
                 className="inline-block px-6 py-3 rounded-lg font-semibold"
                 style={{ background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)', color: '#0A0A0A' }}
               >
-                💛 Support LumePet
+                💛 Help Save LumePet
               </div>
               <p className="text-xs mt-4" style={{ color: '#5A5650' }}>
-                With gratitude, Chris Cerney
+                With all my heart, Chris Cerney 🐾
               </p>
             </div>
           </div>

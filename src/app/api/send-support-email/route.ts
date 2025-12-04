@@ -41,7 +41,7 @@ function getSupportEmailHTML(): string {
                 LUMEPET
               </h1>
               <p style="margin: 0; font-size: 13px; color: #7A756D; letter-spacing: 2px; text-transform: uppercase;">
-                A Message From Our Founder
+                An Urgent Message From Chris
               </p>
             </td>
           </tr>
@@ -57,33 +57,51 @@ function getSupportEmailHTML(): string {
           <tr>
             <td style="padding: 40px 45px;">
               <h2 style="margin: 0 0 25px 0; font-size: 26px; font-weight: normal; color: #F0EDE8; text-align: center; font-family: Georgia, 'Times New Roman', serif; line-height: 1.3;">
-                LumePet Needs Your Help<br>to Stay Online
+                I Need Your Help —<br>LumePet May Have to Shut Down
               </h2>
               
               <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8; text-align: center;">
-                Dear Fellow Pet Lover,
+                Dear Friend,
               </p>
               
               <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
-                I'm Chris, the creator of LumePet. I built this platform because I believe every pet deserves to be celebrated like the royalty they are in our hearts.
+                I'm Chris — just a guy who loves his pets more than anything. I created LumePet because I wanted to give pet parents like us a way to celebrate our furry family members as the royalty they truly are.
               </p>
               
               <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
-                Today, I'm reaching out because <strong style="color: #F0EDE8;">LumePet needs your help.</strong>
+                But I'll be honest with you: <strong style="color: #F0EDE8;">I'm struggling to keep LumePet alive.</strong>
               </p>
               
               <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
-                The technology that transforms your beloved companions into stunning royal portraits isn't free. Every portrait we create requires advanced AI processing, and those costs add up quickly. Running this platform has become a real challenge, and without support, I may not be able to keep LumePet online.
+                Every single portrait costs real money to create. The AI technology that transforms your pet into a stunning masterpiece requires expensive computing power — and right now, <strong style="color: #E74C3C;">the costs are outpacing what I can afford.</strong> I've been paying out of pocket to keep this dream alive, but I can't do it alone anymore.
               </p>
               
-              <p style="margin: 0 0 25px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
-                If LumePet has ever brought a smile to your face, helped you celebrate your furry family member, or created a memory you'll treasure forever — I'm humbly asking for your support. <strong style="color: #F0EDE8;">Even $1 makes a difference.</strong>
+              <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
+                Without support from people who believe in what we're doing, <strong style="color: #F0EDE8;">I'll have no choice but to shut down LumePet.</strong> That means no more royal portraits. No more Rainbow Bridge memorials for pets who've crossed over. No more celebrating the unconditional love our pets give us.
+              </p>
+              
+              <!-- Urgent Box -->
+              <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.3); padding: 20px 25px; margin: 25px 0; border-radius: 8px; text-align: center;">
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #E74C3C; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  ⚠️ This is real
+                </p>
+                <p style="margin: 0; font-size: 15px; color: #B8B2A8; line-height: 1.6;">
+                  I'm not a big corporation. I'm one person who poured my heart into this project. If I can't cover the server and AI costs this month, LumePet goes offline.
+                </p>
+              </div>
+              
+              <p style="margin: 25px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
+                If LumePet ever made you smile... if it helped you treasure a memory of your pet... if it brought you joy even for a moment — <strong style="color: #C5A572;">please consider helping me keep this alive.</strong>
+              </p>
+              
+              <p style="margin: 0 0 25px 0; font-size: 18px; line-height: 1.8; color: #F0EDE8; text-align: center; font-weight: 500;">
+                Even $1 or $5 would mean the world to me. 💛
               </p>
               
               <!-- Quote Box -->
               <div style="background: rgba(197, 165, 114, 0.08); border-left: 3px solid #C5A572; padding: 20px 25px; margin: 30px 0; border-radius: 0 8px 8px 0;">
                 <p style="margin: 0; font-size: 15px; font-style: italic; color: #C5A572; line-height: 1.7;">
-                  "Every pet that crosses our path leaves paw prints on our hearts. LumePet exists to honor those prints forever."
+                  "Our pets give us unconditional love every single day. LumePet is my way of giving something back — a timeless tribute to that love. Please help me keep this dream alive."
                 </p>
               </div>
             </td>
@@ -95,14 +113,14 @@ function getSupportEmailHTML(): string {
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td>
-                    <a href="${BASE_URL}/?support=true" target="_blank" style="display: inline-block; padding: 18px 45px; background: linear-gradient(135deg, #C5A572 0%, #A68B5B 100%); color: #0A0A0A; text-decoration: none; font-size: 18px; font-weight: bold; border-radius: 12px; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.5px; box-shadow: 0 8px 30px rgba(197, 165, 114, 0.35);">
-                      💛 Support LumePet
+                    <a href="${BASE_URL}/?support=true" target="_blank" style="display: inline-block; padding: 20px 50px; background: linear-gradient(135deg, #C5A572 0%, #A68B5B 100%); color: #0A0A0A; text-decoration: none; font-size: 20px; font-weight: bold; border-radius: 12px; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.5px; box-shadow: 0 8px 30px rgba(197, 165, 114, 0.35);">
+                      💛 Help Save LumePet
                     </a>
                   </td>
                 </tr>
               </table>
               <p style="margin: 20px 0 0 0; font-size: 13px; color: #5A5650;">
-                Secure payment via Stripe • Any amount helps
+                100% goes to keeping LumePet online • Secure via Stripe
               </p>
             </td>
           </tr>
@@ -118,18 +136,21 @@ function getSupportEmailHTML(): string {
           <tr>
             <td style="padding: 35px 45px 25px 45px;">
               <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
-                From the bottom of my heart, thank you for being part of the LumePet family. Whether you can contribute or simply share our mission with others who love their pets — it means the world to me.
+                Thank you for reading this far. Whether you can donate, share with a friend, or simply send good thoughts our way — I'm grateful for you. You're part of what makes the pet-loving community so special.
               </p>
               
-              <p style="margin: 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
-                With gratitude and pawsitive vibes,
+              <p style="margin: 0 0 15px 0; font-size: 16px; line-height: 1.8; color: #B8B2A8;">
+                With all my heart,
               </p>
               
-              <p style="margin: 15px 0 0 0; font-size: 20px; color: #C5A572; font-family: Georgia, 'Times New Roman', serif; font-style: italic;">
+              <p style="margin: 0; font-size: 22px; color: #C5A572; font-family: Georgia, 'Times New Roman', serif; font-style: italic;">
                 Chris Cerney
               </p>
               <p style="margin: 5px 0 0 0; font-size: 13px; color: #7A756D;">
-                Founder & Fellow Pet Lover
+                Creator of LumePet 🐾
+              </p>
+              <p style="margin: 10px 0 0 0; font-size: 12px; color: #5A5650; font-style: italic;">
+                P.S. — If you've ever lost a pet, you know how precious those memories are. That's why I built Rainbow Bridge portraits. I can't bear the thought of other pet parents losing access to that.
               </p>
             </td>
           </tr>
