@@ -299,16 +299,22 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }
   }, [initialEmail, sessionRestored]);
 
-  // Handle initialResult - set expiration time when viewing last creation
+  // Handle initialResult - set result, stage, and expiration time when viewing last creation
   useEffect(() => {
-    if (initialResult && stage === "result" && !expirationTime) {
+    if (initialResult) {
+      // Set the result and stage when initialResult is provided
+      setResult(initialResult);
+      setStage("result");
+      
       // Set expiration for 15 minutes from now when viewing last creation
-      setExpirationTime(Date.now() + 15 * 60 * 1000);
-      captureEvent("viewed_last_creation", {
-        image_id: initialResult.imageId,
-      });
+      if (!expirationTime) {
+        setExpirationTime(Date.now() + 15 * 60 * 1000);
+        captureEvent("viewed_last_creation", {
+          image_id: initialResult.imageId,
+        });
+      }
     }
-  }, [initialResult, stage, expirationTime]);
+  }, [initialResult, expirationTime]);
 
   // Set preview URL when file is provided - use base64 data URL for PostHog capture
   useEffect(() => {
