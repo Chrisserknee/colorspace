@@ -1486,8 +1486,8 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoWidth = logoMetadata.width || 200;
   const logoHeight = logoMetadata.height || 200;
   
-  // Smaller watermarks - about 15% of image size for grid pattern
-  const watermarkSize = Math.max(width, height) * 0.15;
+  // Watermarks - about 20% of image size for elegant spacing
+  const watermarkSize = Math.max(width, height) * 0.20;
   const watermarkAspectRatio = logoWidth / logoHeight;
   const watermarkWidth = watermarkSize;
   const watermarkHeight = watermarkSize / watermarkAspectRatio;
@@ -1496,33 +1496,46 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoBase64 = logoBuffer.toString("base64");
   const logoMimeType = logoMetadata.format === "png" ? "image/png" : "image/jpeg";
 
-  // Create grid of watermarks across the image
-  // 4 columns x 4 rows = 16 watermarks
-  const cols = 4;
-  const rows = 4;
+  // Create elegant staggered grid of watermarks
+  // 3x3 base grid with offset rows for diamond-like pattern
   const watermarkImages: string[] = [];
   
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      // Calculate position with even spacing
-      const x = Math.round((width / (cols + 1)) * (col + 1) - watermarkWidth / 2);
-      const y = Math.round((height / (rows + 1)) * (row + 1) - watermarkHeight / 2);
-      
-      watermarkImages.push(`
-      <image 
-        x="${x}" 
-        y="${y}" 
-        width="${Math.round(watermarkWidth)}" 
-        height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}"
-        opacity="0.25"
-        filter="url(#whiteBright)"
-      />`);
-    }
-  }
+  // Row 1: 2 watermarks at 25% and 75% width
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.25 - watermarkWidth / 2)}" y="${Math.round(height * 0.20 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.75 - watermarkWidth / 2)}" y="${Math.round(height * 0.20 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+  
+  // Row 2: 3 watermarks at 15%, 50%, 85% width
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.15 - watermarkWidth / 2)}" y="${Math.round(height * 0.45 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.50 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.85 - watermarkWidth / 2)}" y="${Math.round(height * 0.45 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+  
+  // Row 3: 2 watermarks at 25% and 75% width
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.25 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.75 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
 
-  // Create SVG with grid of watermarks
-  // Watermarks are WHITE with lower opacity
+  // Create SVG with elegant staggered watermarks
+  // Watermarks are WHITE with higher visibility
   const watermarkSvg = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -1536,7 +1549,7 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
         </filter>
       </defs>
       
-      <!-- Grid of ${cols * rows} watermarks -->
+      <!-- 7 elegantly staggered watermarks -->
       ${watermarkImages.join('')}
     </svg>
   `;
