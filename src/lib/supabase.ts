@@ -122,15 +122,38 @@ export async function getMetadata(imageId: string) {
 }
 
 // Helper to save email to emails table
-export async function saveEmail(email: string, imageId?: string, source: string = "checkout") {
+export async function saveEmail(
+  email: string, 
+  imageId?: string, 
+  source: string = "checkout",
+  hasPurchased: boolean = false
+) {
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // Build the upsert data
+  const upsertData: {
+    email: string;
+    image_id: string | null;
+    source: string;
+    created_at: string;
+    has_purchased?: boolean;
+    purchased_at?: string;
+  } = {
+    email: normalizedEmail,
+    image_id: imageId || null,
+    source,
+    created_at: new Date().toISOString(),
+  };
+  
+  // Only set has_purchased if true (don't reset existing purchases)
+  if (hasPurchased) {
+    upsertData.has_purchased = true;
+    upsertData.purchased_at = new Date().toISOString();
+  }
+  
   const { error } = await supabase
     .from("emails")
-    .upsert({
-      email: email.toLowerCase().trim(),
-      image_id: imageId || null,
-      source,
-      created_at: new Date().toISOString(),
-    }, {
+    .upsert(upsertData, {
       onConflict: "email",
     });
 
@@ -138,6 +161,57 @@ export async function saveEmail(email: string, imageId?: string, source: string 
     console.error("Failed to save email:", error);
     return false;
   }
+  
+  console.log(`📧 Email saved: ${normalizedEmail} (purchased: ${hasPurchased})`);
+  return true;
+}
+
+// Helper to mark email as purchased in emails table
+export async function markEmailAsPurchased(email: string, imageId?: string): Promise<boolean> {
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // First try to update existing record
+  const { data: existing } = await supabase
+    .from("emails")
+    .select("id")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+  
+  if (existing) {
+    // Update existing record
+    const { error } = await supabase
+      .from("emails")
+      .update({ 
+        has_purchased: true,
+        purchased_at: new Date().toISOString(),
+        image_id: imageId || undefined,
+      })
+      .eq("email", normalizedEmail);
+    
+    if (error) {
+      console.error("Error updating email as purchased:", error);
+      return false;
+    }
+  } else {
+    // Insert new record with purchased flag
+    const { error } = await supabase
+      .from("emails")
+      .insert({
+        email: normalizedEmail,
+        image_id: imageId || null,
+        source: "purchase",
+        has_purchased: true,
+        purchased_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      });
+    
+    if (error) {
+      console.error("Error inserting purchased email:", error);
+      return false;
+    }
+  }
+  
+  console.log(`✅ Email marked as purchased: ${normalizedEmail}`);
   return true;
 }
 

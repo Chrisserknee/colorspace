@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { saveMetadata, getMetadata, markLeadAsPurchased } from "@/lib/supabase";
+import { saveMetadata, getMetadata, markLeadAsPurchased, markEmailAsPurchased } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
 
 // Initialize Stripe lazily to avoid build-time errors
@@ -81,6 +81,15 @@ export async function POST(request: NextRequest) {
                 console.warn(`⚠️ Failed to mark lead as purchased:`, leadError);
                 // Don't fail the webhook - lead tracking is non-critical
               }
+              
+              // Also save to emails table with purchased flag
+              try {
+                await markEmailAsPurchased(customerEmail, imageId);
+                console.log(`📧 Email marked as purchased in emails table: ${customerEmail}`);
+              } catch (emailError) {
+                console.warn(`⚠️ Failed to mark email as purchased:`, emailError);
+                // Don't fail the webhook - email tracking is non-critical
+              }
             }
             
             // Send confirmation email with download link
@@ -126,6 +135,14 @@ export async function POST(request: NextRequest) {
               console.log(`📧 Lead marked as purchased (pack): ${customerEmail}`);
             } catch (leadError) {
               console.warn(`⚠️ Failed to mark lead as purchased:`, leadError);
+            }
+            
+            // Also save to emails table with purchased flag
+            try {
+              await markEmailAsPurchased(customerEmail);
+              console.log(`📧 Email marked as purchased in emails table (pack): ${customerEmail}`);
+            } catch (emailError) {
+              console.warn(`⚠️ Failed to mark email as purchased:`, emailError);
             }
           }
         } else {
