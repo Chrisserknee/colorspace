@@ -1993,6 +1993,60 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                 ← Go back
               </button>
             </div>
+
+            {/* Preview of Generated Portrait */}
+            {result?.previewUrl && result?.imageId !== "pack" && (
+              <div className="mt-6 pt-6" style={{ borderTop: '1px solid rgba(197, 165, 114, 0.15)' }}>
+                <p className="text-center text-sm mb-3" style={{ color: '#7A756D' }}>
+                  Your royal portrait awaits
+                </p>
+                <div className="relative mx-auto" style={{ maxWidth: '280px' }}>
+                  {/* Gold frame effect */}
+                  <div 
+                    className="absolute inset-0 rounded-xl"
+                    style={{
+                      background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 50%, #A68B5B 100%)',
+                      padding: '3px',
+                      boxShadow: '0 8px 32px rgba(197, 165, 114, 0.3), 0 0 20px rgba(197, 165, 114, 0.15)',
+                    }}
+                  />
+                  <div 
+                    className="relative rounded-xl overflow-hidden"
+                    style={{ 
+                      border: '3px solid transparent',
+                      background: 'linear-gradient(#1A1816, #1A1816) padding-box, linear-gradient(135deg, #D4B896, #C5A572, #A68B5B) border-box',
+                    }}
+                  >
+                    <img 
+                      src={result.previewUrl} 
+                      alt="Your royal pet portrait"
+                      className="w-full h-auto"
+                      style={{ 
+                        filter: 'blur(3px)',
+                        opacity: 0.85,
+                      }}
+                    />
+                    {/* Watermark overlay */}
+                    <div 
+                      className="absolute inset-0 flex items-center justify-center"
+                      style={{ background: 'rgba(0,0,0,0.2)' }}
+                    >
+                      <div className="text-center">
+                        <svg className="w-8 h-8 mx-auto mb-1" style={{ color: '#C5A572' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <p className="text-xs font-medium" style={{ color: '#C5A572' }}>
+                          Unlock 4K Version
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-center text-xs mt-3" style={{ color: '#5A5650' }}>
+                  Purchase to receive your unwatermarked 4K portrait
+                </p>
+              </div>
+            )}
           </div>
         )}
 
