@@ -510,91 +510,83 @@ export default function AdminEmailPage() {
             </div>
             
             {/* Email Body */}
-            <div className="p-6" style={{ background: '#0A0908' }}>
+            <div className="p-5" style={{ background: '#0A0908' }}>
               {/* Logo Section */}
-              <div className="text-center mb-6">
-                <p className="text-5xl mb-4">💛</p>
+              <div className="text-center mb-4">
+                <p className="text-4xl mb-3">💛</p>
                 <h4 
-                  className="text-2xl mb-1 tracking-wider"
+                  className="text-xl mb-1 tracking-wider"
                   style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                 >
                   LUMEPET
                 </h4>
                 <p className="text-xs tracking-widest uppercase" style={{ color: '#7A756D' }}>
-                  An Urgent Message From Chris
+                  A Personal Message From Chris
                 </p>
               </div>
               
               {/* Divider */}
               <div 
-                className="h-px w-2/3 mx-auto mb-6" 
+                className="h-px w-2/3 mx-auto mb-4" 
                 style={{ background: 'linear-gradient(90deg, transparent, rgba(197, 165, 114, 0.3), transparent)' }}
               />
               
               {/* Main Heading */}
               <h5 
-                className="text-xl text-center mb-5 leading-relaxed"
+                className="text-lg text-center mb-4"
                 style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
               >
-                I Need Your Help —<br/>LumePet May Have to Shut Down
+                LumePet Needs Your Help to Stay Online
               </h5>
               
               {/* Message Preview */}
-              <div className="space-y-4 mb-6">
-                <p className="text-sm text-center" style={{ color: '#B8B2A8' }}>
-                  Dear Friend,
+              <div className="space-y-3 mb-5 px-2">
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  I'm Chris — I built LumePet to celebrate our pets as the royalty they truly are. But I need to be honest: <span style={{ color: '#F0EDE8' }}>I'm struggling to keep it running.</span>
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: '#8A857D' }}>
-                  I'm Chris — just a guy who loves his pets more than anything. I created LumePet because I wanted to give pet parents like us a way to celebrate our furry family members...
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  Every portrait costs real money. The AI is expensive, and <span style={{ color: '#E74C3C' }}>the costs are more than I can afford alone.</span>
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: '#8A857D' }}>
-                  But I'll be honest with you: <span style={{ color: '#F0EDE8' }}>I'm struggling to keep LumePet alive.</span>
-                </p>
-              </div>
-              
-              {/* Warning Box */}
-              <div 
-                className="rounded-lg p-4 mb-6 text-center"
-                style={{ background: 'rgba(231, 76, 60, 0.1)', border: '1px solid rgba(231, 76, 60, 0.25)' }}
-              >
-                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#E74C3C' }}>
-                  ⚠️ This is real
-                </p>
-                <p className="text-xs" style={{ color: '#B8B2A8' }}>
-                  I'm not a big corporation. If I can't cover costs this month, LumePet goes offline.
+                <p className="text-sm leading-relaxed" style={{ color: '#B8B2A8' }}>
+                  If LumePet ever brought you joy — <span style={{ color: '#C5A572' }}>please consider helping.</span> Even $1 makes a difference.
                 </p>
               </div>
               
               {/* CTA Button */}
-              <div className="text-center mb-6">
+              <div className="text-center mb-5">
                 <div 
-                  className="inline-block px-8 py-4 rounded-xl font-bold text-lg"
+                  className="inline-block px-6 py-3 rounded-lg font-bold"
                   style={{ 
                     background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)', 
                     color: '#0A0A0A',
-                    boxShadow: '0 8px 25px rgba(197, 165, 114, 0.3)'
+                    boxShadow: '0 6px 20px rgba(197, 165, 114, 0.3)'
                   }}
                 >
-                  💛 Help Save LumePet
+                  💛 Support LumePet
                 </div>
-                <p className="text-xs mt-3" style={{ color: '#5A5650' }}>
-                  100% goes to keeping LumePet online
+                <p className="text-xs mt-2" style={{ color: '#5A5650' }}>
+                  Secure via Stripe • Any amount helps
                 </p>
               </div>
               
               {/* Signature */}
               <div 
-                className="pt-5 text-center"
+                className="pt-4 text-center"
                 style={{ borderTop: '1px solid rgba(197, 165, 114, 0.1)' }}
               >
-                <p className="text-sm mb-2" style={{ color: '#8A857D' }}>With all my heart,</p>
+                <p className="text-sm mb-2" style={{ color: '#B8B2A8' }}>Thank you from the bottom of my heart. 💛</p>
                 <p 
-                  className="text-lg italic"
+                  className="text-base italic"
                   style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                 >
                   Chris Cerney
                 </p>
-                <p className="text-xs mt-1" style={{ color: '#5A5650' }}>Creator of LumePet 🐾</p>
+                <p className="text-xs mt-1" style={{ color: '#7A756D' }}>Creator of LumePet 🐾</p>
+              </div>
+              
+              {/* Paw Prints */}
+              <div className="text-center mt-4 opacity-30">
+                <span style={{ letterSpacing: '10px' }}>🐾 🐾 🐾</span>
               </div>
             </div>
           </div>
