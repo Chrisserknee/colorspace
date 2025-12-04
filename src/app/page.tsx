@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import UploadModal from "@/components/UploadModal";
 import GenerationFlow, { getLastCreation } from "@/components/GenerationFlow";
 import ResumeButton from "@/components/ResumeButton";
+import SupportModal from "@/components/SupportModal";
 
 // Helper to convert data URL to File
 const dataURLtoFile = (dataurl: string, filename: string): File | null => {
@@ -48,6 +49,7 @@ const createPlaceholderFile = (): File => {
 export default function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
   const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
@@ -123,6 +125,24 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      {/* Support LumePet Button - Top Left */}
+      <button
+        onClick={() => setIsSupportModalOpen(true)}
+        className="fixed top-4 left-4 z-40 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105"
+        style={{
+          background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.15) 0%, rgba(197, 165, 114, 0.08) 100%)',
+          border: '1px solid rgba(197, 165, 114, 0.25)',
+          color: '#C5A572',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+        }}
+      >
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Support</span>
+      </button>
+
       {/* Hero Section */}
       <Hero onUploadClick={handleUploadClick} />
 
@@ -181,6 +201,12 @@ export default function Home() {
       <ContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
+      />
+
+      {/* Support Modal */}
+      <SupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
       />
 
       {/* Generation Flow (shows after file selection, email session restore, or viewing last creation) */}
