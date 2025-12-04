@@ -20,19 +20,19 @@ const samples = [
     id: 3,
     title: "Sir Duke",
     pet: "Distinguished Gentleman",
-    image: "/samples/duke.png",
+    image: "/samples/Duke.png",
   },
   {
     id: 4,
     title: "Lady Bella",
     pet: "Elegant Beauty",
-    image: "/samples/bella.png",
+    image: "/samples/Bella.png",
   },
   {
     id: 5,
     title: "Lord Bailey",
     pet: "Noble Companion",
-    image: "/samples/bailey.png",
+    image: "/samples/Bailey.png",
   },
 ];
 
