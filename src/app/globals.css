@@ -917,6 +917,60 @@ a:not(.btn-primary):not(.btn-secondary):not([class*="block"]) {
 
 /* ===== MASTERPIECE REVEAL ANIMATIONS ===== */
 
+/* GPU Acceleration Helper */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Smooth glow - single optimized animation */
+@keyframes smooth-glow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.03) translateZ(0);
+  }
+}
+
+/* Smooth sparkle - lightweight twinkle */
+@keyframes smooth-sparkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8) translateZ(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) translateZ(0);
+  }
+}
+
+/* Smooth star - corner accent */
+@keyframes smooth-star {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.9) rotate(0deg) translateZ(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(15deg) translateZ(0);
+  }
+}
+
+/* Smooth shimmer - single optimized sweep */
+@keyframes smooth-shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-12deg) translateZ(0);
+  }
+  100% {
+    transform: translateX(250%) skewX(-12deg) translateZ(0);
+  }
+}
+
+/* Legacy animations - kept for compatibility */
 /* Outer ethereal glow - ultra slow breathing */
 @keyframes masterpiece-outer-glow {
   0%, 100% {

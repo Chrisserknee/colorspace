@@ -1492,152 +1492,87 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
 
             {/* Preview Image - Display Only */}
             <div className="relative max-w-[240px] sm:max-w-[300px] mx-auto mb-4">
-              {/* Outermost ethereal glow - pulsing slowly */}
+              {/* Optimized glow effect - single layer with CSS only */}
               {showRevealAnimation && (
                 <div 
-                  className="absolute -inset-12 rounded-full pointer-events-none"
+                  className="absolute -inset-8 rounded-3xl pointer-events-none gpu-accelerated"
                   style={{
-                    background: 'radial-gradient(circle, rgba(197, 165, 114, 0.25) 0%, rgba(197, 165, 114, 0.08) 40%, transparent 70%)',
-                    filter: 'blur(20px)',
-                    animation: 'masterpiece-outer-glow 4s ease-in-out infinite',
+                    background: 'radial-gradient(circle, rgba(197, 165, 114, 0.35) 0%, rgba(197, 165, 114, 0.1) 50%, transparent 70%)',
+                    animation: 'smooth-glow 3s ease-in-out infinite',
+                    willChange: 'opacity, transform',
                   }}
                 />
               )}
               
-              {/* Inner intense glow */}
-              {showRevealAnimation && (
-                <div 
-                  className="absolute -inset-6 rounded-3xl pointer-events-none"
-                  style={{
-                    background: 'radial-gradient(circle, rgba(197, 165, 114, 0.5) 0%, rgba(197, 165, 114, 0.2) 40%, transparent 70%)',
-                    filter: 'blur(12px)',
-                    animation: 'masterpiece-inner-glow 3s ease-in-out infinite',
-                    animationDelay: '0.5s',
-                  }}
-                />
-              )}
-              
-              {/* Floating sparkle particles - Layer 1: Tiny distant stars */}
-              {showRevealAnimation && (
-                <div className="absolute -inset-16 pointer-events-none overflow-visible">
-                  {[...Array(40)].map((_, i) => (
-                    <div
-                      key={`tiny-${i}`}
-                      className="absolute"
-                      style={{
-                        left: `${-10 + Math.random() * 120}%`,
-                        top: `${-10 + Math.random() * 120}%`,
-                        animation: `masterpiece-sparkle-float ${4 + Math.random() * 3}s ease-in-out infinite`,
-                        animationDelay: `${Math.random() * 4}s`,
-                      }}
-                    >
-                      <div 
-                        className="rounded-full"
-                        style={{
-                          width: '2px',
-                          height: '2px',
-                          backgroundColor: '#E8D5B5',
-                          boxShadow: '0 0 4px 2px rgba(232, 213, 181, 0.8)',
-                          animation: `masterpiece-twinkle ${1.5 + Math.random()}s ease-in-out infinite`,
-                          animationDelay: `${Math.random()}s`,
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* Floating sparkle particles - Layer 2: Medium golden orbs */}
-              {showRevealAnimation && (
-                <div className="absolute -inset-12 pointer-events-none overflow-visible">
-                  {[...Array(25)].map((_, i) => (
-                    <div
-                      key={`medium-${i}`}
-                      className="absolute"
-                      style={{
-                        left: `${-5 + Math.random() * 110}%`,
-                        top: `${-5 + Math.random() * 110}%`,
-                        animation: `masterpiece-sparkle-float ${5 + Math.random() * 3}s ease-in-out infinite`,
-                        animationDelay: `${Math.random() * 3}s`,
-                      }}
-                    >
-                      <div 
-                        className="rounded-full"
-                        style={{
-                          width: '4px',
-                          height: '4px',
-                          backgroundColor: '#C5A572',
-                          boxShadow: '0 0 8px 4px rgba(197, 165, 114, 0.9), 0 0 20px 8px rgba(197, 165, 114, 0.4)',
-                          animation: `masterpiece-twinkle ${2 + Math.random() * 1.5}s ease-in-out infinite`,
-                          animationDelay: `${Math.random() * 1.5}s`,
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* Floating sparkle particles - Layer 3: Large brilliant stars */}
+              {/* Optimized sparkles - fewer particles, GPU accelerated */}
               {showRevealAnimation && (
                 <div className="absolute -inset-10 pointer-events-none overflow-visible">
-                  {[...Array(12)].map((_, i) => (
+                  {/* Golden sparkles - only 8 */}
+                  {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
                     <div
-                      key={`large-${i}`}
-                      className="absolute"
+                      key={`sparkle-${i}`}
+                      className="absolute rounded-full gpu-accelerated"
                       style={{
-                        left: `${5 + Math.random() * 90}%`,
-                        top: `${5 + Math.random() * 90}%`,
-                        animation: `masterpiece-sparkle-drift ${6 + Math.random() * 4}s ease-in-out infinite`,
-                        animationDelay: `${Math.random() * 4}s`,
+                        left: `${10 + (i * 12) % 80}%`,
+                        top: `${5 + (i * 17) % 90}%`,
+                        width: '4px',
+                        height: '4px',
+                        backgroundColor: '#C5A572',
+                        boxShadow: '0 0 6px 3px rgba(197, 165, 114, 0.8)',
+                        animation: `smooth-sparkle 2.5s ease-in-out infinite`,
+                        animationDelay: `${i * 0.3}s`,
+                        willChange: 'opacity, transform',
                       }}
-                    >
-                      <div 
-                        className="rounded-full"
-                        style={{
-                          width: '6px',
-                          height: '6px',
-                          backgroundColor: '#FFF8E8',
-                          boxShadow: '0 0 12px 6px rgba(255, 248, 232, 1), 0 0 30px 12px rgba(197, 165, 114, 0.6)',
-                          animation: `masterpiece-twinkle-bright ${2.5 + Math.random()}s ease-in-out infinite`,
-                          animationDelay: `${Math.random() * 2}s`,
-                        }}
-                      />
-                    </div>
+                    />
+                  ))}
+                  {/* White accent sparkles - only 4 */}
+                  {[0, 1, 2, 3].map((i) => (
+                    <div
+                      key={`accent-${i}`}
+                      className="absolute rounded-full gpu-accelerated"
+                      style={{
+                        left: `${20 + (i * 22)}%`,
+                        top: `${15 + (i * 25) % 70}%`,
+                        width: '3px',
+                        height: '3px',
+                        backgroundColor: '#FFF8E8',
+                        boxShadow: '0 0 8px 4px rgba(255, 248, 232, 0.9)',
+                        animation: `smooth-sparkle 3s ease-in-out infinite`,
+                        animationDelay: `${0.5 + i * 0.4}s`,
+                        willChange: 'opacity, transform',
+                      }}
+                    />
                   ))}
                 </div>
               )}
               
-              {/* 4-pointed twinkling stars - gentle sway */}
+              {/* Corner stars - only 4, one per corner */}
               {showRevealAnimation && (
-                <div className="absolute -inset-14 pointer-events-none overflow-visible">
-                  {[...Array(8)].map((_, i) => (
-                    <div
+                <div className="absolute -inset-6 pointer-events-none">
+                  {[
+                    { left: '-3%', top: '-3%' },
+                    { left: '97%', top: '-3%' },
+                    { left: '-3%', top: '97%' },
+                    { left: '97%', top: '97%' },
+                  ].map((pos, i) => (
+                    <svg 
                       key={`star-${i}`}
-                      className="absolute"
+                      className="absolute gpu-accelerated"
+                      width="12" 
+                      height="12" 
+                      viewBox="0 0 24 24"
                       style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                        animation: `masterpiece-star-sway ${6 + Math.random() * 4}s ease-in-out infinite`,
-                        animationDelay: `${Math.random() * 3}s`,
+                        ...pos,
+                        animation: `smooth-star 2.5s ease-in-out infinite`,
+                        animationDelay: `${i * 0.5}s`,
+                        willChange: 'opacity, transform',
                       }}
                     >
-                      <svg 
-                        width="14" 
-                        height="14" 
-                        viewBox="0 0 24 24" 
-                        fill="none"
-                        style={{
-                          filter: 'drop-shadow(0 0 6px rgba(197, 165, 114, 0.9))',
-                          animation: `masterpiece-twinkle ${4 + Math.random() * 3}s ease-in-out infinite`,
-                          animationDelay: `${Math.random() * 2}s`,
-                        }}
-                      >
-                        <path 
-                          d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" 
-                          fill="#C5A572"
-                        />
-                      </svg>
-                    </div>
+                      <path 
+                        d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" 
+                        fill="#C5A572"
+                      />
+                    </svg>
                   ))}
                 </div>
               )}
@@ -1702,43 +1637,35 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                   />
                 )}
                 
-                {/* Multiple shimmer sweeps */}
+                {/* Single optimized shimmer sweep */}
                 {showRevealAnimation && (
-                  <>
-                    <div 
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: 'linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.2) 48%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.2) 52%, transparent 70%)',
-                        animation: 'masterpiece-shimmer 4s ease-in-out infinite',
-                      }}
-                    />
-                    <div 
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: 'linear-gradient(75deg, transparent 35%, rgba(197, 165, 114, 0.15) 50%, transparent 65%)',
-                        animation: 'masterpiece-shimmer 5s ease-in-out infinite',
-                        animationDelay: '2s',
-                      }}
-                    />
-                  </>
+                  <div 
+                    className="absolute inset-0 pointer-events-none gpu-accelerated"
+                    style={{
+                      background: 'linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.15) 48%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.15) 52%, transparent 70%)',
+                      animation: 'smooth-shimmer 4s ease-in-out infinite',
+                      willChange: 'transform',
+                    }}
+                  />
                 )}
                 
-                {/* Sparkle overlay inside image */}
+                {/* Simplified sparkle overlay - only 6 sparkles */}
                 {showRevealAnimation && (
                   <div className="absolute inset-0 pointer-events-none">
-                    {[...Array(15)].map((_, i) => (
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
                       <div
                         key={`inner-sparkle-${i}`}
-                        className="absolute rounded-full"
+                        className="absolute rounded-full gpu-accelerated"
                         style={{
                           width: '3px',
                           height: '3px',
                           backgroundColor: '#FFF',
-                          left: `${10 + Math.random() * 80}%`,
-                          top: `${10 + Math.random() * 80}%`,
-                          boxShadow: '0 0 6px 3px rgba(255, 255, 255, 0.8)',
-                          animation: `masterpiece-inner-sparkle ${2 + Math.random() * 2}s ease-in-out infinite`,
-                          animationDelay: `${Math.random() * 3}s`,
+                          left: `${15 + (i * 15)}%`,
+                          top: `${20 + (i * 12) % 60}%`,
+                          boxShadow: '0 0 4px 2px rgba(255, 255, 255, 0.7)',
+                          animation: 'smooth-sparkle 2.5s ease-in-out infinite',
+                          animationDelay: `${i * 0.4}s`,
+                          willChange: 'opacity, transform',
                         }}
                       />
                     ))}
