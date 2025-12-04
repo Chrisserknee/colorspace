@@ -1486,8 +1486,8 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoWidth = logoMetadata.width || 200;
   const logoHeight = logoMetadata.height || 200;
   
-  // Watermarks - about 20% of image size for elegant spacing
-  const watermarkSize = Math.max(width, height) * 0.20;
+  // Watermarks - about 18% of image size for denser coverage
+  const watermarkSize = Math.max(width, height) * 0.18;
   const watermarkAspectRatio = logoWidth / logoHeight;
   const watermarkWidth = watermarkSize;
   const watermarkHeight = watermarkSize / watermarkAspectRatio;
@@ -1496,46 +1496,91 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
   const logoBase64 = logoBuffer.toString("base64");
   const logoMimeType = logoMetadata.format === "png" ? "image/png" : "image/jpeg";
 
-  // Create elegant staggered grid of watermarks
-  // 3x3 base grid with offset rows for diamond-like pattern
+  // Create dense grid of watermarks covering entire image
+  // 4 rows with alternating 3 and 4 watermarks for full coverage
   const watermarkImages: string[] = [];
+  const opacity = "0.45"; // Brighter opacity
   
-  // Row 1: 2 watermarks at 25% and 75% width
+  // Row 1 (top): 3 watermarks
   watermarkImages.push(`
-      <image x="${Math.round(width * 0.25 - watermarkWidth / 2)}" y="${Math.round(height * 0.20 - watermarkHeight / 2)}" 
+      <image x="${Math.round(width * 0.15 - watermarkWidth / 2)}" y="${Math.round(height * 0.12 - watermarkHeight / 2)}" 
         width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
   watermarkImages.push(`
-      <image x="${Math.round(width * 0.75 - watermarkWidth / 2)}" y="${Math.round(height * 0.20 - watermarkHeight / 2)}" 
+      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.12 - watermarkHeight / 2)}" 
         width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.85 - watermarkWidth / 2)}" y="${Math.round(height * 0.12 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
   
-  // Row 2: 3 watermarks at 15%, 50%, 85% width
+  // Row 2: 4 watermarks offset
   watermarkImages.push(`
-      <image x="${Math.round(width * 0.15 - watermarkWidth / 2)}" y="${Math.round(height * 0.45 - watermarkHeight / 2)}" 
+      <image x="${Math.round(width * 0.05 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
         width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
   watermarkImages.push(`
-      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.50 - watermarkHeight / 2)}" 
+      <image x="${Math.round(width * 0.35 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
         width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
   watermarkImages.push(`
-      <image x="${Math.round(width * 0.85 - watermarkWidth / 2)}" y="${Math.round(height * 0.45 - watermarkHeight / 2)}" 
+      <image x="${Math.round(width * 0.65 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
         width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.95 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
   
-  // Row 3: 2 watermarks at 25% and 75% width
+  // Row 3 (middle): 3 watermarks
   watermarkImages.push(`
-      <image x="${Math.round(width * 0.25 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+      <image x="${Math.round(width * 0.20 - watermarkWidth / 2)}" y="${Math.round(height * 0.55 - watermarkHeight / 2)}" 
         width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
   watermarkImages.push(`
-      <image x="${Math.round(width * 0.75 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.55 - watermarkHeight / 2)}" 
         width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="0.35" filter="url(#whiteBright)"/>`);
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.80 - watermarkWidth / 2)}" y="${Math.round(height * 0.55 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  
+  // Row 4: 4 watermarks offset
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.05 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.35 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.65 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.95 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  
+  // Row 5 (bottom): 3 watermarks
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.15 - watermarkWidth / 2)}" y="${Math.round(height * 0.92 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.92 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
+  watermarkImages.push(`
+      <image x="${Math.round(width * 0.85 - watermarkWidth / 2)}" y="${Math.round(height * 0.92 - watermarkHeight / 2)}" 
+        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
+        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
 
-  // Create SVG with elegant staggered watermarks
-  // Watermarks are WHITE with higher visibility
+  // Create SVG with dense watermark coverage
+  // Watermarks are WHITE with high visibility
   const watermarkSvg = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -1549,7 +1594,7 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
         </filter>
       </defs>
       
-      <!-- 7 elegantly staggered watermarks -->
+      <!-- 17 watermarks with dense coverage -->
       ${watermarkImages.join('')}
     </svg>
   `;

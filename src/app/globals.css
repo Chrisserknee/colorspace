@@ -31,6 +31,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* Improve zoom/pinch behavior on mobile */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -39,6 +42,47 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   min-height: 100vh;
+  /* Prevent zoom lag and improve rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================
+   ZOOM/SCALE PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+/* Optimize images for zoom */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  transform: translateZ(0);
+}
+
+/* Reduce backdrop-filter lag on mobile during zoom */
+@media (hover: none) and (pointer: coarse) {
+  .backdrop-blur-light {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  
+  /* Simplify complex effects during touch interaction */
+  *:active {
+    transition-duration: 0.1s !important;
+  }
+}
+
+/* Hardware acceleration for smooth zooming */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* Prevent layout thrashing during zoom */
+.zoom-stable {
+  contain: layout style paint;
 }
 
 /* Dark Background Gradient Pattern */
