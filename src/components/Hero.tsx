@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { captureEvent } from "@/lib/posthog";
 
@@ -8,8 +8,48 @@ interface HeroProps {
   onUploadClick: () => void;
 }
 
+interface HeroPortrait {
+  id: string;
+  title: string;
+  image: string;
+}
+
+const heroPortraits: HeroPortrait[] = [
+  { id: "gracie", title: "Gracie", image: "/samples/Gracie.png" },
+  { id: "charley-lily", title: "Charley & Lily", image: "/samples/charley&Lily.png" },
+];
+
 export default function Hero({ onUploadClick }: HeroProps) {
   const [portraitCount, setPortraitCount] = useState<number>(335);
+  const [selectedPortrait, setSelectedPortrait] = useState<HeroPortrait | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  
+  // Close lightbox
+  const closeLightbox = useCallback(() => {
+    setIsAnimating(false);
+    setTimeout(() => setSelectedPortrait(null), 200);
+  }, []);
+
+  // Open lightbox with animation
+  const openLightbox = useCallback((portrait: HeroPortrait) => {
+    setSelectedPortrait(portrait);
+    setTimeout(() => setIsAnimating(true), 10);
+  }, []);
+
+  // Handle escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+    };
+    if (selectedPortrait) {
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [selectedPortrait, closeLightbox]);
   
   useEffect(() => {
     // Fetch current portrait count
@@ -167,11 +207,12 @@ export default function Hero({ onUploadClick }: HeroProps) {
 
         {/* Sample portraits */}
         <div className="flex justify-center items-end gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
-          {/* First Portrait - Whiskers (Tabby Cat) */}
+          {/* First Portrait - Gracie (Tabby Cat) */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
+              className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
               style={{ padding: '2px' }}
+              onClick={() => openLightbox(heroPortraits[0])}
             >
               {/* Soft outer glow/vignette */}
               <div 
@@ -232,6 +273,12 @@ export default function Hero({ onUploadClick }: HeroProps) {
                         alt="Gracie - Royal Tabby Cat Portrait"
                         className="w-full h-full object-cover"
                       />
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -254,8 +301,9 @@ export default function Hero({ onUploadClick }: HeroProps) {
           {/* Second Portrait - Charley & Lily (Two Dogs) */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0"
+              className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
               style={{ padding: '2px' }}
+              onClick={() => openLightbox(heroPortraits[1])}
             >
               {/* Soft outer glow/vignette */}
               <div 
@@ -316,6 +364,12 @@ export default function Hero({ onUploadClick }: HeroProps) {
                         alt="Charley & Lily - Royal Duo Portrait"
                         className="w-full h-full object-cover"
                       />
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -397,6 +451,110 @@ export default function Hero({ onUploadClick }: HeroProps) {
           </div>
         </div>
       </div>
+
+      {/* Magical Lightbox Modal */}
+      {selectedPortrait && (
+        <div 
+          className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.92)' }}
+          onClick={closeLightbox}
+        >
+          {/* Magical sparkle particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 rounded-full"
+                style={{
+                  backgroundColor: '#C5A572',
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  opacity: isAnimating ? 0.6 : 0,
+                  transform: `scale(${isAnimating ? 1 : 0})`,
+                  transition: `all ${0.3 + Math.random() * 0.5}s ease-out ${Math.random() * 0.2}s`,
+                  boxShadow: '0 0 6px 2px rgba(197, 165, 114, 0.5)',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Close button */}
+          <button
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 p-2 rounded-full transition-all duration-200 hover:scale-110 hover:bg-white/10"
+            style={{ color: '#F0EDE8' }}
+            aria-label="Close"
+          >
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Portrait with magical reveal animation */}
+          <div 
+            className={`relative transition-all duration-500 ease-out ${isAnimating ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: '90vw',
+              maxHeight: '85vh',
+            }}
+          >
+            {/* Magical glow behind frame */}
+            <div 
+              className={`absolute inset-0 transition-all duration-700 ${isAnimating ? 'opacity-100 scale-110' : 'opacity-0 scale-100'}`}
+              style={{
+                background: 'radial-gradient(ellipse at center, rgba(197, 165, 114, 0.4) 0%, rgba(197, 165, 114, 0.1) 40%, transparent 70%)',
+                filter: 'blur(40px)',
+                transform: 'scale(1.3)',
+              }}
+            />
+            
+            {/* Gold frame */}
+            <div 
+              className="relative p-2 sm:p-3 rounded-xl"
+              style={{ 
+                background: 'linear-gradient(135deg, #E8D4B0 0%, #C5A572 30%, #E8D4B0 50%, #C5A572 70%, #E8D4B0 100%)',
+                boxShadow: `
+                  0 30px 100px rgba(0, 0, 0, 0.5),
+                  0 0 60px rgba(197, 165, 114, 0.3),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                  inset 0 -2px 4px rgba(166, 139, 91, 0.4)
+                `.trim().replace(/\s+/g, ' '),
+              }}
+            >
+              <div className="relative rounded-lg overflow-hidden">
+                <Image
+                  src={selectedPortrait.image}
+                  alt={selectedPortrait.title}
+                  width={800}
+                  height={800}
+                  className="object-contain"
+                  style={{
+                    maxHeight: '75vh',
+                    width: 'auto',
+                  }}
+                  priority
+                />
+              </div>
+            </div>
+
+            {/* Title below */}
+            <div 
+              className={`text-center mt-4 transition-all duration-500 delay-200 ${isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+            >
+              <h3 
+                className="text-2xl sm:text-3xl"
+                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+              >
+                {selectedPortrait.title}
+              </h3>
+              <p className="text-sm mt-1" style={{ color: '#7A756D' }}>
+                Click anywhere or press ESC to close
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
