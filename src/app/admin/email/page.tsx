@@ -456,59 +456,146 @@ export default function AdminEmailPage() {
         {/* Email Preview */}
         <div className="mt-8">
           <h3 
-            className="text-lg mb-4"
+            className="text-lg mb-4 flex items-center gap-2"
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#C5A572' }}
           >
-            📄 Email Preview
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Email Preview
           </h3>
+          
+          {/* Email Client Frame */}
           <div 
-            className="rounded-xl overflow-hidden"
+            className="rounded-2xl overflow-hidden"
             style={{ 
+              background: 'linear-gradient(135deg, #1A1816 0%, #0F0E0D 100%)',
               border: '1px solid rgba(197, 165, 114, 0.2)',
-              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
             }}
           >
+            {/* Email Header Bar */}
             <div 
-              className="px-4 py-3 flex items-center gap-3"
-              style={{ background: 'rgba(197, 165, 114, 0.1)', borderBottom: '1px solid rgba(197, 165, 114, 0.15)' }}
+              className="px-5 py-4 flex items-center justify-between"
+              style={{ background: 'rgba(197, 165, 114, 0.08)', borderBottom: '1px solid rgba(197, 165, 114, 0.1)' }}
             >
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full" style={{ background: '#E74C3C' }}></div>
-                <div className="w-3 h-3 rounded-full" style={{ background: '#F39C12' }}></div>
-                <div className="w-3 h-3 rounded-full" style={{ background: '#27AE60' }}></div>
+              <div className="flex items-center gap-3">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ background: '#FF5F57' }}></div>
+                  <div className="w-3 h-3 rounded-full" style={{ background: '#FFBD2E' }}></div>
+                  <div className="w-3 h-3 rounded-full" style={{ background: '#28C840' }}></div>
+                </div>
+                <div className="h-4 w-px" style={{ background: 'rgba(197, 165, 114, 0.2)' }}></div>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                    style={{ background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)', color: '#0A0A0A', fontWeight: 'bold' }}
+                  >
+                    L
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium" style={{ color: '#F0EDE8' }}>LumePet</p>
+                    <p className="text-xs" style={{ color: '#5A5650' }}>noreply@lumepet.app</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-xs" style={{ color: '#7A756D' }}>
-                Subject: <span style={{ color: '#C5A572' }}>LumePet Needs Your Help 💛</span>
+              <p className="text-xs" style={{ color: '#5A5650' }}>Just now</p>
+            </div>
+            
+            {/* Subject Line */}
+            <div className="px-5 py-3" style={{ borderBottom: '1px solid rgba(197, 165, 114, 0.08)' }}>
+              <p className="text-sm font-medium" style={{ color: '#F0EDE8' }}>
+                LumePet Needs Your Help 💛
               </p>
             </div>
-            <div className="p-4 text-center" style={{ background: '#0A0908' }}>
-              <p className="text-4xl mb-3">💛</p>
-              <h4 className="text-xl mb-2" style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-                LUMEPET
-              </h4>
-              <p className="text-sm mb-3" style={{ color: '#7A756D' }}>An Urgent Message From Chris</p>
-              <div className="h-px w-3/4 mx-auto mb-4" style={{ background: 'linear-gradient(90deg, transparent, rgba(197, 165, 114, 0.3), transparent)' }}></div>
-              <h5 className="text-lg mb-3" style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+            
+            {/* Email Body */}
+            <div className="p-6" style={{ background: '#0A0908' }}>
+              {/* Logo Section */}
+              <div className="text-center mb-6">
+                <p className="text-5xl mb-4">💛</p>
+                <h4 
+                  className="text-2xl mb-1 tracking-wider"
+                  style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  LUMEPET
+                </h4>
+                <p className="text-xs tracking-widest uppercase" style={{ color: '#7A756D' }}>
+                  An Urgent Message From Chris
+                </p>
+              </div>
+              
+              {/* Divider */}
+              <div 
+                className="h-px w-2/3 mx-auto mb-6" 
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(197, 165, 114, 0.3), transparent)' }}
+              />
+              
+              {/* Main Heading */}
+              <h5 
+                className="text-xl text-center mb-5 leading-relaxed"
+                style={{ color: '#F0EDE8', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+              >
                 I Need Your Help —<br/>LumePet May Have to Shut Down
               </h5>
-              <p className="text-sm mb-3" style={{ color: '#B8B2A8' }}>
-                I'm struggling to keep LumePet alive...
-              </p>
-              <div 
-                className="inline-block px-3 py-2 rounded-lg text-xs mb-3"
-                style={{ background: 'rgba(231, 76, 60, 0.1)', border: '1px solid rgba(231, 76, 60, 0.3)', color: '#E74C3C' }}
-              >
-                ⚠️ Without support, LumePet goes offline
+              
+              {/* Message Preview */}
+              <div className="space-y-4 mb-6">
+                <p className="text-sm text-center" style={{ color: '#B8B2A8' }}>
+                  Dear Friend,
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: '#8A857D' }}>
+                  I'm Chris — just a guy who loves his pets more than anything. I created LumePet because I wanted to give pet parents like us a way to celebrate our furry family members...
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: '#8A857D' }}>
+                  But I'll be honest with you: <span style={{ color: '#F0EDE8' }}>I'm struggling to keep LumePet alive.</span>
+                </p>
               </div>
+              
+              {/* Warning Box */}
               <div 
-                className="inline-block px-6 py-3 rounded-lg font-semibold"
-                style={{ background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)', color: '#0A0A0A' }}
+                className="rounded-lg p-4 mb-6 text-center"
+                style={{ background: 'rgba(231, 76, 60, 0.1)', border: '1px solid rgba(231, 76, 60, 0.25)' }}
               >
-                💛 Help Save LumePet
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#E74C3C' }}>
+                  ⚠️ This is real
+                </p>
+                <p className="text-xs" style={{ color: '#B8B2A8' }}>
+                  I'm not a big corporation. If I can't cover costs this month, LumePet goes offline.
+                </p>
               </div>
-              <p className="text-xs mt-4" style={{ color: '#5A5650' }}>
-                With all my heart, Chris Cerney 🐾
-              </p>
+              
+              {/* CTA Button */}
+              <div className="text-center mb-6">
+                <div 
+                  className="inline-block px-8 py-4 rounded-xl font-bold text-lg"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)', 
+                    color: '#0A0A0A',
+                    boxShadow: '0 8px 25px rgba(197, 165, 114, 0.3)'
+                  }}
+                >
+                  💛 Help Save LumePet
+                </div>
+                <p className="text-xs mt-3" style={{ color: '#5A5650' }}>
+                  100% goes to keeping LumePet online
+                </p>
+              </div>
+              
+              {/* Signature */}
+              <div 
+                className="pt-5 text-center"
+                style={{ borderTop: '1px solid rgba(197, 165, 114, 0.1)' }}
+              >
+                <p className="text-sm mb-2" style={{ color: '#8A857D' }}>With all my heart,</p>
+                <p 
+                  className="text-lg italic"
+                  style={{ color: '#C5A572', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  Chris Cerney
+                </p>
+                <p className="text-xs mt-1" style={{ color: '#5A5650' }}>Creator of LumePet 🐾</p>
+              </div>
             </div>
           </div>
         </div>
