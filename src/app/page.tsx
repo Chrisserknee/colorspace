@@ -95,6 +95,13 @@ export default function Home() {
           previewUrl: savedLastCreation.previewUrl,
         });
       }
+      
+      // Check for support=true param to auto-open support modal
+      if (urlParams.get("support") === "true") {
+        setIsSupportModalOpen(true);
+        // Clean URL
+        window.history.replaceState({}, "", window.location.pathname);
+      }
     }
   }, []);
 
