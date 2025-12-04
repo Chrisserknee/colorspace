@@ -153,13 +153,16 @@ const getPendingImage = (): string | null => {
 // Last creation storage key
 const LAST_CREATION_KEY = "lumepet_last_creation";
 
+// Import from CreationsModal for saving creations
+import { saveCreation } from "./CreationsModal";
+
 interface LastCreation {
   imageId: string;
   previewUrl: string;
   timestamp: number;
 }
 
-// Save the last successful creation to localStorage
+// Save the last successful creation to localStorage (and also to creations list)
 export const saveLastCreation = (imageId: string, previewUrl: string) => {
   if (typeof window !== "undefined") {
     const lastCreation: LastCreation = {
@@ -168,6 +171,8 @@ export const saveLastCreation = (imageId: string, previewUrl: string) => {
       timestamp: Date.now(),
     };
     localStorage.setItem(LAST_CREATION_KEY, JSON.stringify(lastCreation));
+    // Also save to the creations list
+    saveCreation(imageId, previewUrl);
   }
 };
 

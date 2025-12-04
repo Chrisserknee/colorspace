@@ -12,6 +12,7 @@ import UploadModal from "@/components/UploadModal";
 import GenerationFlow, { getLastCreation } from "@/components/GenerationFlow";
 import ResumeButton from "@/components/ResumeButton";
 import SupportModal from "@/components/SupportModal";
+import CreationsModal, { hasCreations } from "@/components/CreationsModal";
 
 // Helper to convert data URL to File
 const dataURLtoFile = (dataurl: string, filename: string): File | null => {
@@ -50,11 +51,13 @@ export default function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [isCreationsModalOpen, setIsCreationsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
   const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
   const [lastCreation, setLastCreation] = useState<{ imageId: string; previewUrl: string } | null>(null);
   const [viewingLastCreation, setViewingLastCreation] = useState(false);
+  const [hasAnyCreations, setHasAnyCreations] = useState(false);
 
   // Check for email param (session restore) or pending image from pack purchase
   useEffect(() => {
@@ -95,6 +98,9 @@ export default function Home() {
           previewUrl: savedLastCreation.previewUrl,
         });
       }
+      
+      // Check if there are any creations for "My Creations" button
+      setHasAnyCreations(hasCreations());
       
       // Check for support=true param to auto-open support modal
       if (urlParams.get("support") === "true") {
@@ -154,11 +160,11 @@ export default function Home() {
       {/* Hero Section */}
       <Hero onUploadClick={handleUploadClick} />
 
-      {/* View Last Creation Button - static, centered above How It Works */}
-      {!selectedFile && !showFlowFromEmail && !viewingLastCreation && lastCreation && (
+      {/* My Creations Button - static, centered above How It Works */}
+      {!selectedFile && !showFlowFromEmail && !viewingLastCreation && hasAnyCreations && (
         <div className="flex justify-center py-6 -mt-8">
           <button
-            onClick={handleViewLastCreation}
+            onClick={() => setIsCreationsModalOpen(true)}
             className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105"
             style={{
               background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.15) 0%, rgba(197, 165, 114, 0.08) 100%)',
@@ -175,10 +181,9 @@ export default function Home() {
               stroke="currentColor" 
               className="w-5 h-5"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.573-3.007-9.963-7.178z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
-            <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>View Last Creation</span>
+            <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>My Creations</span>
           </button>
         </div>
       )}
@@ -215,6 +220,12 @@ export default function Home() {
       <SupportModal
         isOpen={isSupportModalOpen}
         onClose={() => setIsSupportModalOpen(false)}
+      />
+
+      {/* Creations Modal */}
+      <CreationsModal
+        isOpen={isCreationsModalOpen}
+        onClose={() => setIsCreationsModalOpen(false)}
       />
 
       {/* Generation Flow (shows after file selection, email session restore, or viewing last creation) */}
