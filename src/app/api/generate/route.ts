@@ -2528,7 +2528,20 @@ KEY POSE QUALITIES:
 - Cloak draped naturally over body - soft plush velvety texture
 - Overall feeling of a beloved pet captured in a quiet, comfortable moment`;
 
-    const generationPrompt = `CRITICAL SPECIES REQUIREMENT: THIS IS A ${species}. YOU MUST GENERATE A ${species}. ${notSpecies} REPEAT: THIS IS A ${species} - GENERATE ONLY A ${species}. DO NOT GENERATE THE WRONG SPECIES.
+    // Add critical framing instruction at the very start for large dogs
+    const largeDogFramingPrefix = isLargeDog ? `
+*** CRITICAL FRAMING REQUIREMENT - READ FIRST ***
+THIS IS A LARGE DOG BREED. You MUST zoom out and show a WIDE SHOT.
+- Frame as a HALF-BODY PORTRAIT showing head, neck, chest, and front legs
+- The dog should appear SMALL in the frame with lots of background visible
+- Leave at least 20% EMPTY SPACE above the top of the ears
+- DO NOT create a close-up head shot - show MORE of the body
+- Think "sitting dog from 6 feet away" not "dog face close-up"
+*** END FRAMING REQUIREMENT ***
+
+` : "";
+
+    const generationPrompt = `${largeDogFramingPrefix}CRITICAL SPECIES REQUIREMENT: THIS IS A ${species}. YOU MUST GENERATE A ${species}. ${notSpecies} REPEAT: THIS IS A ${species} - GENERATE ONLY A ${species}. DO NOT GENERATE THE WRONG SPECIES.
 
 THIS IS A ${species}. Generate a ${species}. ${notSpecies}
 
@@ -3164,7 +3177,20 @@ PROFESSIONALLY SCANNED ARTWORK QUALITY:
 
 CRITICAL: The ${species} must look EXACTLY like the original photo - this is a memorial portrait. Vary the composition (sometimes on cloud pillow, sometimes floating, sometimes in mist). Use visible brushstrokes and painterly technique throughout. The pet should appear peaceful, serene, and surrounded by heavenly light. Create a beautiful, varied, painterly tribute that brings comfort.` : null;
 
-      const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
+      // Add framing prefix for large dogs in OpenAI img2img
+      const largeDogImg2ImgPrefix = isLargeDog ? `
+*** MANDATORY FRAMING FOR LARGE DOG ***
+This is a LARGE DOG breed. You MUST create a WIDE SHOT showing the dog from a distance.
+- Show the FULL dog: head, ears, neck, chest, front legs, and cushion
+- The dog should be SMALL in the frame - occupying only 60-70% of image height
+- Leave LOTS of empty background space ABOVE the ears (at least 15-20% of image)
+- Frame like a "full body sitting portrait" NOT a "head close-up"
+- ABSOLUTELY DO NOT crop the top of the head or ears
+*** END MANDATORY FRAMING ***
+
+` : "";
+      
+      const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${largeDogImg2ImgPrefix}${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
 A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with THICK TEXTURED PAINT showing brushwork.
@@ -3218,7 +3244,16 @@ FOR MULTICOLOR PETS: harmonize with dominant fur tone using SUBTLE/ELEGANT color
 Apply same harmony to GEMSTONES: select ELEGANT gems that complement pet's eyes or fur (soft ruby, muted emerald, dusty sapphire, warm topaz, gentle amethyst) - SPARKLING but SUBTLE, LUMINOUS but REFINED
 
 === COMPOSITION (ZOOMED OUT, Wide, Centered, Full Body Visible) ===
-- ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
+${isLargeDog ? `*** LARGE DOG BREED - EXTRA ZOOM OUT REQUIRED ***
+- ZOOM WAY OUT - dog should occupy only 60-70% of frame height
+- Position dog in LOWER half of frame with lots of background above
+- ENTIRE HEAD including FULL EARS must be visible with space above
+- Show: complete head, ears, neck, chest, front legs, cushion
+- At least 15-20% of frame should be background ABOVE the ear tips
+- Think "full sitting portrait from several feet away"
+- NEVER crop the head or ears - full ears visible with background above them
+*** END LARGE DOG REQUIREMENTS ***
+` : ""}- ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
 - WIDE and CENTERED composition with space around the pet
 - Show FULL CUSHION with pet clearly SITTING or RESTING on it
 - Pet SEATED or LYING DOWN NATURALLY like a real ${species} would rest
