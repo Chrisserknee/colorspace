@@ -126,7 +126,7 @@ export default function EmailCapture() {
         ) : (
           <>
             {/* Form */}
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-4">
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto mb-4">
               <input
                 type="email"
                 value={email}
@@ -152,23 +152,36 @@ export default function EmailCapture() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-4 rounded-xl font-semibold text-sm sm:text-base whitespace-nowrap transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="group relative px-8 py-4 rounded-xl font-bold text-sm sm:text-base whitespace-nowrap transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden"
                 style={{
-                  background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)',
+                  background: 'linear-gradient(135deg, #C5A572 0%, #B8956A 50%, #A68B5B 100%)',
                   color: '#0A0A0A',
-                  boxShadow: '0 4px 20px rgba(197, 165, 114, 0.3)',
+                  boxShadow: '0 4px 25px rgba(197, 165, 114, 0.4), 0 0 40px rgba(197, 165, 114, 0.15)',
                 }}
               >
+                {/* Shimmer effect */}
+                <span 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                    transform: 'translateX(-100%)',
+                    animation: 'shimmer 2s infinite',
+                  }}
+                />
                 {isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
+                  <span className="relative flex items-center justify-center gap-2">
                     <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Signing Up...
+                    Joining...
                   </span>
                 ) : (
-                  "Sign Up for a Chance to Win Free Portraits"
+                  <span className="relative flex items-center justify-center gap-2">
+                    {/* Desktop: short text, Mobile: full text */}
+                    <span className="hidden sm:inline">Join & Win 🎁</span>
+                    <span className="sm:hidden">Join for a Chance to Win! 🎁</span>
+                  </span>
                 )}
               </button>
             </form>
