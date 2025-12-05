@@ -114,6 +114,22 @@ function isVeryLargeAnimal(breed: string, petDescription: string): boolean {
   );
 }
 
+// Get aspect ratio based on pet size - taller ratio for large breeds
+function getAspectRatioForSize(breed: string, petDescription: string, species: string): string {
+  const isVeryLarge = isVeryLargeAnimal(breed, petDescription);
+  const isLarge = species === "DOG" && isLargeBreed(breed, petDescription);
+  
+  if (isVeryLarge) {
+    console.log("📐 Using 3:4 portrait aspect ratio for very large animal");
+    return "3:4"; // Taller portrait for horses, etc.
+  } else if (isLarge) {
+    console.log("📐 Using 3:4 portrait aspect ratio for large dog breed");
+    return "3:4"; // Taller portrait to fit ears
+  }
+  
+  return "1:1"; // Standard square for regular pets
+}
+
 // Get composition instructions based on pet size
 function getCompositionForSize(breed: string, petDescription: string, species: string): string {
   const isVeryLarge = isVeryLargeAnimal(breed, petDescription);
@@ -325,7 +341,8 @@ async function addRainbowBridgeTextOverlay(
 // Generate image using FLUX model via Replicate for better pet identity preservation
 async function generateWithFlux(
   imageBase64: string,
-  prompt: string
+  prompt: string,
+  aspectRatio: string = "1:1"
 ): Promise<Buffer> {
   console.log("=== FLUX IMAGE-TO-IMAGE GENERATION ===");
   
@@ -353,6 +370,7 @@ async function generateWithFlux(
   console.log("FLUX parameters:");
   console.log("- Prompt strength:", promptStrength, `(${Math.round((1 - promptStrength) * 100)}% original preserved)`);
   console.log("- Guidance scale:", guidanceScale);
+  console.log("- Aspect ratio:", aspectRatio);
   console.log("- Prompt length:", prompt.length);
   
   try {
@@ -369,7 +387,7 @@ async function generateWithFlux(
           output_format: "png",
           output_quality: 95,
           safety_tolerance: 5, // More permissive for pet images
-          aspect_ratio: "1:1",
+          aspect_ratio: aspectRatio, // Dynamic - "3:4" for large breeds, "1:1" for standard
         }
       }
     );
@@ -830,8 +848,9 @@ ugly, duplicate, extra limbs, missing limbs, close-up, cropped`;
           refine: "expert_ensemble_refiner",
           high_noise_frac: 0.8,
           num_outputs: 1,
-          width: 1024,
-          height: 1024,
+          // Use portrait orientation (3:4) for large breeds to prevent ear cropping
+          width: isLargeBreed(breed, petDescription) || isVeryLargeAnimal(breed, petDescription) ? 768 : 1024,
+          height: isLargeBreed(breed, petDescription) || isVeryLargeAnimal(breed, petDescription) ? 1024 : 1024,
         }
       }
     );
@@ -3962,10 +3981,14 @@ USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
 
 CRITICAL: ${species} must sit NATURALLY like a real ${species} - NOT human-like pose. NO human clothing - ONLY a cloak draped over. Keep ${species} EXACTLY as shown. Only add 18th-century aristocratic styling with draped cloak.`;
 
+      // Get aspect ratio for this pet - taller for large breeds
+      const aspectRatio = getAspectRatioForSize(detectedBreed, petDescription, species);
+      
       // No fallback - if FLUX fails, we fail
       firstGeneratedBuffer = await generateWithFlux(
         base64Image,
-        fluxPrompt
+        fluxPrompt,
+        aspectRatio
       );
       
       console.log("✅ FLUX generation complete");
