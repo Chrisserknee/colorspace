@@ -2572,6 +2572,69 @@ The following facial structure analysis MUST be preserved exactly:
 ${facialStructureAnalysis}
 ` : "";
 
+    // Determine if this is a large animal that needs different composition
+    const largeAnimals = ["HORSE", "PONY"];
+    const isLargeAnimal = largeAnimals.includes(species);
+    
+    // Species-specific composition instructions
+    const compositionInstructions = isLargeAnimal ? `
+=== COMPOSITION FOR MAJESTIC ${species} (CRITICAL) ===
+- FULL BODY VIEW - show the entire ${species} from head to hooves
+- WIDE SHOT framing - capture the majestic proportions and powerful build
+- ${species} STANDING PROUDLY or in natural majestic pose (not lying down)
+- Show the elegant neck, strong body, and graceful legs
+- Camera positioned at distance to capture full majesty
+- Subject CENTERED in frame with room to show full stature
+- Natural ${species} pose: standing noble, slight turn, head held high, or gentle movement
+- Ornate royal draping/blanket over back instead of cloak
+- Decorated bridle or halter with gold and jewels
+- Rich background: stable interior, pastoral landscape, or grand estate grounds
+- The ${species}'s full beautiful form should dominate the composition` : `
+=== COMPOSITION (CRITICAL - Follow Exactly) ===
+- Subject positioned LOW and CENTRAL - resting on cushion, not standing or floating
+- Body ¾ VIEW, head forward or slightly angled - classical portrait posture
+- FRONT PAWS VISIBLE and resting on cushion - signature trait
+- Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest PROPERLY SECURING THE CLOAK - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, clasp HOLDS THE CLOAK TOGETHER at the chest
+- MEDIUM CLOSE-UP framing: chest to top of head (NOT full body, NOT face only)
+- Camera at pet's eye level or slightly above`;
+
+    // Species-specific pose instructions
+    const poseInstructions = isLargeAnimal ? `
+=== POSE: MAJESTIC ${species} POSES ===
+Choose ONE of these noble ${species} poses:
+- PROUD STANCE: Standing tall with head held high, noble bearing, weight evenly distributed
+- GENTLE TURN: Body slightly angled, head turned toward viewer, elegant and approachable
+- REGAL PROFILE: Side view showing full noble profile, one ear forward, alert but calm
+- GRACEFUL MOVEMENT: Captured mid-stride or pawing gently, showing natural grace
+- PASTORAL REST: Standing peacefully in a scenic setting, relaxed but dignified
+
+KEY ${species} QUALITIES:
+- Show the powerful yet graceful build
+- Mane flowing naturally, well-groomed appearance
+- Eyes intelligent and gentle
+- Muscular form visible under royal drapery
+- Hooves visible and properly proportioned
+- Tail natural and flowing` : `
+=== POSE: NATURAL AND RELAXED (Varied Positions) ===
+Choose ONE of these natural, comfortable poses - NOT always stiffly upright:
+- RELAXED RECLINE: Pet lounging comfortably, slightly reclined against cushion, relaxed posture
+- SOFT SETTLE: Pet settled down naturally, paws tucked or crossed casually, at ease
+- GENTLE TILT: Head tilted slightly to one side with curious or thoughtful expression
+- COZY CURL: Body slightly curved, comfortable and content, like resting by a fire
+- DIGNIFIED REST: Upright but relaxed, not stiff - natural noble bearing without tension
+- SLEEPY ELEGANCE: Slightly drowsy, heavy-lidded eyes, peaceful and serene expression
+- ALERT BUT CALM: Ears relaxed (not fully perked), attentive but comfortable
+
+KEY POSE QUALITIES:
+- The ${species} should look COMFORTABLE and AT EASE - not posed stiffly
+- Natural body language - relaxed shoulders, soft posture, genuine expression
+- Front paws visible, positioned naturally (crossed, tucked, or resting)
+- Head position can vary: straight, tilted, slightly turned - whatever feels natural
+- Expression should feel AUTHENTIC - not forced or artificial
+- Cloak draped naturally over body - soft plush velvety texture
+- Overall feeling of a beloved pet captured in a quiet, comfortable moment`;
+
     const generationPrompt = `CRITICAL SPECIES REQUIREMENT: THIS IS A ${species}. YOU MUST GENERATE A ${species}. ${notSpecies} REPEAT: THIS IS A ${species} - GENERATE ONLY A ${species}. DO NOT GENERATE THE WRONG SPECIES.
 
 THIS IS A ${species}. Generate a ${species}. ${notSpecies}
@@ -2617,37 +2680,10 @@ WHAT CREATES INSTANT RECOGNITION:
 - The ${species} must be 100% ANIMAL - NOT a human-animal hybrid
 - NO human body, NO human posture, NO bipedal stance
 - NO human hands, arms, or humanoid body shape
-- The ${species} has FOUR LEGS/PAWS - natural animal anatomy only
-- Natural animal proportions and body structure
+- Natural animal anatomy and proportions
 - The pet is a REAL ${species}, not an anthropomorphic character
-
-=== COMPOSITION (CRITICAL - Follow Exactly) ===
-- Subject positioned LOW and CENTRAL - resting on cushion, not standing or floating
-- Body ¾ VIEW, head forward or slightly angled - classical portrait posture
-- FRONT PAWS VISIBLE and resting on cushion - signature trait
-- Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
-- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest PROPERLY SECURING THE CLOAK - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, clasp HOLDS THE CLOAK TOGETHER at the chest
-- MEDIUM CLOSE-UP framing: chest to top of head (NOT full body, NOT face only)
-- Camera at pet's eye level or slightly above
-
-=== POSE: NATURAL AND RELAXED (Varied Positions) ===
-Choose ONE of these natural, comfortable poses - NOT always stiffly upright:
-- RELAXED RECLINE: Pet lounging comfortably, slightly reclined against cushion, relaxed posture
-- SOFT SETTLE: Pet settled down naturally, paws tucked or crossed casually, at ease
-- GENTLE TILT: Head tilted slightly to one side with curious or thoughtful expression
-- COZY CURL: Body slightly curved, comfortable and content, like resting by a fire
-- DIGNIFIED REST: Upright but relaxed, not stiff - natural noble bearing without tension
-- SLEEPY ELEGANCE: Slightly drowsy, heavy-lidded eyes, peaceful and serene expression
-- ALERT BUT CALM: Ears relaxed (not fully perked), attentive but comfortable
-
-KEY POSE QUALITIES:
-- The ${species} should look COMFORTABLE and AT EASE - not posed stiffly
-- Natural body language - relaxed shoulders, soft posture, genuine expression
-- Front paws visible, positioned naturally (crossed, tucked, or resting)
-- Head position can vary: straight, tilted, slightly turned - whatever feels natural
-- Expression should feel AUTHENTIC - not forced or artificial
-- Cloak draped naturally over body - soft plush velvety texture
-- Overall feeling of a beloved pet captured in a quiet, comfortable moment
+${compositionInstructions}
+${poseInstructions}
 ${facialStructureSection}
 === THE ${species} - DETAILED DESCRIPTION ===
 ${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${agePreservationInstructions}
