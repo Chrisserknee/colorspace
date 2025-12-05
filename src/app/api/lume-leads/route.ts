@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { addRoyalClubSubscriber } from "@/lib/supabase";
+import { sendRoyalClubWelcomeEmail } from "@/lib/lumeEmails";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
@@ -81,9 +82,25 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Send welcome email to new subscribers
+    let welcomeEmailSent = false;
+    if (isNew) {
+      console.log(`📧 Sending Royal Club welcome email to ${email}...`);
+      const emailResult = await sendRoyalClubWelcomeEmail(email);
+      welcomeEmailSent = emailResult.success;
+      
+      if (emailResult.success) {
+        console.log(`✅ Royal Club welcome email sent to ${email}`);
+      } else {
+        console.warn(`⚠️ Failed to send welcome email: ${emailResult.error}`);
+        // Don't fail the request - subscription still succeeded
+      }
+    }
+    
     return NextResponse.json({
       success: true,
       isNew,
+      welcomeEmailSent,
       message: isNew ? "Welcome to the Royal Club!" : "You're already subscribed!",
     });
     

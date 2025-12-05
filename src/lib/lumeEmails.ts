@@ -38,6 +38,148 @@ const FROM_EMAIL = 'LumePet <noreply@lumepet.app>';
 // Base URL for CTAs
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://lumepet.app';
 
+// ============================================
+// ROYAL CLUB WELCOME EMAIL
+// ============================================
+
+/**
+ * Send welcome email to new Royal Club subscribers
+ */
+export async function sendRoyalClubWelcomeEmail(email: string): Promise<{ success: boolean; error?: string }> {
+  const subject = "Welcome to the Royal Club! 👑";
+  
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to the Royal Club</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0A0A0A; font-family: Georgia, 'Times New Roman', serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0A0A0A; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #1A1A1A; border-radius: 16px; border: 1px solid rgba(197, 165, 114, 0.2);">
+          
+          <!-- Header with Crown -->
+          <tr>
+            <td style="padding: 50px 40px 30px; text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 20px;">👑</div>
+              <h1 style="color: #C5A572; font-size: 32px; margin: 0 0 10px; font-weight: normal; letter-spacing: 1px;">Welcome to the Royal Club</h1>
+              <p style="color: #7A756D; font-size: 14px; margin: 0; letter-spacing: 2px; text-transform: uppercase;">You're officially part of the LumePet family</p>
+            </td>
+          </tr>
+          
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 20px 40px 40px;">
+              <p style="color: #F0EDE8; font-size: 18px; line-height: 1.7; text-align: center; margin: 0 0 30px;">
+                Thank you for joining our exclusive community of pet lovers! You're now first in line for:
+              </p>
+              
+              <!-- Benefits List -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                <tr>
+                  <td style="padding: 15px 20px; background: rgba(197, 165, 114, 0.08); border-radius: 12px; margin-bottom: 10px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="50" style="color: #C5A572; font-size: 24px; vertical-align: top;">🎨</td>
+                        <td style="color: #B8B2A8; font-size: 16px;">
+                          <strong style="color: #F0EDE8;">New Portrait Styles</strong><br>
+                          Be the first to try new artistic styles before anyone else
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr><td style="height: 12px;"></td></tr>
+                <tr>
+                  <td style="padding: 15px 20px; background: rgba(197, 165, 114, 0.08); border-radius: 12px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="50" style="color: #C5A572; font-size: 24px; vertical-align: top;">💰</td>
+                        <td style="color: #B8B2A8; font-size: 16px;">
+                          <strong style="color: #F0EDE8;">Exclusive Discounts</strong><br>
+                          Special pricing only for Royal Club members
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr><td style="height: 12px;"></td></tr>
+                <tr>
+                  <td style="padding: 15px 20px; background: rgba(197, 165, 114, 0.08); border-radius: 12px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="50" style="color: #C5A572; font-size: 24px; vertical-align: top;">🎁</td>
+                        <td style="color: #B8B2A8; font-size: 16px;">
+                          <strong style="color: #F0EDE8;">Monthly Giveaways</strong><br>
+                          Chance to win free custom pet portraits every month
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 40px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${BASE_URL}" style="display: inline-block; background: linear-gradient(135deg, #C5A572 0%, #A68B5B 100%); color: #0A0A0A; text-decoration: none; padding: 18px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">
+                      Create Your First Portrait
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; border-top: 1px solid rgba(197, 165, 114, 0.15); text-align: center;">
+              <p style="color: #C5A572; font-size: 18px; margin: 0 0 5px; font-weight: normal;">LumePet</p>
+              <p style="color: #7A756D; font-size: 12px; margin: 0 0 15px;">Royal Pet Portraits</p>
+              <p style="color: #5A5550; font-size: 11px; margin: 0;">
+                You're receiving this because you joined the Royal Club.<br>
+                <a href="${BASE_URL}/unsubscribe?email=${encodeURIComponent(email)}" style="color: #7A756D;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('RESEND_API_KEY not configured, skipping welcome email');
+      return { success: false, error: 'Email not configured' };
+    }
+
+    const { data, error } = await getResendClient().emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject,
+      html,
+    });
+
+    if (error) {
+      console.error(`Failed to send Royal Club welcome email to ${email}:`, error);
+      return { success: false, error: error.message };
+    }
+
+    console.log(`👑 Royal Club welcome email sent to ${email} (ID: ${data?.id})`);
+    return { success: true };
+  } catch (err) {
+    console.error(`Royal Club welcome email error for ${email}:`, err);
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
 // Lead data type
 export interface LumeLead {
   id: string;
