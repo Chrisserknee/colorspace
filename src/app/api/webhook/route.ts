@@ -91,9 +91,17 @@ export async function POST(request: NextRequest) {
                   context: {
                     petName: session.metadata?.petName,
                     style: session.metadata?.style,
+                    // UTM attribution data
+                    utm_source: session.metadata?.utm_source,
+                    utm_medium: session.metadata?.utm_medium,
+                    utm_campaign: session.metadata?.utm_campaign,
+                    referrer: session.metadata?.referrer,
                   }
                 });
                 console.log(`🎉 Customer added to paying_customers table: ${customerEmail}`);
+                if (session.metadata?.utm_source) {
+                  console.log(`📊 Attribution: source=${session.metadata.utm_source}, medium=${session.metadata.utm_medium}`);
+                }
               } catch (customerError) {
                 console.warn(`⚠️ Failed to add customer:`, customerError);
                 // Don't fail the webhook - this is non-critical
@@ -150,8 +158,19 @@ export async function POST(request: NextRequest) {
               await addCustomer(customerEmail, {
                 purchaseType: 'pack',
                 stripeSessionId: session.id,
+                context: {
+                  packType: session.metadata?.packType,
+                  // UTM attribution data
+                  utm_source: session.metadata?.utm_source,
+                  utm_medium: session.metadata?.utm_medium,
+                  utm_campaign: session.metadata?.utm_campaign,
+                  referrer: session.metadata?.referrer,
+                }
               });
               console.log(`🎉 Customer added to paying_customers table (pack): ${customerEmail}`);
+              if (session.metadata?.utm_source) {
+                console.log(`📊 Attribution: source=${session.metadata.utm_source}, medium=${session.metadata.utm_medium}`);
+              }
             } catch (customerError) {
               console.warn(`⚠️ Failed to add customer:`, customerError);
             }

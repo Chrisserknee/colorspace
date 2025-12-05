@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { CONFIG } from "@/lib/config";
 import { captureEvent, identifyUser } from "@/lib/posthog";
+import { getUTMForAPI } from "@/lib/utm";
 
 type Stage = "preview" | "email-capture" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
@@ -826,6 +827,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
           email: email || null, // Pass email if we have it, otherwise Stripe collects it
           type: "image",
           cancelUrl,
+          utmData: getUTMForAPI(), // Include UTM attribution data
         }),
       });
       
@@ -907,6 +909,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         type: isPackPurchase ? "pack" : "image",
         packType: isPackPurchase ? "2-pack" : undefined,
         cancelUrl,
+        utmData: getUTMForAPI(), // Include UTM attribution data
       };
       console.log("Calling checkout API with:", requestBody);
       

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { captureEvent } from "@/lib/posthog";
+import { getUTMForAPI } from "@/lib/utm";
 
 interface Creation {
   imageId: string;
@@ -110,6 +111,7 @@ export default function CreationsModal({ isOpen, onClose }: CreationsModalProps)
           imageId: creation.imageId,
           type: "image",
           cancelUrl: "/",
+          utmData: getUTMForAPI(), // Include UTM attribution data
         }),
       });
       

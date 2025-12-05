@@ -14,6 +14,7 @@ import GenerationFlow, { getLastCreation } from "@/components/GenerationFlow";
 import ResumeButton from "@/components/ResumeButton";
 import SupportModal from "@/components/SupportModal";
 import CreationsModal, { hasCreations } from "@/components/CreationsModal";
+import { captureUTMParams } from "@/lib/utm";
 
 // Helper to convert data URL to File
 const dataURLtoFile = (dataurl: string, filename: string): File | null => {
@@ -63,6 +64,9 @@ export default function Home() {
   // Check for email param (session restore) or pending image from pack purchase
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Capture UTM parameters for attribution tracking
+      captureUTMParams();
+      
       const urlParams = new URLSearchParams(window.location.search);
       
       // Check for email param for session restoration

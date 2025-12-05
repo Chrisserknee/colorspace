@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { imageId, email, type, packType, canvasImageDataUrl, cancelUrl: requestedCancelUrl } = body;
+    const { imageId, email, type, packType, canvasImageDataUrl, cancelUrl: requestedCancelUrl, utmData } = body;
 
     // Email is now optional - Stripe will collect it during checkout if not provided
     let sanitizedEmail: string | null = null;
@@ -245,6 +245,11 @@ export async function POST(request: NextRequest) {
         ...(imageId ? { imageId } : {}),
         ...(sanitizedEmail ? { customerEmail: sanitizedEmail } : {}),
         ...(isPackPurchase ? { type: "pack", packType: sanitizeString(packType || "", 20) } : {}),
+        // UTM attribution data
+        ...(utmData?.utm_source ? { utm_source: sanitizeString(utmData.utm_source, 50) } : {}),
+        ...(utmData?.utm_medium ? { utm_medium: sanitizeString(utmData.utm_medium, 50) } : {}),
+        ...(utmData?.utm_campaign ? { utm_campaign: sanitizeString(utmData.utm_campaign, 100) } : {}),
+        ...(utmData?.referrer ? { referrer: sanitizeString(utmData.referrer, 200) } : {}),
       },
     });
 

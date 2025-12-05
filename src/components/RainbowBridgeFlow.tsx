@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { CONFIG } from "@/lib/config";
 import { captureEvent } from "@/lib/posthog";
+import { getUTMForAPI } from "@/lib/utm";
 
 type Stage = "preview" | "email-capture" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
@@ -829,6 +830,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             email: email,
             type: "image",
             cancelUrl,
+            utmData: getUTMForAPI(), // Include UTM attribution data
           }),
         });
         
@@ -944,6 +946,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
           // Include the canvas-rendered image for Stripe to display
           canvasImageDataUrl: canvasImageUrl || undefined,
           cancelUrl,
+          utmData: getUTMForAPI(), // Include UTM attribution data
         }),
       });
 

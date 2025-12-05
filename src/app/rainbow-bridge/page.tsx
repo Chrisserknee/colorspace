@@ -8,6 +8,7 @@ import UploadModal from "@/components/UploadModal";
 import RainbowBridgeFlow from "@/components/RainbowBridgeFlow";
 import ContactModal from "@/components/Contact";
 import ResumeButton from "@/components/ResumeButton";
+import { captureUTMParams } from "@/lib/utm";
 
 export default function RainbowBridge() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -16,9 +17,12 @@ export default function RainbowBridge() {
   const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
   const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
 
-  // Check for email param (session restore)
+  // Check for email param (session restore) and capture UTM
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Capture UTM parameters for attribution tracking
+      captureUTMParams();
+      
       const urlParams = new URLSearchParams(window.location.search);
       
       // Check for email param for session restoration
