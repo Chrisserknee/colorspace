@@ -1,11 +1,11 @@
 -- ============================================
--- CUSTOMERS TABLE - Purchased Customer Emails
+-- PAYING_CUSTOMERS TABLE - Purchased Customer Emails
 -- ============================================
--- This table stores emails from customers who have completed a purchase.
--- Separate from the leads/emails table which is for nurturing non-purchasers.
+-- This table stores emails from paying_customers who have completed a purchase.
+-- Separate from the emails table which is for Royal Club subscribers.
 
--- Create the customers table
-CREATE TABLE IF NOT EXISTS customers (
+-- Create the paying_paying_customers table
+CREATE TABLE IF NOT EXISTS paying_paying_customers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -36,42 +36,42 @@ CREATE TABLE IF NOT EXISTS customers (
 );
 
 -- Create unique constraint on email (case-insensitive)
-CREATE UNIQUE INDEX IF NOT EXISTS customers_email_unique 
-ON customers (LOWER(email));
+CREATE UNIQUE INDEX IF NOT EXISTS paying_customers_email_unique 
+ON paying_customers (LOWER(email));
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS customers_email_idx 
-ON customers (LOWER(email));
+CREATE INDEX IF NOT EXISTS paying_customers_email_idx 
+ON paying_customers (LOWER(email));
 
-CREATE INDEX IF NOT EXISTS customers_created_at_idx 
-ON customers (created_at DESC);
+CREATE INDEX IF NOT EXISTS paying_customers_created_at_idx 
+ON paying_customers (created_at DESC);
 
-CREATE INDEX IF NOT EXISTS customers_first_purchase_idx 
-ON customers (first_purchase_at DESC);
+CREATE INDEX IF NOT EXISTS paying_customers_first_purchase_idx 
+ON paying_customers (first_purchase_at DESC);
 
-CREATE INDEX IF NOT EXISTS customers_marketing_idx 
-ON customers (marketing_opt_in, unsubscribed)
+CREATE INDEX IF NOT EXISTS paying_customers_marketing_idx 
+ON paying_customers (marketing_opt_in, unsubscribed)
 WHERE marketing_opt_in = TRUE AND unsubscribed = FALSE;
 
 -- Enable Row Level Security (RLS)
-ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE paying_customers ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Allow service role full access
-DROP POLICY IF EXISTS "Service role can do everything" ON customers;
-CREATE POLICY "Service role can do everything" ON customers
+DROP POLICY IF EXISTS "Service role can do everything" ON paying_customers;
+CREATE POLICY "Service role can do everything" ON paying_customers
     FOR ALL
     USING (auth.role() = 'service_role')
     WITH CHECK (auth.role() = 'service_role');
 
 -- Policy: Block public access
-DROP POLICY IF EXISTS "Block public access" ON customers;
-CREATE POLICY "Block public access" ON customers
+DROP POLICY IF EXISTS "Block public access" ON paying_customers;
+CREATE POLICY "Block public access" ON paying_customers
     FOR ALL
     USING (false)
     WITH CHECK (false);
 
 -- Function to automatically update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_customers_updated_at()
+CREATE OR REPLACE FUNCTION update_paying_customers_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
@@ -80,38 +80,38 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to auto-update updated_at
-DROP TRIGGER IF EXISTS customers_updated_at_trigger ON customers;
-CREATE TRIGGER customers_updated_at_trigger
-    BEFORE UPDATE ON customers
+DROP TRIGGER IF EXISTS paying_customers_updated_at_trigger ON paying_customers;
+CREATE TRIGGER paying_customers_updated_at_trigger
+    BEFORE UPDATE ON paying_customers
     FOR EACH ROW
-    EXECUTE FUNCTION update_customers_updated_at();
+    EXECUTE FUNCTION update_paying_customers_updated_at();
 
 -- Grant permissions to service_role
-GRANT ALL ON customers TO service_role;
+GRANT ALL ON paying_customers TO service_role;
 
 -- ============================================
 -- HELPFUL QUERIES FOR MONITORING
 -- ============================================
 
--- View all customers
--- SELECT * FROM customers ORDER BY created_at DESC;
+-- View all paying_customers
+-- SELECT * FROM paying_customers ORDER BY created_at DESC;
 
--- View repeat customers
--- SELECT * FROM customers WHERE total_purchases > 1 ORDER BY total_purchases DESC;
+-- View repeat paying_customers
+-- SELECT * FROM paying_customers WHERE total_purchases > 1 ORDER BY total_purchases DESC;
 
--- View customers by purchase type
+-- View paying_customers by purchase type
 -- SELECT purchase_type, COUNT(*) as count 
--- FROM customers 
+-- FROM paying_customers 
 -- GROUP BY purchase_type 
 -- ORDER BY count DESC;
 
--- View customers who can receive marketing emails
--- SELECT * FROM customers 
+-- View paying_customers who can receive marketing emails
+-- SELECT * FROM paying_customers 
 -- WHERE marketing_opt_in = TRUE AND unsubscribed = FALSE;
 
 -- Export customer emails for marketing
 -- SELECT email, first_purchase_at, total_purchases, purchase_type 
--- FROM customers 
+-- FROM paying_customers 
 -- WHERE marketing_opt_in = TRUE AND unsubscribed = FALSE
 -- ORDER BY first_purchase_at DESC;
 

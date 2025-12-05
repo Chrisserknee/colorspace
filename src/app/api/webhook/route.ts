@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
                     style: session.metadata?.style,
                   }
                 });
-                console.log(`🎉 Customer added to customers table: ${customerEmail}`);
+                console.log(`🎉 Customer added to paying_customers table: ${customerEmail}`);
               } catch (customerError) {
                 console.warn(`⚠️ Failed to add customer:`, customerError);
                 // Don't fail the webhook - this is non-critical
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
                 purchaseType: 'pack',
                 stripeSessionId: session.id,
               });
-              console.log(`🎉 Customer added to customers table (pack): ${customerEmail}`);
+              console.log(`🎉 Customer added to paying_customers table (pack): ${customerEmail}`);
             } catch (customerError) {
               console.warn(`⚠️ Failed to add customer:`, customerError);
             }

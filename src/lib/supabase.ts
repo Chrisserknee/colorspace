@@ -703,27 +703,18 @@ export async function markLeadAsPurchased(email: string): Promise<boolean> {
 }
 
 /**
- * Get emails that are due for follow-up emails
- * Returns emails where:
- * - has_purchased = false
- * - unsubscribed = false (or null)
- * - last_email_step_sent < 6 (haven't completed sequence)
+ * Get leads due for follow-up emails
+ * 
+ * NOTE: This function is DISABLED because the emails table is now
+ * used only for Royal Club subscribers, not checkout abandonments.
+ * The nurture email sequence is no longer active.
+ * 
+ * Returns empty array to prevent sending nurture emails to Royal Club members.
  */
 export async function getLeadsDueForFollowup(): Promise<LumeLead[]> {
-  const { data, error } = await supabase
-    .from("emails")
-    .select("*")
-    .eq("has_purchased", false)
-    .or("unsubscribed.is.null,unsubscribed.eq.false")
-    .lt("last_email_step_sent", 6)
-    .order("created_at", { ascending: true });
-  
-  if (error) {
-    console.error("Error fetching emails for followup:", error);
-    return [];
-  }
-  
-  return data || [];
+  // DISABLED - emails table is now Royal Club only, not for nurture sequence
+  console.log("⏸️ Nurture email sequence is disabled - emails table is for Royal Club only");
+  return [];
 }
 
 /**
@@ -751,8 +742,8 @@ export async function unsubscribeLead(email: string): Promise<boolean> {
 }
 
 // ============================================
-// CUSTOMERS TABLE HELPERS (Purchased Customers)
-// Separate from leads/emails - these are paying customers
+// PAYING CUSTOMERS TABLE HELPERS
+// Separate from emails (Royal Club) - these are paying customers
 // ============================================
 
 export interface Customer {
@@ -793,7 +784,7 @@ export async function addCustomer(
     
     // Check if customer already exists
     const { data: existing, error: selectError } = await supabase
-      .from("customers")
+      .from("paying_customers")
       .select("*")
       .eq("email", normalizedEmail)
       .maybeSingle();
@@ -838,7 +829,7 @@ export async function addCustomer(
       }
       
       const { data: updated, error: updateError } = await supabase
-        .from("customers")
+        .from("paying_customers")
         .update(updateData)
         .eq("id", existing.id)
         .select()
@@ -849,7 +840,7 @@ export async function addCustomer(
         return { customer: existing, isNew: false, error: updateError.message };
       }
       
-      console.log(`📦 Repeat customer updated: ${normalizedEmail} (purchase #${updated.total_purchases})`);
+      console.log(`📦 Repeat customer updated in paying_customers: ${normalizedEmail} (purchase #${updated.total_purchases})`);
       return { customer: updated, isNew: false };
     }
     
@@ -881,7 +872,7 @@ export async function addCustomer(
     }
     
     const { data: newCustomer, error: insertError } = await supabase
-      .from("customers")
+      .from("paying_customers")
       .insert(insertData)
       .select()
       .single();
@@ -890,7 +881,7 @@ export async function addCustomer(
       // Handle duplicate key (race condition)
       if (insertError.code === '23505') {
         const { data: retryCustomer } = await supabase
-          .from("customers")
+          .from("paying_customers")
           .select("*")
           .eq("email", normalizedEmail)
           .single();
@@ -915,7 +906,7 @@ export async function getCustomerByEmail(email: string): Promise<Customer | null
   const normalizedEmail = email.toLowerCase().trim();
   
   const { data, error } = await supabase
-    .from("customers")
+    .from("paying_customers")
     .select("*")
     .eq("email", normalizedEmail)
     .maybeSingle();
@@ -936,7 +927,7 @@ export async function getAllCustomers(options: {
   limit?: number;
 } = {}): Promise<Customer[]> {
   let query = supabase
-    .from("customers")
+    .from("paying_customers")
     .select("*")
     .order("created_at", { ascending: false });
   
@@ -965,7 +956,7 @@ export async function unsubscribeCustomer(email: string): Promise<boolean> {
   const normalizedEmail = email.toLowerCase().trim();
   
   const { error } = await supabase
-    .from("customers")
+    .from("paying_customers")
     .update({
       unsubscribed: true,
       unsubscribed_at: new Date().toISOString(),
