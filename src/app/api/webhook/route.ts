@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { saveMetadata, getMetadata, markLeadAsPurchased, addCustomer } from "@/lib/supabase";
+import { saveMetadata, getMetadata, addCustomer, markSubscriberAsPurchased } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
 
 // Initialize Stripe lazily to avoid build-time errors
@@ -72,13 +72,13 @@ export async function POST(request: NextRequest) {
             });
             console.log(`✅ Payment confirmed for image: ${imageId}`);
             
-            // Mark as purchased in emails table (stops follow-up emails)
+            // Mark as purchased in emails table (for Royal Club conversion tracking)
             if (customerEmail) {
               try {
-                await markLeadAsPurchased(customerEmail);
-                console.log(`📧 Email marked as purchased in leads: ${customerEmail}`);
+                await markSubscriberAsPurchased(customerEmail);
+                console.log(`📧 Royal Club subscriber marked as converted: ${customerEmail}`);
               } catch (leadError) {
-                console.warn(`⚠️ Failed to mark email as purchased:`, leadError);
+                console.warn(`⚠️ Failed to mark subscriber as purchased:`, leadError);
               }
               
               // Add to customers table (separate list of paying customers)
@@ -137,12 +137,12 @@ export async function POST(request: NextRequest) {
           console.log(`📦 Pack purchase completed (session: ${session.id})`);
           // Pack purchases don't have a specific image to email about
           if (customerEmail) {
-            // Mark as purchased in emails table (stops follow-up emails)
+            // Mark as purchased in emails table (for Royal Club conversion tracking)
             try {
-              await markLeadAsPurchased(customerEmail);
-              console.log(`📧 Email marked as purchased (pack): ${customerEmail}`);
+              await markSubscriberAsPurchased(customerEmail);
+              console.log(`📧 Royal Club subscriber marked as converted (pack): ${customerEmail}`);
             } catch (leadError) {
-              console.warn(`⚠️ Failed to mark email as purchased:`, leadError);
+              console.warn(`⚠️ Failed to mark subscriber as purchased:`, leadError);
             }
             
             // Add to customers table (separate list of paying customers)

@@ -358,8 +358,144 @@ export async function incrementPortraitCount(): Promise<number> {
 }
 
 // ============================================
-// EMAIL LEAD HELPERS (Email Sequence)
-// Now uses unified "emails" table instead of lume_leads
+// ROYAL CLUB EMAIL SUBSCRIBERS (emails table)
+// For newsletter signups - separate from customers
+// ============================================
+
+/**
+ * Add a Royal Club subscriber
+ * This is the main function for newsletter/Royal Club signups
+ */
+export async function addRoyalClubSubscriber(
+  email: string,
+  options: {
+    signupLocation?: string;
+    context?: Record<string, unknown>;
+  } = {}
+): Promise<{ success: boolean; isNew: boolean; error?: string }> {
+  try {
+    const normalizedEmail = email.toLowerCase().trim();
+    const now = new Date().toISOString();
+    
+    // Check if already subscribed
+    const { data: existing, error: selectError } = await supabase
+      .from("emails")
+      .select("id, unsubscribed")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+    
+    if (selectError && selectError.code !== 'PGRST116') {
+      console.error("Error checking for existing subscriber:", selectError);
+      return { success: false, isNew: false, error: selectError.message };
+    }
+    
+    if (existing) {
+      // Already exists - resubscribe if unsubscribed
+      if (existing.unsubscribed) {
+        await supabase
+          .from("emails")
+          .update({
+            subscribed: true,
+            unsubscribed: false,
+            unsubscribed_at: null,
+            updated_at: now,
+          })
+          .eq("id", existing.id);
+        console.log(`📧 Resubscribed: ${normalizedEmail}`);
+      } else {
+        console.log(`📧 Already subscribed: ${normalizedEmail}`);
+      }
+      return { success: true, isNew: false };
+    }
+    
+    // Create new subscriber
+    const { error: insertError } = await supabase
+      .from("emails")
+      .insert({
+        email: normalizedEmail,
+        source: "royal-club",
+        signup_location: options.signupLocation || "homepage-footer",
+        subscribed: true,
+        unsubscribed: false,
+        has_purchased: false,
+        context: options.context || null,
+      });
+    
+    if (insertError) {
+      if (insertError.code === '23505') {
+        // Duplicate - already exists
+        return { success: true, isNew: false };
+      }
+      console.error("Error adding subscriber:", insertError);
+      return { success: false, isNew: false, error: insertError.message };
+    }
+    
+    console.log(`🎉 New Royal Club subscriber: ${normalizedEmail}`);
+    return { success: true, isNew: true };
+  } catch (err) {
+    console.error("addRoyalClubSubscriber error:", err);
+    return { success: false, isNew: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Get all Royal Club subscribers (for export/marketing)
+ */
+export async function getRoyalClubSubscribers(options: {
+  activeOnly?: boolean;
+  limit?: number;
+} = {}): Promise<{ email: string; created_at: string; source: string }[]> {
+  let query = supabase
+    .from("emails")
+    .select("email, created_at, source, signup_location")
+    .order("created_at", { ascending: false });
+  
+  if (options.activeOnly !== false) {
+    query = query.eq("subscribed", true).eq("unsubscribed", false);
+  }
+  
+  if (options.limit) {
+    query = query.limit(options.limit);
+  }
+  
+  const { data, error } = await query;
+  
+  if (error) {
+    console.error("Error fetching subscribers:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
+ * Mark a Royal Club subscriber as having purchased
+ * (for conversion tracking)
+ */
+export async function markSubscriberAsPurchased(email: string): Promise<boolean> {
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  const { error } = await supabase
+    .from("emails")
+    .update({
+      has_purchased: true,
+      purchased_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("email", normalizedEmail);
+  
+  if (error) {
+    // Not an error if they weren't subscribed
+    return false;
+  }
+  
+  console.log(`📧 Subscriber marked as purchased: ${normalizedEmail}`);
+  return true;
+}
+
+// ============================================
+// LEGACY EMAIL LEAD HELPERS (for backwards compatibility)
+// These still work but prefer the new functions above
 // ============================================
 
 export interface LumeLeadContext {

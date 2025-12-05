@@ -1,103 +1,111 @@
--- SQL to create emails table in Supabase
--- Copy and paste ONLY the SQL below into Supabase SQL Editor
--- This is the UNIFIED emails table (replaces both old emails and lume_leads)
+-- ============================================
+-- EMAILS TABLE - Royal Club Subscribers
+-- ============================================
+-- This table stores emails from Royal Club newsletter signups.
+-- Separate from the customers table which is for paying customers.
 
--- Step 1: Create emails table
+-- Create the emails table
 CREATE TABLE IF NOT EXISTS emails (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  email TEXT NOT NULL UNIQUE,
-  image_id UUID,
-  source TEXT DEFAULT 'checkout',
-  has_purchased BOOLEAN DEFAULT FALSE,
-  purchased_at TIMESTAMPTZ,
-  -- Email sequence tracking (from lume_leads)
-  last_email_step_sent INTEGER DEFAULT 0,
-  context JSONB,
-  unsubscribed BOOLEAN DEFAULT FALSE,
-  unsubscribed_at TIMESTAMPTZ,
-  -- Timestamps
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Subscription details
+    source TEXT DEFAULT 'royal-club', -- Where they signed up: 'royal-club', 'homepage', 'rainbow-bridge'
+    signup_location TEXT, -- More specific: 'homepage-footer', 'checkout-modal', etc.
+    
+    -- Marketing preferences
+    subscribed BOOLEAN DEFAULT TRUE,
+    unsubscribed BOOLEAN DEFAULT FALSE,
+    unsubscribed_at TIMESTAMP WITH TIME ZONE,
+    
+    -- Conversion tracking
+    has_purchased BOOLEAN DEFAULT FALSE,
+    purchased_at TIMESTAMP WITH TIME ZONE,
+    
+    -- Context (what they were interested in, etc.)
+    context JSONB
 );
 
--- Step 1b: Add columns if they don't exist (for existing tables)
-DO $$ 
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'has_purchased') THEN
-    ALTER TABLE emails ADD COLUMN has_purchased BOOLEAN DEFAULT FALSE;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'purchased_at') THEN
-    ALTER TABLE emails ADD COLUMN purchased_at TIMESTAMPTZ;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'last_email_step_sent') THEN
-    ALTER TABLE emails ADD COLUMN last_email_step_sent INTEGER DEFAULT 0;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'context') THEN
-    ALTER TABLE emails ADD COLUMN context JSONB;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'unsubscribed') THEN
-    ALTER TABLE emails ADD COLUMN unsubscribed BOOLEAN DEFAULT FALSE;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'emails' AND column_name = 'unsubscribed_at') THEN
-    ALTER TABLE emails ADD COLUMN unsubscribed_at TIMESTAMPTZ;
-  END IF;
-END $$;
+-- Create unique constraint on email (case-insensitive)
+CREATE UNIQUE INDEX IF NOT EXISTS emails_email_unique 
+ON emails (LOWER(email));
 
--- Step 2: Add foreign key constraint (only if portraits table exists)
-DO $$ 
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'portraits') THEN
-    ALTER TABLE emails ADD CONSTRAINT fk_emails_image_id 
-      FOREIGN KEY (image_id) REFERENCES portraits(id) ON DELETE SET NULL;
-  END IF;
-END $$;
+-- Create indexes for common queries
+CREATE INDEX IF NOT EXISTS emails_email_idx 
+ON emails (LOWER(email));
 
--- Step 3: Create indexes
-CREATE INDEX IF NOT EXISTS idx_emails_email ON emails(email);
-CREATE INDEX IF NOT EXISTS idx_emails_created_at ON emails(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_emails_has_purchased ON emails(has_purchased);
-CREATE INDEX IF NOT EXISTS idx_emails_purchased_at ON emails(purchased_at DESC);
-CREATE INDEX IF NOT EXISTS idx_emails_last_email_step ON emails(last_email_step_sent);
-CREATE INDEX IF NOT EXISTS idx_emails_unsubscribed ON emails(unsubscribed);
--- Composite index for email sequence cron job
-CREATE INDEX IF NOT EXISTS idx_emails_followup ON emails(has_purchased, unsubscribed, last_email_step_sent) WHERE has_purchased = false AND unsubscribed = false;
+CREATE INDEX IF NOT EXISTS emails_created_at_idx 
+ON emails (created_at DESC);
 
--- Step 4: Enable Row Level Security (RLS)
+CREATE INDEX IF NOT EXISTS emails_source_idx 
+ON emails (source);
+
+CREATE INDEX IF NOT EXISTS emails_subscribed_idx 
+ON emails (subscribed, unsubscribed)
+WHERE subscribed = TRUE AND unsubscribed = FALSE;
+
+-- Enable Row Level Security (RLS)
 ALTER TABLE emails ENABLE ROW LEVEL SECURITY;
 
--- Step 5: Drop existing policy if it exists, then create new one
-DROP POLICY IF EXISTS "Service role can manage emails" ON emails;
-DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON emails;
-DROP POLICY IF EXISTS "Enable all operations for service role" ON emails;
+-- Policy: Allow service role full access
+DROP POLICY IF EXISTS "Service role can do everything" ON emails;
+CREATE POLICY "Service role can do everything" ON emails
+    FOR ALL
+    USING (auth.role() = 'service_role')
+    WITH CHECK (auth.role() = 'service_role');
 
--- Policy: Allow service_role (used by API) to do everything
-CREATE POLICY "Enable all operations for service role" ON emails
-  FOR ALL
-  USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
-
--- Policy: Block all public/anonymous access (security)
+-- Policy: Block public access
+DROP POLICY IF EXISTS "Block public access" ON emails;
 CREATE POLICY "Block public access" ON emails
-  FOR ALL
-  USING (false)
-  WITH CHECK (false);
+    FOR ALL
+    USING (false)
+    WITH CHECK (false);
 
--- Step 6: Create updated_at trigger function (if it doesn't exist)
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- Function to automatically update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_emails_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
+    NEW.updated_at = NOW();
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Step 7: Create trigger
-DROP TRIGGER IF EXISTS update_emails_updated_at ON emails;
-CREATE TRIGGER update_emails_updated_at
-  BEFORE UPDATE ON emails
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+-- Trigger to auto-update updated_at
+DROP TRIGGER IF EXISTS emails_updated_at_trigger ON emails;
+CREATE TRIGGER emails_updated_at_trigger
+    BEFORE UPDATE ON emails
+    FOR EACH ROW
+    EXECUTE FUNCTION update_emails_updated_at();
 
--- Step 8: Grant permissions to service_role
+-- Grant permissions to service_role
 GRANT ALL ON emails TO service_role;
-GRANT USAGE ON SCHEMA public TO service_role;
+
+-- ============================================
+-- HELPFUL QUERIES FOR MONITORING
+-- ============================================
+
+-- View all Royal Club subscribers
+-- SELECT * FROM emails WHERE source = 'royal-club' ORDER BY created_at DESC;
+
+-- View active subscribers (for marketing)
+-- SELECT email, created_at, source 
+-- FROM emails 
+-- WHERE subscribed = TRUE AND unsubscribed = FALSE
+-- ORDER BY created_at DESC;
+
+-- View subscribers who later purchased (conversion tracking)
+-- SELECT * FROM emails WHERE has_purchased = TRUE ORDER BY purchased_at DESC;
+
+-- Count subscribers by source
+-- SELECT source, COUNT(*) as count 
+-- FROM emails 
+-- GROUP BY source 
+-- ORDER BY count DESC;
+
+-- Export Royal Club emails for marketing
+-- SELECT email, created_at, source, signup_location
+-- FROM emails 
+-- WHERE subscribed = TRUE AND unsubscribed = FALSE
+-- ORDER BY created_at DESC;
