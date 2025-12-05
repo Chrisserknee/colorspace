@@ -120,26 +120,49 @@ function getCompositionForSize(breed: string, petDescription: string, species: s
   const isLarge = species === "DOG" && isLargeBreed(breed, petDescription);
   
   if (isVeryLarge) {
-    console.log("📐 Detected VERY LARGE animal - using zoomed out composition");
-    return `COMPOSITION - ZOOMED OUT FOR LARGE ANIMAL:
-- FULL BODY visible in frame - do NOT crop the head or body
-- Subject positioned LOWER in frame with generous HEADROOM above
-- Show the COMPLETE head, ears, neck, and upper body clearly
-- Camera positioned FURTHER BACK to capture full majesty
-- Pet appears SMALLER in frame to fit entirely
-- More background visible around the subject
-- Maintain proper proportions - this is a LARGE animal
-- CRITICAL: DO NOT crop top of head or ears`;
+    console.log("📐 Detected VERY LARGE animal - using MAXIMUM zoom out composition");
+    return `COMPOSITION - MAXIMUM ZOOM OUT FOR VERY LARGE ANIMAL:
+=== CRITICAL FRAMING REQUIREMENTS ===
+- ZOOM WAY OUT - pet should occupy only 60% of frame height
+- Subject positioned in LOWER THIRD of frame
+- MINIMUM 20% empty space above the TOP OF EARS
+- Show COMPLETE animal from ear tips to paws
+- Camera FAR BACK - wide angle view
+- Pet appears MUCH SMALLER in frame to fit entirely with room to spare
+
+=== ABSOLUTELY FORBIDDEN ===
+- DO NOT crop ANY part of the head
+- DO NOT crop the ears - FULL EAR TIPS must be visible
+- DO NOT position subject in upper half of frame
+- DO NOT frame tightly - leave generous margins
+
+=== REQUIRED SPACING ===
+- Top of ears must have clear sky/background above them
+- At least 15-20% of frame height as headroom above ears
+- Cloak draped naturally with realistic fabric folds
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest`;
   } else if (isLarge) {
     console.log("📐 Detected LARGE DOG breed - using zoomed out composition");
-    return `COMPOSITION - ADJUSTED FOR LARGE DOG:
-- Subject positioned LOWER in frame with extra HEADROOM above
-- Show the COMPLETE head including TOP OF EARS - do NOT crop
-- Include neck and chest/shoulder area in frame
-- Camera positioned slightly FURTHER BACK than normal
-- More space above the head to prevent cropping
-- CRITICAL: Entire head and ears must be fully visible - no cropping
-- Large breeds need more vertical space - account for this`;
+    return `COMPOSITION - ZOOMED OUT FOR LARGE DOG BREED:
+=== CRITICAL FRAMING REQUIREMENTS ===
+- ZOOM OUT significantly - pet should occupy only 70% of frame height  
+- Subject positioned in LOWER 40% of frame - NOT centered vertically
+- MINIMUM 15% empty space above the TOP OF EARS
+- The ENTIRE head including FULL EAR TIPS must be completely visible
+- Camera positioned FURTHER BACK than normal portrait distance
+
+=== ABSOLUTELY FORBIDDEN ===
+- DO NOT crop the top of the head
+- DO NOT crop the ears - even partially
+- DO NOT let ears touch or go past the top edge
+- DO NOT frame tightly around the head
+
+=== REQUIRED SPACING ===
+- Clear background visible ABOVE the ear tips
+- Headroom of at least 10-15% of frame height above ears
+- Include neck, chest, and shoulder area
+- Cloak draped naturally with realistic fabric folds
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest`;
   }
   
   // Standard composition for smaller pets
@@ -149,7 +172,8 @@ function getCompositionForSize(breed: string, petDescription: string, species: s
 - Front paws visible, positioned naturally
 - Cloak draped naturally with realistic fabric folds
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
-- Authentic, genuine expression`;
+- Authentic, genuine expression
+- FULL HEAD visible including ears - do not crop`;
 }
 
 // Rainbow Bridge memorial quotes - randomly selected for each portrait
@@ -3029,7 +3053,7 @@ FINISH QUALITY - HEAVILY AGED AND WEATHERED:
 - Nose size relative to face must match - if described as 'small nose', generate a small nose
 - Muzzle length must match - if described as 'short muzzle', generate a short muzzle
 
-FULL BODY PORTRAIT - ${isVeryLargeAnimal(detectedBreed, petDescription) ? "EXTRA ZOOMED OUT FOR LARGE ANIMAL" : isLargeBreed(detectedBreed, petDescription) ? "ZOOMED OUT FOR LARGE DOG" : "ZOOMED OUT"} FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. ${isVeryLargeAnimal(detectedBreed, petDescription) ? "CRITICAL: This is a VERY LARGE animal - position MUCH LOWER in frame with GENEROUS headroom. Show FULL BODY with lots of space above head. Camera far back to capture full size." : isLargeBreed(detectedBreed, petDescription) ? "IMPORTANT: This is a LARGE DOG breed - position LOWER in frame with EXTRA headroom above. DO NOT crop the top of the head or ears. Include more vertical space." : ""} Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. CRITICAL: ENTIRE HEAD including TOP OF EARS must be fully visible - NO CROPPING. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by a BRIGHT POLISHED SILVER CLOAK CLASP at upper chest HOLDING THE CLOAK CLOSED (two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver that catches the light), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
+FULL BODY PORTRAIT - ${isVeryLargeAnimal(detectedBreed, petDescription) ? "MAXIMUM ZOOM OUT" : isLargeBreed(detectedBreed, petDescription) ? "ZOOMED OUT FOR LARGE BREED" : "STANDARD"} FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. ${isVeryLargeAnimal(detectedBreed, petDescription) ? "*** CRITICAL LARGE ANIMAL FRAMING ***: This is a VERY LARGE animal. ZOOM WAY OUT - subject should fill only 60% of frame height. Position subject in LOWER THIRD of frame. Leave MINIMUM 20% headroom above ear tips. ABSOLUTELY DO NOT CROP ANY PART OF HEAD OR EARS. Full ear tips MUST be visible with clear background above them." : isLargeBreed(detectedBreed, petDescription) ? "*** CRITICAL LARGE DOG FRAMING ***: This is a LARGE DOG breed. ZOOM OUT significantly - subject should fill only 70% of frame height. Position subject LOWER in frame. Leave MINIMUM 15% headroom above ear tips. ABSOLUTELY DO NOT crop the top of head or ears. The COMPLETE ears including tips MUST be fully visible with background space above them." : ""} Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. *** MANDATORY: ENTIRE HEAD including FULL EAR TIPS must be completely visible with background above - NEVER crop ears ***. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by a BRIGHT POLISHED SILVER CLOAK CLASP at upper chest HOLDING THE CLOAK CLOSED (two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver that catches the light), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
 
 RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
 
