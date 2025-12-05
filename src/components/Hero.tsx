@@ -16,7 +16,7 @@ interface HeroPortrait {
 
 const heroPortraits: HeroPortrait[] = [
   { id: "gracie", title: "Gracie", image: "/samples/Gracie.png" },
-  { id: "charley-lily", title: "Charley & Lily", image: "/samples/charley&Lily.png" },
+  { id: "charley-lily", title: "Charley & Lily", image: "/samples/charley&Lily2.png" },
 ];
 
 export default function Hero({ onUploadClick }: HeroProps) {
@@ -336,7 +336,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       }}
                     >
                       <img 
-                        src="/samples/charley&Lily.png" 
+                        src="/samples/charley&Lily2.png" 
                         alt="Charley & Lily - Royal Duo Portrait"
                         className="w-full h-full object-cover"
                       />

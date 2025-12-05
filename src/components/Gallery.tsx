@@ -21,7 +21,7 @@ const samples: Sample[] = [
     id: 2,
     title: "Charley & Lily",
     pet: "Royal Duo",
-    image: "/samples/charley&Lily.png",
+    image: "/samples/charley&Lily2.png",
   },
   {
     id: 3,
