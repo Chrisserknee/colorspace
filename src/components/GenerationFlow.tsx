@@ -1127,15 +1127,27 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                   src={previewUrl}
                   alt="Your pet"
                   fill
-                  className="object-cover"
+                  className="object-cover pointer-events-none"
                   unoptimized
                   data-posthog-unmask="true"
                   style={{ position: 'absolute', top: 0, left: 0 }}
                 />
               )}
-              {/* Secret click indicator (very subtle) */}
+              {/* Secret click indicator - shows progress toward 6 clicks */}
               {secretClickCount > 0 && secretClickCount < 6 && (
-                <div className="absolute top-2 right-2 w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'rgba(197, 165, 114, 0.3)' }}></div>
+                <div className="absolute top-2 right-2 flex gap-1">
+                  {[...Array(6)].map((_, i) => (
+                    <div 
+                      key={i}
+                      className="w-2 h-2 rounded-full transition-all duration-200"
+                      style={{ 
+                        backgroundColor: i < secretClickCount 
+                          ? 'rgba(197, 165, 114, 0.8)' 
+                          : 'rgba(197, 165, 114, 0.2)' 
+                      }}
+                    />
+                  ))}
+                </div>
               )}
               {secretActivated && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">

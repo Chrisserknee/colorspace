@@ -1172,13 +1172,25 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                   src={previewUrl}
                   alt="Your beloved pet"
                   fill
-                  className="object-cover"
+                  className="object-cover pointer-events-none"
                   unoptimized
                 />
               )}
-              {/* Secret click indicator (very subtle) */}
+              {/* Secret click indicator - shows progress toward 6 clicks */}
               {secretClickCount > 0 && secretClickCount < 6 && (
-                <div className="absolute top-2 right-2 w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'rgba(212, 175, 55, 0.3)' }}></div>
+                <div className="absolute top-2 right-2 flex gap-1">
+                  {[...Array(6)].map((_, i) => (
+                    <div 
+                      key={i}
+                      className="w-2 h-2 rounded-full transition-all duration-200"
+                      style={{ 
+                        backgroundColor: i < secretClickCount 
+                          ? 'rgba(212, 175, 55, 0.8)' 
+                          : 'rgba(212, 175, 55, 0.2)' 
+                      }}
+                    />
+                  ))}
+                </div>
               )}
               {secretActivated && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
