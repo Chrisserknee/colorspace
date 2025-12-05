@@ -7,6 +7,7 @@ import Gallery from "@/components/Gallery";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import ContactModal from "@/components/Contact";
+import EmailCapture from "@/components/EmailCapture";
 import Footer from "@/components/Footer";
 import UploadModal from "@/components/UploadModal";
 import GenerationFlow, { getLastCreation } from "@/components/GenerationFlow";
@@ -199,6 +200,9 @@ export default function Home() {
 
       {/* FAQ Section */}
       <FAQ />
+
+      {/* Email Capture Section */}
+      <EmailCapture />
 
       {/* Footer */}
       <Footer onContactClick={() => setIsContactModalOpen(true)} />
