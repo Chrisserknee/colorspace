@@ -114,22 +114,6 @@ function isVeryLargeAnimal(breed: string, petDescription: string): boolean {
   );
 }
 
-// Get aspect ratio based on pet size - taller ratio for large breeds
-function getAspectRatioForSize(breed: string, petDescription: string, species: string): string {
-  const isVeryLarge = isVeryLargeAnimal(breed, petDescription);
-  const isLarge = species === "DOG" && isLargeBreed(breed, petDescription);
-  
-  if (isVeryLarge) {
-    console.log("📐 Using 3:4 portrait aspect ratio for very large animal");
-    return "3:4"; // Taller portrait for horses, etc.
-  } else if (isLarge) {
-    console.log("📐 Using 3:4 portrait aspect ratio for large dog breed");
-    return "3:4"; // Taller portrait to fit ears
-  }
-  
-  return "1:1"; // Standard square for regular pets
-}
-
 // Get composition instructions based on pet size
 function getCompositionForSize(breed: string, petDescription: string, species: string): string {
   const isVeryLarge = isVeryLargeAnimal(breed, petDescription);
@@ -337,92 +321,6 @@ async function addRainbowBridgeTextOverlay(
   }
 }
 
-
-// Generate image using FLUX model via Replicate for better pet identity preservation
-async function generateWithFlux(
-  imageBase64: string,
-  prompt: string,
-  aspectRatio: string = "1:1"
-): Promise<Buffer> {
-  console.log("=== FLUX IMAGE-TO-IMAGE GENERATION ===");
-  
-  if (!process.env.REPLICATE_API_TOKEN) {
-    throw new Error("REPLICATE_API_TOKEN not configured");
-  }
-  
-  const replicate = new Replicate({
-    auth: process.env.REPLICATE_API_TOKEN,
-  });
-
-  // Convert base64 to data URL if needed
-  const imageDataUrl = imageBase64.startsWith("data:") 
-    ? imageBase64 
-    : `data:image/jpeg;base64,${imageBase64}`;
-
-  // Get prompt strength from environment variable (default: 0.15 = 85% original preserved)
-  // Lower values = more faithful to original image
-  // Recommended range: 0.10 - 0.25
-  const promptStrength = parseFloat(process.env.FLUX_PROMPT_STRENGTH || "0.15");
-  
-  // Lower guidance scale for subtle style application (default: 2.5)
-  const guidanceScale = parseFloat(process.env.FLUX_GUIDANCE_SCALE || "2.5");
-
-  console.log("FLUX parameters:");
-  console.log("- Prompt strength:", promptStrength, `(${Math.round((1 - promptStrength) * 100)}% original preserved)`);
-  console.log("- Guidance scale:", guidanceScale);
-  console.log("- Aspect ratio:", aspectRatio);
-  console.log("- Prompt length:", prompt.length);
-  
-  try {
-    // Use FLUX 1.1 Pro for best quality img2img
-    const output = await replicate.run(
-      "black-forest-labs/flux-1.1-pro",
-      {
-        input: {
-          prompt: prompt,
-          image: imageDataUrl,
-          prompt_strength: promptStrength, // 0.15 = 85% original image preserved
-          num_inference_steps: 28,
-          guidance_scale: guidanceScale, // Lower = more subtle style application
-          output_format: "png",
-          output_quality: 95,
-          safety_tolerance: 5, // More permissive for pet images
-          aspect_ratio: aspectRatio, // Dynamic - "3:4" for large breeds, "1:1" for standard
-        }
-      }
-    );
-
-    console.log("FLUX generation complete, output type:", typeof output);
-    
-    // FLUX returns a URL or array of URLs
-    let imageUrl: string;
-    if (Array.isArray(output)) {
-      imageUrl = output[0] as string;
-    } else if (typeof output === "string") {
-      imageUrl = output;
-    } else {
-      throw new Error("Unexpected FLUX output format");
-    }
-    
-    console.log("Downloading generated image from:", imageUrl.substring(0, 50) + "...");
-    
-    // Download the generated image
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to download FLUX image: ${response.status}`);
-    }
-    
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    
-    console.log("✅ FLUX generation successful, buffer size:", buffer.length);
-    
-    return buffer;
-  } catch (error) {
-    console.error("FLUX generation error:", error);
-    throw error;
-  }
-}
 
 // Generate image using OpenAI img2img (images.edit) for primary generation
 // This uses OpenAI's image editing API to transform the pet photo into a late 18th-century aristocratic portrait
@@ -661,245 +559,6 @@ async function applyStyleTransfer(
     return buffer;
   } catch (error) {
     console.error("Style transfer error:", error);
-    throw error;
-  }
-}
-
-// Full Stable Diffusion generation using SDXL img2img
-// This uses moderate denoising to create a beautiful late 18th-century aristocratic portrait
-// while preserving the pet's key identity features from the reference image
-async function generateWithStableDiffusion(
-  contentImageBase64: string,
-  petDescription: string,
-  species: string,
-  breed: string
-): Promise<Buffer> {
-  console.log("=== FULL STABLE DIFFUSION GENERATION (SDXL) ===");
-  
-  if (!process.env.REPLICATE_API_TOKEN) {
-    throw new Error("REPLICATE_API_TOKEN not configured");
-  }
-  
-  const replicate = new Replicate({
-    auth: process.env.REPLICATE_API_TOKEN,
-  });
-
-  // Convert base64 to data URL if needed
-  const contentImageUrl = contentImageBase64.startsWith("data:") 
-    ? contentImageBase64 
-    : `data:image/jpeg;base64,${contentImageBase64}`;
-
-  // Prompt strength for full SD generation
-  // LOWERED to 0.25 to preserve MORE of the original pet's identity (75% preserved)
-  // Higher = more creative but loses pet identity, lower = closer to original
-  // For cats especially, we need lower values to preserve their unique features
-  const basePromptStrength = parseFloat(process.env.SD_PROMPT_STRENGTH || "0.25");
-  // Use even lower strength for cats (they have more distinctive features that need preserving)
-  // Grey cats need extra low strength to prevent color shifts
-  const promptStrength = species === "CAT" ? Math.min(basePromptStrength, 0.22) : basePromptStrength;
-  const guidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
-  const numSteps = parseInt(process.env.SD_NUM_STEPS || "30");
-  
-  console.log("Stable Diffusion parameters:");
-  console.log("- Base prompt strength:", basePromptStrength);
-  console.log("- Adjusted prompt strength:", promptStrength, `(${Math.round((1 - promptStrength) * 100)}% original preserved)`);
-  console.log("- Species adjustment:", species === "CAT" ? "YES - using lower strength for cat" : "NO");
-  console.log("- Guidance scale:", guidanceScale);
-  console.log("- Inference steps:", numSteps);
-  console.log("- Species:", species);
-  console.log("- Breed:", breed || "Unknown");
-
-  // Extract key identifying features from pet description for the prompt
-  const breedInfo = breed ? `${breed} ${species.toLowerCase()}` : species.toLowerCase();
-  
-  // Detect fur color from description for color preservation
-  const descLower = petDescription.toLowerCase();
-  const isGreyFur = descLower.includes("grey") || descLower.includes("gray") || descLower.includes("silver") || 
-                   descLower.includes("russian blue") || descLower.includes("chartreux") || descLower.includes("slate") ||
-                   descLower.includes("ash") || descLower.includes("smoky") || descLower.includes("blue-grey");
-  const isBlackFur = descLower.includes("black") || descLower.includes("ebony") || descLower.includes("jet black");
-  const isWhiteFur = descLower.includes("white") || descLower.includes("snow white");
-  const isOrangeFur = descLower.includes("orange") || descLower.includes("ginger") || descLower.includes("tabby") || descLower.includes("marmalade");
-  
-  // Color-specific preservation instructions
-  const colorPreservation = isGreyFur 
-    ? `\n- GREY/GRAY FUR: This cat has GREY fur - preserve the COOL GREY color exactly. DO NOT turn white/cream/golden.`
-    : isBlackFur 
-    ? `\n- BLACK FUR: This pet has BLACK fur - preserve the DEEP BLACK color exactly. DO NOT lighten to grey/white.`
-    : isWhiteFur
-    ? `\n- WHITE FUR: This pet has WHITE fur - preserve the pure white color.`
-    : isOrangeFur
-    ? `\n- ORANGE/GINGER FUR: This pet has ORANGE fur - preserve the warm orange/ginger color exactly.`
-    : "";
-
-  // Create species-specific identity preservation instructions
-  const identityInstructions = species === "CAT" 
-    ? `CRITICAL - PRESERVE THIS EXACT CAT'S IDENTITY:
-- Keep the EXACT face shape, head structure, and facial proportions from the reference
-- Preserve the EXACT eye color, eye shape, and eye spacing - do NOT change these
-- Keep ALL fur patterns, markings, and FUR COLOR in their EXACT form - DO NOT CHANGE THE FUR COLOR
-- Preserve ear shape, size, and placement precisely
-- Maintain the cat's unique nose shape and whisker pattern${colorPreservation}
-- This must be INSTANTLY RECOGNIZABLE as the same cat from the photo`
-    : `CRITICAL - PRESERVE THIS EXACT ${species}'S IDENTITY:
-- Keep the EXACT face shape, head structure, and facial proportions from the reference
-- Preserve the EXACT eye color, eye shape, and expression
-- Keep ALL markings, patterns, and FUR COLOR in their EXACT form - DO NOT CHANGE THE FUR COLOR${colorPreservation}
-- Maintain the unique characteristics that make this pet recognizable
-- This must be INSTANTLY RECOGNIZABLE as the same ${species.toLowerCase()} from the photo`;
-
-  // Create a detailed prompt that describes both the pet and the desired style
-  const sdPrompt = `AUTHENTIC 300-year-old HEAVILY AGED ANTIQUE oil painting masterpiece portrait of a ${breedInfo}, in NATURAL RELAXED POSE on luxurious velvet cushion. Late 18th-century European aristocratic style (1770-1830) Georgian/Regency/Napoleonic era.
-
-${identityInstructions}
-
-SUBJECT - THIS SPECIFIC ${species.toUpperCase()}:
-The ${species.toLowerCase()} has the exact features from the reference image - preserve the face structure, eye color, markings, and unique characteristics.
-
-NATURAL RELAXED POSE (NOT stiff or rigid):
-- Pet looks COMFORTABLE and AT EASE - relaxed body language, soft posture
-- Can be: slightly reclined, settled down naturally, head tilted, gently curved, or peacefully resting
-- Expression AUTHENTIC and genuine - not forced or artificial
-- Front paws visible, positioned naturally (crossed, tucked, or resting)
-- Overall feeling of a beloved pet captured in a quiet, comfortable moment
-
-HEAVILY AGED ANTIQUE OIL PAINTING (PUSH AGING EFFECTS HARD):
-- LOOSE FLOWING BRUSHWORK: Long sweeping strokes 6-12 inches, graceful curves following form
-- EXTREMELY ROUGH WEATHERED TEXTURE: Surface looks ANCIENT, heavily TEXTURED like artifact
-- PROMINENT CRAQUELURE: CLEARLY VISIBLE network of cracks throughout - like cracked dried earth
-- AGED VARNISH with subtle patina - NOT brown, maintains original colors
-- THICK SCULPTURAL IMPASTO with WORN PEAKS from centuries of handling
-- VISIBLE BRISTLE MARKS showing brush movement direction
-- FEATHERY EDGES: Soft trailing brush endings that fade naturally
-- DRY BRUSH SCRATCHES: Heavy scratchy, textured strokes throughout
-- COARSE CANVAS WEAVE clearly visible - aged linen texture prominent
-- SIGNIFICANT SURFACE WEAR: Obvious weathering on raised impasto, rubbed areas
-- WEATHERED SOFT EDGES: Paint worn at corners and perimeter, canvas peeking through
-
-VIBRANT COLORFUL PALETTE (NOT BROWN):
-- BRILLIANT JEWEL TONES - rich saturated colors maintained through aging
-- LUSTROUS velvet cloak in RICH COLORS (burgundy, royal blue, emerald, crimson)
-- GLEAMING gold embroidery, SPARKLING gems with INTERNAL FIRE
-- Colors remain VIBRANT and SATURATED - not dulled to brown
-- USE THE SPECIFIED BACKGROUND COLOR from the BACKGROUND section below - NEVER brown
-
-${getCompositionForSize(breed || "", petDescription, species)}
-
-BACKGROUND - SPECIFIC COLOR FOR THIS PORTRAIT:
-- USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
-- This is the REQUIRED background color - do not use any other color
-- SFUMATO depth with color receding into atmospheric haze
-- CREATE CONTRAST - background should make the pet POP
-- STRICTLY FORBIDDEN: brown, tan, beige, sepia, amber, earth tones, muddy colors
-
-DISCOVERED IN FORGOTTEN CASTLE:
-- Looks like ANCIENT 300-year-old painting by Gainsborough, Reynolds, or Vigée Le Brun
-- LOOSE FEATHERY BRUSHWORK - light, airy, flowing, alive with movement
-- HEAVY CRAQUELURE, THICK PATINA, SIGNIFICANT SURFACE WEAR throughout
-- Discovered in a castle attic after 300 years - NOT cleaned or restored
-- EXTREMELY ROUGH WEATHERED AUTHENTIC TEXTURE - ancient artifact quality
-- Worth millions - belongs in National Portrait Gallery`;
-
-  // Species-specific negative prompts to prevent identity changes
-  const colorChangeNegative = isGreyFur 
-    ? "white fur, cream fur, golden fur, warm tones on fur, beige fur, light colored cat, white cat,"
-    : isBlackFur
-    ? "grey fur, white fur, light fur, faded black, charcoal instead of black,"
-    : isWhiteFur
-    ? "grey fur, cream fur, yellow fur, dirty white,"
-    : "";
-    
-  const speciesNegative = species === "CAT" 
-    ? `wrong cat, different cat, generic cat, cat breed change, wrong eye color, wrong fur color, wrong fur pattern, wrong markings, wrong face shape, dog features, canine features, ${colorChangeNegative}`
-    : species === "DOG"
-    ? `wrong dog, different dog, generic dog, dog breed change, wrong eye color, wrong fur color, wrong fur pattern, wrong markings, wrong face shape, cat features, feline features, ${colorChangeNegative}`
-    : `wrong animal, different animal, generic pet, wrong features, ${colorChangeNegative}`;
-
-  const negativePrompt = `${speciesNegative}
-photograph, photo, photorealistic, modern, digital art, cartoon, anime, 3d render, CGI,
-blurry, low quality, watermark, text, logo, 
-human body, humanoid, anthropomorphic, bipedal, standing upright, human pose, standing on hind legs,
-wrong species, different animal, changed identity, unrecognizable pet,
-flat colors, flat lighting, no texture, smooth gradients, airbrushed, plastic looking, too smooth, too perfect,
-too clean, too new, freshly painted, pristine, crisp edges, restored, cleaned,
-stiff pose, rigid posture, unnatural position, forced expression,
-no cracks, no aging, no patina, no weathering,
-overly refined, digitally perfect, clinical, polished, slick,
-dark, gloomy, moody, dark lighting, heavy shadows, dim, underexposed, dark atmosphere, somber,
-brown background, dark brown background, tan background, beige background, sepia background, amber background, golden-brown background, earth tone background, muddy background, brown tones, brown colors, brownish, all brown, monotone brown, dark muddy colors, heavy red background, dark red background, all red, dominant red,
-muted colors, dull colors, grey colors, muddy colors, washed out, faded, low saturation,
-deformed, disfigured, bad anatomy, wrong proportions,
-ugly, duplicate, extra limbs, missing limbs, close-up, cropped`;
-  
-  console.log("Generating with SDXL...");
-  
-  try {
-    const output = await replicate.run(
-      "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-      {
-        input: {
-          image: contentImageUrl,
-          prompt: sdPrompt,
-          negative_prompt: negativePrompt,
-          prompt_strength: promptStrength,
-          num_inference_steps: numSteps,
-          guidance_scale: guidanceScale,
-          scheduler: "K_EULER_ANCESTRAL",
-          refine: "expert_ensemble_refiner",
-          high_noise_frac: 0.8,
-          num_outputs: 1,
-          // Use portrait orientation (3:4) for large breeds to prevent ear cropping
-          width: isLargeBreed(breed, petDescription) || isVeryLargeAnimal(breed, petDescription) ? 768 : 1024,
-          height: isLargeBreed(breed, petDescription) || isVeryLargeAnimal(breed, petDescription) ? 1024 : 1024,
-        }
-      }
-    );
-
-    console.log("SDXL generation complete, output type:", typeof output);
-    
-    // Handle FileOutput from Replicate
-    let buffer: Buffer;
-    
-    if (Array.isArray(output) && output.length > 0) {
-      const firstOutput = output[0];
-      console.log("First output type:", typeof firstOutput);
-      
-      if (typeof firstOutput === "string") {
-        console.log("Downloading from URL string");
-        const response = await fetch(firstOutput);
-        if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
-        buffer = Buffer.from(await response.arrayBuffer());
-      } else if (firstOutput && typeof firstOutput === "object") {
-        const outputObj = firstOutput as Record<string, unknown>;
-        
-        if (typeof outputObj.blob === "function") {
-          const blob = await (outputObj.blob as () => Promise<Blob>)();
-          console.log("Got blob, size:", blob.size);
-          buffer = Buffer.from(await blob.arrayBuffer());
-        } else if (typeof outputObj.toString === "function") {
-          const urlString = outputObj.toString();
-          const response = await fetch(urlString);
-          if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
-          buffer = Buffer.from(await response.arrayBuffer());
-        } else {
-          throw new Error("Cannot extract image data from FileOutput");
-        }
-      } else {
-        throw new Error(`Unexpected output type: ${typeof firstOutput}`);
-      }
-    } else if (typeof output === "string") {
-      const response = await fetch(output);
-      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
-      buffer = Buffer.from(await response.arrayBuffer());
-    } else {
-      throw new Error(`Unexpected SDXL output format: ${typeof output}`);
-    }
-    
-    console.log("✅ Stable Diffusion generation successful, buffer size:", buffer.length);
-    
-    return buffer;
-  } catch (error) {
-    console.error("Stable Diffusion generation error:", error);
     throw error;
   }
 }
@@ -3084,20 +2743,16 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     // The only difference is watermarking - the actual generation is identical for all types.
     // useSecretCredit and usePackCredit do NOT affect model selection - only watermarking.
     const useOpenAIImg2Img = process.env.USE_OPENAI_IMG2IMG === "true" && process.env.OPENAI_API_KEY;
-    const useStableDiffusion = !useOpenAIImg2Img && process.env.USE_STABLE_DIFFUSION === "true" && process.env.REPLICATE_API_TOKEN;
-    const useComposite = !useOpenAIImg2Img && !useStableDiffusion && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
-    const useStyleTransfer = !useOpenAIImg2Img && !useStableDiffusion && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
-    const useIPAdapter = !useOpenAIImg2Img && !useStableDiffusion && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
-    const useFluxModel = !useOpenAIImg2Img && !useStableDiffusion && !useComposite && !useStyleTransfer && !useIPAdapter && process.env.USE_FLUX_MODEL === "true" && process.env.REPLICATE_API_TOKEN;
+    const useComposite = !useOpenAIImg2Img && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
+    const useStyleTransfer = !useOpenAIImg2Img && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
+    const useIPAdapter = !useOpenAIImg2Img && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
     
     console.log("=== IMAGE GENERATION ===");
     console.log("Environment check:");
     console.log("- USE_OPENAI_IMG2IMG:", process.env.USE_OPENAI_IMG2IMG || "not set");
-    console.log("- USE_STABLE_DIFFUSION:", process.env.USE_STABLE_DIFFUSION || "not set");
     console.log("- USE_COMPOSITE:", process.env.USE_COMPOSITE || "not set");
     console.log("- USE_STYLE_TRANSFER:", process.env.USE_STYLE_TRANSFER || "not set");
     console.log("- USE_IP_ADAPTER:", process.env.USE_IP_ADAPTER || "not set");
-    console.log("- USE_FLUX_MODEL:", process.env.USE_FLUX_MODEL || "not set");
     console.log("- OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "set" : "not set");
     console.log("- REPLICATE_API_TOKEN:", process.env.REPLICATE_API_TOKEN ? "set" : "not set");
     console.log("- IS_MULTI_PET:", isMultiPet ? "true" : "false");
@@ -3279,19 +2934,15 @@ CRITICAL: BOTH pets must look EXACTLY like themselves in the original photo. Thi
       // === SINGLE PET GENERATION PATH (Original) ===
     
     const modelName = useOpenAIImg2Img ? "OpenAI img2img (images.edit)"
-      : useStableDiffusion ? "Stable Diffusion SDXL (full generation)"
       : useComposite ? "Composite (segment + scene + blend)"
       : useStyleTransfer ? "Style Transfer + GPT Refinement" 
       : useIPAdapter ? "IP-Adapter SDXL (identity preservation)" 
-      : useFluxModel ? "FLUX (img2img)" 
       : "GPT-Image-1 (OpenAI)";
     console.log("Model selected:", modelName);
     console.log("Selection reason:", useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true" 
-      : useStableDiffusion ? "USE_STABLE_DIFFUSION=true"
       : useComposite ? "USE_COMPOSITE=true"
       : useStyleTransfer ? "USE_STYLE_TRANSFER=true"
       : useIPAdapter ? "USE_IP_ADAPTER=true"
-      : useFluxModel ? "USE_FLUX_MODEL=true"
       : "No model flags set, using default GPT-Image-1");
     console.log("Generation type:", useSecretCredit ? "SECRET CREDIT (un-watermarked)" : usePackCredit ? "PACK CREDIT (watermarked)" : "FREE (watermarked)");
     console.log("⚠️ IMPORTANT: All generation types (free, pack credit, secret credit) use the SAME model:", modelName);
@@ -3678,20 +3329,6 @@ CRITICAL: The ${species} must sit NATURALLY like a real ${species} - NOT in a hu
       );
       
       console.log("✅ OpenAI img2img generation complete");
-    } else if (useStableDiffusion) {
-      // Use full Stable Diffusion SDXL for generation
-      console.log("🎨 Using Full Stable Diffusion SDXL...");
-      console.log("📌 Pet identity preserved from reference image");
-      console.log("📌 Late 18th-century aristocratic portrait style applied via SDXL");
-      
-      firstGeneratedBuffer = await generateWithStableDiffusion(
-        base64Image,
-        petDescription,
-        species,
-        detectedBreed
-      );
-      
-      console.log("✅ Stable Diffusion generation complete");
     } else if (useComposite) {
       // Use composite approach for maximum face preservation
       console.log("🎨 Using Composite Approach...");
@@ -3819,179 +3456,6 @@ The ${species} should match the reference image exactly - same face, markings, c
       );
       
       console.log("✅ IP-Adapter generation complete");
-    } else if (useFluxModel) {
-      // Use FLUX for image-to-image generation
-      console.log("🎨 Using FLUX img2img for pet accuracy...");
-      console.log("📌 Pet identity will be preserved from original image");
-      console.log("📌 No fallback - if Replicate fails, generation fails");
-      
-      // Use the same robust detection logic (petDescription already updated with "black" if needed)
-      const petDescLowerForFlux = petDescription.toLowerCase();
-      const isWhiteCatForFlux = species === "CAT" && (
-        petDescLowerForFlux.includes("white") || 
-        petDescLowerForFlux.includes("snow white") ||
-        petDescLowerForFlux.includes("pure white")
-      );
-      
-      // Check if GREY cat - CRITICAL: Grey cats often get turned white/cream
-      const isGreyCatForFlux = species === "CAT" && (
-        petDescLowerForFlux.includes("grey") ||
-        petDescLowerForFlux.includes("gray") ||
-        petDescLowerForFlux.includes("russian blue") ||
-        petDescLowerForFlux.includes("chartreux") ||
-        petDescLowerForFlux.includes("british shorthair") ||
-        petDescLowerForFlux.includes("korat") ||
-        petDescLowerForFlux.includes("nebelung") ||
-        petDescLowerForFlux.includes("blue cat") ||
-        petDescLowerForFlux.includes("silver") ||
-        petDescLowerForFlux.includes("slate") ||
-        petDescLowerForFlux.includes("ash") ||
-        petDescLowerForFlux.includes("smoky") ||
-        petDescLowerForFlux.includes("blue-grey") ||
-        petDescLowerForFlux.includes("blue-gray")
-      );
-      
-      // Check if black cat or dark-coated pet - use same logic as main detection
-      const descSaysBlackForFlux = (
-        petDescLowerForFlux.includes("black") ||
-        petDescLowerForFlux.includes("ebony") ||
-        petDescLowerForFlux.includes("jet black") ||
-        petDescLowerForFlux.includes("coal black") ||
-        petDescLowerForFlux.includes("charcoal") ||
-        petDescLowerForFlux.includes("dark brown")
-      );
-      
-      const isBlackCatForFlux = species === "CAT" && (
-        descSaysBlackForFlux || 
-        (imageDarkness.isDark && !petDescLowerForFlux.includes("white") && !petDescLowerForFlux.includes("light"))
-      );
-      
-      const isDarkCoatedForFlux = (
-        descSaysBlackForFlux ||
-        (imageDarkness.isDark && !petDescLowerForFlux.includes("white") && !petDescLowerForFlux.includes("light"))
-      ) && !petDescLowerForFlux.includes("white");
-      
-      const feminineAestheticForFlux = gender === "female" ? `
-=== FEMININE AESTHETIC ===
-FEMALE ${species} - feminine aesthetic:
-- LIGHTER, SOFTER cloak colors - pastel pinks, lavenders, soft blues, pearl whites
-- DELICATE fabrics - fine, refined, gentle textures
-- FINER jewelry - more delicate, smaller gems, intricate filigree
-- GENTLER visual tone - softer lighting, more graceful
-` : "";
-
-      const whiteCatTreatmentForFlux = isWhiteCatForFlux ? `
-=== WHITE CAT - ANGELIC LUMINOUS ===
-WHITE CAT - angelic luminous:
-- ANGELIC appearance - ethereal, heavenly
-- LUMINOUS glow enhancing white fur - soft radiant light
-- SOFT GLOW around entire cat - gentle radiance
-- Enhanced presence - cat GLOWS with light
-` : "";
-
-      const greyCatTreatmentForFlux = isGreyCatForFlux ? `
-=== GREY CAT - CRITICAL COLOR PRESERVATION ===
-GREY/GRAY CAT - CRITICAL: Preserve EXACT GREY fur color:
-- Cat MUST remain GREY/GRAY - NEVER white, cream, beige, golden
-- Preserve COOL GREY/BLUE-GREY tone exactly as reference
-- This cat has GREY fur - NOT white, NOT cream, NOT golden
-- Maintain COOL GREY/SILVER/SLATE tone throughout
-- DO NOT warm up colors - keep COOL GREY tones
-- DO NOT brighten to white/cream - maintain GREY
-` : "";
-      
-      const blackCatTreatmentForFlux = isBlackCatForFlux || isDarkCoatedForFlux ? `
-=== BLACK/DARK-COATED PET - CRITICAL COLOR PRESERVATION ===
-${isBlackCatForFlux ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve DEEP BLACK/DARK color:
-- Pet MUST remain DEEP BLACK or DARK BROWN - NEVER white, gray, or light
-- Preserve RICH DEEP BLACK fur - maintain dark tones
-- SUBTLE highlights ONLY - don't wash out black
-- AVOID over-brightening - keep natural dark color
-- Black/dark color is ESSENTIAL - preserve exactly
-- DO NOT lighten fur - keep DEEP RICH BLACK/DARK
-` : "";
-
-      const fluxPrompt = `18th-century aristocratic oil portrait. Late 18th-century European aristocratic portraiture (1770-1830 Georgian/Regency/Napoleonic era). Style of Gainsborough, Reynolds, Vigée Le Brun. NOT Renaissance.${feminineAestheticForFlux}${whiteCatTreatmentForFlux}${greyCatTreatmentForFlux}${blackCatTreatmentForFlux}
-
-=== LIGHTING (EXTREMELY BRIGHT - Well-Illuminated) ===
-- EXTREMELY BRIGHT KEY LIGHT illuminating the subject - BRILLIANTLY LIT
-- STRONG BRILLIANT HIGHLIGHTS on the FACE and fur - INTENSELY ILLUMINATED
-- MINIMAL SHADOWS - use fill light to eliminate dark areas
-- Subject should GLOW with BRIGHT RADIANT light - NEVER dark or moody
-- BRIGHT warm highlights throughout - LUMINOUS and CHEERFUL
-- LIGHT, BRIGHT, and AIRY atmosphere - NOT gloomy, NOT dark, NOT heavy
-- Subject is the BRIGHTEST element - clearly visible and RADIANT
-- Professional BRIGHT portrait lighting - cheerful and uplifting
-- ABSOLUTELY NO dark moody lighting - this should feel BRIGHT and HAPPY
-
-=== BACKGROUND COLOR - SPECIFIC FOR THIS PORTRAIT ===
-USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
-- This is the REQUIRED background color - do not use any other color
-- The background MUST be this specific color
-- CREATE CONTRAST: This color should make the pet POP and stand out
-- AVOID: Brown, tan, beige, sepia, muddy tones
-
-=== COMPOSITION (Wide, Centered, Full Cushion) ===
-- WIDE and CENTERED composition showing FULL CUSHION
-- Pet seated NATURALLY like a real ${species} on embroidered throne cushion with VISIBLE GOLD TASSELS
-- Natural animal seated pose - NOT human-like posture
-- Body ¾ view, FRONT PAWS VISIBLE resting naturally on cushion
-- DAINTY, DELICATE regal CLOAK DRAPED over BOTH pet AND cushion - NOT clothing, just draped fabric
-- More DAINTY and REFINED - not heavy or bulky
-- NO human clothing - NO sleeves, NO buttons, NO tailored garments
-- SOFT, PLUSH VELVETY texture - luxurious velvet with visible nap and plush feel
-- VELVETY appearance - soft, plush, luxurious velvet fabric
-- BRIGHT ANTIQUE GOLD EMBROIDERY - delicate and refined
-- DEEP, RICH, SATURATED fabric colors
-- WHITE FUR TRIM with BLACK ERMINE SPOTS
-- Pet's natural body visible beneath draped cloak
-- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK TOGETHER
-- Two GLEAMING SHINY silver plates connected by BRIGHT silver chain - HIGHLY REFLECTIVE finish that catches the light brilliantly
-
-=== JEWELRY (Antique 18th-Century) ===
-- Layered MULTI-CHAIN gold necklaces, ornate FILIGREE
-- BRIGHT WHITE PEARLS and small CLUSTERED BRIGHT GEMSTONES
-- BRIGHT SPARKLING gems complement pet's natural colors
-
-=== BACKGROUND - SPECIFIC COLOR FOR THIS PORTRAIT ===
-- Heavy SILKY velvet drapery with PAINTERLY FOLDS
-- USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
-- This is the REQUIRED background color - do not use any other color
-- The background MUST be this specific color throughout
-- CREATE STRONG CONTRAST with the pet's fur color
-- AVOID: Brown, tan, beige, sepia - keep it fresh and interesting
-
-=== RENDERING (Old-Master Realism with Glow - BRIGHT) ===
-- VISIBLE BRUSHSTROKES, TEXTURED OIL PAINT, CANVAS GRAIN
-- MUSEUM-QUALITY rendering
-- LONG FLOWING brush strokes
-- Hand-painted charm with slight imperfections
-- NOT digital, NOT airbrushed, NOT too perfect
-- LUMINOUS GLOW throughout - BRIGHT and RADIANT
-- SILKY LUSTROUS textures on fabrics - visible sheen
-- VIBRANT, SATURATED colors throughout - rich jewel tones that POP
-- BRIGHT overall atmosphere - NOT dark, NOT gloomy, NOT moody
-- Subject GLOWS with BRIGHT warm light, fabrics GLOW with VIBRANT color
-- CHEERFUL and UPLIFTING mood - like a sunlit portrait
-
-=== PRESERVE FROM ORIGINAL ===
-- Exact facial features, all markings, eye color, expression
-- Warm natural fur with painterly highlights
-- Deep black fur rich and saturated
-
-CRITICAL: ${species} must sit NATURALLY like a real ${species} - NOT human-like pose. NO human clothing - ONLY a cloak draped over. Keep ${species} EXACTLY as shown. Only add 18th-century aristocratic styling with draped cloak.`;
-
-      // Get aspect ratio for this pet - taller for large breeds
-      const aspectRatio = getAspectRatioForSize(detectedBreed, petDescription, species);
-      
-      // No fallback - if FLUX fails, we fail
-      firstGeneratedBuffer = await generateWithFlux(
-        base64Image,
-        fluxPrompt,
-        aspectRatio
-      );
-      
-      console.log("✅ FLUX generation complete");
     } else {
       // Use GPT-Image-1 (original approach)
       console.log("🎨 Using GPT-Image-1 for generation...");
