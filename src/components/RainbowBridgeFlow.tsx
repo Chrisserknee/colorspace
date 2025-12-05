@@ -1114,21 +1114,21 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                 setSecretClickCount(newCount);
                 
                 if (newCount >= 6) {
-                  // Grant 8 extra free generations (can stack up to 13 TOTAL bonus)
+                  // Grant 6 extra free generations (can stack up to 12 TOTAL bonus)
                   const limits = getLimits();
-                  const maxBonusTotal = 13; // Maximum TOTAL bonus that can ever be granted
+                  const maxBonusTotal = 12; // Maximum TOTAL bonus that can ever be granted
                   const currentBonusGranted = limits.bonusGranted || 0;
                   
                   // Check if user has already received max bonus
                   if (currentBonusGranted >= maxBonusTotal) {
-                    console.log("❌ Maximum bonus already granted (13 total). No more bonus available.");
+                    console.log("❌ Maximum bonus already granted (12 total). No more bonus available.");
                     setSecretClickCount(0);
                     return;
                   }
                   
-                  // Calculate how much bonus we can still grant (up to 8, but limited by remaining capacity)
+                  // Calculate how much bonus we can still grant (up to 6, but limited by remaining capacity)
                   const remainingBonusCapacity = maxBonusTotal - currentBonusGranted;
-                  const bonusToGrant = Math.min(8, remainingBonusCapacity);
+                  const bonusToGrant = Math.min(6, remainingBonusCapacity);
                   
                   if (bonusToGrant <= 0) {
                     console.log("❌ No bonus capacity remaining.");
@@ -1151,10 +1151,10 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                   setSecretClickCount(0);
                   
                   // Calculate remaining bonus capacity
-                  const newRemainingCapacity = maxBonusTotal - limits.bonusGranted;
+                  const newRemainingCapacity = maxBonusTotal - (limits.bonusGranted || 0);
                   
                   // Show subtle feedback
-                  console.log(`🎉 Secret activated! +${bonusToGrant} generations granted. Total bonus used: ${limits.bonusGranted}/${maxBonusTotal}. Remaining capacity: ${newRemainingCapacity}`);
+                  console.log(`🎉 Secret activated! +${bonusToGrant} generations granted. Total bonus used: ${limits.bonusGranted || 0}/${maxBonusTotal}. Remaining capacity: ${newRemainingCapacity}`);
                   console.log("Can generate:", newCheck.allowed);
                   
                   // Reset activated display after short delay

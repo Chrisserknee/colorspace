@@ -40,6 +40,25 @@ async function analyzeImageDarkness(imageBuffer: Buffer): Promise<{ isDark: bool
   }
 }
 
+// Background colors for portrait variety - randomly selected for each portrait
+const PORTRAIT_BACKGROUND_COLORS = [
+  // Cool tones
+  "powder blue", "sky blue", "soft teal", "sapphire blue", "navy blue", "periwinkle", "slate blue",
+  // Warm tones
+  "soft pink", "dusty rose", "blush pink", "peach", "coral", "champagne", "warm cream",
+  // Neutrals
+  "charcoal black", "soft grey", "silver grey", "warm ivory", "pure white", "cream",
+  // Greens
+  "emerald green", "sage green", "mint green", "forest green", "olive green",
+  // Purples
+  "soft lavender", "lilac", "dusty purple", "mauve", "plum",
+];
+
+// Helper to get a random background color
+function getRandomBackgroundColor(): string {
+  return PORTRAIT_BACKGROUND_COLORS[Math.floor(Math.random() * PORTRAIT_BACKGROUND_COLORS.length)];
+}
+
 // Rainbow Bridge memorial quotes - randomly selected for each portrait
 const RAINBOW_BRIDGE_QUOTES = [
   "Where there is love, there is never truly goodbye.",
@@ -627,7 +646,7 @@ VIBRANT COLORFUL PALETTE (NOT BROWN):
 - LUSTROUS velvet cloak in RICH COLORS (burgundy, royal blue, emerald, crimson)
 - GLEAMING gold embroidery, SPARKLING gems with INTERNAL FIRE
 - Colors remain VIBRANT and SATURATED - not dulled to brown
-- COLORFUL backgrounds: deep blue, rich green, soft pink, cream, burgundy - NEVER brown
+- USE THE SPECIFIED BACKGROUND COLOR from the BACKGROUND section below - NEVER brown
 
 COMPOSITION:
 - Subject LOW and CENTRAL on ornate velvet throne cushion
@@ -637,9 +656,9 @@ COMPOSITION:
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
 - Authentic, genuine expression
 
-BACKGROUND - HIGHLY VARIED (Different Every Time):
-- RANDOMIZE from: charcoal black, pure white, silver grey, powder blue, sky blue, navy, teal, soft pink, dusty rose, emerald, sage, mint, lavender, lilac, cream, ivory, peach, coral
-- IMPORTANT: Choose a DIFFERENT background color each time - avoid repetition
+BACKGROUND - SPECIFIC COLOR FOR THIS PORTRAIT:
+- USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
+- This is the REQUIRED background color - do not use any other color
 - SFUMATO depth with color receding into atmospheric haze
 - CREATE CONTRAST - background should make the pet POP
 - STRICTLY FORBIDDEN: brown, tan, beige, sepia, amber, earth tones, muddy colors
@@ -830,10 +849,11 @@ SCENE ELEMENTS:
 - SPARKLING jewelry: pearls with IRIDESCENT overtones, gems with INTERNAL FIRE and light refraction
 - Cream/ivory RUFFLED LACE COLLAR with delicate texture details, Elizabethan ruff style
 - RICH SATURATED velvet curtain draped to one side creating atmospheric depth
-- LUMINOUS COLORFUL background with SFUMATO gradient - NOT BROWN
+- LUMINOUS background matching the SPECIFIED BACKGROUND COLOR - NOT BROWN
 
-BACKGROUND COLORS (VARIED - NOT DARK BROWN):
-- Choose from: deep royal blue, rich burgundy, forest green, soft cream, warm peach, dusty rose, sage green, powder blue, lavender, champagne gold, ivory white, muted teal
+BACKGROUND COLOR - SPECIFIC FOR THIS PORTRAIT:
+- USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
+- This is the REQUIRED background color - do not use any other color
 - Background should be BRIGHT and AIRY, not dark or muddy
 - NEVER use dark brown, muddy brown, or monotonous brown tones
 
@@ -842,7 +862,7 @@ VIVID SATURATED COLORS:
 - RICH SATURATED burgundy/crimson robe with LUSTROUS sheen
 - GLEAMING gold embroidery with true METALLIC reflection quality
 - DEEP SATURATED forest green or royal blue curtain accent
-- LUMINOUS COLORFUL background - soft cream, dusty rose, powder blue, or sage green
+- LUMINOUS background using the SPECIFIED BACKGROUND COLOR from above
 - LUSTROUS cream/ivory lace with subtle warm undertones
 - SPARKLING gems: vivid ruby, rich emerald, deep sapphire with BRILLIANT internal fire
 - VELVETY deep blacks with subtle undertones - never flat or grey
@@ -1343,11 +1363,12 @@ async function enhanceImage(inputBuffer: Buffer): Promise<Buffer> {
   }
 }
 
-// Upscale image using Real-ESRGAN for higher resolution (optional, controlled by env var)
-async function upscaleImage(inputBuffer: Buffer, scale: number = 2): Promise<Buffer> {
+// Upscale image using Real-ESRGAN for higher resolution (with retry mechanism)
+async function upscaleImage(inputBuffer: Buffer, scale: number = 2, maxRetries: number = 3): Promise<Buffer> {
   console.log("=== UPSCALING IMAGE ===");
   console.log(`Input buffer size: ${inputBuffer.length} bytes`);
   console.log(`Target scale: ${scale}x`);
+  console.log(`Max retries: ${maxRetries}`);
   
   if (!process.env.REPLICATE_API_TOKEN) {
     console.warn("REPLICATE_API_TOKEN not set, skipping upscale");
@@ -1364,72 +1385,137 @@ async function upscaleImage(inputBuffer: Buffer, scale: number = 2): Promise<Buf
   const originalHeight = metadata.height || 1024;
   console.log(`Original dimensions: ${originalWidth}x${originalHeight}`);
   
+  // If image is very large, resize it first to avoid API issues (max 2048px on longest side)
+  let processBuffer = inputBuffer;
+  const maxInputSize = 2048;
+  if (originalWidth > maxInputSize || originalHeight > maxInputSize) {
+    console.log(`Image too large (${originalWidth}x${originalHeight}), resizing to max ${maxInputSize}px before upscale...`);
+    processBuffer = await sharp(inputBuffer)
+      .resize(maxInputSize, maxInputSize, { fit: 'inside', withoutEnlargement: true })
+      .png()
+      .toBuffer();
+    const resizedMeta = await sharp(processBuffer).metadata();
+    console.log(`Resized to ${resizedMeta.width}x${resizedMeta.height} for upscaling`);
+  }
+  
   // Convert buffer to base64 data URL
-  const base64Image = inputBuffer.toString("base64");
-  const mimeType = metadata.format === "png" ? "image/png" : "image/jpeg";
+  const processMetadata = await sharp(processBuffer).metadata();
+  const base64Image = processBuffer.toString("base64");
+  const mimeType = processMetadata.format === "png" ? "image/png" : "image/jpeg";
   const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
   
-  try {
-    // Use Real-ESRGAN for high-quality upscaling
-    // Model: nightmareai/real-esrgan - great for artistic images
-    console.log("Running Real-ESRGAN upscaler...");
-    const startTime = Date.now();
-    
-    const output = await replicate.run(
-      "nightmareai/real-esrgan:f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
-      {
-        input: {
-          image: imageDataUrl,
-          scale: scale, // 2x or 4x
-          face_enhance: false, // Not for faces, just general upscale
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Upscale attempt ${attempt}/${maxRetries}...`);
+      
+      // Use Real-ESRGAN for high-quality upscaling
+      // Model: nightmareai/real-esrgan - great for artistic images
+      console.log("Running Real-ESRGAN upscaler...");
+      const startTime = Date.now();
+      
+      const output = await replicate.run(
+        "nightmareai/real-esrgan:f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
+        {
+          input: {
+            image: imageDataUrl,
+            scale: scale, // 2x or 4x
+            face_enhance: false, // Not for faces, just general upscale
+          }
+        }
+      );
+      
+      const elapsedTime = Date.now() - startTime;
+      console.log(`Upscale API completed in ${elapsedTime}ms`);
+      
+      // Handle output - could be string URL or FileOutput object
+      let upscaledBuffer: Buffer;
+      let downloadUrl: string | null = null;
+      
+      if (typeof output === "string") {
+        downloadUrl = output;
+      } else if (output && typeof output === "object") {
+        // FileOutput object from Replicate SDK
+        const outputObj = output as { url?: () => string } | string;
+        
+        if (typeof outputObj === "string") {
+          downloadUrl = outputObj;
+        } else if ("url" in outputObj && typeof outputObj.url === "function") {
+          downloadUrl = outputObj.url();
+        } else {
+          downloadUrl = String(output);
         }
       }
-    );
-    
-    const elapsedTime = Date.now() - startTime;
-    console.log(`Upscale completed in ${elapsedTime}ms`);
-    
-    // Handle output - could be string URL or FileOutput object
-    let upscaledBuffer: Buffer;
-    
-    if (typeof output === "string") {
-      // Direct URL string
-      console.log("Downloading upscaled image from URL...");
-      const response = await fetch(output);
-      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
-      upscaledBuffer = Buffer.from(await response.arrayBuffer());
-    } else if (output && typeof output === "object") {
-      // FileOutput object from Replicate SDK
-      const outputObj = output as { url?: () => string } | string;
-      let downloadUrl: string;
       
-      if (typeof outputObj === "string") {
-        downloadUrl = outputObj;
-      } else if ("url" in outputObj && typeof outputObj.url === "function") {
-        downloadUrl = outputObj.url();
-      } else {
-        downloadUrl = String(output);
+      if (!downloadUrl) {
+        throw new Error("No download URL received from upscaler");
       }
       
       console.log("Downloading upscaled image...");
       const response = await fetch(downloadUrl);
-      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
+      if (!response.ok) throw new Error(`Failed to download upscaled image: ${response.status}`);
       upscaledBuffer = Buffer.from(await response.arrayBuffer());
-    } else {
-      throw new Error("Unexpected output format from upscaler");
+      
+      // Validate upscaled image
+      const newMetadata = await sharp(upscaledBuffer).metadata();
+      const newWidth = newMetadata.width || 0;
+      const newHeight = newMetadata.height || 0;
+      
+      console.log(`Upscaled dimensions: ${newWidth}x${newHeight}`);
+      console.log(`Upscaled buffer size: ${upscaledBuffer.length} bytes`);
+      
+      // Verify the image was actually upscaled (should be larger than input)
+      const inputWidth = processMetadata.width || 1024;
+      const inputHeight = processMetadata.height || 1024;
+      const expectedMinWidth = inputWidth * scale * 0.9; // Allow 10% tolerance
+      const expectedMinHeight = inputHeight * scale * 0.9;
+      
+      if (newWidth < expectedMinWidth || newHeight < expectedMinHeight) {
+        console.warn(`⚠️ Upscaled image smaller than expected! Got ${newWidth}x${newHeight}, expected at least ${Math.round(expectedMinWidth)}x${Math.round(expectedMinHeight)}`);
+        throw new Error(`Upscaled image dimensions too small: ${newWidth}x${newHeight}`);
+      }
+      
+      console.log(`✅ Upscale successful on attempt ${attempt}! Final size: ${newWidth}x${newHeight}`);
+      return upscaledBuffer;
+      
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.error(`Upscale attempt ${attempt} failed:`, lastError.message);
+      
+      if (attempt < maxRetries) {
+        const delay = attempt * 2000; // Increasing delay: 2s, 4s, 6s
+        console.log(`Waiting ${delay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
     }
+  }
+  
+  // All retries failed - use sharp to upscale as fallback
+  console.error(`❌ All ${maxRetries} upscale attempts failed. Using sharp fallback upscale.`);
+  console.error(`Last error: ${lastError?.message}`);
+  
+  // Fallback: Use sharp's lanczos3 upscaling (not as good as Real-ESRGAN but ensures we get higher resolution)
+  try {
+    const targetWidth = originalWidth * scale;
+    const targetHeight = originalHeight * scale;
+    console.log(`Fallback: Using sharp to upscale to ${targetWidth}x${targetHeight}...`);
     
-    // Get new dimensions
-    const newMetadata = await sharp(upscaledBuffer).metadata();
-    console.log(`Upscaled dimensions: ${newMetadata.width}x${newMetadata.height}`);
-    console.log(`Upscaled buffer size: ${upscaledBuffer.length} bytes`);
-    console.log("✅ Upscale successful");
+    const fallbackBuffer = await sharp(inputBuffer)
+      .resize(targetWidth, targetHeight, { 
+        kernel: 'lanczos3',
+        fit: 'fill'
+      })
+      .sharpen({ sigma: 0.5 }) // Light sharpening to reduce blur
+      .png()
+      .toBuffer();
     
-    return upscaledBuffer;
-  } catch (error) {
-    console.error("Upscale error:", error);
-    console.warn("Falling back to original image");
-    return inputBuffer; // Return original on failure
+    const fallbackMeta = await sharp(fallbackBuffer).metadata();
+    console.log(`✅ Fallback upscale complete: ${fallbackMeta.width}x${fallbackMeta.height}`);
+    return fallbackBuffer;
+  } catch (fallbackError) {
+    console.error("Fallback upscale also failed:", fallbackError);
+    return inputBuffer; // Return original only as last resort
   }
 }
 
@@ -3708,15 +3794,11 @@ ${isBlackCatForFlux ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve DEEP
 - Professional BRIGHT portrait lighting - cheerful and uplifting
 - ABSOLUTELY NO dark moody lighting - this should feel BRIGHT and HAPPY
 
-=== AUTOMATIC COLOR HARMONY (VARIED - Different Every Time) ===
-RANDOMIZE background colors each generation - USE A DIFFERENT COLOR EACH TIME:
-- COOL TONES: Powder blue, sky blue, teal, sapphire, navy, periwinkle, slate blue
-- WARM TONES: Soft pink, dusty rose, peach, coral, champagne, warm cream
-- NEUTRALS: Charcoal black, soft grey, silver grey, warm ivory, pure white, cream
-- GREENS: Emerald, sage, mint, forest green, olive, hunter green
-- PURPLES: Soft lavender, lilac, dusty purple, mauve, plum
-- MIX IT UP: Each portrait should have a DIFFERENT background color - avoid repetition
-- CREATE CONTRAST: Choose colors that make the pet POP and stand out
+=== BACKGROUND COLOR - SPECIFIC FOR THIS PORTRAIT ===
+USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
+- This is the REQUIRED background color - do not use any other color
+- The background MUST be this specific color
+- CREATE CONTRAST: This color should make the pet POP and stand out
 - AVOID: Brown, tan, beige, sepia, muddy tones
 
 === COMPOSITION (Wide, Centered, Full Cushion) ===
@@ -3741,17 +3823,11 @@ RANDOMIZE background colors each generation - USE A DIFFERENT COLOR EACH TIME:
 - BRIGHT WHITE PEARLS and small CLUSTERED BRIGHT GEMSTONES
 - BRIGHT SPARKLING gems complement pet's natural colors
 
-=== BACKGROUND (HIGHLY VARIED - Different Every Time) ===
+=== BACKGROUND - SPECIFIC COLOR FOR THIS PORTRAIT ===
 - Heavy SILKY velvet drapery with PAINTERLY FOLDS
-- VARY THE BACKGROUND COLOR - pick ONE at random each time:
-  * BLACKS/DARKS: Rich charcoal, deep black, dark slate (dramatic contrast)
-  * WHITES/LIGHTS: Pure white, soft cream, ivory, champagne (bright, airy)
-  * GREYS: Silver grey, warm grey, slate grey, dove grey
-  * BLUES: Powder blue, sky blue, navy, teal, sapphire, periwinkle
-  * PINKS: Soft pink, dusty rose, blush, coral, peach
-  * GREENS: Emerald, sage, mint, forest, olive
-  * PURPLES: Lavender, lilac, mauve, dusty purple
-- IMPORTANT: Use a DIFFERENT color each generation - maximize variety
+- USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
+- This is the REQUIRED background color - do not use any other color
+- The background MUST be this specific color throughout
 - CREATE STRONG CONTRAST with the pet's fur color
 - AVOID: Brown, tan, beige, sepia - keep it fresh and interesting
 
