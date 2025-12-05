@@ -1066,59 +1066,43 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
             </div>
 
             <div 
-              className="relative aspect-square max-w-[200px] sm:max-w-xs mx-auto rounded-xl overflow-hidden shadow-lg mb-4 cursor-pointer"
+              className="relative aspect-square max-w-[200px] sm:max-w-xs mx-auto rounded-xl overflow-hidden shadow-lg mb-4"
               style={{ border: '2px solid rgba(197, 165, 114, 0.3)' }}
               onClick={() => {
+                // Secret click counter - no visual feedback (it's a secret!)
                 const newCount = secretClickCount + 1;
                 setSecretClickCount(newCount);
                 
                 if (newCount >= 6) {
-                  // Grant 6 extra free generations (can stack up to 12 TOTAL bonus)
+                  // Grant 6 bonus credits (using packCredits for simplicity - these bypass all limits)
                   const limits = getLimits();
-                  const maxBonusTotal = 12; // Maximum TOTAL bonus that can ever be granted
+                  const maxBonusTotal = 12;
                   const currentBonusGranted = limits.bonusGranted || 0;
                   
-                  // Check if user has already received max bonus
                   if (currentBonusGranted >= maxBonusTotal) {
-                    console.log("❌ Maximum bonus already granted (12 total). No more bonus available.");
                     setSecretClickCount(0);
                     return;
                   }
                   
-                  // Calculate how much bonus we can still grant (up to 6, but limited by remaining capacity)
-                  const remainingBonusCapacity = maxBonusTotal - currentBonusGranted;
-                  const bonusToGrant = Math.min(6, remainingBonusCapacity);
+                  const remainingCapacity = maxBonusTotal - currentBonusGranted;
+                  const bonusToGrant = Math.min(6, remainingCapacity);
                   
                   if (bonusToGrant <= 0) {
-                    console.log("❌ No bonus capacity remaining.");
                     setSecretClickCount(0);
                     return;
                   }
                   
-                  // Grant bonus by reducing freeGenerations (can go negative = bonus credits)
-                  limits.freeGenerations = limits.freeGenerations - bonusToGrant;
-                  limits.bonusGranted = currentBonusGranted + bonusToGrant; // Track total bonus granted
+                  // Add to packCredits - these always allow generation
+                  limits.packCredits = (limits.packCredits || 0) + bonusToGrant;
+                  limits.bonusGranted = currentBonusGranted + bonusToGrant;
                   
                   saveLimits(limits);
                   setGenerationLimits(limits);
-                  const newCheck = canGenerate(limits);
-                  setLimitCheck(newCheck);
-                  setSecretActivated(true);
-                  setUseSecretCredit(true); // Enable un-watermarked generation for testing
-                  
-                  // Reset click count
+                  setLimitCheck(canGenerate(limits));
                   setSecretClickCount(0);
                   
-                  // Calculate remaining bonus capacity
-                  const newRemainingCapacity = maxBonusTotal - (limits.bonusGranted || 0);
-                  
-                  // Show subtle feedback
-                  console.log(`🎉 Secret activated! +${bonusToGrant} generations granted. Total bonus used: ${limits.bonusGranted || 0}/${maxBonusTotal}. Remaining capacity: ${newRemainingCapacity}`);
-                  
-                  // Reset activated display after short delay
-                  setTimeout(() => {
-                    setSecretActivated(false);
-                  }, 2000);
+                  // Silent success - just log to console for debugging
+                  console.log(`🎁 Secret bonus: +${bonusToGrant} credits granted`);
                 }
               }}
             >
@@ -1132,29 +1116,6 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                   data-posthog-unmask="true"
                   style={{ position: 'absolute', top: 0, left: 0 }}
                 />
-              )}
-              {/* Secret click indicator - shows progress toward 6 clicks */}
-              {secretClickCount > 0 && secretClickCount < 6 && (
-                <div className="absolute top-2 right-2 flex gap-1">
-                  {[...Array(6)].map((_, i) => (
-                    <div 
-                      key={i}
-                      className="w-2 h-2 rounded-full transition-all duration-200"
-                      style={{ 
-                        backgroundColor: i < secretClickCount 
-                          ? 'rgba(197, 165, 114, 0.8)' 
-                          : 'rgba(197, 165, 114, 0.2)' 
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-              {secretActivated && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <div className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'rgba(34, 197, 94, 0.2)', color: '#4ADE80' }}>
-                    ✨ Bonus granted!
-                  </div>
-                </div>
               )}
             </div>
 
