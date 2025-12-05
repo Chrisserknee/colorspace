@@ -4,6 +4,10 @@ import { useState, useEffect, useRef } from "react";
 
 const faqs = [
   {
+    question: "What types of pets can I transform?",
+    answer: "We support all beloved pets! Dogs, cats, birds (parakeets, parrots, cockatiels), fish, rabbits, hamsters, guinea pigs, reptiles (bearded dragons, geckos, snakes), ferrets, turtles, horses, rats, and most other unique or exotic pets. If you love them, we can immortalize them!",
+  },
+  {
     question: "Is my photo safe?",
     answer: "Absolutely. Your photos are processed securely and are automatically deleted from our servers after 24 hours. We never share or use your images for any purpose other than creating your portrait.",
   },

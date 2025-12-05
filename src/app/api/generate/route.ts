@@ -1787,8 +1787,8 @@ export async function POST(request: NextRequest) {
                 text: `This image contains TWO pets. Analyze BOTH pets for a royal portrait.
 
 For EACH pet, provide:
-1. SPECIES: [CAT] or [DOG] 
-2. BREED: Specific breed or "Mixed"
+1. SPECIES: [DOG], [CAT], [BIRD], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [RAT], or [EXOTIC]
+2. BREED: Specific breed/variety or "Mixed"
 3. COLORS: Fur color, markings, patterns
 4. FACE: Eye color, distinctive features
 5. SIZE: Small/Medium/Large (relative)
@@ -1829,12 +1829,14 @@ Brief description of how they look together (e.g., "A regal golden retriever bes
       multiPetCombinedDescription = togetherMatch ? togetherMatch[1].trim() : "";
       
       // Extract species for each pet
-      const species1Match = petDescription1.match(/\[(DOG|CAT)\]/i);
-      const species2Match = petDescription2.match(/\[(DOG|CAT)\]/i);
+      const species1Match = petDescription1.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC)\]/i);
+      const species2Match = petDescription2.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC)\]/i);
       species1 = species1Match ? species1Match[1].toUpperCase() : 
-                 petDescription1.toLowerCase().includes("dog") ? "DOG" : "CAT";
+                 petDescription1.toLowerCase().includes("dog") ? "DOG" : 
+                 petDescription1.toLowerCase().includes("cat") ? "CAT" : "PET";
       species2 = species2Match ? species2Match[1].toUpperCase() : 
-                 petDescription2.toLowerCase().includes("dog") ? "DOG" : "CAT";
+                 petDescription2.toLowerCase().includes("dog") ? "DOG" : 
+                 petDescription2.toLowerCase().includes("cat") ? "CAT" : "PET";
       
       console.log(`🐾 Pet 1: ${species1} - ${petDescription1.substring(0, 100)}`);
       console.log(`🐾 Pet 2: ${species2} - ${petDescription2.substring(0, 100)}`);
@@ -1853,20 +1855,35 @@ Brief description of how they look together (e.g., "A regal golden retriever bes
           content: [
             {
               type: "text",
-              text: `Analyze this pet photo. Start with [CAT] or [DOG] or [RABBIT].
+              text: `Analyze this pet photo. Identify the species first.
 
-SPECIES: Look at snout size, facial structure, ears. Dogs have larger snouts. Cats have compact faces with whiskers.
+SUPPORTED SPECIES (use these exact tags):
+[DOG], [CAT], [BIRD], [FISH], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [RAT], [EXOTIC]
+
+SPECIES IDENTIFICATION:
+- DOG: Larger snout/muzzle, canine features, various breeds
+- CAT: Compact face, whiskers, feline features
+- BIRD: Feathers, beak (parakeet, parrot, cockatiel, etc.)
+- FISH: Scales, fins, aquatic
+- RABBIT: Long ears, compact furry body
+- HAMSTER: Small, round, short ears
+- GUINEA PIG: Larger than hamster, no tail
+- REPTILE: Scales (bearded dragon, gecko, snake, iguana)
+- FERRET: Long body, small face
+- TURTLE: Shell, reptilian
+- HORSE: Equine features, large
+- RAT: Long tail, pointed face
+- EXOTIC: Other unique pets
 
 Provide a CONCISE description:
-1. SPECIES & BREED: [SPECIES] - Breed name or "Mixed" (confidence: HIGH/MEDIUM/LOW)
-2. AGE: PUPPY/KITTEN or ADULT
-3. COLORS: Be SPECIFIC - for dark pets say "black" or "grey" or "dark brown" explicitly. List base color, any markings with locations.
-4. FACE: Eye color, eye shape, nose color, any distinctive facial features
-5. EARS: Shape, size, position
-6. UNIQUE FEATURES: 3-5 things that make THIS pet recognizable (asymmetries, markings, expression)
-7. FUR: Length and texture (short/medium/long, smooth/fluffy)
+1. SPECIES & BREED: [SPECIES] - Breed/variety or "Mixed" (confidence: HIGH/MEDIUM/LOW)
+2. AGE: YOUNG or ADULT
+3. COLORS: Be SPECIFIC - list base color, any markings with locations.
+4. FACE: Eye color, eye shape, distinctive facial features
+5. UNIQUE FEATURES: 3-5 things that make THIS pet recognizable
+6. COVERING: Fur/feathers/scales - texture and length
 
-Format: "[SPECIES] BREED: [breed]. AGE: [stage]. COLORS: [detailed colors and markings]. FACE: [eye/nose details]. EARS: [description]. UNIQUE: [distinctive features]. FUR: [texture]."`,
+Format: "[SPECIES] BREED: [breed]. AGE: [stage]. COLORS: [detailed colors and markings]. FACE: [details]. UNIQUE: [distinctive features]. COVERING: [texture]."`,
             },
             {
               type: "image_url",
@@ -1932,7 +1949,7 @@ Format: "[SPECIES] BREED: [breed]. AGE: [stage]. COLORS: [detailed colors and ma
     });
 
     // Extract species from the description (format: [DOG], [CAT], etc.)
-    const speciesMatch = petDescription.match(/\[(DOG|CAT|RABBIT|BIRD|HAMSTER|GUINEA PIG|FERRET|HORSE|PET)\]/i);
+    const speciesMatch = petDescription.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC|PET)\]/i);
     let species = speciesMatch ? speciesMatch[1].toUpperCase() : "";
     
     // Extract age/stage from the description
@@ -1958,12 +1975,26 @@ Format: "[SPECIES] BREED: [breed]. AGE: [stage]. COLORS: [detailed colors and ma
         species = "DOG";
       } else if (lowerDesc.includes("cat") || lowerDesc.includes("kitten") || lowerDesc.includes("feline")) {
         species = "CAT";
+      } else if (lowerDesc.includes("bird") || lowerDesc.includes("parrot") || lowerDesc.includes("parakeet") || lowerDesc.includes("cockatiel") || lowerDesc.includes("budgie")) {
+        species = "BIRD";
+      } else if (lowerDesc.includes("fish") || lowerDesc.includes("goldfish") || lowerDesc.includes("betta") || lowerDesc.includes("aquatic")) {
+        species = "FISH";
       } else if (lowerDesc.includes("rabbit") || lowerDesc.includes("bunny")) {
         species = "RABBIT";
-      } else if (lowerDesc.includes("bird") || lowerDesc.includes("parrot") || lowerDesc.includes("parakeet")) {
-        species = "BIRD";
-      } else if (lowerDesc.includes("hamster") || lowerDesc.includes("guinea pig") || lowerDesc.includes("ferret")) {
-        species = "SMALL PET";
+      } else if (lowerDesc.includes("hamster")) {
+        species = "HAMSTER";
+      } else if (lowerDesc.includes("guinea pig")) {
+        species = "GUINEA PIG";
+      } else if (lowerDesc.includes("reptile") || lowerDesc.includes("bearded dragon") || lowerDesc.includes("gecko") || lowerDesc.includes("snake") || lowerDesc.includes("iguana") || lowerDesc.includes("lizard")) {
+        species = "REPTILE";
+      } else if (lowerDesc.includes("ferret")) {
+        species = "FERRET";
+      } else if (lowerDesc.includes("turtle") || lowerDesc.includes("tortoise")) {
+        species = "TURTLE";
+      } else if (lowerDesc.includes("horse") || lowerDesc.includes("pony") || lowerDesc.includes("equine")) {
+        species = "HORSE";
+      } else if (lowerDesc.includes("rat") || lowerDesc.includes("mouse")) {
+        species = "RAT";
       } else {
         species = "PET";
       }
@@ -1984,87 +2015,95 @@ Format: "[SPECIES] BREED: [breed]. AGE: [stage]. COLORS: [detailed colors and ma
       species = "CAT";
     }
     
-    // ALWAYS validate species with a direct image check - this is critical for accuracy
-    console.log("🔍 Performing mandatory species validation check...");
-    try {
-      const speciesValidationCheck = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: `Look at this image VERY CAREFULLY. Is this a DOG or a CAT?
+    // Validate species with a direct image check - helps ensure accuracy for dogs/cats
+    // For other species, we trust the initial detection
+    const commonSpecies = ["DOG", "CAT"];
+    const allValidSpecies = ["DOG", "CAT", "BIRD", "FISH", "RABBIT", "HAMSTER", "GUINEA PIG", "REPTILE", "FERRET", "TURTLE", "HORSE", "RAT", "EXOTIC"];
+    
+    if (commonSpecies.includes(species) || !species || species === "PET") {
+      console.log("🔍 Performing species validation check for dog/cat...");
+      try {
+        const speciesValidationCheck = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `Look at this image VERY CAREFULLY. What type of pet is this?
 
-CRITICAL - Examine these features:
-- NOSE SIZE: Dogs have larger/wider noses (snouts). Cats have smaller, more compact noses.
-- FACIAL STRUCTURE: Dogs have wider heads and canine facial proportions. Cats have more compact, triangular faces.
-- EARS: Both can have pointed ears, but look at the overall facial structure.
-- WHISKERS: Cats typically have more prominent whiskers.
-- EYE SHAPE: Cats often have more almond-shaped eyes. Dogs have rounder eyes.
+Identify the species. Respond with ONLY ONE of these words:
+DOG, CAT, BIRD, FISH, RABBIT, HAMSTER, GUINEA PIG, REPTILE, FERRET, TURTLE, HORSE, RAT, or EXOTIC
 
-Key differences:
-- DOG: Larger snout/muzzle, wider head, canine facial structure, dog-like proportions
-- CAT: Smaller nose, compact face, triangular face shape, feline features, prominent whiskers
+Key identification features:
+- DOG: Larger snout/muzzle, canine facial structure
+- CAT: Compact face, whiskers, feline features
+- BIRD: Feathers, beak
+- FISH: Scales, fins, aquatic
+- RABBIT: Long ears, compact furry body
+- HAMSTER: Small, round, short ears
+- GUINEA PIG: Larger than hamster, no tail
+- REPTILE: Scales (lizard, gecko, snake, bearded dragon)
+- FERRET: Long body, small face
+- TURTLE: Shell
+- HORSE: Equine features
+- RAT: Long tail, pointed face
+- EXOTIC: Other unique pets
 
-Respond with ONLY one word: DOG or CAT
-
-Be VERY careful - misidentifying will cause major errors.`,
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${base64Image}`,
-                  detail: "high", // Use high detail for better accuracy
+Respond with ONLY the species name.`,
                 },
-              },
-            ],
-          },
-        ],
-        max_tokens: 10,
-        temperature: 0, // Use deterministic response
-      });
-      const validatedSpecies = speciesValidationCheck.choices[0]?.message?.content?.trim().toUpperCase();
-      
-      // CRITICAL: Always use validation result if it's clear
-      if (validatedSpecies === "DOG" || validatedSpecies === "CAT") {
-        // If validation differs from initial detection, ALWAYS use validation result
-        if (validatedSpecies !== species) {
-          console.warn(`⚠️ SPECIES MISMATCH: Initial detection was ${species}, but validation says ${validatedSpecies}. FORCING validated species.`);
-          species = validatedSpecies;
-        } else {
-          console.log(`✅ Species validation confirmed: ${species}`);
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:image/jpeg;base64,${base64Image}`,
+                    detail: "high",
+                  },
+                },
+              ],
+            },
+          ],
+          max_tokens: 20,
+          temperature: 0,
+        });
+        const validatedSpecies = speciesValidationCheck.choices[0]?.message?.content?.trim().toUpperCase().replace(/[^A-Z ]/g, '');
+        
+        // Use validation result if it's a recognized species
+        if (allValidSpecies.includes(validatedSpecies)) {
+          if (validatedSpecies !== species) {
+            console.log(`🔄 Species updated: ${species || 'unknown'} → ${validatedSpecies}`);
+            species = validatedSpecies;
+          } else {
+            console.log(`✅ Species validation confirmed: ${species}`);
+          }
+        } else if (!species || species === "PET") {
+          // Default to the validation result even if not in our list
+          if (validatedSpecies) {
+            species = validatedSpecies;
+            console.log(`✅ Species set via validation: ${species}`);
+          }
         }
-      } else if (!species || species === "PET") {
-        // If we don't have a species yet, use validation result
-        if (validatedSpecies === "DOG" || validatedSpecies === "CAT") {
-          species = validatedSpecies;
-          console.log(`✅ Species set via validation: ${species}`);
+      } catch (validationError) {
+        console.error("⚠️ Species validation check failed:", validationError);
+        // Continue with detected species
+        if (!species || species === "PET") {
+          species = "PET"; // Default to generic PET if we can't determine
+          console.warn("⚠️ Unable to determine exact species, using generic PET");
         }
       }
-      
-      // CRITICAL: If validation failed but we have a species, log warning but continue
-      if (!validatedSpecies || (validatedSpecies !== "DOG" && validatedSpecies !== "CAT")) {
-        console.warn(`⚠️ Species validation returned unclear result: "${validatedSpecies}". Using detected species: ${species}`);
-      }
-    } catch (validationError) {
-      console.error("⚠️ Species validation check failed:", validationError);
-      // If validation fails, we MUST have a species from initial detection
-      if (!species || species === "PET") {
-        throw new Error("CRITICAL: Unable to determine pet species. Please ensure the image clearly shows a cat or dog.");
-      }
-      console.warn(`⚠️ Continuing with detected species: ${species} (validation failed)`);
+    } else {
+      console.log(`✅ Non-dog/cat species detected, skipping validation: ${species}`);
     }
     
-    // CRITICAL: Final check - we MUST have a valid species
-    if (!species || species === "PET") {
-      throw new Error("CRITICAL: Unable to determine pet species. Please ensure the image clearly shows a cat or dog.");
+    // Final species check - allow any detected species
+    if (!species) {
+      species = "PET";
+      console.warn("⚠️ No species detected, defaulting to PET");
     }
     
-    // CRITICAL: Ensure species is either DOG or CAT (most common)
-    if (species !== "DOG" && species !== "CAT") {
-      console.warn(`⚠️ Unusual species detected: ${species}. Proceeding but may need special handling.`);
+    // Log for all species types
+    if (!allValidSpecies.includes(species) && species !== "PET") {
+      console.log(`ℹ️ Unique species detected: ${species}. Proceeding with portrait generation.`);
     }
     
     console.log("Detected age/stage:", ageStage);
@@ -2073,11 +2112,22 @@ Be VERY careful - misidentifying will cause major errors.`,
     }
     
     // Create STRONGER negative species instruction with multiple repetitions
-    const notSpecies = species === "DOG" 
-      ? "CRITICAL: This is a DOG. DO NOT generate a cat, kitten, or any feline. This MUST be a DOG. Generate ONLY a DOG." 
-      : species === "CAT" 
-      ? "CRITICAL: This is a CAT. DO NOT generate a dog, puppy, or any canine. This MUST be a CAT. Generate ONLY a CAT."
-      : `CRITICAL: This is a ${species}. DO NOT generate any other animal. Generate ONLY a ${species}.`;
+    // Species-specific enforcement message
+    const speciesEnforcement: Record<string, string> = {
+      "DOG": "CRITICAL: This is a DOG. DO NOT generate a cat or any other animal. This MUST be a DOG.",
+      "CAT": "CRITICAL: This is a CAT. DO NOT generate a dog or any other animal. This MUST be a CAT.",
+      "BIRD": "CRITICAL: This is a BIRD. Preserve feathers and beak. DO NOT generate a mammal.",
+      "FISH": "CRITICAL: This is a FISH. Preserve fins and scales. Keep aquatic appearance.",
+      "RABBIT": "CRITICAL: This is a RABBIT. Preserve long ears and bunny features.",
+      "HAMSTER": "CRITICAL: This is a HAMSTER. Preserve small, round body and short ears.",
+      "GUINEA PIG": "CRITICAL: This is a GUINEA PIG. Preserve rounded body without tail.",
+      "REPTILE": "CRITICAL: This is a REPTILE. Preserve scales and reptilian features.",
+      "FERRET": "CRITICAL: This is a FERRET. Preserve long body and small face.",
+      "TURTLE": "CRITICAL: This is a TURTLE. Preserve shell and reptilian features.",
+      "HORSE": "CRITICAL: This is a HORSE. Preserve equine features and proportions.",
+      "RAT": "CRITICAL: This is a RAT. Preserve pointed face and long tail.",
+    };
+    const notSpecies = speciesEnforcement[species] || `CRITICAL: This is a ${species}. DO NOT generate any other animal. Generate ONLY a ${species}.`;
     
     console.log("=== SPECIES DETECTION ===");
     console.log("Detected species:", species);
