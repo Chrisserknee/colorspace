@@ -1722,3 +1722,27 @@ select:focus-visible {
 .protected-image-container * {
   -webkit-touch-callout: none;
 }
+
+/* ============================================
+   HIDE VERCEL DEPLOYMENT BADGE
+   ============================================ */
+
+/* Hide Vercel live feedback / deployment badge */
+[data-vercel-toolbar],
+[data-vercel-live-feedback],
+.vercel-live-feedback,
+#vercel-live-feedback,
+[id^="vercel-"],
+[class^="vercel-"],
+a[href*="vercel.com"][target="_blank"]:has(svg),
+body > a[target="_blank"]:last-of-type:has(img[alt*="Vercel"]),
+body > div:last-of-type:has(a[href*="vercel"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
