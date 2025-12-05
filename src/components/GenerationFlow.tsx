@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { CONFIG } from "@/lib/config";
-import { captureEvent } from "@/lib/posthog";
+import { captureEvent, identifyUser } from "@/lib/posthog";
 
 type Stage = "preview" | "email-capture" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
@@ -558,6 +558,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, context: sessionContext }),
       });
+      
+      // Identify user in PostHog for tracking
+      identifyUser(email, { email });
       
       captureEvent("email_captured_pre_generate", {
         gender: gender || "not_selected",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { identifyUser, captureEvent } from "@/lib/posthog";
 
 export default function EmailCapture() {
   const [email, setEmail] = useState("");
@@ -36,6 +37,14 @@ export default function EmailCapture() {
       if (!response.ok) {
         throw new Error("Failed to subscribe");
       }
+
+      // Identify user in PostHog for tracking
+      identifyUser(email, { 
+        email: email,
+        source: "royal-club",
+        signup_location: "homepage-footer"
+      });
+      captureEvent("royal_club_signup", { email });
 
       setIsSuccess(true);
       setEmail("");
