@@ -79,6 +79,7 @@ const grantPurchaseBonus = (type?: string, packType?: string) => {
     } else {
       limits.purchases += 1;
       sessionStorage.setItem("last_purchase_time", now.toString());
+      console.log(`🎁 Purchase bonus granted: 2 additional free generations! (Total purchases: ${limits.purchases})`);
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(limits));
   }
