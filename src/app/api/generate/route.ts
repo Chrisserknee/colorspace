@@ -2451,6 +2451,9 @@ ${facialStructureAnalysis}
     const largeAnimals = ["HORSE", "PONY"];
     const isLargeAnimal = largeAnimals.includes(species);
     
+    // Check if this is a large dog breed that needs more headroom
+    const isLargeDog = species === "DOG" && (isLargeBreed(detectedBreed, petDescription) || isVeryLargeAnimal(detectedBreed, petDescription));
+    
     // Species-specific composition instructions
     const compositionInstructions = isLargeAnimal ? `
 === COMPOSITION FOR MAJESTIC ${species} (CRITICAL) ===
@@ -2464,7 +2467,22 @@ ${facialStructureAnalysis}
 - Ornate royal draping/blanket over back instead of cloak
 - Decorated bridle or halter with gold and jewels
 - Rich background: stable interior, pastoral landscape, or grand estate grounds
-- The ${species}'s full beautiful form should dominate the composition` : `
+- The ${species}'s full beautiful form should dominate the composition` : isLargeDog ? `
+=== COMPOSITION FOR LARGE DOG BREED (CRITICAL - PREVENT EAR CROPPING) ===
+*** THIS IS A LARGE DOG BREED - ZOOM OUT TO FIT ENTIRE HEAD ***
+- ZOOM OUT significantly - show MORE of the dog, not just head/shoulders
+- Subject positioned in LOWER PORTION of frame - NOT centered vertically
+- CRITICAL: Leave GENEROUS empty space above the TOP OF EARS
+- The COMPLETE head including FULL EAR TIPS must be visible - NEVER crop ears
+- Show head, neck, chest, and upper body - wide framing
+- At least 15-20% of frame height should be background ABOVE the ears
+- Camera positioned FURTHER BACK than normal portrait distance
+- Body ¾ VIEW, head forward or slightly angled
+- FRONT PAWS VISIBLE and resting on cushion
+- Cloak draped over body + cushion with realistic folds
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest
+- ABSOLUTELY FORBIDDEN: cropping ANY part of the head or ears
+- Think "full upper body portrait" not "head shot"` : `
 === COMPOSITION (CRITICAL - Follow Exactly) ===
 - Subject positioned LOW and CENTRAL - resting on cushion, not standing or floating
 - Body ¾ VIEW, head forward or slightly angled - classical portrait posture
