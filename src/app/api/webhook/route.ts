@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { saveMetadata, getMetadata, markLeadAsPurchased } from "@/lib/supabase";
+import { saveMetadata, getMetadata, markLeadAsPurchased, addCustomer } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
 
 // Initialize Stripe lazily to avoid build-time errors
@@ -72,14 +72,31 @@ export async function POST(request: NextRequest) {
             });
             console.log(`✅ Payment confirmed for image: ${imageId}`);
             
-            // Mark as purchased in unified emails table (stops follow-up emails)
+            // Mark as purchased in emails table (stops follow-up emails)
             if (customerEmail) {
               try {
                 await markLeadAsPurchased(customerEmail);
-                console.log(`📧 Email marked as purchased: ${customerEmail}`);
+                console.log(`📧 Email marked as purchased in leads: ${customerEmail}`);
               } catch (leadError) {
                 console.warn(`⚠️ Failed to mark email as purchased:`, leadError);
-                // Don't fail the webhook - email tracking is non-critical
+              }
+              
+              // Add to customers table (separate list of paying customers)
+              try {
+                const isRainbowBridge = session.metadata?.style === 'rainbow-bridge';
+                await addCustomer(customerEmail, {
+                  purchaseType: isRainbowBridge ? 'rainbow-bridge' : 'portrait',
+                  imageId: imageId,
+                  stripeSessionId: session.id,
+                  context: {
+                    petName: session.metadata?.petName,
+                    style: session.metadata?.style,
+                  }
+                });
+                console.log(`🎉 Customer added to customers table: ${customerEmail}`);
+              } catch (customerError) {
+                console.warn(`⚠️ Failed to add customer:`, customerError);
+                // Don't fail the webhook - this is non-critical
               }
             }
             
@@ -119,13 +136,24 @@ export async function POST(request: NextRequest) {
         } else if (isPackPurchase) {
           console.log(`📦 Pack purchase completed (session: ${session.id})`);
           // Pack purchases don't have a specific image to email about
-          // But we should still mark as purchased in unified emails table
           if (customerEmail) {
+            // Mark as purchased in emails table (stops follow-up emails)
             try {
               await markLeadAsPurchased(customerEmail);
               console.log(`📧 Email marked as purchased (pack): ${customerEmail}`);
             } catch (leadError) {
               console.warn(`⚠️ Failed to mark email as purchased:`, leadError);
+            }
+            
+            // Add to customers table (separate list of paying customers)
+            try {
+              await addCustomer(customerEmail, {
+                purchaseType: 'pack',
+                stripeSessionId: session.id,
+              });
+              console.log(`🎉 Customer added to customers table (pack): ${customerEmail}`);
+            } catch (customerError) {
+              console.warn(`⚠️ Failed to add customer:`, customerError);
             }
           }
         } else {

@@ -614,4 +614,243 @@ export async function unsubscribeLead(email: string): Promise<boolean> {
   return true;
 }
 
+// ============================================
+// CUSTOMERS TABLE HELPERS (Purchased Customers)
+// Separate from leads/emails - these are paying customers
+// ============================================
+
+export interface Customer {
+  id: string;
+  email: string;
+  created_at: string;
+  updated_at: string;
+  first_purchase_at: string;
+  last_purchase_at: string;
+  total_purchases: number;
+  purchase_type: string;
+  image_ids: string[] | null;
+  stripe_customer_id: string | null;
+  stripe_session_ids: string[] | null;
+  marketing_opt_in: boolean;
+  unsubscribed: boolean;
+  unsubscribed_at: string | null;
+  context: Record<string, unknown> | null;
+}
+
+/**
+ * Add or update a customer after purchase
+ * This is the main function to call when someone makes a purchase
+ */
+export async function addCustomer(
+  email: string,
+  options: {
+    purchaseType?: 'portrait' | 'pack' | 'rainbow-bridge';
+    imageId?: string;
+    stripeSessionId?: string;
+    stripeCustomerId?: string;
+    context?: Record<string, unknown>;
+  } = {}
+): Promise<{ customer: Customer | null; isNew: boolean; error?: string }> {
+  try {
+    const normalizedEmail = email.toLowerCase().trim();
+    const now = new Date().toISOString();
+    
+    // Check if customer already exists
+    const { data: existing, error: selectError } = await supabase
+      .from("customers")
+      .select("*")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+    
+    if (selectError && selectError.code !== 'PGRST116') {
+      console.error("Error checking for existing customer:", selectError);
+      return { customer: null, isNew: false, error: selectError.message };
+    }
+    
+    if (existing) {
+      // Update existing customer - increment purchase count
+      const updateData: Record<string, unknown> = {
+        last_purchase_at: now,
+        total_purchases: (existing.total_purchases || 1) + 1,
+        updated_at: now,
+      };
+      
+      // Add new image ID if provided
+      if (options.imageId) {
+        const existingIds = existing.image_ids || [];
+        if (!existingIds.includes(options.imageId)) {
+          updateData.image_ids = [...existingIds, options.imageId];
+        }
+      }
+      
+      // Add new Stripe session ID if provided
+      if (options.stripeSessionId) {
+        const existingSessionIds = existing.stripe_session_ids || [];
+        if (!existingSessionIds.includes(options.stripeSessionId)) {
+          updateData.stripe_session_ids = [...existingSessionIds, options.stripeSessionId];
+        }
+      }
+      
+      // Update Stripe customer ID if provided
+      if (options.stripeCustomerId) {
+        updateData.stripe_customer_id = options.stripeCustomerId;
+      }
+      
+      // Merge context
+      if (options.context) {
+        updateData.context = { ...(existing.context || {}), ...options.context };
+      }
+      
+      const { data: updated, error: updateError } = await supabase
+        .from("customers")
+        .update(updateData)
+        .eq("id", existing.id)
+        .select()
+        .single();
+      
+      if (updateError) {
+        console.error("Error updating customer:", updateError);
+        return { customer: existing, isNew: false, error: updateError.message };
+      }
+      
+      console.log(`📦 Repeat customer updated: ${normalizedEmail} (purchase #${updated.total_purchases})`);
+      return { customer: updated, isNew: false };
+    }
+    
+    // Create new customer
+    const insertData: Record<string, unknown> = {
+      email: normalizedEmail,
+      first_purchase_at: now,
+      last_purchase_at: now,
+      total_purchases: 1,
+      purchase_type: options.purchaseType || 'portrait',
+      marketing_opt_in: true,
+      unsubscribed: false,
+    };
+    
+    if (options.imageId) {
+      insertData.image_ids = [options.imageId];
+    }
+    
+    if (options.stripeSessionId) {
+      insertData.stripe_session_ids = [options.stripeSessionId];
+    }
+    
+    if (options.stripeCustomerId) {
+      insertData.stripe_customer_id = options.stripeCustomerId;
+    }
+    
+    if (options.context) {
+      insertData.context = options.context;
+    }
+    
+    const { data: newCustomer, error: insertError } = await supabase
+      .from("customers")
+      .insert(insertData)
+      .select()
+      .single();
+    
+    if (insertError) {
+      // Handle duplicate key (race condition)
+      if (insertError.code === '23505') {
+        const { data: retryCustomer } = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email", normalizedEmail)
+          .single();
+        return { customer: retryCustomer, isNew: false };
+      }
+      console.error("Error creating customer:", insertError);
+      return { customer: null, isNew: false, error: insertError.message };
+    }
+    
+    console.log(`🎉 New customer added: ${normalizedEmail}`);
+    return { customer: newCustomer, isNew: true };
+  } catch (err) {
+    console.error("addCustomer error:", err);
+    return { customer: null, isNew: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Get a customer by email
+ */
+export async function getCustomerByEmail(email: string): Promise<Customer | null> {
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  const { data, error } = await supabase
+    .from("customers")
+    .select("*")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+  
+  if (error) {
+    console.error("Error fetching customer:", error);
+    return null;
+  }
+  
+  return data;
+}
+
+/**
+ * Get all customers (for export/marketing)
+ */
+export async function getAllCustomers(options: {
+  marketingOnly?: boolean;
+  limit?: number;
+} = {}): Promise<Customer[]> {
+  let query = supabase
+    .from("customers")
+    .select("*")
+    .order("created_at", { ascending: false });
+  
+  if (options.marketingOnly) {
+    query = query.eq("marketing_opt_in", true).eq("unsubscribed", false);
+  }
+  
+  if (options.limit) {
+    query = query.limit(options.limit);
+  }
+  
+  const { data, error } = await query;
+  
+  if (error) {
+    console.error("Error fetching customers:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+/**
+ * Unsubscribe a customer from marketing
+ */
+export async function unsubscribeCustomer(email: string): Promise<boolean> {
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  const { error } = await supabase
+    .from("customers")
+    .update({
+      unsubscribed: true,
+      unsubscribed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("email", normalizedEmail);
+  
+  if (error) {
+    console.error("Error unsubscribing customer:", error);
+    return false;
+  }
+  
+  console.log(`✅ Customer unsubscribed: ${normalizedEmail}`);
+  return true;
+}
+
+/**
+ * Check if an email is a customer (has purchased)
+ */
+export async function isCustomer(email: string): Promise<boolean> {
+  const customer = await getCustomerByEmail(email);
+  return customer !== null;
+}
 
