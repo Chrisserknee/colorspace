@@ -2066,10 +2066,11 @@ Respond with ONLY the species name.`,
           max_tokens: 20,
           temperature: 0,
         });
-        const validatedSpecies = speciesValidationCheck.choices[0]?.message?.content?.trim().toUpperCase().replace(/[^A-Z ]/g, '');
+        const validatedSpeciesRaw = speciesValidationCheck.choices[0]?.message?.content?.trim().toUpperCase().replace(/[^A-Z ]/g, '');
+        const validatedSpecies = validatedSpeciesRaw || "";
         
         // Use validation result if it's a recognized species
-        if (allValidSpecies.includes(validatedSpecies)) {
+        if (validatedSpecies && allValidSpecies.includes(validatedSpecies)) {
           if (validatedSpecies !== species) {
             console.log(`🔄 Species updated: ${species || 'unknown'} → ${validatedSpecies}`);
             species = validatedSpecies;
