@@ -59,6 +59,99 @@ function getRandomBackgroundColor(): string {
   return PORTRAIT_BACKGROUND_COLORS[Math.floor(Math.random() * PORTRAIT_BACKGROUND_COLORS.length)];
 }
 
+// Large dog breeds that need zoomed-out composition to show full head and body
+const LARGE_DOG_BREEDS = [
+  // Giant breeds
+  "great dane", "irish wolfhound", "scottish deerhound", "english mastiff", "mastiff",
+  "neapolitan mastiff", "tibetan mastiff", "saint bernard", "st. bernard", "st bernard",
+  "newfoundland", "leonberger", "great pyrenees", "pyrenean mountain", "bernese mountain",
+  "greater swiss mountain", "anatolian shepherd", "kangal", "caucasian shepherd",
+  "central asian shepherd", "spanish mastiff", "dogue de bordeaux", "cane corso",
+  "boerboel", "tosa inu", "fila brasileiro", "black russian terrier", "komondor",
+  // Large breeds
+  "german shepherd", "golden retriever", "labrador", "lab retriever", "rottweiler",
+  "doberman", "dobermann", "boxer", "husky", "siberian husky", "alaskan malamute",
+  "akita", "belgian malinois", "belgian shepherd", "collie", "rough collie", "border collie",
+  "german shorthaired pointer", "weimaraner", "vizsla", "rhodesian ridgeback",
+  "bloodhound", "basset hound", "irish setter", "gordon setter", "english setter",
+  "afghan hound", "borzoi", "saluki", "greyhound", "scottish greyhound",
+  "standard poodle", "old english sheepdog", "briard", "bouvier des flandres",
+  "giant schnauzer", "airedale terrier", "chesapeake bay retriever", "flat-coated retriever",
+  "curly-coated retriever", "dutch shepherd", "samoyed", "chow chow",
+  "american bulldog", "english bulldog", "bull mastiff", "bullmastiff",
+  // Medium-large that often get cropped
+  "australian shepherd", "aussie shepherd", "pit bull", "pitbull", "american pit bull",
+  "staffordshire", "american staffordshire", "dalmatian", "springer spaniel",
+  "english springer", "standard schnauzer", "bluetick coonhound", "redbone coonhound",
+  "treeing walker", "plott hound"
+];
+
+// Horses and large animals that need even more zoomed out composition
+const VERY_LARGE_ANIMALS = [
+  "horse", "pony", "mare", "stallion", "foal", "colt", "filly", "gelding",
+  "donkey", "mule", "burro", "miniature horse", "mini horse",
+  "llama", "alpaca", "goat", "sheep", "pig", "potbelly", "pot belly",
+  "cow", "calf", "bull", "steer"
+];
+
+// Helper to check if a breed/description indicates a large dog
+function isLargeBreed(breed: string, petDescription: string): boolean {
+  const breedLower = breed.toLowerCase();
+  const descLower = petDescription.toLowerCase();
+  
+  return LARGE_DOG_BREEDS.some(largeBeed => 
+    breedLower.includes(largeBeed) || descLower.includes(largeBeed)
+  );
+}
+
+// Helper to check if animal is very large (horse, etc.)
+function isVeryLargeAnimal(breed: string, petDescription: string): boolean {
+  const breedLower = breed.toLowerCase();
+  const descLower = petDescription.toLowerCase();
+  
+  return VERY_LARGE_ANIMALS.some(animal => 
+    breedLower.includes(animal) || descLower.includes(animal)
+  );
+}
+
+// Get composition instructions based on pet size
+function getCompositionForSize(breed: string, petDescription: string, species: string): string {
+  const isVeryLarge = isVeryLargeAnimal(breed, petDescription);
+  const isLarge = species === "DOG" && isLargeBreed(breed, petDescription);
+  
+  if (isVeryLarge) {
+    console.log("📐 Detected VERY LARGE animal - using zoomed out composition");
+    return `COMPOSITION - ZOOMED OUT FOR LARGE ANIMAL:
+- FULL BODY visible in frame - do NOT crop the head or body
+- Subject positioned LOWER in frame with generous HEADROOM above
+- Show the COMPLETE head, ears, neck, and upper body clearly
+- Camera positioned FURTHER BACK to capture full majesty
+- Pet appears SMALLER in frame to fit entirely
+- More background visible around the subject
+- Maintain proper proportions - this is a LARGE animal
+- CRITICAL: DO NOT crop top of head or ears`;
+  } else if (isLarge) {
+    console.log("📐 Detected LARGE DOG breed - using zoomed out composition");
+    return `COMPOSITION - ADJUSTED FOR LARGE DOG:
+- Subject positioned LOWER in frame with extra HEADROOM above
+- Show the COMPLETE head including TOP OF EARS - do NOT crop
+- Include neck and chest/shoulder area in frame
+- Camera positioned slightly FURTHER BACK than normal
+- More space above the head to prevent cropping
+- CRITICAL: Entire head and ears must be fully visible - no cropping
+- Large breeds need more vertical space - account for this`;
+  }
+  
+  // Standard composition for smaller pets
+  return `COMPOSITION:
+- Subject LOW and CENTRAL on ornate velvet throne cushion
+- NATURAL body position - comfortable, relaxed, at ease
+- Front paws visible, positioned naturally
+- Cloak draped naturally with realistic fabric folds
+- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
+- Authentic, genuine expression`;
+}
+
 // Rainbow Bridge memorial quotes - randomly selected for each portrait
 const RAINBOW_BRIDGE_QUOTES = [
   "Where there is love, there is never truly goodbye.",
@@ -648,13 +741,7 @@ VIBRANT COLORFUL PALETTE (NOT BROWN):
 - Colors remain VIBRANT and SATURATED - not dulled to brown
 - USE THE SPECIFIED BACKGROUND COLOR from the BACKGROUND section below - NEVER brown
 
-COMPOSITION:
-- Subject LOW and CENTRAL on ornate velvet throne cushion
-- NATURAL body position - comfortable, relaxed, at ease
-- Front paws visible, positioned naturally
-- Cloak draped naturally with realistic fabric folds
-- BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
-- Authentic, genuine expression
+${getCompositionForSize(breed || "", petDescription, species)}
 
 BACKGROUND - SPECIFIC COLOR FOR THIS PORTRAIT:
 - USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
@@ -2942,7 +3029,7 @@ FINISH QUALITY - HEAVILY AGED AND WEATHERED:
 - Nose size relative to face must match - if described as 'small nose', generate a small nose
 - Muzzle length must match - if described as 'short muzzle', generate a short muzzle
 
-FULL BODY PORTRAIT - ZOOMED OUT FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by a BRIGHT POLISHED SILVER CLOAK CLASP at upper chest HOLDING THE CLOAK CLOSED (two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver that catches the light), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
+FULL BODY PORTRAIT - ${isVeryLargeAnimal(detectedBreed, petDescription) ? "EXTRA ZOOMED OUT FOR LARGE ANIMAL" : isLargeBreed(detectedBreed, petDescription) ? "ZOOMED OUT FOR LARGE DOG" : "ZOOMED OUT"} FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. The pet should be clearly seated on the cushion or lying down comfortably. ${isVeryLargeAnimal(detectedBreed, petDescription) ? "CRITICAL: This is a VERY LARGE animal - position MUCH LOWER in frame with GENEROUS headroom. Show FULL BODY with lots of space above head. Camera far back to capture full size." : isLargeBreed(detectedBreed, petDescription) ? "IMPORTANT: This is a LARGE DOG breed - position LOWER in frame with EXTRA headroom above. DO NOT crop the top of the head or ears. Include more vertical space." : ""} Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. CRITICAL: ENTIRE HEAD including TOP OF EARS must be fully visible - NO CROPPING. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by a BRIGHT POLISHED SILVER CLOAK CLASP at upper chest HOLDING THE CLOAK CLOSED (two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver that catches the light), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
 
 RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
 
