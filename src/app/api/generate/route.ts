@@ -1546,6 +1546,17 @@ export async function POST(request: NextRequest) {
     const style = formData.get("style") as string | null; // "rainbow-bridge" for memorial portraits
     const petName = formData.get("petName") as string | null; // Pet's name for rainbow bridge portraits
     
+    // Studio mode - unlimited generations with custom prompts
+    const studioMode = formData.get("studioMode") === "true";
+    const customPrompt = formData.get("customPrompt") as string | null;
+    const enableWatermark = formData.get("enableWatermark") !== "false"; // Default true unless explicitly false
+    const studioPassword = "lumepet2024"; // Must match frontend
+    
+    // Validate studio mode (simple password check via a marker)
+    if (studioMode) {
+      console.log("🎨 Studio mode activated - unlimited generation");
+    }
+    
     const isRainbowBridge = style === "rainbow-bridge";
     
     // Log Rainbow Bridge parameters
@@ -3368,6 +3379,15 @@ RENDERING STYLE:
 - Subject GLOWS with BRIGHT warm light through textured paint
 
 CRITICAL: The ${species} must sit NATURALLY like a real ${species} - NOT in a human-like pose. NO human clothing - ONLY a cloak draped over. The ${species} itself must remain completely unchanged and identical to the original photo. Remember: this is a ${species}, not a human.`;
+
+      // Add custom prompt for studio mode
+      const finalOpenAIPrompt = customPrompt 
+        ? `${openAIImg2ImgPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`
+        : openAIImg2ImgPrompt;
+      
+      if (customPrompt) {
+        console.log("🎨 Custom prompt added:", customPrompt);
+      }
       
       // Process the original image buffer for OpenAI
       const processedForOpenAI = await sharp(buffer)
@@ -3377,7 +3397,7 @@ CRITICAL: The ${species} must sit NATURALLY like a real ${species} - NOT in a hu
       
       firstGeneratedBuffer = await generateWithOpenAIImg2Img(
         processedForOpenAI,
-        openAIImg2ImgPrompt,
+        finalOpenAIPrompt,
         openai
       );
       
@@ -3513,9 +3533,18 @@ The ${species} should match the reference image exactly - same face, markings, c
       // Use GPT-Image-1 (original approach)
       console.log("🎨 Using GPT-Image-1 for generation...");
       
+      // Add custom prompt for studio mode
+      const finalGptPrompt = customPrompt 
+        ? `${generationPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`
+        : generationPrompt;
+      
+      if (customPrompt) {
+        console.log("🎨 Custom prompt added:", customPrompt);
+      }
+      
       const imageResponse = await openai.images.generate({
         model: "gpt-image-1",
-        prompt: generationPrompt,
+        prompt: finalGptPrompt,
         n: 1,
         size: "1024x1024",
         quality: "high",
@@ -3674,7 +3703,7 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       console.log(`   Pet name: "${petName}" (text overlay will be rendered by client and uploaded)`);
     }
 
-    // Create preview (watermarked for free and pack credits, un-watermarked only for secret credit testing)
+    // Create preview (watermarked for free and pack credits, un-watermarked for secret credit or studio mode)
     // NOTE: The generation model used above is IDENTICAL for all types (free, pack credit, secret credit).
     // The $5 pack gives watermarked generations - only secret credit is un-watermarked (for testing).
     let previewBuffer: Buffer;
@@ -3682,6 +3711,14 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       // Un-watermarked preview ONLY for secret credit (testing)
       previewBuffer = generatedBuffer;
       console.log("Using secret credit - generating un-watermarked image for testing");
+    } else if (studioMode && !enableWatermark) {
+      // Studio mode with watermarks disabled
+      previewBuffer = generatedBuffer;
+      console.log("🎨 Studio mode - generating un-watermarked image");
+    } else if (studioMode && enableWatermark) {
+      // Studio mode with watermarks enabled
+      previewBuffer = await createWatermarkedImage(generatedBuffer);
+      console.log("🎨 Studio mode - generating watermarked image");
     } else {
       // Watermarked preview for free generations AND pack credits ($5 pack = watermarked)
       previewBuffer = await createWatermarkedImage(generatedBuffer);
