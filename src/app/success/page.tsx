@@ -671,17 +671,17 @@ function SuccessContent() {
                 <div 
                   className="absolute overflow-hidden"
                   style={selectedCanvas === "16x16" ? {
-                    // 16x16 mockup - wall-mounted canvas (moved down)
-                    top: '13%',
-                    left: '27%',
+                    // 16x16: moved right + down
+                    top: '16%',
+                    left: '30%',
                     width: '46%',
                     height: '50%',
                   } : {
-                    // 12x12 mockup - desk canvas (moved down)
-                    top: '19%',
-                    left: '28%',
-                    width: '38%',
-                    height: '42%',
+                    // 12x12: bigger + moved right + down
+                    top: '22%',
+                    left: '32%',
+                    width: '42%',
+                    height: '46%',
                   }}
                 >
                   {/* The portrait image */}
