@@ -141,8 +141,18 @@ export default function StudioPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Generation failed");
+        // Handle non-JSON error responses (like Vercel's 403 Forbidden)
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Generation failed");
+        } else {
+          const errorText = await response.text();
+          if (response.status === 403) {
+            throw new Error("Access blocked - please try refreshing the page and trying again. If this persists, the image may be too large.");
+          }
+          throw new Error(`Server error (${response.status}): ${errorText.substring(0, 100)}`);
+        }
       }
 
       const data = await response.json();
