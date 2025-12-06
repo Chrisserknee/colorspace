@@ -3861,9 +3861,11 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
 
     // Return watermarked preview - HD version only available after purchase
     // For Rainbow Bridge, also return quote and petName (client renders text overlay and uploads to Supabase)
+    // For Studio mode, also return HD URL for full resolution downloads
     return NextResponse.json({
       imageId,
       previewUrl: previewUrl, // Watermarked version for preview (without text)
+      ...(studioMode ? { hdUrl: hdUrl } : {}), // Include HD URL for studio mode
       ...(isRainbowBridge ? { 
         quote: selectedQuote,
         petName: petName,
