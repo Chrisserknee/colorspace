@@ -1675,18 +1675,19 @@ export async function POST(request: NextRequest) {
 For EACH pet, provide:
 1. SPECIES: [DOG], [CAT], [BIRD], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [RAT], or [EXOTIC]
 2. BREED: Specific breed/variety or "Mixed"
-3. COLORS: Fur color, markings, patterns
-4. FACE: Eye color, distinctive features
-5. SIZE: Small/Medium/Large (relative)
-6. UNIQUE: 2-3 distinctive features
+3. SIZE & BUILD: Size (tiny/small/medium/large/giant) + body type (petite, compact, stocky, athletic, muscular, slender, lanky, fluffy, barrel-chested, leggy, chunky)
+4. COLORS: Fur color, markings, patterns
+5. FACE: Eye color, distinctive features
+6. BODY: Notable proportions (long body, short legs, broad chest, big paws, etc.)
+7. UNIQUE: 2-3 distinctive features that make THIS specific pet recognizable
 
 Format your response EXACTLY like this:
 ---PET 1---
-[SPECIES] BREED: [breed]. COLORS: [colors]. FACE: [features]. SIZE: [size]. UNIQUE: [features].
+[SPECIES] BREED: [breed]. SIZE: [size and build]. BODY: [proportions]. COLORS: [colors]. FACE: [features]. UNIQUE: [features].
 ---PET 2---
-[SPECIES] BREED: [breed]. COLORS: [colors]. FACE: [features]. SIZE: [size]. UNIQUE: [features].
+[SPECIES] BREED: [breed]. SIZE: [size and build]. BODY: [proportions]. COLORS: [colors]. FACE: [features]. UNIQUE: [features].
 ---TOGETHER---
-Brief description of how they look together (e.g., "A regal golden retriever beside a sleek black cat").`,
+Brief description of how they look together, noting their relative sizes (e.g., "A large muscular golden retriever beside a petite sleek black cat").`,
               },
               {
                 type: "image_url",
@@ -1764,12 +1765,14 @@ SPECIES IDENTIFICATION:
 Provide a CONCISE description:
 1. SPECIES & BREED: [SPECIES] - Breed/variety or "Mixed" (confidence: HIGH/MEDIUM/LOW)
 2. AGE: YOUNG or ADULT
-3. COLORS: Be SPECIFIC - list base color, any markings with locations.
-4. FACE: Eye color, eye shape, distinctive facial features
-5. UNIQUE FEATURES: 3-5 things that make THIS pet recognizable
-6. COVERING: Fur/feathers/scales - texture and length
+3. SIZE & STATURE: Describe the pet's overall size (tiny/small/medium/large/giant) AND body build (petite, compact, stocky, athletic, muscular, slender, lanky, fluffy/round, barrel-chested, leggy, chunky)
+4. COLORS: Be SPECIFIC - list base color, any markings with locations.
+5. FACE: Eye color, eye shape, distinctive facial features
+6. BODY PROPORTIONS: Describe notable proportions (long body, short legs, large paws, long neck, broad chest, narrow waist, big ears relative to head, etc.)
+7. UNIQUE FEATURES: 3-5 things that make THIS pet recognizable
+8. COVERING: Fur/feathers/scales - texture and length
 
-Format: "[SPECIES] BREED: [breed]. AGE: [stage]. COLORS: [detailed colors and markings]. FACE: [details]. UNIQUE: [distinctive features]. COVERING: [texture]."`,
+Format: "[SPECIES] BREED: [breed]. AGE: [stage]. SIZE: [size and stature]. BODY: [proportions]. COLORS: [detailed colors and markings]. FACE: [details]. UNIQUE: [distinctive features]. COVERING: [texture]."`,
             },
             {
               type: "image_url",
@@ -2585,6 +2588,16 @@ IDENTITY REQUIREMENTS:
 - If this pet has any asymmetrical features, they MUST be preserved
 - The portrait should capture what makes THIS pet different from every other pet of the same breed
 
+BODY SIZE & STATURE PRESERVATION - CRITICAL:
+- Match the pet's EXACT body type: if stocky, show stocky; if slender, show slender
+- Preserve the pet's SIZE accurately: a tiny Chihuahua should look tiny, a massive Great Dane should look imposing
+- Maintain correct proportions: long-bodied pets stay long, short-legged pets have short legs
+- If the pet is chunky/fluffy, show that roundness; if lean/athletic, show that musculature
+- Barrel-chested pets should have broad chests; narrow pets should appear streamlined
+- Leg length relative to body must be accurate - corgis have short legs, greyhounds have long legs
+- Paw size relative to body should match - some pets have notably large or small paws
+- The body silhouette from any angle should be recognizable as THIS specific pet
+
 WHAT CREATES INSTANT RECOGNITION:
 - Correct skull shape and snout proportions (these vary significantly even within breeds)
 - Exact eye shape, size, spacing, and color
@@ -2592,6 +2605,7 @@ WHAT CREATES INSTANT RECOGNITION:
 - Unique markings in their exact locations
 - The pet's characteristic expression
 - Correct coat color with accurate shading and patterns
+- Accurate body size, build, and stature (stocky vs slender, compact vs lanky)
 
 === CRITICAL: FULLY ANIMAL - NO HUMAN FEATURES ===
 - The ${species} must be 100% ANIMAL - NOT a human-animal hybrid
@@ -2614,6 +2628,16 @@ The generated pet MUST match the description EXACTLY:
 - Every marking, spot, patch, or stripe described MUST appear in the generated image in the EXACT same location
 - If asymmetrical markings are described, they MUST be asymmetrical in the generated image
 - Eye spacing, nose size, muzzle length must match the description precisely
+
+BODY SIZE & BUILD - MATCH EXACTLY:
+- If described as 'stocky' or 'compact', generate a stocky/compact body - NOT slender
+- If described as 'slender' or 'athletic', generate a lean body - NOT chunky
+- If described as 'large' or 'giant', the pet should appear imposingly large
+- If described as 'tiny' or 'petite', the pet should appear delicately small
+- Long-bodied pets (like Dachshunds, Corgis) must have elongated bodies
+- Short-legged breeds must have visibly short legs relative to body
+- Barrel-chested pets must show broad, deep chests
+- If described as 'fluffy' or 'round', show that fullness in the silhouette
 
 This ${species} portrait must look like THIS EXACT ${species}. ${notSpecies}
 
