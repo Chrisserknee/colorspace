@@ -15,7 +15,7 @@ interface HeroPortrait {
 }
 
 const heroPortraits: HeroPortrait[] = [
-  { id: "gracie", title: "Gracie", image: "/samples/Gracie.png" },
+  { id: "ophelia", title: "Ophelia", image: "/samples/ophelia.png" },
   { id: "charley-lily", title: "Charley & Lily", image: "/samples/charley&Lily2.png" },
 ];
 
@@ -183,7 +183,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
 
         {/* Sample portraits */}
         <div className="flex justify-center items-end gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
-          {/* First Portrait - Gracie (Tabby Cat) */}
+          {/* First Portrait - Ophelia (Cat) */}
           <div className="flex flex-col items-center">
             <div 
               className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
@@ -245,8 +245,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       }}
                     >
                       <img 
-                        src="/samples/Gracie.png" 
-                        alt="Gracie - Royal Tabby Cat Portrait"
+                        src="/samples/ophelia.png" 
+                        alt="Ophelia - Royal Cat Portrait"
                         className="w-full h-full object-cover"
                       />
                       {/* Hover overlay */}
@@ -270,7 +270,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 letterSpacing: '0.05em'
               }}
             >
-              Gracie
+              Ophelia
             </p>
           </div>
 
