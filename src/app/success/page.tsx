@@ -667,11 +667,11 @@ function SuccessContent() {
                     zIndex: 1,
                     ...(selectedCanvas === "16x16" ? {
                       // 16x16: EXACT pixel coordinates from Photoshop
-                      // Image: 1024x1024, Canvas: (281,184) to (793,688)
+                      // Image: 1024x1024, Canvas: (281,184) to (792,690)
                       top: '18%',
                       left: '27.4%',
                       width: '50%',
-                      height: '49.2%',
+                      height: '49.4%',
                     } : {
                       // 12x12: needs exact coordinates too
                       top: '24%',
