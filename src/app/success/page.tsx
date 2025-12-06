@@ -666,13 +666,14 @@ function SuccessContent() {
                   style={{
                     zIndex: 1,
                     ...(selectedCanvas === "16x16" ? {
-                      // 16x16: smaller + centered
-                      top: '17%',
-                      left: '34%',
-                      width: '42%',
-                      height: '46%',
+                      // 16x16: EXACT pixel coordinates from Photoshop
+                      // Image: 1024x1024, Canvas: (281,184) to (793,688)
+                      top: '18%',
+                      left: '27.4%',
+                      width: '50%',
+                      height: '49.2%',
                     } : {
-                      // 12x12: smaller + centered
+                      // 12x12: needs exact coordinates too
                       top: '24%',
                       left: '35%',
                       width: '38%',
