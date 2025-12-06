@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 
 // Password for access (you can change this)
-const STUDIO_PASSWORD = "lumepet2024";
+const STUDIO_PASSWORD = "LumePetLover1325519*";
 
 interface GeneratedImage {
   id: string;
