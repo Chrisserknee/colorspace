@@ -429,6 +429,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
           } catch (err) {
             captureError("visibility_recovery", err, { stage, hiddenDuration });
           }
+        }
       }
     };
     
