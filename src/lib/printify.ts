@@ -321,7 +321,7 @@ export async function getOrderStatus(orderId: string): Promise<PrintifyOrderResp
  * 1. Upload image to Printify
  * 2. Create product with image
  * 3. Create order with shipping address
- * 4. Send to production
+ * 4. Optionally send to production (default: NO - orders stay pending for manual review)
  */
 export async function createFullCanvasOrder(
   imageUrl: string,
@@ -330,8 +330,9 @@ export async function createFullCanvasOrder(
   options?: {
     petName?: string;
     externalId?: string;
+    autoSendToProduction?: boolean; // Default: false - orders stay pending for manual approval
   }
-): Promise<{ orderId: string; productId: string }> {
+): Promise<{ orderId: string; productId: string; status: string }> {
   console.log(`🖼️ Starting canvas order: ${size} to ${shippingAddress.city}, ${shippingAddress.country}`);
   
   const config = CANVAS_PRODUCTS[size];
@@ -351,14 +352,22 @@ export async function createFullCanvasOrder(
     options?.externalId
   );
   
-  // Step 4: Send to production
-  await sendOrderToProduction(order.id);
-  
-  console.log(`🎉 Canvas order complete! Order ID: ${order.id}`);
+  // Step 4: Optionally send to production
+  // Default is FALSE - orders stay PENDING for manual review in Printify dashboard
+  let status = 'pending';
+  if (options?.autoSendToProduction) {
+    await sendOrderToProduction(order.id);
+    status = 'production';
+    console.log(`🎉 Canvas order complete and sent to production! Order ID: ${order.id}`);
+  } else {
+    console.log(`🎉 Canvas order created (PENDING - awaiting manual approval in Printify)! Order ID: ${order.id}`);
+    console.log(`📋 To approve: Go to Printify dashboard → Orders → Find order ${order.id} → Send to production`);
+  }
   
   return {
     orderId: order.id,
     productId: productId,
+    status: status,
   };
 }
 

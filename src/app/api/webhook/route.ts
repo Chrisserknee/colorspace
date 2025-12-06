@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
                   stripe_session_id: session.id,
                   printify_order_id: printifyResult.orderId,
                   printify_product_id: printifyResult.productId,
-                  status: 'production',
+                  status: printifyResult.status, // 'pending' until manually approved in Printify
                   shipping_address: shippingAddress,
                   amount_paid: session.amount_total,
                 });
