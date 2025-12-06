@@ -181,7 +181,19 @@ export async function POST(request: NextRequest) {
           const canvasImageId = session.metadata.imageId;
           const canvasSize = session.metadata.canvasSize as CanvasSize;
           // shipping_details is available when shipping_address_collection is enabled
-          const shippingDetails = (session as unknown as { shipping_details?: Stripe.Checkout.Session.ShippingDetails }).shipping_details;
+          const shippingDetails = (session as unknown as { 
+            shipping_details?: { 
+              name?: string; 
+              address?: { 
+                line1?: string; 
+                line2?: string; 
+                city?: string; 
+                state?: string; 
+                postal_code?: string; 
+                country?: string; 
+              }; 
+            }; 
+          }).shipping_details;
           
           console.log(`🖼️ Canvas order received: ${canvasSize} for image ${canvasImageId}`);
           
