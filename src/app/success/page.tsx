@@ -671,17 +671,19 @@ function SuccessContent() {
                 <div 
                   className="absolute overflow-hidden"
                   style={selectedCanvas === "16x16" ? {
-                    // 16x16 mockup positioning - canvas face only (excludes 3D left edge)
-                    top: '9.5%',
-                    left: '28%',
-                    width: '44%',
-                    height: '47%',
+                    // 16x16 mockup - wall-mounted canvas
+                    // Canvas face: starts after 3D left edge
+                    top: '7.5%',
+                    left: '25%',
+                    width: '47%',
+                    height: '51%',
                   } : {
-                    // 12x12 mockup positioning - canvas face only (excludes 3D left edge)
-                    top: '14.2%',
-                    left: '26.5%',
-                    width: '39%',
-                    height: '41%',
+                    // 12x12 mockup - desk canvas  
+                    // Canvas face: starts after 3D left edge
+                    top: '13%',
+                    left: '22%',
+                    width: '40%',
+                    height: '44%',
                   }}
                 >
                   {/* The portrait image */}
