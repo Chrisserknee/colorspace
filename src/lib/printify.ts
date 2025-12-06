@@ -19,14 +19,14 @@ export const CANVAS_PRODUCTS = {
     printProviderId: 29, // Common print provider for canvas
     variantId: 17348, // 12x12 variant (check Printify catalog for exact ID)
     size: '12"x12"',
-    priceInCents: 9900,
+    priceInCents: 6900,
   },
   "16x16": {
     blueprintId: 3,
     printProviderId: 29,
     variantId: 17349, // 16x16 variant (check Printify catalog for exact ID)
     size: '16"x16"',
-    priceInCents: 15000,
+    priceInCents: 12900,
   },
 } as const;
 
