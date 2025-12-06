@@ -1008,7 +1008,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     trackTikTokAddToCart({
       content_id: result?.imageId,
       content_name: "Pet Portrait Download",
-      value: CONFIG.PORTRAIT_PRICE_AMOUNT / 100, // Convert cents to dollars
+      value: CONFIG.PRICE_AMOUNT / 100, // Convert cents to dollars
     });
     
     if (!result) {
@@ -1019,7 +1019,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     // TikTok Pixel: Track InitiateCheckout
     trackTikTokInitiateCheckout({
       content_id: result.imageId,
-      value: CONFIG.PORTRAIT_PRICE_AMOUNT / 100,
+      value: CONFIG.PRICE_AMOUNT / 100,
     });
     
     // Go directly to Stripe checkout - email will be collected by Stripe

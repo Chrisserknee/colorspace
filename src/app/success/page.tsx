@@ -299,7 +299,7 @@ function SuccessContent() {
       contentName = "Canvas Print";
     } else if (imageId) {
       // Standard portrait purchase
-      purchaseValue = CONFIG.PORTRAIT_PRICE_AMOUNT / 100;
+      purchaseValue = CONFIG.PRICE_AMOUNT / 100;
       contentName = "Pet Portrait Download";
     }
     
