@@ -1,9 +1,8 @@
 // Configuration constants
 export const CONFIG = {
   // Price for HD portrait in dollars
-  // TESTING: $0.50 for testing - CHANGE BACK TO $19.99 FOR PRODUCTION!
-  PRICE_DISPLAY: "$0.50",
-  PRICE_AMOUNT: 50, // $0.50 in cents - TESTING
+  PRICE_DISPLAY: "$20",
+  PRICE_AMOUNT: 2000, // $20 in cents
   
   // Pack pricing - Tiered options
   // Starter Pack: $1 for 1 portrait
