@@ -884,11 +884,28 @@ BREED CONTEXT: ${breed || "Unknown breed - analyze visible characteristics"}
 *** BREED-SPECIFIC FACIAL TEMPLATES (use as reference) ***
 
 FOR CATS - Common breed facial structures:
-- BRITISH SHORTHAIR / CHARTREUX: Very FLAT, WIDE face. Round head. SHORT muzzle (almost flat). WIDE-SET eyes. Full, puffy cheeks. Broad skull. "Smiling" expression.
-- RUSSIAN BLUE: Wedge-shaped head. Medium muzzle. LARGE ears set wide. Almond eyes. More angular than British Shorthair.
-- PERSIAN: Extremely flat face (brachycephalic). Very short muzzle. Round eyes. Small ears.
-- SIAMESE: Long, wedge-shaped head. Long muzzle. Large pointed ears. Almond eyes angled upward.
-- MAINE COON: Square muzzle. Large head. High cheekbones. Large tufted ears. Wide-set eyes.
+
+- MAINE COON (CRITICAL - very distinctive breed):
+  * EARS: VERY TALL, LARGE, pointed ears - often 40%+ of head height. Lynx tips (tufts at ear tips) are ESSENTIAL. Ears set HIGH and WIDE on head. Ear furnishings (hair inside ears).
+  * HEAD: Large, slightly longer than wide. Strong bone structure. High cheekbones.
+  * MUZZLE: SQUARE, strong, medium length - distinctive "box" shape when viewed from front. NOT pointed like Siamese.
+  * EYES: Large, slightly oval, wide-set. Often green, gold, or copper. Expressive, alert look.
+  * CHIN: Strong, in line with nose and upper lip.
+  * COAT: Long, flowing fur. Distinctive "ruff" around neck like a lion's mane. Fluffy chest.
+  * FOR KITTENS: Even larger ears relative to head, rounder face, larger eyes.
+
+- BRITISH SHORTHAIR / CHARTREUX: Very FLAT, WIDE face. Round head. SHORT muzzle (almost flat). WIDE-SET eyes. Full, puffy cheeks. Broad skull. "Smiling" expression. Small to medium ears.
+
+- RUSSIAN BLUE: Wedge-shaped head. Medium muzzle. LARGE ears set wide. Vivid green almond eyes. More angular than British Shorthair. Silvery-blue coat.
+
+- PERSIAN: Extremely flat face (brachycephalic). Very short/flat muzzle. Large round eyes. Small ears set low and wide. Long flowing coat.
+
+- SIAMESE: Long, wedge-shaped head. Long pointed muzzle. VERY LARGE pointed ears set low. Almond eyes angled upward. Blue eyes. Sleek body.
+
+- RAGDOLL: Semi-long fur. Blue eyes. Medium-large ears with rounded tips. Docile expression.
+
+- NORWEGIAN FOREST CAT: Similar to Maine Coon but with more triangular head. Almond eyes. Large tufted ears.
+
 - DOMESTIC SHORTHAIR: Variable - analyze individual features carefully.
 
 FOR DOGS - Common breed facial structures:
@@ -2495,6 +2512,45 @@ This is a ${isBlackCat ? "BLACK CAT" : "DARK-COATED PET"} - CRITICAL: Preserve t
 - Use contrast with lighter backgrounds/cloaks to make the black fur stand out
 - DO NOT lighten or brighten the fur color - keep it DEEP and RICH BLACK/DARK` : "";
     
+    // Detect Maine Coon or similar large-eared cat breeds
+    const isMoonCoonOrSimilar = species === "CAT" && (
+      petDescription.toLowerCase().includes("maine coon") ||
+      petDescription.toLowerCase().includes("maine-coon") ||
+      petDescription.toLowerCase().includes("norwegian forest") ||
+      petDescription.toLowerCase().includes("lynx tip") ||
+      petDescription.toLowerCase().includes("tufted ear") ||
+      petDescription.toLowerCase().includes("ear tuft") ||
+      (petDescription.toLowerCase().includes("large ear") && petDescription.toLowerCase().includes("tall ear"))
+    );
+    
+    // Maine Coon / Norwegian Forest Cat treatment - preserve distinctive features
+    const maineCoonTreatment = isMoonCoonOrSimilar ? `
+=== MAINE COON / NORWEGIAN FOREST CAT - CRITICAL BREED FEATURES ===
+This appears to be a Maine Coon or similar large-eared breed - CRITICAL: Preserve these distinctive features:
+
+*** EARS - THE MOST IMPORTANT FEATURE ***
+- VERY TALL, LARGE ears - they should be PROMINENTLY TALL, roughly 40% of head height or more
+- Ears set HIGH on the head
+- LYNX TIPS (tufts at the ear tips) - these hair tufts at ear points are ESSENTIAL
+- Ear furnishings - long hair growing from inside the ears
+- Ears are POINTED, not rounded
+- If this is a kitten, ears appear even LARGER relative to head
+
+*** HEAD AND FACE ***
+- Large, strong head with high cheekbones
+- SQUARE MUZZLE - distinctive "box" shape when viewed from front
+- NOT a pointed muzzle like Siamese
+- Strong chin in line with nose
+- "M" marking on forehead if tabby
+
+*** COAT ***
+- Long, flowing fur (medium-long to long)
+- Distinctive "ruff" or mane around neck
+- Fluffy chest
+- Bushy tail
+
+DO NOT generate a generic cat face. The TALL EARS with LYNX TIPS are what make Maine Coons instantly recognizable.` : "";
+    
     // Age preservation instructions
     let agePreservationInstructions = "";
     if (ageStage === "PUPPY" || ageStage === "KITTEN") {
@@ -2507,7 +2563,8 @@ This is a ${ageStage} - preserve their youthful, baby features EXACTLY:
 - Keep the playful, innocent expression characteristic of young animals
 - DO NOT age them up - maintain their exact puppy/kitten stage
 - The portrait should reflect the animal exactly as it appears - a ${ageStage}, not an adult
-- Preserve all youthful characteristics: rounder head, larger eyes, smaller muzzle, softer features`;
+- Preserve all youthful characteristics: rounder head, larger eyes, smaller muzzle, softer features
+${isMoonCoonOrSimilar ? "- For Maine Coon kittens: Ears are EVEN LARGER relative to head - preserve this dramatic ear size" : ""}`;
     }
     
     // Build facial structure section if analysis was successful
@@ -2658,12 +2715,17 @@ EYES - EXTREMELY IMPORTANT:
 - The exact EYE COLOR must match (golden-yellow, amber, green, blue, copper)
 - Eye SIZE relative to face must be accurate
 
-EARS:
-- LARGE ears = make them LARGE
+EARS - CRITICAL FOR CATS:
+- LARGE ears = make them LARGE - do not shrink them
 - SMALL ears = make them SMALL  
+- TALL ears = make them TALL (especially Maine Coons - their ears are VERY tall)
 - WIDE-SET ears = position them FAR apart
 - HIGH-SET ears = position them HIGH on the head
 - Ear SHAPE (pointed, rounded, folded) must match exactly
+- LYNX TIPS (ear tufts) = if described, these are ESSENTIAL - show hair tufts at ear tips
+- Ear FURNISHINGS = if described, show long hair inside ears
+- For cats: ear size relative to head is CRITICAL for breed recognition
+- Maine Coons, Norwegian Forest Cats have DRAMATICALLY TALL ears - do not make them average size
 
 CHEEKS & JAWLINE:
 - FULL cheeks = show full, rounded cheeks
@@ -2701,7 +2763,7 @@ ${compositionInstructions}
 ${poseInstructions}
 ${facialStructureSection}
 === THE ${species} - DETAILED DESCRIPTION ===
-${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${agePreservationInstructions}
+${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
 
 === CRITICAL: EXACT MATCHING ===
 The generated pet MUST match the description EXACTLY:
