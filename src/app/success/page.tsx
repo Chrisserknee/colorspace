@@ -655,36 +655,31 @@ function SuccessContent() {
           </div>
 
           {/* Canvas Preview Mockup - Room Scene (changes based on selected size) */}
+          {/* Portrait is rendered BEHIND the mockup - mockup has transparent canvas area */}
           <div className="relative mx-auto mb-6 rounded-lg overflow-hidden" style={{ maxWidth: '400px' }}>
-            {/* Room mockup background */}
             <div className="relative w-full" style={{ aspectRatio: '1/1' }}>
-              <Image
-                src={selectedCanvas === "16x16" ? "/samples/16x16.png" : "/samples/12x12.png"}
-                alt="Room mockup"
-                fill
-                className="object-cover"
-                unoptimized
-              />
               
-              {/* Portrait overlay - precisely positioned on the canvas FACE (not edge) */}
+              {/* Portrait layer - BEHIND the mockup (z-index: 1) */}
               {displayImageUrl && (
                 <div 
                   className="absolute overflow-hidden"
-                  style={selectedCanvas === "16x16" ? {
-                    // 16x16: moved down + smaller
-                    top: '19%',
-                    left: '30%',
-                    width: '43%',
-                    height: '47%',
-                  } : {
-                    // 12x12: lowered more
-                    top: '27%',
-                    left: '29%',
-                    width: '42%',
-                    height: '46%',
+                  style={{
+                    zIndex: 1,
+                    ...(selectedCanvas === "16x16" ? {
+                      // 16x16 positioning
+                      top: '8%',
+                      left: '24%',
+                      width: '50%',
+                      height: '54%',
+                    } : {
+                      // 12x12 positioning
+                      top: '14%',
+                      left: '20%',
+                      width: '46%',
+                      height: '50%',
+                    })
                   }}
                 >
-                  {/* The portrait image */}
                   <Image
                     src={displayImageUrl}
                     alt="Your portrait on canvas"
@@ -692,23 +687,27 @@ function SuccessContent() {
                     className="object-cover"
                     unoptimized
                   />
-                  {/* Canvas texture overlay for realism */}
+                  {/* Canvas texture overlay */}
                   <div 
                     className="absolute inset-0 pointer-events-none"
                     style={{ 
-                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px)',
+                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)',
                       mixBlendMode: 'multiply',
-                    }}
-                  />
-                  {/* Subtle lighting for depth */}
-                  <div 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ 
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, rgba(0,0,0,0.08) 100%)',
                     }}
                   />
                 </div>
               )}
+              
+              {/* Room mockup layer - ON TOP (z-index: 2) */}
+              {/* The canvas area should be transparent in the PNG */}
+              <Image
+                src={selectedCanvas === "16x16" ? "/samples/16x16.png" : "/samples/12x12.png"}
+                alt="Room mockup"
+                fill
+                className="object-cover"
+                style={{ zIndex: 2 }}
+                unoptimized
+              />
             </div>
             
             {/* Caption */}
