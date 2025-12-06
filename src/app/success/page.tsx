@@ -654,42 +654,52 @@ function SuccessContent() {
             </p>
           </div>
 
-          {/* Canvas Preview Mockup */}
-          <div className="relative mx-auto mb-6" style={{ maxWidth: '280px' }}>
-            {/* Wall background effect */}
-            <div 
-              className="absolute inset-0 rounded-lg"
-              style={{ 
-                background: 'linear-gradient(180deg, #2A2520 0%, #1A1815 100%)',
-                boxShadow: 'inset 0 0 60px rgba(0,0,0,0.5)',
-              }}
-            />
-            
-            {/* Canvas frame */}
-            <div className="relative p-6">
-              <div 
-                className="relative aspect-square rounded overflow-hidden"
-                style={{ 
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.5), 0 0 0 4px rgba(60, 50, 40, 0.8), 0 0 0 8px rgba(40, 35, 30, 0.6)',
-                }}
-              >
-                {displayImageUrl && (
+          {/* Canvas Preview Mockup - Room Scene */}
+          <div className="relative mx-auto mb-6 rounded-lg overflow-hidden" style={{ maxWidth: '400px' }}>
+            {/* Room mockup background */}
+            <div className="relative w-full" style={{ aspectRatio: '1/1' }}>
+              <Image
+                src="/samples/12x12.png"
+                alt="Room mockup"
+                fill
+                className="object-cover"
+                unoptimized
+              />
+              
+              {/* Portrait overlay - positioned over the blank canvas in the mockup */}
+              {displayImageUrl && (
+                <div 
+                  className="absolute"
+                  style={{ 
+                    top: '14%',
+                    left: '26%',
+                    width: '42%',
+                    height: '42%',
+                  }}
+                >
                   <Image
                     src={displayImageUrl}
-                    alt="Canvas preview"
+                    alt="Your portrait on canvas"
                     fill
                     className="object-cover"
+                    style={{
+                      boxShadow: '2px 4px 12px rgba(0,0,0,0.4)',
+                    }}
                     unoptimized
                   />
-                )}
-                {/* Canvas texture overlay */}
-                <div 
-                  className="absolute inset-0 pointer-events-none"
-                  style={{ 
-                    background: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.02) 1px, rgba(255,255,255,0.02) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.02) 1px, rgba(255,255,255,0.02) 2px)',
-                  }}
-                />
-              </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Caption */}
+            <div 
+              className="absolute bottom-0 left-0 right-0 py-2 px-3 text-center text-xs"
+              style={{ 
+                background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                color: '#B8B2A8',
+              }}
+            >
+              See how it looks in your home
             </div>
           </div>
 
