@@ -7,6 +7,69 @@ import Image from "next/image";
 const STUDIO_PASSWORD = "LumePetLover1325519*";
 
 const MAX_QUEUE_SIZE = 10;
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB max to stay under Vercel limits
+const MAX_DIMENSION = 2048; // Max width/height
+
+// Compress and resize image before upload
+async function compressImage(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    // If file is small enough and is JPEG, use as-is
+    if (file.size < MAX_IMAGE_SIZE && file.type === "image/jpeg") {
+      resolve(file);
+      return;
+    }
+
+    const img = document.createElement("img");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    img.onload = () => {
+      let { width, height } = img;
+
+      // Scale down if too large
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        const scale = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      if (!ctx) {
+        reject(new Error("Could not get canvas context"));
+        return;
+      }
+
+      // Draw image (this also removes any black bars/letterboxing)
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Convert to JPEG with compression
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Could not compress image"));
+            return;
+          }
+          
+          const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), {
+            type: "image/jpeg",
+          });
+          
+          console.log(`📸 Compressed: ${(file.size / 1024).toFixed(0)}KB → ${(compressedFile.size / 1024).toFixed(0)}KB`);
+          resolve(compressedFile);
+        },
+        "image/jpeg",
+        0.85 // Quality
+      );
+    };
+
+    img.onerror = () => reject(new Error("Could not load image"));
+    img.src = URL.createObjectURL(file);
+  });
+}
 
 interface QueuedPhoto {
   id: string;
@@ -61,13 +124,13 @@ export default function StudioPage() {
   };
 
   // Handle multiple image uploads
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    addFilesToQueue(files);
+    await addFilesToQueue(files);
   }, []);
 
-  // Add files to queue
-  const addFilesToQueue = (files: File[]) => {
+  // Add files to queue (with compression)
+  const addFilesToQueue = async (files: File[]) => {
     const remainingSlots = MAX_QUEUE_SIZE - photoQueue.length;
     const filesToAdd = files.slice(0, remainingSlots);
     
@@ -75,7 +138,19 @@ export default function StudioPage() {
       setError(`Only ${remainingSlots} slots available. Added first ${remainingSlots} photos.`);
     }
     
-    const newPhotos: QueuedPhoto[] = filesToAdd.map((file) => ({
+    // Compress all files in parallel
+    const compressedFiles = await Promise.all(
+      filesToAdd.map(async (file) => {
+        try {
+          return await compressImage(file);
+        } catch (e) {
+          console.error("Compression failed, using original:", e);
+          return file; // Use original if compression fails
+        }
+      })
+    );
+    
+    const newPhotos: QueuedPhoto[] = compressedFiles.map((file) => ({
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       file,
       preview: URL.createObjectURL(file),
@@ -87,10 +162,10 @@ export default function StudioPage() {
   };
 
   // Handle drag and drop
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
-    addFilesToQueue(files);
+    await addFilesToQueue(files);
   }, [photoQueue.length]);
 
   // Update pet name for queued photo
