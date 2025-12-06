@@ -1,9 +1,8 @@
 // Configuration constants
 export const CONFIG = {
   // Price for HD portrait in dollars
-  // TESTING: Set to $0.50 for testing - CHANGE BACK TO $19.99 FOR PRODUCTION!
-  PRICE_DISPLAY: "$0.50",
-  PRICE_AMOUNT: 50, // $0.50 in cents - TESTING
+  PRICE_DISPLAY: "$19.99",
+  PRICE_AMOUNT: 1999, // $19.99 in cents
   
   // Pack pricing - Tiered options
   // Starter Pack: $1 for 1 portrait
@@ -40,15 +39,14 @@ export const CONFIG = {
   PACK_PRODUCT_DESCRIPTION: "Watermarked portraits (does not include the full HD version)",
   
   // Canvas Print pricing (Printify integration)
-  // TESTING: Set to $0.50 for testing - CHANGE BACK FOR PRODUCTION!
-  CANVAS_12X12_PRICE_DISPLAY: "$0.50",
-  CANVAS_12X12_PRICE_AMOUNT: 50, // $0.50 in cents - TESTING
+  CANVAS_12X12_PRICE_DISPLAY: "$99",
+  CANVAS_12X12_PRICE_AMOUNT: 9900, // $99 in cents
   CANVAS_12X12_SIZE: '12"x12"',
   CANVAS_12X12_NAME: "Gallery Canvas - 12×12",
   CANVAS_12X12_DESCRIPTION: "Museum-quality canvas print, 12×12 inches, ready to hang",
   
-  CANVAS_16X16_PRICE_DISPLAY: "$0.50",
-  CANVAS_16X16_PRICE_AMOUNT: 50, // $0.50 in cents - TESTING
+  CANVAS_16X16_PRICE_DISPLAY: "$150",
+  CANVAS_16X16_PRICE_AMOUNT: 15000, // $150 in cents
   CANVAS_16X16_SIZE: '16"x16"',
   CANVAS_16X16_NAME: "Premium Canvas - 16×16",
   CANVAS_16X16_DESCRIPTION: "Large museum-quality canvas print, 16×16 inches, ready to hang",
