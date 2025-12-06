@@ -10,7 +10,7 @@ Transform your beloved pet into a stunning Renaissance oil painting masterpiece 
 - **Watermarked Previews**: Generate previews for free; purchase to unlock HD, watermark-free versions
 - **Stripe Integration**: Secure payment processing with Stripe Checkout
 - **Mobile-First Design**: Beautiful, responsive design inspired by premium web experiences
-- **Elegant UI**: Fable-inspired design with soft gradients, ornate frames, and smooth animations
+- **Elegant UI**: warm-inspired design with soft gradients, ornate frames, and smooth animations
 
 ## 🚀 Getting Started
 
