@@ -881,6 +881,25 @@ async function analyzeFacialStructure(
 
 BREED CONTEXT: ${breed || "Unknown breed - analyze visible characteristics"}
 
+*** BREED-SPECIFIC FACIAL TEMPLATES (use as reference) ***
+
+FOR CATS - Common breed facial structures:
+- BRITISH SHORTHAIR / CHARTREUX: Very FLAT, WIDE face. Round head. SHORT muzzle (almost flat). WIDE-SET eyes. Full, puffy cheeks. Broad skull. "Smiling" expression.
+- RUSSIAN BLUE: Wedge-shaped head. Medium muzzle. LARGE ears set wide. Almond eyes. More angular than British Shorthair.
+- PERSIAN: Extremely flat face (brachycephalic). Very short muzzle. Round eyes. Small ears.
+- SIAMESE: Long, wedge-shaped head. Long muzzle. Large pointed ears. Almond eyes angled upward.
+- MAINE COON: Square muzzle. Large head. High cheekbones. Large tufted ears. Wide-set eyes.
+- DOMESTIC SHORTHAIR: Variable - analyze individual features carefully.
+
+FOR DOGS - Common breed facial structures:
+- PUG/BULLDOG: Brachycephalic. Very flat face. Wrinkled. Large round eyes.
+- LABRADOR: Square muzzle. Medium proportions. Friendly expression.
+- GERMAN SHEPHERD: Long muzzle. Wedge head. Alert ears. Intelligent expression.
+- GOLDEN RETRIEVER: Medium muzzle. Soft expression. Gentle features.
+- HUSKY: Wolf-like. Almond eyes. Erect triangular ears.
+
+*** ANALYZE THIS SPECIFIC PET ***
+
 Provide a DETAILED facial structure analysis:
 
 === SKULL AND HEAD STRUCTURE ===
@@ -2062,13 +2081,13 @@ Respond with ONLY the species name.`,
     const detectedBreed = breedMatch ? breedMatch[1].trim() : "";
     console.log("Detected breed:", detectedBreed || "Unknown");
 
-    // Step 1.5: Perform detailed facial structure analysis (OPTIONAL - disabled by default for speed)
-    // Enable with ENABLE_FACIAL_ANALYSIS=true if needed for complex breeds
+    // Step 1.5: Perform detailed facial structure analysis (ENABLED by default for identity accuracy)
+    // Disable with DISABLE_FACIAL_ANALYSIS=true if speed is more important than accuracy
     let facialStructureAnalysis = "";
-    const enableFacialAnalysis = process.env.ENABLE_FACIAL_ANALYSIS === "true";
+    const disableFacialAnalysis = process.env.DISABLE_FACIAL_ANALYSIS === "true";
     
-    if (enableFacialAnalysis) {
-      console.log("🔬 Performing detailed facial structure analysis (enabled via env)...");
+    if (!disableFacialAnalysis) {
+      console.log("🔬 Performing detailed facial structure analysis for identity accuracy...");
       try {
         facialStructureAnalysis = await analyzeFacialStructure(openai, base64Image, species, detectedBreed);
         console.log("✅ Facial structure analysis complete");
@@ -2076,7 +2095,7 @@ Respond with ONLY the species name.`,
         console.error("⚠️ Facial structure analysis failed, continuing without it:", facialError);
       }
     } else {
-      console.log("⏭️ Skipping facial structure analysis (disabled for speed)");
+      console.log("⏭️ Skipping facial structure analysis (disabled via env)");
     }
 
     // Randomize elements for unique paintings - SIGNIFICANTLY EXPANDED for maximum variety
@@ -2431,19 +2450,26 @@ This is a WHITE CAT - apply angelic luminous aesthetic:
 - More luminous than other pets - special angelic treatment` : "";
 
     // Add GREY cat color preservation treatment - CRITICAL to prevent grey becoming white
+    // Also includes breed-specific facial structure for grey cat breeds
     const greyCatTreatment = isGreyCat ? `
-=== GREY CAT - CRITICAL COLOR PRESERVATION ===
+=== GREY CAT - CRITICAL COLOR AND STRUCTURE PRESERVATION ===
 This is a GREY/GRAY CAT - CRITICAL: Preserve the EXACT GREY fur color:
 - The cat MUST remain GREY/GRAY - NEVER white, cream, beige, or golden
 - Preserve the COOL GREY/BLUE-GREY fur tone exactly as in the reference
 - This cat has GREY fur - NOT white, NOT cream, NOT golden, NOT warm-toned
-- Russian Blue / Chartreux / British Shorthair type grey coloring
 - Maintain the distinctive COOL GREY/SILVER/SLATE tone throughout
 - The grey color is ESSENTIAL to this cat's identity - preserve it exactly
 - DO NOT warm up the colors - keep the COOL GREY tones
 - DO NOT brighten to white or cream - maintain GREY
 - Any highlights should be silvery-grey, NOT warm or golden
-- The cat's fur should read as DEFINITIVELY GREY in the final image` : "";
+- The cat's fur should read as DEFINITIVELY GREY in the final image
+
+*** GREY CAT BREED FACIAL STRUCTURE ***
+Grey cats are often Chartreux, British Shorthair, Russian Blue, or Korat breeds. Pay attention to:
+- CHARTREUX / BRITISH SHORTHAIR: FLAT, WIDE face. Very short muzzle (almost flat). FULL puffy cheeks. Broad skull. Wide-set eyes. Round head shape. "Smiling" expression from wide muzzle.
+- RUSSIAN BLUE: More angular wedge-shaped head. Larger ears. Almond eyes. Less flat face than Chartreux.
+- KORAT: Heart-shaped face. Large green eyes. Medium muzzle.
+Identify which type this cat resembles and MATCH that facial structure exactly.` : "";
     
     // Add black cat color preservation treatment
     const blackCatTreatment = isBlackCat || isDarkCoated ? `
@@ -2643,6 +2669,16 @@ BODY SIZE & STATURE PRESERVATION:
 
 THE RECOGNITION TEST:
 Ask yourself: If 10 pets of this breed were lined up, would the owner be able to pick out THEIR pet from this portrait? If not, the facial features aren't accurate enough.
+
+*** CRITICAL: DO NOT GENERATE A GENERIC BREED FACE ***
+- Do NOT generate a "typical" or "ideal" example of the breed
+- Do NOT default to the most common facial features for this breed
+- Generate THIS SPECIFIC pet's unique facial structure
+- Every pet has individual variations - capture THOSE variations
+- If the description says "flat, wide face" - make it FLAT and WIDE, not medium
+- If the description says "almond eyes" - make them ALMOND, not round
+- If the description says "wide-set eyes" - space them WIDE, not average
+- The face should look like THIS pet, not like a breed standard photo
 
 === CRITICAL: FULLY ANIMAL - NO HUMAN FEATURES ===
 - The ${species} must be 100% ANIMAL - NOT a human-animal hybrid
