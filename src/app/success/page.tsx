@@ -654,72 +654,48 @@ function SuccessContent() {
             </p>
           </div>
 
-          {/* Canvas Preview Mockup - Room Scene (changes based on selected size) */}
-          {/* Portrait is rendered BEHIND the mockup - mockup has transparent canvas area */}
-          <div className="relative mx-auto mb-6 rounded-lg overflow-hidden" style={{ maxWidth: '400px' }}>
-            <div className="relative w-full" style={{ aspectRatio: '1/1' }}>
-              
-              {/* Portrait layer - BEHIND the mockup (z-index: 1) */}
+          {/* Canvas Preview - Portrait with canvas texture */}
+          <div className="relative mx-auto mb-6" style={{ maxWidth: '300px' }}>
+            {/* Canvas frame effect */}
+            <div 
+              className="relative aspect-square rounded overflow-hidden"
+              style={{ 
+                boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 0 0 4px rgba(80, 70, 60, 0.8), inset 0 0 0 8px rgba(60, 50, 40, 0.6)',
+                border: '2px solid rgba(90, 80, 70, 0.9)',
+              }}
+            >
               {displayImageUrl && (
-                <div 
-                  className="absolute overflow-hidden"
-                  style={{
-                    zIndex: 1,
-                    ...(selectedCanvas === "16x16" ? {
-                      // 16x16: moved right + down
-                      top: '12%',
-                      left: '28%',
-                      width: '50%',
-                      height: '54%',
-                    } : {
-                      // 12x12: moved right + down
-                      top: '18%',
-                      left: '25%',
-                      width: '46%',
-                      height: '50%',
-                    })
-                  }}
-                >
-                  <Image
-                    src={displayImageUrl}
-                    alt="Your portrait on canvas"
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                  {/* Canvas texture overlay */}
-                  <div 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ 
-                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)',
-                      mixBlendMode: 'multiply',
-                    }}
-                  />
-                </div>
+                <Image
+                  src={displayImageUrl}
+                  alt="Your portrait on canvas"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
               )}
-              
-              {/* Room mockup layer - ON TOP (z-index: 2) */}
-              {/* The canvas area should be transparent in the PNG */}
-              <Image
-                src={selectedCanvas === "16x16" ? "/samples/16x16.png" : "/samples/12x12.png"}
-                alt="Room mockup"
-                fill
-                className="object-cover"
-                style={{ zIndex: 2 }}
-                unoptimized
+              {/* Canvas texture overlay */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{ 
+                  background: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.03) 1px, rgba(255,255,255,0.03) 3px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.03) 1px, rgba(255,255,255,0.03) 3px)',
+                }}
+              />
+              {/* Subtle vignette for depth */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{ 
+                  boxShadow: 'inset 0 0 40px rgba(0,0,0,0.15)',
+                }}
               />
             </div>
             
-            {/* Caption */}
-            <div 
-              className="absolute bottom-0 left-0 right-0 py-2 px-3 text-center text-xs"
-              style={{ 
-                background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                color: '#B8B2A8',
-              }}
+            {/* Size label */}
+            <p 
+              className="text-center mt-3 text-sm"
+              style={{ color: '#B8B2A8' }}
             >
-              {selectedCanvas === "16x16" ? "16×16 Premium Canvas" : "12×12 Gallery Canvas"} — See how it looks in your home
-            </div>
+              {selectedCanvas === "16x16" ? '16" × 16" Premium Canvas' : '12" × 12" Gallery Canvas'}
+            </p>
           </div>
 
           {/* Size Options */}
