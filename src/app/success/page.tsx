@@ -674,11 +674,11 @@ function SuccessContent() {
                       height: '49.4%',
                     } : {
                       // 12x12: EXACT pixel coordinates from Photoshop
-                      // Image: 1024x1024, Canvas: (261,272) to (745,751)
+                      // Image: 1024x1024, Canvas: (262,272) to (745,755)
                       top: '26.6%',
-                      left: '25.5%',
-                      width: '47.3%',
-                      height: '46.8%',
+                      left: '25.6%',
+                      width: '47.2%',
+                      height: '47.2%',
                     })
                   }}
                 >
