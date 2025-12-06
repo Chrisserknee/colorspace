@@ -654,12 +654,12 @@ function SuccessContent() {
             </p>
           </div>
 
-          {/* Canvas Preview Mockup - Room Scene */}
+          {/* Canvas Preview Mockup - Room Scene (changes based on selected size) */}
           <div className="relative mx-auto mb-6 rounded-lg overflow-hidden" style={{ maxWidth: '400px' }}>
             {/* Room mockup background */}
             <div className="relative w-full" style={{ aspectRatio: '1/1' }}>
               <Image
-                src="/samples/12x12.png"
+                src={selectedCanvas === "16x16" ? "/samples/16x16.png" : "/samples/12x12.png"}
                 alt="Room mockup"
                 fill
                 className="object-cover"
@@ -667,10 +667,18 @@ function SuccessContent() {
               />
               
               {/* Portrait overlay - positioned over the blank canvas in the mockup */}
+              {/* Different positioning for each mockup */}
               {displayImageUrl && (
                 <div 
                   className="absolute"
-                  style={{ 
+                  style={selectedCanvas === "16x16" ? {
+                    // 16x16 mockup positioning
+                    top: '8%',
+                    left: '23%',
+                    width: '50%',
+                    height: '50%',
+                  } : {
+                    // 12x12 mockup positioning  
                     top: '14%',
                     left: '26%',
                     width: '42%',
@@ -699,7 +707,7 @@ function SuccessContent() {
                 color: '#B8B2A8',
               }}
             >
-              See how it looks in your home
+              {selectedCanvas === "16x16" ? "16×16 Premium Canvas" : "12×12 Gallery Canvas"} — See how it looks in your home
             </div>
           </div>
 
