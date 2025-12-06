@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { saveMetadata, getMetadata, addCustomer, markSubscriberAsPurchased, supabase } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
 import { createFullCanvasOrder, CanvasSize, ShippingAddress } from "@/lib/printify";
+import { trackServerCompletePayment } from "@/lib/tiktok-server";
 
 // Initialize Stripe lazily to avoid build-time errors
 function getStripe(): Stripe {
@@ -72,6 +73,22 @@ export async function POST(request: NextRequest) {
               status: "completed",
             });
             console.log(`✅ Payment confirmed for image: ${imageId}`);
+            
+            // TikTok Events API: Track CompletePayment server-side
+            try {
+              const amountTotal = session.amount_total ? session.amount_total / 100 : 19.99;
+              await trackServerCompletePayment({
+                email: customerEmail || undefined,
+                value: amountTotal,
+                content_id: imageId,
+                content_name: "Pet Portrait Download",
+                order_id: session.id,
+              });
+              console.log(`📱 TikTok server event sent: CompletePayment $${amountTotal}`);
+            } catch (tiktokError) {
+              console.warn("⚠️ TikTok server tracking failed:", tiktokError);
+              // Don't fail the webhook for tracking errors
+            }
             
             // Mark as purchased in emails table (for Royal Club conversion tracking)
             if (customerEmail) {
@@ -144,6 +161,31 @@ export async function POST(request: NextRequest) {
           }
         } else if (isPackPurchase) {
           console.log(`📦 Pack purchase completed (session: ${session.id})`);
+          
+          // TikTok Events API: Track pack purchase server-side
+          try {
+            const packType = session.metadata?.packType;
+            let packValue = 5; // default
+            let packName = "Portrait Pack";
+            
+            switch (packType) {
+              case "1-pack": packValue = 5; packName = "1-Pack Portrait Credits"; break;
+              case "5-pack": packValue = 20; packName = "5-Pack Portrait Credits"; break;
+              case "10-pack": packValue = 35; packName = "10-Pack Portrait Credits"; break;
+            }
+            
+            await trackServerCompletePayment({
+              email: customerEmail || undefined,
+              value: packValue,
+              content_id: packType || "pack",
+              content_name: packName,
+              order_id: session.id,
+            });
+            console.log(`📱 TikTok server event sent: CompletePayment $${packValue} (${packName})`);
+          } catch (tiktokError) {
+            console.warn("⚠️ TikTok server tracking failed:", tiktokError);
+          }
+          
           // Pack purchases don't have a specific image to email about
           if (customerEmail) {
             // Mark as purchased in emails table (for Royal Club conversion tracking)
@@ -196,6 +238,21 @@ export async function POST(request: NextRequest) {
           }).shipping_details;
           
           console.log(`🖼️ Canvas order received: ${canvasSize} for image ${canvasImageId}`);
+          
+          // TikTok Events API: Track canvas purchase server-side
+          try {
+            const canvasValue = canvasSize === "16x16" ? 129 : 69;
+            await trackServerCompletePayment({
+              email: customerEmail || undefined,
+              value: canvasValue,
+              content_id: canvasImageId || "canvas",
+              content_name: `Canvas Print ${canvasSize}`,
+              order_id: session.id,
+            });
+            console.log(`📱 TikTok server event sent: CompletePayment $${canvasValue} (Canvas ${canvasSize})`);
+          } catch (tiktokError) {
+            console.warn("⚠️ TikTok server tracking failed:", tiktokError);
+          }
           
           if (!canvasImageId || !canvasSize || !shippingDetails?.address) {
             console.error(`❌ Canvas order missing required data: imageId=${canvasImageId}, size=${canvasSize}, shipping=${!!shippingDetails}`);
