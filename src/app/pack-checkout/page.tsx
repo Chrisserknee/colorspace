@@ -54,45 +54,33 @@ function PackCheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const packParam = searchParams.get("pack") as PackType | null;
-  const emailParam = searchParams.get("email");
   
   const [selectedPack, setSelectedPack] = useState<PackType>(packParam || "5");
-  const [email, setEmail] = useState(emailParam || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Update selected pack and email when URL params change
+  // Update selected pack when URL params change
   useEffect(() => {
     if (packParam && ["1", "5", "10"].includes(packParam)) {
       setSelectedPack(packParam);
     }
-    if (emailParam) {
-      setEmail(emailParam);
-    }
-  }, [packParam, emailParam]);
+  }, [packParam]);
 
   const currentPack = PACKS.find(p => p.id === selectedPack) || PACKS[1];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !email.includes("@")) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
+  const handleSubmit = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Build cancel URL to return to this page with email pre-filled
-      const cancelUrl = `/pack-checkout?pack=${selectedPack}&email=${encodeURIComponent(email)}`;
+      // Build cancel URL to return to this page
+      const cancelUrl = `/pack-checkout?pack=${selectedPack}`;
       
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
+          // Email will be collected by Stripe during checkout
           type: "pack",
           packType: currentPack.packType,
           cancelUrl,
@@ -217,24 +205,7 @@ function PackCheckoutContent() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <label className="block mb-2 text-sm" style={{ color: '#B8B2A8' }}>
-            Enter your email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="w-full px-4 py-3 rounded-xl text-lg mb-4 outline-none"
-            style={{ 
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              border: '2px solid rgba(197, 165, 114, 0.3)',
-              color: '#F0EDE8',
-            }}
-            required
-          />
-
+        <div>
           {error && (
             <p className="text-center text-sm mb-4" style={{ color: '#F87171' }}>
               {error}
@@ -242,7 +213,7 @@ function PackCheckoutContent() {
           )}
 
           <button
-            type="submit"
+            onClick={handleSubmit}
             disabled={loading}
             className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
             style={{ 
@@ -251,9 +222,13 @@ function PackCheckoutContent() {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? "Processing..." : `Pay ${currentPack.price} with Stripe`}
+            {loading ? "Processing..." : `Continue to Payment - ${currentPack.price}`}
           </button>
-        </form>
+          
+          <p className="text-center text-xs mt-3" style={{ color: '#7A756D' }}>
+            You&apos;ll enter your email on the next page
+          </p>
+        </div>
 
         <div className="mt-6 text-center">
           <button 
