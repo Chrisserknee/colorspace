@@ -672,18 +672,16 @@ function SuccessContent() {
                   className="absolute overflow-hidden"
                   style={selectedCanvas === "16x16" ? {
                     // 16x16 mockup - wall-mounted canvas
-                    // Canvas face: starts after 3D left edge
-                    top: '7.5%',
-                    left: '25%',
-                    width: '47%',
-                    height: '51%',
+                    top: '6%',
+                    left: '24%',
+                    width: '50%',
+                    height: '55%',
                   } : {
                     // 12x12 mockup - desk canvas  
-                    // Canvas face: starts after 3D left edge
-                    top: '13%',
-                    left: '22%',
-                    width: '40%',
-                    height: '44%',
+                    top: '12%',
+                    left: '21%',
+                    width: '44%',
+                    height: '48%',
                   }}
                 >
                   {/* The portrait image */}
