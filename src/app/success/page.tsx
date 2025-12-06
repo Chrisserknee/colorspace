@@ -666,34 +666,46 @@ function SuccessContent() {
                 unoptimized
               />
               
-              {/* Portrait overlay - positioned over the blank canvas in the mockup */}
-              {/* Different positioning for each mockup */}
+              {/* Portrait overlay - precisely positioned over the blank canvas */}
               {displayImageUrl && (
                 <div 
-                  className="absolute"
+                  className="absolute overflow-hidden"
                   style={selectedCanvas === "16x16" ? {
-                    // 16x16 mockup positioning
-                    top: '8%',
-                    left: '23%',
-                    width: '50%',
-                    height: '50%',
+                    // 16x16 mockup positioning (wall-mounted, larger)
+                    top: '9.5%',
+                    left: '24.5%',
+                    width: '48%',
+                    height: '48%',
                   } : {
-                    // 12x12 mockup positioning  
-                    top: '14%',
-                    left: '26%',
-                    width: '42%',
-                    height: '42%',
+                    // 12x12 mockup positioning (on desk, smaller)
+                    top: '13.5%',
+                    left: '24%',
+                    width: '43%',
+                    height: '44%',
                   }}
                 >
+                  {/* The portrait image */}
                   <Image
                     src={displayImageUrl}
                     alt="Your portrait on canvas"
                     fill
                     className="object-cover"
-                    style={{
-                      boxShadow: '2px 4px 12px rgba(0,0,0,0.4)',
-                    }}
                     unoptimized
+                  />
+                  {/* Canvas texture overlay for realism */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ 
+                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)',
+                      mixBlendMode: 'multiply',
+                    }}
+                  />
+                  {/* Subtle lighting/shadow for depth */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ 
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                    }}
                   />
                 </div>
               )}
