@@ -7,7 +7,7 @@
     },
     {
       "path": "/api/cron/canvas-emails",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 10 * * *"
     }
   ]
 }
