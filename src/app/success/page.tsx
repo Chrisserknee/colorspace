@@ -677,8 +677,8 @@ function SuccessContent() {
                     width: '43%',
                     height: '47%',
                   } : {
-                    // 12x12: moved down + left
-                    top: '25%',
+                    // 12x12: lowered more
+                    top: '27%',
                     left: '29%',
                     width: '42%',
                     height: '46%',
