@@ -19,6 +19,12 @@ import {
   trackFlowStep,
 } from "@/lib/posthog";
 import { getUTMForAPI } from "@/lib/utm";
+import { 
+  trackTikTokAddToCart, 
+  trackTikTokInitiateCheckout,
+  trackTikTokViewContent,
+  identifyTikTokUser 
+} from "@/lib/tiktok";
 
 type Stage = "preview" | "email-capture" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
@@ -829,6 +835,12 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         has_preview_url: !!data.previewUrl,
       });
       
+      // TikTok Pixel: Track ViewContent when portrait is generated
+      trackTikTokViewContent({
+        content_id: data.imageId,
+        content_name: "Generated Pet Portrait",
+      });
+      
       // Save as last creation for "View Last Creation" button
       if (data.imageId && data.previewUrl) {
         saveLastCreation(data.imageId, data.previewUrl);
@@ -992,10 +1004,23 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       has_email: !!email,
     });
     
+    // TikTok Pixel: Track AddToCart event
+    trackTikTokAddToCart({
+      content_id: result?.imageId,
+      content_name: "Pet Portrait Download",
+      value: CONFIG.PORTRAIT_PRICE_AMOUNT / 100, // Convert cents to dollars
+    });
+    
     if (!result) {
       setError("Something went wrong. Please try again.");
       return;
     }
+    
+    // TikTok Pixel: Track InitiateCheckout
+    trackTikTokInitiateCheckout({
+      content_id: result.imageId,
+      value: CONFIG.PORTRAIT_PRICE_AMOUNT / 100,
+    });
     
     // Go directly to Stripe checkout - email will be collected by Stripe
     setStage("checkout");

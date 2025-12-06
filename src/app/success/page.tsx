@@ -1,10 +1,11 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect, Suspense, useCallback } from "react";
+import { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CONFIG } from "@/lib/config";
+import { trackTikTokCompletePayment, identifyTikTokUser } from "@/lib/tiktok";
 
 // Rainbow Bridge text overlay data from localStorage
 interface RainbowBridgeData {
@@ -261,6 +262,58 @@ function SuccessContent() {
   useEffect(() => {
     grantPurchaseBonus(type || undefined, packType || undefined);
   }, [type, packType]);
+  
+  // Track ref to prevent duplicate TikTok events
+  const tiktokTrackedRef = useRef(false);
+  
+  // TikTok Pixel: Track CompletePayment conversion
+  useEffect(() => {
+    // Only track once per page load
+    if (tiktokTrackedRef.current) return;
+    
+    // Determine purchase value based on type
+    let purchaseValue = 0;
+    let contentName = "Pet Portrait";
+    
+    if (type === "pack") {
+      switch (packType) {
+        case "1-pack":
+          purchaseValue = 5;
+          contentName = "1-Pack Portrait Credits";
+          break;
+        case "5-pack":
+          purchaseValue = 20;
+          contentName = "5-Pack Portrait Credits";
+          break;
+        case "10-pack":
+          purchaseValue = 35;
+          contentName = "10-Pack Portrait Credits";
+          break;
+        default:
+          purchaseValue = 5;
+          contentName = "Portrait Pack";
+      }
+    } else if (type === "canvas") {
+      // Canvas purchase - get value from URL or use defaults
+      purchaseValue = 69; // Default to 12x12 price
+      contentName = "Canvas Print";
+    } else if (imageId) {
+      // Standard portrait purchase
+      purchaseValue = CONFIG.PORTRAIT_PRICE_AMOUNT / 100;
+      contentName = "Pet Portrait Download";
+    }
+    
+    if (purchaseValue > 0) {
+      trackTikTokCompletePayment({
+        content_id: imageId || packType || "purchase",
+        content_name: contentName,
+        value: purchaseValue,
+        quantity: 1,
+      });
+      tiktokTrackedRef.current = true;
+      console.log(`📱 TikTok Pixel: CompletePayment tracked - $${purchaseValue} for ${contentName}`);
+    }
+  }, [type, packType, imageId]);
 
   useEffect(() => {
     // For pack purchases, we don't need to validate an image
