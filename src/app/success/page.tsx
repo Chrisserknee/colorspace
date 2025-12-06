@@ -132,6 +132,7 @@ function SuccessContent() {
   const [selectedCanvas, setSelectedCanvas] = useState<CanvasSize>("16x16");
   const [isOrderingCanvas, setIsOrderingCanvas] = useState(false);
   const [isCanvasTransitioning, setIsCanvasTransitioning] = useState(false);
+  const [isCanvasZoomed, setIsCanvasZoomed] = useState(false);
 
   // Smooth canvas size transition handler
   const handleCanvasChange = (newSize: CanvasSize) => {
@@ -670,7 +671,18 @@ function SuccessContent() {
 
           {/* Canvas Preview Mockup - Room Scene */}
           {/* Portrait is rendered BEHIND the mockup - mockup has transparent canvas area */}
-          <div className="relative mx-auto mb-6 rounded-lg overflow-hidden" style={{ maxWidth: '400px' }}>
+          <div 
+            className="relative mx-auto mb-6 rounded-lg overflow-hidden cursor-zoom-in group"
+            style={{ maxWidth: '400px' }}
+            onClick={() => setIsCanvasZoomed(true)}
+            title="Click to zoom"
+          >
+            {/* Zoom hint overlay */}
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all duration-200 pointer-events-none">
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white text-sm font-medium bg-black/60 px-3 py-1.5 rounded-full">
+                🔍 Click to zoom
+              </span>
+            </div>
             <div className="relative w-full" style={{ aspectRatio: '1/1' }}>
               
               {/* Portrait layer - BEHIND the mockup (z-index: 1) */}
@@ -886,6 +898,88 @@ function SuccessContent() {
           </Link>
         </div>
       </div>
+
+      {/* Canvas Zoom Modal */}
+      {isCanvasZoomed && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm cursor-zoom-out"
+          onClick={() => setIsCanvasZoomed(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setIsCanvasZoomed(false)}
+            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            style={{ color: '#F0EDE8' }}
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          {/* Zoomed mockup */}
+          <div 
+            className="relative w-full max-w-3xl mx-auto"
+            style={{ aspectRatio: '1/1' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Portrait layer */}
+            {displayImageUrl && (
+              <div 
+                className="absolute overflow-hidden"
+                style={{
+                  zIndex: 1,
+                  ...(selectedCanvas === "16x16" ? {
+                    top: '18%',
+                    left: '27.4%',
+                    width: '50%',
+                    height: '49.4%',
+                  } : {
+                    top: '25.7%',
+                    left: '24.7%',
+                    width: '49%',
+                    height: '49%',
+                  })
+                }}
+              >
+                <Image
+                  src={displayImageUrl}
+                  alt="Your portrait on canvas"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 768px"
+                />
+              </div>
+            )}
+            
+            {/* Room mockup layer */}
+            <Image
+              src={selectedCanvas === "16x16" ? "/samples/16x16.png" : "/samples/12x12.png"}
+              alt="Room mockup"
+              fill
+              className="object-cover"
+              style={{ zIndex: 2 }}
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+            
+            {/* Size label */}
+            <div 
+              className="absolute bottom-4 left-4 px-4 py-2 rounded-full text-sm font-medium"
+              style={{ 
+                backgroundColor: 'rgba(10, 10, 10, 0.85)', 
+                color: '#C5A572',
+                zIndex: 3,
+              }}
+            >
+              {selectedCanvas === "16x16" ? "16×16 Premium Canvas" : "12×12 Gallery Canvas"}
+            </div>
+          </div>
+          
+          {/* Hint text */}
+          <p className="absolute bottom-6 left-0 right-0 text-center text-sm" style={{ color: '#7A756D' }}>
+            Click anywhere to close
+          </p>
+        </div>
+      )}
     </div>
   );
 }
