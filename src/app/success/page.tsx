@@ -671,15 +671,15 @@ function SuccessContent() {
                 <div 
                   className="absolute overflow-hidden"
                   style={selectedCanvas === "16x16" ? {
-                    // 16x16: moved right + down
-                    top: '16%',
+                    // 16x16: moved down + smaller
+                    top: '19%',
                     left: '30%',
-                    width: '46%',
-                    height: '50%',
+                    width: '43%',
+                    height: '47%',
                   } : {
-                    // 12x12: bigger + moved right + down
-                    top: '22%',
-                    left: '32%',
+                    // 12x12: moved down + left
+                    top: '25%',
+                    left: '29%',
                     width: '42%',
                     height: '46%',
                   }}
