@@ -1,8 +1,8 @@
 // Configuration constants
 export const CONFIG = {
   // Price for HD portrait in dollars
-  PRICE_DISPLAY: "$20",
-  PRICE_AMOUNT: 2000, // $20 in cents
+  PRICE_DISPLAY: "$19.99",
+  PRICE_AMOUNT: 1999, // $19.99 in cents
   
   // Pack pricing - Tiered options
   // Starter Pack: $1 for 1 portrait
