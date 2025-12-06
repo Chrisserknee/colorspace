@@ -1,9 +1,10 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { CONFIG } from "@/lib/config";
 
 // Rainbow Bridge text overlay data from localStorage
 interface RainbowBridgeData {
@@ -85,8 +86,40 @@ const grantPurchaseBonus = (type?: string, packType?: string) => {
   }
 };
 
+// Canvas size options for upsell
+type CanvasSize = "12x12" | "16x16";
+
+interface CanvasOption {
+  size: CanvasSize;
+  displaySize: string;
+  price: string;
+  priceAmount: number;
+  label: string;
+  description: string;
+}
+
+const CANVAS_OPTIONS: CanvasOption[] = [
+  {
+    size: "12x12",
+    displaySize: '12" × 12"',
+    price: CONFIG.CANVAS_12X12_PRICE_DISPLAY,
+    priceAmount: CONFIG.CANVAS_12X12_PRICE_AMOUNT,
+    label: "Gallery Canvas",
+    description: "Perfect for desks & shelves",
+  },
+  {
+    size: "16x16",
+    displaySize: '16" × 16"',
+    price: CONFIG.CANVAS_16X16_PRICE_DISPLAY,
+    priceAmount: CONFIG.CANVAS_16X16_PRICE_AMOUNT,
+    label: "Premium Canvas",
+    description: "Statement piece for your wall",
+  },
+];
+
 function SuccessContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const imageId = searchParams.get("imageId");
   const type = searchParams.get("type");
   const packType = searchParams.get("packType");
@@ -96,6 +129,8 @@ function SuccessContent() {
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [rainbowBridgeData, setRainbowBridgeData] = useState<RainbowBridgeData | null>(null);
+  const [selectedCanvas, setSelectedCanvas] = useState<CanvasSize>("16x16");
+  const [isOrderingCanvas, setIsOrderingCanvas] = useState(false);
 
   // Function to render text overlay on canvas
   const renderTextOverlay = useCallback(async (imageUrl: string, name: string, quote: string): Promise<string> => {
@@ -338,6 +373,42 @@ function SuccessContent() {
     }
   };
 
+  // Handle canvas order
+  const handleCanvasOrder = async () => {
+    if (!imageId) return;
+    
+    setIsOrderingCanvas(true);
+    
+    try {
+      const response = await fetch("/api/canvas-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageId,
+          size: selectedCanvas,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create checkout");
+      }
+      
+      // Redirect to Stripe checkout
+      if (data.url) {
+        router.push(data.url);
+      }
+    } catch (error) {
+      console.error("Canvas order error:", error);
+      alert("Failed to start checkout. Please try again.");
+    } finally {
+      setIsOrderingCanvas(false);
+    }
+  };
+
   // Loading state
   if (isValid === null) {
     return (
@@ -549,6 +620,175 @@ function SuccessContent() {
           <p className="text-sm mb-8" style={{ color: '#7A756D' }}>
             High-resolution PNG • Watermark-free • Perfect for printing
           </p>
+        </div>
+
+        {/* Canvas Upsell Section */}
+        <div 
+          className="card animate-fade-in-up delay-350 mb-8"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.08) 0%, rgba(197, 165, 114, 0.02) 100%)',
+            border: '2px solid rgba(197, 165, 114, 0.25)',
+          }}
+        >
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div 
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4"
+              style={{ 
+                backgroundColor: 'rgba(197, 165, 114, 0.15)',
+                border: '1px solid rgba(197, 165, 114, 0.3)',
+              }}
+            >
+              <span className="text-sm font-medium" style={{ color: '#C5A572' }}>
+                ✨ Special Offer
+              </span>
+            </div>
+            <h3 
+              className="text-2xl sm:text-3xl mb-2"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            >
+              Bring Your Portrait to Life
+            </h3>
+            <p style={{ color: '#B8B2A8' }}>
+              Museum-quality canvas prints, ready to hang
+            </p>
+          </div>
+
+          {/* Canvas Preview Mockup */}
+          <div className="relative mx-auto mb-6" style={{ maxWidth: '280px' }}>
+            {/* Wall background effect */}
+            <div 
+              className="absolute inset-0 rounded-lg"
+              style={{ 
+                background: 'linear-gradient(180deg, #2A2520 0%, #1A1815 100%)',
+                boxShadow: 'inset 0 0 60px rgba(0,0,0,0.5)',
+              }}
+            />
+            
+            {/* Canvas frame */}
+            <div className="relative p-6">
+              <div 
+                className="relative aspect-square rounded overflow-hidden"
+                style={{ 
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.5), 0 0 0 4px rgba(60, 50, 40, 0.8), 0 0 0 8px rgba(40, 35, 30, 0.6)',
+                }}
+              >
+                {displayImageUrl && (
+                  <Image
+                    src={displayImageUrl}
+                    alt="Canvas preview"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                )}
+                {/* Canvas texture overlay */}
+                <div 
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ 
+                    background: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.02) 1px, rgba(255,255,255,0.02) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.02) 1px, rgba(255,255,255,0.02) 2px)',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Size Options */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {CANVAS_OPTIONS.map((option) => (
+              <button
+                key={option.size}
+                onClick={() => setSelectedCanvas(option.size)}
+                className="relative p-4 rounded-lg transition-all text-left"
+                style={{
+                  backgroundColor: selectedCanvas === option.size 
+                    ? 'rgba(197, 165, 114, 0.15)' 
+                    : 'rgba(255, 255, 255, 0.03)',
+                  border: selectedCanvas === option.size 
+                    ? '2px solid rgba(197, 165, 114, 0.5)' 
+                    : '2px solid rgba(255, 255, 255, 0.1)',
+                }}
+              >
+                {/* Checkmark */}
+                {selectedCanvas === option.size && (
+                  <div 
+                    className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: '#C5A572' }}
+                  >
+                    <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
+                
+                <div 
+                  className="text-lg font-semibold mb-0.5"
+                  style={{ 
+                    fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                    color: selectedCanvas === option.size ? '#F0EDE8' : '#B8B2A8' 
+                  }}
+                >
+                  {option.displaySize}
+                </div>
+                <div 
+                  className="text-xs mb-2"
+                  style={{ color: '#7A756D' }}
+                >
+                  {option.description}
+                </div>
+                <div 
+                  className="text-xl font-bold"
+                  style={{ color: '#C5A572' }}
+                >
+                  {option.price}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Order Button */}
+          <button
+            onClick={handleCanvasOrder}
+            disabled={isOrderingCanvas}
+            className="w-full py-4 px-6 rounded-full font-semibold text-lg transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)',
+              color: '#0A0A0A',
+              boxShadow: '0 4px 20px rgba(197, 165, 114, 0.3)',
+            }}
+          >
+            {isOrderingCanvas ? (
+              <span className="flex items-center justify-center gap-2">
+                <div 
+                  className="w-5 h-5 rounded-full animate-spin"
+                  style={{ 
+                    borderWidth: '2px',
+                    borderStyle: 'solid',
+                    borderColor: 'rgba(0, 0, 0, 0.3)',
+                    borderTopColor: '#0A0A0A'
+                  }}
+                />
+                Creating Order...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                🖼️ Order Canvas Print - {CANVAS_OPTIONS.find(o => o.size === selectedCanvas)?.price}
+              </span>
+            )}
+          </button>
+
+          {/* Trust indicators */}
+          <div className="flex flex-wrap justify-center gap-4 mt-4 text-xs" style={{ color: '#7A756D' }}>
+            <span className="flex items-center gap-1">
+              <span>🚚</span> Free US Shipping
+            </span>
+            <span className="flex items-center gap-1">
+              <span>✨</span> Gallery Quality
+            </span>
+            <span className="flex items-center gap-1">
+              <span>🎁</span> Ready to Hang
+            </span>
+          </div>
         </div>
 
         {/* Tips section */}

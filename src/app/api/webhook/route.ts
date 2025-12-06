@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { saveMetadata, getMetadata, addCustomer, markSubscriberAsPurchased } from "@/lib/supabase";
+import { saveMetadata, getMetadata, addCustomer, markSubscriberAsPurchased, supabase } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
+import { createFullCanvasOrder, CanvasSize, ShippingAddress } from "@/lib/printify";
 
 // Initialize Stripe lazily to avoid build-time errors
 function getStripe(): Stripe {
@@ -173,6 +174,96 @@ export async function POST(request: NextRequest) {
               }
             } catch (customerError) {
               console.warn(`⚠️ Failed to add customer:`, customerError);
+            }
+          }
+        } else if (session.metadata?.type === "canvas") {
+          // 🖼️ Canvas print order
+          const canvasImageId = session.metadata.imageId;
+          const canvasSize = session.metadata.canvasSize as CanvasSize;
+          const shippingDetails = session.shipping_details;
+          
+          console.log(`🖼️ Canvas order received: ${canvasSize} for image ${canvasImageId}`);
+          
+          if (!canvasImageId || !canvasSize || !shippingDetails?.address) {
+            console.error(`❌ Canvas order missing required data: imageId=${canvasImageId}, size=${canvasSize}, shipping=${!!shippingDetails}`);
+          } else {
+            try {
+              // Get the HD image URL from metadata
+              const portraitMetadata = await getMetadata(canvasImageId);
+              if (!portraitMetadata?.hd_url) {
+                throw new Error(`HD image URL not found for imageId: ${canvasImageId}`);
+              }
+              
+              // Build shipping address for Printify
+              const shippingAddress: ShippingAddress = {
+                first_name: shippingDetails.name?.split(' ')[0] || 'Customer',
+                last_name: shippingDetails.name?.split(' ').slice(1).join(' ') || '',
+                email: customerEmail || '',
+                phone: session.customer_details?.phone || undefined,
+                country: shippingDetails.address.country || 'US',
+                region: shippingDetails.address.state || '',
+                address1: shippingDetails.address.line1 || '',
+                address2: shippingDetails.address.line2 || undefined,
+                city: shippingDetails.address.city || '',
+                zip: shippingDetails.address.postal_code || '',
+              };
+              
+              // Create order with Printify
+              const printifyResult = await createFullCanvasOrder(
+                portraitMetadata.hd_url,
+                canvasSize,
+                shippingAddress,
+                {
+                  petName: portraitMetadata.pet_name,
+                  externalId: session.id,
+                }
+              );
+              
+              console.log(`✅ Printify order created: ${printifyResult.orderId}`);
+              
+              // Save canvas order to database
+              const { error: dbError } = await supabase
+                .from('canvas_orders')
+                .insert({
+                  image_id: canvasImageId,
+                  customer_email: customerEmail || null,
+                  canvas_size: canvasSize,
+                  stripe_session_id: session.id,
+                  printify_order_id: printifyResult.orderId,
+                  printify_product_id: printifyResult.productId,
+                  status: 'production',
+                  shipping_address: shippingAddress,
+                  amount_paid: session.amount_total,
+                });
+              
+              if (dbError) {
+                console.error(`⚠️ Failed to save canvas order to database:`, dbError);
+              } else {
+                console.log(`💾 Canvas order saved to database`);
+              }
+              
+              // Add customer if not already added
+              if (customerEmail) {
+                try {
+                  await addCustomer(customerEmail, {
+                    purchaseType: 'canvas',
+                    imageId: canvasImageId,
+                    stripeSessionId: session.id,
+                    context: {
+                      canvasSize: canvasSize,
+                      printifyOrderId: printifyResult.orderId,
+                    }
+                  });
+                  console.log(`🎉 Canvas customer added: ${customerEmail}`);
+                } catch (customerError) {
+                  console.warn(`⚠️ Failed to add canvas customer:`, customerError);
+                }
+              }
+              
+            } catch (canvasError) {
+              console.error(`❌ Failed to process canvas order:`, canvasError);
+              // Don't throw - return 200 to prevent Stripe retries
+              // The order is paid, we need to manually handle this
             }
           }
         } else {
