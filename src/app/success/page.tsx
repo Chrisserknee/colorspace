@@ -666,15 +666,15 @@ function SuccessContent() {
                   style={{
                     zIndex: 1,
                     ...(selectedCanvas === "16x16" ? {
-                      // 16x16 positioning
-                      top: '8%',
-                      left: '24%',
+                      // 16x16: moved right + down
+                      top: '12%',
+                      left: '28%',
                       width: '50%',
                       height: '54%',
                     } : {
-                      // 12x12 positioning
-                      top: '14%',
-                      left: '20%',
+                      // 12x12: moved right + down
+                      top: '18%',
+                      left: '25%',
                       width: '46%',
                       height: '50%',
                     })
