@@ -34,7 +34,7 @@ const PACKS: PackInfo[] = [
     priceAmount: 5,
     portraits: 5,
     packType: "5-pack",
-    badge: "BEST VALUE",
+    badge: "MOST POPULAR",
     badgeColor: "#4ADE80",
     featured: true,
   },
@@ -45,7 +45,7 @@ const PACKS: PackInfo[] = [
     priceAmount: 10,
     portraits: 10,
     packType: "10-pack",
-    badge: "MOST SAVINGS",
+    badge: "FOR PET PARENTS",
     badgeColor: "#60A5FA",
   },
 ];
