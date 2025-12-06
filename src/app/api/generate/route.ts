@@ -1677,7 +1677,7 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: "How many pets (dogs or cats) are clearly visible in this image? Respond with ONLY a number: 1 or 2. If more than 2, respond with 2. If none or unclear, respond with 1.",
+              text: "How many pets (dogs or cats) are clearly visible in this image? Respond with ONLY a single number: 1, 2, 3, or 4. If more than 4, respond with 4. If none or unclear, respond with 1.",
             },
             {
               type: "image_url",
@@ -1694,20 +1694,28 @@ export async function POST(request: NextRequest) {
     });
     
     const petCountStr = petCountResponse.choices[0]?.message?.content?.trim() || "1";
-    const detectedPetCount = petCountStr === "2" ? 2 : 1;
+    const detectedPetCount = Math.min(4, Math.max(1, parseInt(petCountStr) || 1));
     console.log(`🐾 Detected ${detectedPetCount} pet(s) in image`);
     
-    // Track multi-pet info
+    // Track multi-pet info (supports up to 4 pets)
+    const petDescriptions: string[] = [];
+    const petSpecies: string[] = [];
+    let multiPetCombinedDescription = "";
+    const isMultiPet = detectedPetCount >= 2;
+    
+    // Legacy variables for backwards compatibility
     let petDescription1 = "";
     let petDescription2 = "";
     let species1 = "";
     let species2 = "";
-    let multiPetCombinedDescription = "";
-    const isMultiPet = detectedPetCount === 2;
     
     if (isMultiPet) {
-      // MULTI-PET MODE: Analyze both pets in the single image
-      console.log("🐾🐾 Analyzing BOTH pets in image with GPT-4o...");
+      // MULTI-PET MODE: Analyze all pets in the single image (2-4 pets)
+      console.log(`🐾🐾 Analyzing ${detectedPetCount} pets in image with GPT-4o...`);
+      
+      // Build dynamic prompt for number of pets detected
+      const petSections = Array.from({ length: detectedPetCount }, (_, i) => `---PET ${i + 1}---
+[SPECIES] BREED: [breed]. SIZE: [size and build]. BODY: [proportions]. COLORS: [colors]. FACE: [features]. UNIQUE: [features].`).join('\n');
       
       const multiPetVisionResponse = await openai.chat.completions.create({
         model: "gpt-4o",  // Use full model for multi-pet - need better understanding
@@ -1717,7 +1725,7 @@ export async function POST(request: NextRequest) {
             content: [
               {
                 type: "text",
-                text: `This image contains TWO pets. Analyze BOTH pets for a royal portrait.
+                text: `This image contains ${detectedPetCount} pets. Analyze ALL ${detectedPetCount} pets for a royal portrait.
 
 For EACH pet, provide:
 1. SPECIES: [DOG], [CAT], [BIRD], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [RAT], or [EXOTIC]
@@ -1729,12 +1737,9 @@ For EACH pet, provide:
 7. UNIQUE: 2-3 distinctive features that make THIS specific pet recognizable
 
 Format your response EXACTLY like this:
----PET 1---
-[SPECIES] BREED: [breed]. SIZE: [size and build]. BODY: [proportions]. COLORS: [colors]. FACE: [features]. UNIQUE: [features].
----PET 2---
-[SPECIES] BREED: [breed]. SIZE: [size and build]. BODY: [proportions]. COLORS: [colors]. FACE: [features]. UNIQUE: [features].
+${petSections}
 ---TOGETHER---
-Brief description of how they look together, noting their relative sizes (e.g., "A large muscular golden retriever beside a petite sleek black cat").`,
+Brief description of how they look together, noting their relative sizes and positions.`,
               },
               {
                 type: "image_url",
@@ -1746,35 +1751,40 @@ Brief description of how they look together, noting their relative sizes (e.g., 
             ],
           },
         ],
-        max_tokens: 1200,
+        max_tokens: 2000,  // Increased for more pets
         temperature: 0.2,
       });
       
       const multiPetResponse = multiPetVisionResponse.choices[0]?.message?.content || "";
-      console.log("Multi-pet vision response:", multiPetResponse.substring(0, 500));
+      console.log("Multi-pet vision response:", multiPetResponse.substring(0, 800));
       
-      // Parse the multi-pet response
-      const pet1Match = multiPetResponse.match(/---PET 1---\s*([\s\S]*?)(?=---PET 2---|$)/i);
-      const pet2Match = multiPetResponse.match(/---PET 2---\s*([\s\S]*?)(?=---TOGETHER---|$)/i);
+      // Parse the multi-pet response for each pet
+      for (let i = 1; i <= detectedPetCount; i++) {
+        const nextPetMarker = i < detectedPetCount ? `---PET ${i + 1}---` : "---TOGETHER---";
+        const petRegex = new RegExp(`---PET ${i}---\\s*([\\s\\S]*?)(?=${nextPetMarker}|$)`, 'i');
+        const petMatch = multiPetResponse.match(petRegex);
+        const description = petMatch ? petMatch[1].trim() : "a beloved pet";
+        petDescriptions.push(description);
+        
+        // Extract species
+        const speciesMatch = description.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC)\]/i);
+        const species = speciesMatch ? speciesMatch[1].toUpperCase() : 
+                   description.toLowerCase().includes("dog") ? "DOG" : 
+                   description.toLowerCase().includes("cat") ? "CAT" : "PET";
+        petSpecies.push(species);
+        
+        console.log(`🐾 Pet ${i}: ${species} - ${description.substring(0, 100)}`);
+      }
+      
       const togetherMatch = multiPetResponse.match(/---TOGETHER---\s*([\s\S]*?)$/i);
-      
-      petDescription1 = pet1Match ? pet1Match[1].trim() : "a beloved pet";
-      petDescription2 = pet2Match ? pet2Match[1].trim() : "a beloved pet";
       multiPetCombinedDescription = togetherMatch ? togetherMatch[1].trim() : "";
-      
-      // Extract species for each pet
-      const species1Match = petDescription1.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC)\]/i);
-      const species2Match = petDescription2.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC)\]/i);
-      species1 = species1Match ? species1Match[1].toUpperCase() : 
-                 petDescription1.toLowerCase().includes("dog") ? "DOG" : 
-                 petDescription1.toLowerCase().includes("cat") ? "CAT" : "PET";
-      species2 = species2Match ? species2Match[1].toUpperCase() : 
-                 petDescription2.toLowerCase().includes("dog") ? "DOG" : 
-                 petDescription2.toLowerCase().includes("cat") ? "CAT" : "PET";
-      
-      console.log(`🐾 Pet 1: ${species1} - ${petDescription1.substring(0, 100)}`);
-      console.log(`🐾 Pet 2: ${species2} - ${petDescription2.substring(0, 100)}`);
       console.log(`🐾 Together: ${multiPetCombinedDescription}`);
+      
+      // Set legacy variables for backwards compatibility
+      petDescription1 = petDescriptions[0] || "";
+      petDescription2 = petDescriptions[1] || "";
+      species1 = petSpecies[0] || "";
+      species2 = petSpecies[1] || "";
       
       console.log(`Multi-pet vision analysis took ${Date.now() - visionStartTime}ms`);
     } else {
@@ -2971,47 +2981,61 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     
     let firstGeneratedBuffer: Buffer;
     
-    // === MULTI-PET GENERATION PATH (auto-detected 2 pets in single image) ===
-    if (isMultiPet && petDescription1 && petDescription2) {
-      console.log("🐾🐾 === MULTI-PET GENERATION MODE (img2img) ===");
-      console.log(`Pet 1 (${species1}): ${petDescription1.substring(0, 100)}...`);
-      console.log(`Pet 2 (${species2}): ${petDescription2.substring(0, 100)}...`);
+    // === MULTI-PET GENERATION PATH (auto-detected 2-4 pets in single image) ===
+    if (isMultiPet && petDescriptions.length >= 2) {
+      const petCount = petDescriptions.length;
+      const petCountWord = petCount === 2 ? "TWO" : petCount === 3 ? "THREE" : "FOUR";
       
-      // Create a prompt for transforming the image with both pets into a royal portrait
-      // Using img2img preserves both pets' identities from the original photo
+      console.log(`🐾🐾 === MULTI-PET GENERATION MODE (${petCount} pets, img2img) ===`);
+      petDescriptions.forEach((desc, i) => {
+        console.log(`Pet ${i + 1} (${petSpecies[i]}): ${desc.substring(0, 100)}...`);
+      });
+      
+      // Build species description
+      const allSameSpecies = petSpecies.every(s => s === petSpecies[0]);
+      const speciesDescription = allSameSpecies 
+        ? `${petCountWord} ${petSpecies[0]}S` 
+        : petSpecies.map((s, i) => i === petSpecies.length - 1 ? `and a ${s}` : `a ${s}`).join(', ').replace(/, and/, ' and');
+      
+      // Build pet descriptions list
+      const petDescriptionsList = petDescriptions.map((desc, i) => 
+        `- Pet ${i + 1} (${petSpecies[i]}): ${desc.substring(0, 200)}`
+      ).join('\n');
+      
+      // Create a prompt for transforming the image with all pets into a royal portrait
+      // Using img2img preserves all pets' identities from the original photo
       // IMPORTANT: This prompt mirrors the single-pet prompt structure for consistent style
-      const multiPetImg2ImgPrompt = `CRITICAL: These are TWO ${species1 === species2 ? `${species1}S` : `a ${species1} and a ${species2}`}. Keep BOTH pets exactly as shown - preserve both animals precisely.
+      const multiPetImg2ImgPrompt = `CRITICAL: These are ${speciesDescription}. Keep ALL ${petCount} pets exactly as shown - preserve all animals precisely.
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
 A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in SUBTLE ELEGANT colored cloaks (soft blush, dusty lavender, gentle powder blue, muted mint, warm cream) fastened with SHINY SILVER or GOLD clasps, adorned with PEARL NECKLACES, gold chains, and gemstone jewelry. Fabrics rendered with THICK TEXTURED PAINT showing brushwork.
 
 Compositions use SOFT ELEGANT BACKGROUNDS (warm cream, dusty powder blue, gentle pale pink, soft lavender, warm ivory - NEVER brown, NEVER dark, NEVER gloomy, NEVER oversaturated) with VISIBLE PAINT TEXTURE throughout. Colors are SUBTLE yet LUMINOUS—soft muted tones that are BRIGHT but REFINED, never garish—applied with THICK, SCULPTURAL brushstrokes creating a regal, SOPHISTICATED, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT but SUBTLE, with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat, NOT oversaturated.
 
-18th-century aristocratic oil portrait of TWO pets with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED. BRIGHT but ELEGANT aesthetic.
+18th-century aristocratic oil portrait of ${petCountWord} pets with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED. BRIGHT but ELEGANT aesthetic.
 
-=== CRITICAL - PRESERVE BOTH PETS' IDENTITIES EXACTLY ===
-- Pet 1 (${species1}): ${petDescription1.substring(0, 200)}
-- Pet 2 (${species2}): ${petDescription2.substring(0, 200)}
+=== CRITICAL - PRESERVE ALL ${petCount} PETS' IDENTITIES EXACTLY ===
+${petDescriptionsList}
 ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : ""}
-- Preserve BOTH pets' face structures, skull shapes, snout proportions EXACTLY
+- Preserve ALL pets' face structures, skull shapes, snout proportions EXACTLY
 - Keep all markings, colors, fur patterns in their EXACT locations for EACH pet
-- Maintain the exact eye color, shape, spacing, and expression for BOTH
+- Maintain the exact eye color, shape, spacing, and expression for ALL
 - Preserve ear shapes, sizes, and positions exactly for EACH pet
-- The unique identifying features of BOTH pets must remain unchanged
+- The unique identifying features of ALL ${petCount} pets must remain unchanged
 
-=== COMPOSITION - TWO PETS SITTING NATURALLY TOGETHER ===
-- ZOOMED OUT FRAMING - show BOTH pets' full bodies, not just heads
-- WIDE and CENTERED composition with both pets visible
-- Show LARGE CUSHION that comfortably fits BOTH pets
-- BOTH pets SEATED or LYING DOWN NATURALLY side by side
-- Position pets CLOSE TOGETHER like companions - shoulders touching or nearly touching
+=== COMPOSITION - ${petCountWord} PETS SITTING NATURALLY TOGETHER ===
+- ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies, not just heads
+- WIDE and CENTERED composition with all pets visible
+- Show LARGE CUSHION that comfortably fits ALL ${petCount} pets
+- ALL pets SEATED or LYING DOWN NATURALLY together
+- Position pets CLOSE TOGETHER like companions - arranged naturally
 - NEVER standing upright like humans - always sitting, lying, or resting
 - Natural animal posture for EACH: body low, front paws resting on cushion
-- BOTH pets should look comfortable and naturally positioned together
-- Natural sibling/companion pose - they should look like they belong together
-- FRONT PAWS VISIBLE for both pets, resting naturally on the shared cushion
-- Pets can be at slightly different angles (one more forward, one slightly turned)
-- Create visual balance - neither pet should dominate or overshadow the other
+- ALL pets should look comfortable and naturally positioned together
+- Natural family/companion pose - they should look like they belong together
+- FRONT PAWS VISIBLE for all pets, resting naturally on the shared cushion
+- Pets can be at slightly different angles (some forward, some slightly turned)
+- Create visual balance - all pets should be equally prominent and visible
 
 === SUBTLE ELEGANT COLOR PALETTE (BRIGHT yet REFINED - NOT DARK) ===
 - SUBTLE, ELEGANT, SOFT colors throughout - NOT dark or gloomy, NOT oversaturated
@@ -3020,26 +3044,26 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - BACKGROUNDS: Soft cream, dusty powder blue, gentle pale pink, soft lavender, muted mint, warm ivory
 - SOFT PASTELS: Gentle blush, soft lavender, dusty periwinkle, muted sage, soft powder blue, gentle peach
 - LIGHT AND AIRY feel - cheerful, elegant, luminous but never garish
-- CREATE HARMONY with subtle colors that make BOTH pets stand out beautifully
+- CREATE HARMONY with subtle colors that make ALL pets stand out beautifully
 - Overall palette should feel BRIGHT, REFINED, and SOPHISTICATED
 
-=== LIGHTING (VERY BRIGHT - Both Subjects Well-Illuminated) ===
-- VERY BRIGHT KEY LIGHT illuminating BOTH pets - WELL-LIT and LUMINOUS
-- STRONG BRILLIANT HIGHLIGHTS on BOTH faces and fur - INTENSELY ILLUMINATED
+=== LIGHTING (VERY BRIGHT - All Subjects Well-Illuminated) ===
+- VERY BRIGHT KEY LIGHT illuminating ALL ${petCount} pets - WELL-LIT and LUMINOUS
+- STRONG BRILLIANT HIGHLIGHTS on ALL faces and fur - INTENSELY ILLUMINATED
 - MINIMAL SHADOWS - use fill light to reduce dark areas
-- BOTH subjects should GLOW with BRIGHT RADIANT light
+- ALL subjects should GLOW with BRIGHT RADIANT light
 - LIGHT AND AIRY feel - NOT heavy shadows, NOT dark, NOT gloomy
-- BOTH pets are the BRIGHTEST elements - clearly visible and well-lit
-- Ensure even lighting across both subjects - no one pet in shadow
+- ALL pets are the BRIGHTEST elements - clearly visible and well-lit
+- Ensure even lighting across all subjects - no pet in shadow
 - BRIGHT OVERALL COMPOSITION - cheerful and luminous
 
-=== THRONE CUSHION (Large - Fits Both Pets - SUBTLE ELEGANT COLORS) ===
-- LARGE embroidered SILKY velvet cushion that comfortably fits BOTH pets
+=== THRONE CUSHION (Extra Large - Fits All ${petCount} Pets - SUBTLE ELEGANT COLORS) ===
+- EXTRA LARGE embroidered SILKY velvet cushion that comfortably fits ALL ${petCount} pets
 - SUBTLE ELEGANT colors: soft blush, dusty powder blue, gentle lavender, muted mint, warm cream
 - NOT dark colors - use SOFT, REFINED, SOPHISTICATED tones
 - SILKY texture with visible sheen and luminous quality
 - GOLD or SILVER embroidery, ornate details, tassels
-- Wide enough for both pets to sit comfortably side by side
+- Wide enough for all pets to sit comfortably together
 
 === REGAL CLOAKS (One Draped Over Each Pet - SUBTLE BEAUTIFUL COLORS) ===
 - DAINTY, DELICATE regal CLOAK DRAPED over EACH pet
@@ -3055,7 +3079,7 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - PEARL NECKLACES on each pet - elegant strings of lustrous pearls
 - Gemstone accents - sparkling rubies, sapphires, emeralds
 - Delicate filigree details in gold or silver
-- Both pets should look regal and dignified with beautiful jewelry
+- All pets should look regal and dignified with beautiful jewelry
 
 === SIGNATURE THICK OIL-PAINT TEXTURE (CRITICAL - Physically Painted Look) ===
 This must look like a HIGH-END PHYSICAL OIL PAINTING that was PROFESSIONALLY SCANNED:
@@ -3084,7 +3108,7 @@ PROFESSIONALLY SCANNED ARTWORK QUALITY:
 - Classical oil painting technique - Gainsborough, Reynolds, Vigée Le Brun style
 - NOT digital, NOT airbrushed, NOT smooth, NOT flat
 
-CRITICAL: BOTH pets must look EXACTLY like themselves in the original photo. This is a portrait of THESE TWO SPECIFIC pets together - their identities must be instantly recognizable.`;
+CRITICAL: ALL ${petCount} pets must look EXACTLY like themselves in the original photo. This is a portrait of THESE ${petCount} SPECIFIC pets together - their identities must be instantly recognizable.`;
 
       console.log("Multi-pet img2img prompt length:", multiPetImg2ImgPrompt.length);
       

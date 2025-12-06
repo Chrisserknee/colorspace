@@ -211,7 +211,7 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
             {isRainbowBridge ? "Choose Your Pet's Photo" : "Choose Your Pet Photo"}
           </h3>
           <p style={{ color: colors.subtitleColor }}>
-            {isRainbowBridge ? "Select a cherished photo of your beloved companion" : "Select a clear, well-lit photo of your pet (1 or 2 pets OK!)"}
+            {isRainbowBridge ? "Select a cherished photo of your beloved companion" : "Select a clear, well-lit photo of your pet (up to 4 pets OK!)"}
           </p>
         </div>
 
@@ -293,7 +293,7 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
             <span className="font-medium" style={{ color: colors.tipAccent }}>💡 Tip:</span>{" "}
             {isRainbowBridge 
               ? "Photos where you can clearly see their face create the most beautiful memorials."
-              : "Photos with 1 or 2 pets work great! We'll auto-detect and create a portrait for all your furry friends."
+              : "Photos with up to 4 pets work great! We'll auto-detect and create a portrait for all your furry friends."
             }
           </p>
         </div>
