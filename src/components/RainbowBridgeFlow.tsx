@@ -984,6 +984,14 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
         return;
       }
       
+      // CRITICAL: Clear the stored session so it doesn't get auto-restored
+      try {
+        localStorage.removeItem('lumepet_last_session');
+        console.log("🗑️ Cleared stored session on reset");
+      } catch (e) {
+        console.warn("Failed to clear session:", e);
+      }
+      
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }

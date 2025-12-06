@@ -326,10 +326,26 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }
   }, [initialEmail, sessionRestored]);
 
+  // Track if user has explicitly uploaded a new file (to prevent session restoration)
+  const hasNewFileRef = useRef(false);
+  
+  // When file changes, mark that we have a new file
+  useEffect(() => {
+    if (file) {
+      hasNewFileRef.current = true;
+    }
+  }, [file]);
+  
   // Local session recovery - check localStorage for recent session on mount (no email needed)
   useEffect(() => {
     // Only run on client, and only if we don't have initialResult or initialEmail
     if (typeof window === "undefined" || initialResult || initialEmail) return;
+    
+    // CRITICAL: Don't restore session if user has uploaded a new file
+    if (file && hasNewFileRef.current) {
+      console.log("📷 New file uploaded - skipping session recovery");
+      return;
+    }
     
     try {
       const stored = localStorage.getItem('lumepet_last_session');
@@ -365,7 +381,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     } catch (err) {
       console.warn("Local session recovery failed:", err);
     }
-  }, [initialResult, initialEmail]);
+  }, [initialResult, initialEmail, file]);
   
   // Track when tab was hidden for duration calculation
   const tabHiddenTimeRef = useRef<number | null>(null);
@@ -407,7 +423,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
           has_result: !!result,
         });
         
-        if (!result && stage !== "generating") {
+        // Only recover session if user doesn't have a new file uploaded
+        // and we're not actively in a flow with a file
+        if (!result && stage !== "generating" && !file) {
           // Check if we should recover a session
           try {
             const stored = localStorage.getItem('lumepet_last_session');
@@ -441,7 +459,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [result, email, stage]);
+  }, [result, email, stage, file]);
 
   // Handle initialResult - set result, stage, and expiration time when viewing last creation
   useEffect(() => {
@@ -1218,6 +1236,14 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       if (initialEmail) {
         window.location.href = '/';
         return;
+      }
+      
+      // CRITICAL: Clear the stored session so it doesn't get auto-restored
+      try {
+        localStorage.removeItem('lumepet_last_session');
+        console.log("🗑️ Cleared stored session on reset");
+      } catch (e) {
+        console.warn("Failed to clear session:", e);
       }
       
       if (previewUrl) {
