@@ -306,6 +306,95 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }
   }, [initialEmail, sessionRestored]);
 
+  // Local session recovery - check localStorage for recent session on mount (no email needed)
+  useEffect(() => {
+    // Only run on client, and only if we don't have initialResult or initialEmail
+    if (typeof window === "undefined" || initialResult || initialEmail) return;
+    
+    try {
+      const stored = localStorage.getItem('lumepet_last_session');
+      if (stored) {
+        const session = JSON.parse(stored);
+        const hoursSince = (Date.now() - session.timestamp) / (1000 * 60 * 60);
+        
+        // Only restore if less than 2 hours old and has result
+        if (hoursSince < 2 && session.imageId && session.previewUrl) {
+          console.log("🔄 Recovering local session from localStorage:", session);
+          
+          // Set the result
+          setResult({
+            imageId: session.imageId,
+            previewUrl: session.previewUrl,
+          });
+          
+          // Restore email if available
+          if (session.email) {
+            setEmail(session.email);
+          }
+          
+          // Set expiration and show result
+          setExpirationTime(Date.now() + 15 * 60 * 1000);
+          setStage("result");
+          
+          captureEvent("local_session_recovered", {
+            session_age_hours: hoursSince.toFixed(2),
+            has_email: !!session.email,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Local session recovery failed:", err);
+    }
+  }, [initialResult, initialEmail]);
+  
+  // Visibility change handler - save state when tab goes inactive
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && result) {
+        // Tab became hidden - ensure session is saved
+        const sessionData = {
+          email: email || null,
+          imageId: result.imageId,
+          previewUrl: result.previewUrl,
+          timestamp: Date.now(),
+          type: 'lumepet',
+        };
+        localStorage.setItem('lumepet_last_session', JSON.stringify(sessionData));
+        console.log("💾 Session saved on tab hide");
+      } else if (!document.hidden && !result && stage !== "generating") {
+        // Tab became visible again - check if we should recover a session
+        try {
+          const stored = localStorage.getItem('lumepet_last_session');
+          if (stored) {
+            const session = JSON.parse(stored);
+            const minutesSince = (Date.now() - session.timestamp) / (1000 * 60);
+            
+            // If session is very recent (less than 5 minutes) and we don't have a result, recover it
+            if (minutesSince < 5 && session.imageId && session.previewUrl && !result) {
+              console.log("🔄 Recovering session on tab visibility:", session);
+              setResult({
+                imageId: session.imageId,
+                previewUrl: session.previewUrl,
+              });
+              if (session.email) setEmail(session.email);
+              setExpirationTime(Date.now() + 15 * 60 * 1000);
+              setStage("result");
+              
+              captureEvent("session_recovered_on_visibility", {
+                minutes_since: minutesSince.toFixed(1),
+              });
+            }
+          }
+        } catch (err) {
+          console.warn("Visibility recovery failed:", err);
+        }
+      }
+    };
+    
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [result, email, stage]);
+
   // Handle initialResult - set result, stage, and expiration time when viewing last creation
   useEffect(() => {
     if (initialResult) {
