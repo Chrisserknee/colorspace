@@ -96,7 +96,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
         {/* Personal message */}
         <div className="text-center mb-6" style={{ color: '#B8B2A8' }}>
           <p className="text-sm leading-relaxed mb-3">
-            Hi, I&apos;m Chris — a fellow pet lover who built LumePet to celebrate the incredible bond we share with our furry family members.
+            Hi, I&apos;m Chris — a fellow pet parent who built LumePet to celebrate the incredible bond we share with our furry family members.
           </p>
           <p className="text-sm leading-relaxed mb-3">
             Every portrait we create uses advanced technology that costs real money to run. Your support helps keep LumePet alive so more pet parents can treasure their companions forever.
