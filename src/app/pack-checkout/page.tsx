@@ -224,10 +224,6 @@ function PackCheckoutContent() {
           >
             {loading ? "Processing..." : `Continue to Payment - ${currentPack.price}`}
           </button>
-          
-          <p className="text-center text-xs mt-3" style={{ color: '#7A756D' }}>
-            You&apos;ll enter your email on the next page
-          </p>
         </div>
 
         <div className="mt-6 text-center">
