@@ -666,22 +666,22 @@ function SuccessContent() {
                 unoptimized
               />
               
-              {/* Portrait overlay - precisely positioned over the blank canvas */}
+              {/* Portrait overlay - precisely positioned on the canvas FACE (not edge) */}
               {displayImageUrl && (
                 <div 
                   className="absolute overflow-hidden"
                   style={selectedCanvas === "16x16" ? {
-                    // 16x16 mockup positioning (wall-mounted, larger)
+                    // 16x16 mockup positioning - canvas face only (excludes 3D left edge)
                     top: '9.5%',
-                    left: '24.5%',
-                    width: '48%',
-                    height: '48%',
+                    left: '28%',
+                    width: '44%',
+                    height: '47%',
                   } : {
-                    // 12x12 mockup positioning (on desk, smaller)
-                    top: '13.5%',
-                    left: '24%',
-                    width: '43%',
-                    height: '44%',
+                    // 12x12 mockup positioning - canvas face only (excludes 3D left edge)
+                    top: '14.2%',
+                    left: '26.5%',
+                    width: '39%',
+                    height: '41%',
                   }}
                 >
                   {/* The portrait image */}
@@ -696,15 +696,15 @@ function SuccessContent() {
                   <div 
                     className="absolute inset-0 pointer-events-none"
                     style={{ 
-                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)',
+                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px)',
                       mixBlendMode: 'multiply',
                     }}
                   />
-                  {/* Subtle lighting/shadow for depth */}
+                  {/* Subtle lighting for depth */}
                   <div 
                     className="absolute inset-0 pointer-events-none"
                     style={{ 
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, rgba(0,0,0,0.08) 100%)',
                     }}
                   />
                 </div>
