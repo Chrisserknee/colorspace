@@ -255,7 +255,7 @@ export async function POST(request: NextRequest) {
                 console.log(`💾 Canvas order saved to database`);
               }
               
-              // Add customer if not already added
+              // Add customer if not already added and mark as canvas purchaser
               if (customerEmail) {
                 try {
                   await addCustomer(customerEmail, {
@@ -267,7 +267,17 @@ export async function POST(request: NextRequest) {
                       printifyOrderId: printifyResult.orderId,
                     }
                   });
-                  console.log(`🎉 Canvas customer added: ${customerEmail}`);
+                  
+                  // Mark this customer as having purchased a canvas (stops upsell emails)
+                  await supabase
+                    .from("paying_customers")
+                    .update({ 
+                      canvas_purchased: true, 
+                      canvas_purchased_at: new Date().toISOString() 
+                    })
+                    .eq("email", customerEmail.toLowerCase().trim());
+                  
+                  console.log(`🎉 Canvas customer added and marked: ${customerEmail}`);
                 } catch (customerError) {
                   console.warn(`⚠️ Failed to add canvas customer:`, customerError);
                 }

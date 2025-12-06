@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/lume-followups",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/canvas-emails",
+      "schedule": "*/30 * * * *"
     }
   ]
 }

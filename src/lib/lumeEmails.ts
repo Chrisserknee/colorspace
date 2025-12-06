@@ -181,16 +181,58 @@ export async function sendRoyalClubWelcomeEmail(email: string): Promise<{ succes
 }
 
 // ============================================
-// CANVAS UPSELL EMAIL
+// CANVAS UPSELL EMAIL SEQUENCE
 // ============================================
 
+type CanvasEmailStep = 1 | 2 | 3;
+
+const CANVAS_EMAIL_CONFIG: Record<CanvasEmailStep, { subject: string; headline: string; subheadline: string; ctaText: string; urgencyText?: string }> = {
+  1: {
+    subject: "Your Pet's Portrait is Now Available on Canvas 🖼️",
+    headline: "Your Portrait on Canvas",
+    subheadline: "Museum-Quality • Ready to Hang",
+    ctaText: "👉 View Your Canvas Print",
+  },
+  2: {
+    subject: "Still thinking about that canvas print? 🎨",
+    headline: "Your Portrait Awaits",
+    subheadline: "Handcrafted Canvas Prints",
+    ctaText: "👉 See Your Canvas Options",
+    urgencyText: "Don't miss out on bringing your pet's artwork to life!",
+  },
+  3: {
+    subject: "Last chance: Get your pet's canvas print 🖼️",
+    headline: "Last Chance!",
+    subheadline: "Limited Time Canvas Offer",
+    ctaText: "👉 Order Your Canvas Now",
+    urgencyText: "This is your final reminder — your exclusive canvas offer expires soon!",
+  },
+};
+
 /**
- * Send canvas upsell email to existing portrait customers
+ * Send canvas upsell email (1 of 3 in sequence)
  */
-export async function sendCanvasUpsellEmail(email: string, imageId: string): Promise<{ success: boolean; error?: string }> {
-  const subject = "Your Pet's Portrait is Now Available on Canvas 🖼️";
-  const successPageUrl = `${BASE_URL}/success?imageId=${imageId}`;
+export async function sendCanvasUpsellEmail(
+  email: string, 
+  imageId: string, 
+  step: CanvasEmailStep = 1
+): Promise<{ success: boolean; error?: string }> {
+  const config = CANVAS_EMAIL_CONFIG[step];
+  const subject = config.subject;
+  // Add #canvas anchor to auto-scroll to canvas section
+  const successPageUrl = `${BASE_URL}/success?imageId=${imageId}#canvas`;
   
+  const urgencySection = config.urgencyText ? `
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 25px 0;">
+                <tr>
+                  <td style="padding: 15px 20px; background: rgba(197, 165, 114, 0.15); border-radius: 12px; border: 1px solid rgba(197, 165, 114, 0.3);">
+                    <p style="color: #C5A572; font-size: 15px; margin: 0; text-align: center; font-weight: bold;">
+                      ⏰ ${config.urgencyText}
+                    </p>
+                  </td>
+                </tr>
+              </table>` : '';
+
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -208,14 +250,16 @@ export async function sendCanvasUpsellEmail(email: string, imageId: string): Pro
           <tr>
             <td style="padding: 50px 40px 30px; text-align: center;">
               <div style="font-size: 48px; margin-bottom: 20px;">🖼️</div>
-              <h1 style="color: #C5A572; font-size: 28px; margin: 0 0 10px; font-weight: normal; letter-spacing: 1px;">Your Portrait on Canvas</h1>
-              <p style="color: #7A756D; font-size: 14px; margin: 0; letter-spacing: 2px; text-transform: uppercase;">Museum-Quality • Ready to Hang</p>
+              <h1 style="color: #C5A572; font-size: 28px; margin: 0 0 10px; font-weight: normal; letter-spacing: 1px;">${config.headline}</h1>
+              <p style="color: #7A756D; font-size: 14px; margin: 0; letter-spacing: 2px; text-transform: uppercase;">${config.subheadline}</p>
             </td>
           </tr>
           
           <!-- Main Content -->
           <tr>
             <td style="padding: 20px 40px 40px;">
+              ${urgencySection}
+              
               <p style="color: #F0EDE8; font-size: 18px; line-height: 1.8; margin: 0 0 25px;">
                 Hi there,
               </p>
@@ -244,7 +288,7 @@ export async function sendCanvasUpsellEmail(email: string, imageId: string): Pro
                 <tr>
                   <td align="center">
                     <a href="${successPageUrl}" style="display: inline-block; background: linear-gradient(135deg, #C5A572 0%, #A68B5B 100%); color: #0A0A0A; text-decoration: none; padding: 18px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">
-                      👉 View Your Canvas Print
+                      ${config.ctaText}
                     </a>
                   </td>
                 </tr>

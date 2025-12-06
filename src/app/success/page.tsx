@@ -637,7 +637,8 @@ function SuccessContent() {
 
         {/* Canvas Upsell Section */}
         <div 
-          className="card animate-fade-in-up delay-350 mb-8"
+          id="canvas"
+          className="card animate-fade-in-up delay-350 mb-8 scroll-mt-8"
           style={{ 
             background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.08) 0%, rgba(197, 165, 114, 0.02) 100%)',
             border: '2px solid rgba(197, 165, 114, 0.25)',
