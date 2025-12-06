@@ -889,6 +889,10 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     handleGenerate(true);
   };
 
+  // Checkout abort controller for timeout handling
+  const checkoutAbortRef = useRef<AbortController | null>(null);
+  const [checkoutElapsed, setCheckoutElapsed] = useState(0);
+  
   const handlePurchaseClick = async () => {
     // Track purchase button clicked
     captureEvent("purchase_button_clicked", {
@@ -904,6 +908,20 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     
     // Go directly to Stripe checkout - email will be collected by Stripe
     setStage("checkout");
+    setCheckoutElapsed(0);
+    
+    // Create abort controller for timeout
+    checkoutAbortRef.current = new AbortController();
+    const timeoutId = setTimeout(() => {
+      if (checkoutAbortRef.current) {
+        checkoutAbortRef.current.abort();
+      }
+    }, 30000); // 30 second timeout
+    
+    // Track elapsed time
+    const elapsedInterval = setInterval(() => {
+      setCheckoutElapsed(prev => prev + 1);
+    }, 1000);
     
     try {
       // Cancel URL returns user to result page
@@ -919,7 +937,11 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
           cancelUrl,
           utmData: getUTMForAPI(), // Include UTM attribution data
         }),
+        signal: checkoutAbortRef.current.signal,
       });
+      
+      clearTimeout(timeoutId);
+      clearInterval(elapsedInterval);
       
       const data = await response.json();
       
@@ -930,10 +952,27 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         setStage("result");
       }
     } catch (err) {
-      console.error("Checkout error:", err);
-      setError("Failed to redirect to checkout. Please try again.");
+      clearTimeout(timeoutId);
+      clearInterval(elapsedInterval);
+      
+      if (err instanceof Error && err.name === "AbortError") {
+        console.error("Checkout request timed out");
+        setError("Checkout is taking too long. Please check your internet connection and try again.");
+        captureEvent("checkout_timeout", { elapsed_seconds: 30 });
+      } else {
+        console.error("Checkout error:", err);
+        setError("Failed to redirect to checkout. Please try again.");
+      }
       setStage("result");
     }
+  };
+  
+  const cancelCheckout = () => {
+    if (checkoutAbortRef.current) {
+      checkoutAbortRef.current.abort();
+    }
+    setStage("result");
+    captureEvent("checkout_cancelled_by_user", { elapsed_seconds: checkoutElapsed });
   };
 
   const validateEmail = (email: string) => {
@@ -2071,6 +2110,26 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
             <p style={{ color: '#B8B2A8' }}>
               Taking you to our secure payment page.
             </p>
+            
+            {/* Show cancel button after 5 seconds */}
+            {checkoutElapsed >= 5 && (
+              <div className="mt-6">
+                <p className="text-xs mb-3" style={{ color: '#7A756D' }}>
+                  Taking longer than expected? ({checkoutElapsed}s)
+                </p>
+                <button
+                  onClick={cancelCheckout}
+                  className="px-6 py-2 rounded-lg text-sm transition-all hover:scale-105"
+                  style={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: '#B8B2A8',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                  }}
+                >
+                  Cancel & Go Back
+                </button>
+              </div>
+            )}
           </div>
         )}
 
