@@ -13,7 +13,7 @@ interface Sample {
 const samples: Sample[] = [
   {
     id: 1,
-    title: "Her Majesty Gracie",
+    title: "Her Majesty Beatrix",
     pet: "Tabby Cat",
     image: "/samples/Gracie.png",
   },
