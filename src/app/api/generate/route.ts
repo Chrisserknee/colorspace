@@ -1516,20 +1516,38 @@ export async function POST(request: NextRequest) {
   console.log("User agent:", userAgent);
   console.log("Is mobile:", isMobile);
   
-  // Rate limiting - prevent abuse
-  const rateLimit = checkRateLimit(`generate:${clientIP}`, RATE_LIMITS.generate);
-  if (!rateLimit.allowed) {
-    console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+  // Check if this is studio mode (check form data early for rate limit bypass)
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch (e) {
+    console.error("Failed to parse form data:", e);
     return NextResponse.json(
-      { error: "Too many requests. Please wait a moment before trying again." },
-      { 
-        status: 429,
-        headers: {
-          "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString(),
-          "X-RateLimit-Remaining": "0",
-        }
-      }
+      { error: "Invalid request format" },
+      { status: 400 }
     );
+  }
+  
+  const isStudioMode = formData.get("studioMode") === "true";
+  
+  // Rate limiting - bypass for studio mode (password protected)
+  if (!isStudioMode) {
+    const rateLimit = checkRateLimit(`generate:${clientIP}`, RATE_LIMITS.generate);
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment before trying again." },
+        { 
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString(),
+            "X-RateLimit-Remaining": "0",
+          }
+        }
+      );
+    }
+  } else {
+    console.log("🎨 Studio mode - bypassing rate limit");
   }
   
   try {
@@ -1556,8 +1574,7 @@ export async function POST(request: NextRequest) {
     
     console.log("Using OpenAI for vision (GPT-4o) and image generation (DALL-E 3)");
 
-    // Parse form data
-    const formData = await request.formData();
+    // Form data already parsed above for studio mode check
     const imageFile = formData.get("image") as File | null;
     const gender = formData.get("gender") as string | null;
     const usePackCredit = formData.get("usePackCredit") === "true";
@@ -1565,16 +1582,10 @@ export async function POST(request: NextRequest) {
     const style = formData.get("style") as string | null; // "rainbow-bridge" for memorial portraits
     const petName = formData.get("petName") as string | null; // Pet's name for rainbow bridge portraits
     
-    // Studio mode - unlimited generations with custom prompts
-    const studioMode = formData.get("studioMode") === "true";
+    // Studio mode - unlimited generations with custom prompts (already checked above as isStudioMode)
+    const studioMode = isStudioMode;
     const customPrompt = formData.get("customPrompt") as string | null;
     const enableWatermark = formData.get("enableWatermark") !== "false"; // Default true unless explicitly false
-    const studioPassword = "lumepet2024"; // Must match frontend
-    
-    // Validate studio mode (simple password check via a marker)
-    if (studioMode) {
-      console.log("🎨 Studio mode activated - unlimited generation");
-    }
     
     const isRainbowBridge = style === "rainbow-bridge";
     
