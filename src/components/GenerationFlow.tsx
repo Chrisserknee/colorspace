@@ -3,7 +3,21 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { CONFIG } from "@/lib/config";
-import { captureEvent, identifyUser } from "@/lib/posthog";
+import { 
+  captureEvent, 
+  identifyUser, 
+  captureError,
+  trackApiCall,
+  trackClick,
+  trackVisibilityChange,
+  trackGenerationStart,
+  trackGenerationComplete,
+  trackGenerationError,
+  trackCheckoutStart,
+  trackCheckoutSuccess,
+  trackCheckoutError,
+  trackFlowStep,
+} from "@/lib/posthog";
 import { getUTMForAPI } from "@/lib/utm";
 
 type Stage = "preview" | "email-capture" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
@@ -347,47 +361,74 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }
   }, [initialResult, initialEmail]);
   
+  // Track when tab was hidden for duration calculation
+  const tabHiddenTimeRef = useRef<number | null>(null);
+  
   // Visibility change handler - save state when tab goes inactive
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden && result) {
-        // Tab became hidden - ensure session is saved
-        const sessionData = {
-          email: email || null,
-          imageId: result.imageId,
-          previewUrl: result.previewUrl,
-          timestamp: Date.now(),
-          type: 'lumepet',
-        };
-        localStorage.setItem('lumepet_last_session', JSON.stringify(sessionData));
-        console.log("💾 Session saved on tab hide");
-      } else if (!document.hidden && !result && stage !== "generating") {
-        // Tab became visible again - check if we should recover a session
-        try {
-          const stored = localStorage.getItem('lumepet_last_session');
-          if (stored) {
-            const session = JSON.parse(stored);
-            const minutesSince = (Date.now() - session.timestamp) / (1000 * 60);
-            
-            // If session is very recent (less than 5 minutes) and we don't have a result, recover it
-            if (minutesSince < 5 && session.imageId && session.previewUrl && !result) {
-              console.log("🔄 Recovering session on tab visibility:", session);
-              setResult({
-                imageId: session.imageId,
-                previewUrl: session.previewUrl,
-              });
-              if (session.email) setEmail(session.email);
-              setExpirationTime(Date.now() + 15 * 60 * 1000);
-              setStage("result");
-              
-              captureEvent("session_recovered_on_visibility", {
-                minutes_since: minutesSince.toFixed(1),
-              });
-            }
-          }
-        } catch (err) {
-          console.warn("Visibility recovery failed:", err);
+      if (document.hidden) {
+        // Tab became hidden
+        tabHiddenTimeRef.current = Date.now();
+        
+        trackVisibilityChange(false, {
+          current_stage: stage,
+          has_result: !!result,
+          has_email: !!email,
+        });
+        
+        if (result) {
+          // Save session on hide
+          const sessionData = {
+            email: email || null,
+            imageId: result.imageId,
+            previewUrl: result.previewUrl,
+            timestamp: Date.now(),
+            type: 'lumepet',
+          };
+          localStorage.setItem('lumepet_last_session', JSON.stringify(sessionData));
+          console.log("💾 Session saved on tab hide");
         }
+      } else {
+        // Tab became visible
+        const hiddenDuration = tabHiddenTimeRef.current 
+          ? Date.now() - tabHiddenTimeRef.current 
+          : 0;
+        
+        trackVisibilityChange(true, {
+          hiddenDuration,
+          current_stage: stage,
+          has_result: !!result,
+        });
+        
+        if (!result && stage !== "generating") {
+          // Check if we should recover a session
+          try {
+            const stored = localStorage.getItem('lumepet_last_session');
+            if (stored) {
+              const session = JSON.parse(stored);
+              const minutesSince = (Date.now() - session.timestamp) / (1000 * 60);
+              
+              // If session is very recent (less than 5 minutes) and we don't have a result, recover it
+              if (minutesSince < 5 && session.imageId && session.previewUrl && !result) {
+                console.log("🔄 Recovering session on tab visibility:", session);
+                setResult({
+                  imageId: session.imageId,
+                  previewUrl: session.previewUrl,
+                });
+                if (session.email) setEmail(session.email);
+                setExpirationTime(Date.now() + 15 * 60 * 1000);
+                setStage("result");
+                
+                captureEvent("session_recovered_on_visibility", {
+                  minutes_since: minutesSince.toFixed(1),
+                  hidden_duration_ms: hiddenDuration,
+                });
+              }
+            }
+          } catch (err) {
+            captureError("visibility_recovery", err, { stage, hiddenDuration });
+          }
       }
     };
     
@@ -700,14 +741,31 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       gender: gender || "not_selected",
     });
 
+    const generationApiStartTime = Date.now();
+    
     try {
       // Compress image if it's too large (over 3.5MB)
       let fileToUpload = file;
+      const originalSize = file.size;
       if (file.size > 3.5 * 1024 * 1024) {
         console.log(`Compressing image from ${(file.size / 1024 / 1024).toFixed(2)}MB...`);
         fileToUpload = await compressImage(file, 3.5);
         console.log(`Compressed to ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
+        
+        captureEvent("image_compressed", {
+          original_size_kb: Math.round(originalSize / 1024),
+          compressed_size_kb: Math.round(fileToUpload.size / 1024),
+          compression_ratio: (fileToUpload.size / originalSize).toFixed(2),
+        });
       }
+      
+      trackGenerationStart({
+        hasFile: true,
+        fileSize: fileToUpload.size,
+        fileType: fileToUpload.type,
+        is_retry: isRetry,
+        gender: gender || "not_selected",
+      });
       
       const formData = new FormData();
       formData.append("image", fileToUpload);
@@ -730,9 +788,18 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         method: "POST",
         body: formData,
       });
+      
+      const apiDuration = Date.now() - generationApiStartTime;
+      trackApiCall("/api/generate", "POST", generationApiStartTime, { 
+        ok: response.ok, 
+        status: response.status 
+      });
 
       // Handle 413 Payload Too Large error specifically
       if (response.status === 413) {
+        trackGenerationError("payload_too_large", apiDuration, {
+          file_size_kb: Math.round(fileToUpload.size / 1024),
+        });
         throw new Error("Image file is too large. Please use an image smaller than 4MB, or try compressing it first.");
       }
 
@@ -746,10 +813,20 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
           error: data.error,
           fullData: data,
         });
+        trackGenerationError(data.error || "api_error", apiDuration, {
+          status_code: response.status,
+        });
         throw new Error(data.error || `Failed to generate portrait (${response.status})`);
       }
 
       setResult(data);
+      
+      // Track successful generation
+      trackGenerationComplete(data.imageId, apiDuration, {
+        is_retry: isRetry,
+        gender: gender || "not_selected",
+        has_preview_url: !!data.previewUrl,
+      });
       
       // Save as last creation for "View Last Creation" button
       if (data.imageId && data.previewUrl) {
@@ -853,8 +930,21 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       setStage("result");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      const errorDuration = Date.now() - generationApiStartTime;
+      
       console.error("Generation error:", err);
       console.error("Error message:", errorMessage);
+      
+      // Track the error with full context
+      captureError("generation", err, {
+        error_message: errorMessage,
+        duration_ms: errorDuration,
+        is_retry: isRetry,
+        gender: gender || "not_selected",
+        file_size_kb: file ? Math.round(file.size / 1024) : undefined,
+        file_type: file?.type,
+      });
+      
       setError(errorMessage);
       setStage("preview");
       
@@ -910,6 +1000,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     setStage("checkout");
     setCheckoutElapsed(0);
     
+    const checkoutStartTime = Date.now();
+    trackCheckoutStart(result.imageId, { has_email: !!email });
+    
     // Create abort controller for timeout
     checkoutAbortRef.current = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -927,6 +1020,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       // Cancel URL returns user to result page
       const cancelUrl = `/`;
       
+      const apiStartTime = Date.now();
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -940,27 +1034,47 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         signal: checkoutAbortRef.current.signal,
       });
       
+      trackApiCall("/api/checkout", "POST", apiStartTime, { ok: response.ok, status: response.status });
+      
       clearTimeout(timeoutId);
       clearInterval(elapsedInterval);
       
       const data = await response.json();
       
       if (response.ok && data.checkoutUrl) {
+        trackCheckoutSuccess(result.imageId, Date.now() - checkoutStartTime, {
+          has_checkout_url: true,
+        });
         window.location.href = data.checkoutUrl;
       } else {
-        setError(data.error || "Failed to create checkout session");
+        const errorMsg = data.error || "Failed to create checkout session";
+        trackCheckoutError(errorMsg, Date.now() - checkoutStartTime, {
+          status_code: response.status,
+          image_id: result.imageId,
+        });
+        setError(errorMsg);
         setStage("result");
       }
     } catch (err) {
       clearTimeout(timeoutId);
       clearInterval(elapsedInterval);
       
+      const duration = Date.now() - checkoutStartTime;
+      
       if (err instanceof Error && err.name === "AbortError") {
         console.error("Checkout request timed out");
+        trackCheckoutError("timeout", duration, { 
+          image_id: result.imageId,
+          timeout_seconds: 30,
+        });
         setError("Checkout is taking too long. Please check your internet connection and try again.");
-        captureEvent("checkout_timeout", { elapsed_seconds: 30 });
       } else {
-        console.error("Checkout error:", err);
+        const errorMsg = err instanceof Error ? err.message : "Unknown error";
+        trackCheckoutError(errorMsg, duration, { 
+          image_id: result.imageId,
+          error_type: "network_or_exception",
+        });
+        captureError("checkout_exception", err, { image_id: result.imageId });
         setError("Failed to redirect to checkout. Please try again.");
       }
       setStage("result");
@@ -972,7 +1086,10 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       checkoutAbortRef.current.abort();
     }
     setStage("result");
-    captureEvent("checkout_cancelled_by_user", { elapsed_seconds: checkoutElapsed });
+    captureEvent("checkout_cancelled_by_user", { 
+      elapsed_seconds: checkoutElapsed,
+      image_id: result?.imageId,
+    });
   };
 
   const validateEmail = (email: string) => {
