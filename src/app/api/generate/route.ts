@@ -1742,49 +1742,68 @@ Brief description of how they look together, noting their relative sizes (e.g., 
           content: [
             {
               type: "text",
-              text: `Analyze this pet photo. Identify the species first.
+              text: `Analyze this pet photo with EXTREME PRECISION for identity preservation. The goal is to capture THIS EXACT pet's unique appearance so it can be recreated perfectly.
 
 SUPPORTED SPECIES (use these exact tags):
 [DOG], [CAT], [BIRD], [FISH], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [RAT], [EXOTIC]
 
-SPECIES IDENTIFICATION:
-- DOG: Larger snout/muzzle, canine features, various breeds
-- CAT: Compact face, whiskers, feline features
-- BIRD: Feathers, beak (parakeet, parrot, cockatiel, etc.)
-- FISH: Scales, fins, aquatic
-- RABBIT: Long ears, compact furry body
-- HAMSTER: Small, round, short ears
-- GUINEA PIG: Larger than hamster, no tail
-- REPTILE: Scales (bearded dragon, gecko, snake, iguana)
-- FERRET: Long body, small face
-- TURTLE: Shell, reptilian
-- HORSE: Equine features, large
-- RAT: Long tail, pointed face
-- EXOTIC: Other unique pets
+Provide an EXTREMELY DETAILED description focusing on what makes THIS SPECIFIC pet unique:
 
-Provide a CONCISE description:
 1. SPECIES & BREED: [SPECIES] - Breed/variety or "Mixed" (confidence: HIGH/MEDIUM/LOW)
-2. AGE: YOUNG or ADULT
-3. SIZE & STATURE: Describe the pet's overall size (tiny/small/medium/large/giant) AND body build (petite, compact, stocky, athletic, muscular, slender, lanky, fluffy/round, barrel-chested, leggy, chunky)
-4. COLORS: Be SPECIFIC - list base color, any markings with locations.
-5. FACE: Eye color, eye shape, distinctive facial features
-6. BODY PROPORTIONS: Describe notable proportions (long body, short legs, large paws, long neck, broad chest, narrow waist, big ears relative to head, etc.)
-7. UNIQUE FEATURES: 3-5 things that make THIS pet recognizable
-8. COVERING: Fur/feathers/scales - texture and length
 
-Format: "[SPECIES] BREED: [breed]. AGE: [stage]. SIZE: [size and stature]. BODY: [proportions]. COLORS: [detailed colors and markings]. FACE: [details]. UNIQUE: [distinctive features]. COVERING: [texture]."`,
+2. FACE GEOMETRY (CRITICAL - be extremely precise):
+   - HEAD SHAPE: Round, oval, triangular, square, heart-shaped? How wide vs long?
+   - SNOUT/MUZZLE: Length (short/medium/long), width, shape (pointed, blunt, flat)
+   - FOREHEAD: Flat, domed, sloped? Prominent or subtle?
+   - CHEEKS: Full/puffy, hollow, angular, rounded?
+   - CHIN: Prominent, recessed, pointed, rounded?
+   - JAW LINE: Sharp, soft, wide, narrow?
+
+3. EYES (CRITICAL - be extremely precise):
+   - COLOR: Exact shade (golden-yellow, amber, emerald green, copper, etc.)
+   - SHAPE: Round, almond, oval, hooded? How open or squinted?
+   - SIZE: Large, medium, small relative to face?
+   - SPACING: Wide-set, close-set, or average?
+   - TILT: Upward slant, downward, straight?
+   - EXPRESSION: Alert, sleepy, curious, intense?
+
+4. EARS:
+   - SIZE: Large, medium, small relative to head?
+   - SHAPE: Pointed, rounded, folded, tufted?
+   - POSITION: High-set, low-set, wide apart, close together?
+   - ANGLE: Upright, tilted forward, tilted back, sideways?
+
+5. NOSE:
+   - SIZE: Large, medium, small relative to face?
+   - SHAPE: Wide, narrow, button, triangular?
+   - COLOR: Pink, black, brown, multicolored?
+
+6. BODY & BUILD:
+   - SIZE: Tiny/small/medium/large/giant
+   - BUILD: Petite, compact, stocky, athletic, muscular, slender, fluffy, chunky
+   - PROPORTIONS: Long body, short legs, barrel-chested, leggy, etc.
+
+7. COAT:
+   - COLOR: Primary and secondary colors with EXACT shades
+   - PATTERN: Solid, tabby, tuxedo, calico, pointed, etc.
+   - MARKINGS: Specific locations of any markings, patches, or patterns
+   - TEXTURE: Short, medium, long, fluffy, sleek, wiry, double-coat?
+
+8. UNIQUE IDENTIFIERS: 3-5 specific features that would let you identify THIS pet in a crowd of similar pets
+
+Format your response as a detailed paragraph that could be used to recreate this exact pet's appearance.`,
             },
             {
               type: "image_url",
               image_url: {
                 url: `data:image/jpeg;base64,${base64Image}`,
-                detail: "low",  // Use low detail for faster processing - sufficient for pet ID
+                detail: "high",  // Use HIGH detail for accurate facial feature capture
               },
             },
           ],
         },
       ],
-      max_tokens: 800,  // Reduced - we only need essential info
+      max_tokens: 1200,  // Increased for detailed facial analysis
       temperature: 0.1,
     });
     
@@ -2576,36 +2595,54 @@ Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft 
 - MIX IT UP: Each portrait should have a unique, different color palette
 - CREATE CONTRAST: Colors should make the pet stand out beautifully
 
-=== IDENTITY PRESERVATION - MOST CRITICAL ===
-This portrait MUST be instantly recognizable as THIS SPECIFIC ${species}. The owner should look at the portrait and immediately feel "That's MY pet!"
+=== IDENTITY PRESERVATION - MOST CRITICAL - READ CAREFULLY ===
+This portrait MUST be instantly recognizable as THIS SPECIFIC ${species}. The owner should look at the portrait and immediately feel "That's MY pet!" NOT "that's A pet that looks similar."
 
-IDENTITY REQUIREMENTS:
-- The facial structure must match the original EXACTLY - this is what makes pets recognizable
-- Preserve the unique "look" in the eyes - the expression that defines this pet's personality
-- Every distinctive marking must be in the EXACT correct location
-- The overall silhouette and proportions must match the original
-- Breed characteristics must be accurate but INDIVIDUAL features take priority
-- If this pet has any asymmetrical features, they MUST be preserved
-- The portrait should capture what makes THIS pet different from every other pet of the same breed
+*** FACIAL GEOMETRY - THE #1 PRIORITY ***
+The FACE is what makes a pet recognizable. You MUST match these EXACTLY:
 
-BODY SIZE & STATURE PRESERVATION - CRITICAL:
+HEAD SHAPE:
+- If the description says "round head" - make it ROUND, not oval or triangular
+- If "square jaw" - make it SQUARE, not rounded
+- If "wide face" - make it WIDE, not narrow
+- The head-to-body proportion must match exactly
+
+SNOUT/MUZZLE:
+- SHORT snout = generate SHORT snout (not medium or long)
+- FLAT face = generate FLAT face (like a Persian, not a Siamese)
+- LONG muzzle = generate LONG muzzle (like a Greyhound, not a Bulldog)
+- The snout length relative to head size is CRITICAL for recognition
+
+EYES - EXTREMELY IMPORTANT:
+- ROUND eyes = generate perfectly ROUND eyes
+- ALMOND eyes = generate almond-shaped eyes
+- WIDE-SET eyes = space them WIDE apart
+- CLOSE-SET eyes = space them CLOSE together
+- The exact EYE COLOR must match (golden-yellow, amber, green, blue, copper)
+- Eye SIZE relative to face must be accurate
+
+EARS:
+- LARGE ears = make them LARGE
+- SMALL ears = make them SMALL  
+- WIDE-SET ears = position them FAR apart
+- HIGH-SET ears = position them HIGH on the head
+- Ear SHAPE (pointed, rounded, folded) must match exactly
+
+CHEEKS & JAWLINE:
+- FULL cheeks = show full, rounded cheeks
+- ANGULAR face = show defined bone structure
+- SOFT features = show gentle, rounded features
+
+BODY SIZE & STATURE PRESERVATION:
 - Match the pet's EXACT body type: if stocky, show stocky; if slender, show slender
 - Preserve the pet's SIZE accurately: a tiny Chihuahua should look tiny, a massive Great Dane should look imposing
 - Maintain correct proportions: long-bodied pets stay long, short-legged pets have short legs
 - If the pet is chunky/fluffy, show that roundness; if lean/athletic, show that musculature
 - Barrel-chested pets should have broad chests; narrow pets should appear streamlined
-- Leg length relative to body must be accurate - corgis have short legs, greyhounds have long legs
-- Paw size relative to body should match - some pets have notably large or small paws
 - The body silhouette from any angle should be recognizable as THIS specific pet
 
-WHAT CREATES INSTANT RECOGNITION:
-- Correct skull shape and snout proportions (these vary significantly even within breeds)
-- Exact eye shape, size, spacing, and color
-- Precise ear shape, size, and carriage
-- Unique markings in their exact locations
-- The pet's characteristic expression
-- Correct coat color with accurate shading and patterns
-- Accurate body size, build, and stature (stocky vs slender, compact vs lanky)
+THE RECOGNITION TEST:
+Ask yourself: If 10 pets of this breed were lined up, would the owner be able to pick out THEIR pet from this portrait? If not, the facial features aren't accurate enough.
 
 === CRITICAL: FULLY ANIMAL - NO HUMAN FEATURES ===
 - The ${species} must be 100% ANIMAL - NOT a human-animal hybrid
