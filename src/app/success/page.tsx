@@ -673,11 +673,12 @@ function SuccessContent() {
                       width: '50%',
                       height: '49.4%',
                     } : {
-                      // 12x12: needs exact coordinates too
-                      top: '24%',
-                      left: '35%',
-                      width: '38%',
-                      height: '42%',
+                      // 12x12: EXACT pixel coordinates from Photoshop
+                      // Image: 1024x1024, Canvas: (261,272) to (745,751)
+                      top: '26.6%',
+                      left: '25.5%',
+                      width: '47.3%',
+                      height: '46.8%',
                     })
                   }}
                 >
