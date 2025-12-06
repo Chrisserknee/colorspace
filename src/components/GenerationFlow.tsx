@@ -33,6 +33,188 @@ const VICTORIAN_PHRASES = [
   "A masterpiece takes form...",
 ];
 
+// Tamagotchi-style cat emotions/animations
+const CAT_STATES = ["sitting", "blinking", "wagging", "purring", "dancing"] as const;
+type CatState = typeof CAT_STATES[number];
+
+// Tamagotchi Cat Component
+function TamagotchiCat({ progress }: { progress: number }) {
+  const [catState, setCatState] = useState<CatState>("sitting");
+  const [blinkFrame, setBlinkFrame] = useState(false);
+  
+  // Cycle through cat states based on progress
+  useEffect(() => {
+    const stateIndex = Math.floor((progress / 100) * CAT_STATES.length) % CAT_STATES.length;
+    setCatState(CAT_STATES[stateIndex] || "sitting");
+  }, [progress]);
+  
+  // Blink animation
+  useEffect(() => {
+    const blinkInterval = setInterval(() => {
+      setBlinkFrame(true);
+      setTimeout(() => setBlinkFrame(false), 150);
+    }, 2500);
+    return () => clearInterval(blinkInterval);
+  }, []);
+  
+  // Get animation class based on state
+  const getAnimationClass = () => {
+    switch (catState) {
+      case "dancing": return "animate-bounce";
+      case "wagging": return "animate-wiggle";
+      case "purring": return "animate-pulse";
+      default: return "";
+    }
+  };
+  
+  // Cat pixel art using CSS/SVG
+  return (
+    <div className={`relative ${getAnimationClass()}`}>
+      {/* Cat Container */}
+      <div 
+        className="relative w-24 h-24 flex items-center justify-center"
+        style={{ 
+          filter: 'drop-shadow(0 0 15px rgba(197, 165, 114, 0.4))'
+        }}
+      >
+        {/* Cat Body - Pixel Art Style */}
+        <svg viewBox="0 0 64 64" className="w-full h-full">
+          {/* Ears */}
+          <polygon 
+            points="12,20 18,8 24,20" 
+            fill="#C5A572" 
+            className={catState === "wagging" ? "origin-bottom animate-wiggle" : ""}
+          />
+          <polygon 
+            points="40,20 46,8 52,20" 
+            fill="#C5A572"
+            className={catState === "wagging" ? "origin-bottom animate-wiggle" : ""}
+          />
+          <polygon points="14,18 18,10 22,18" fill="#FFD4B8" />
+          <polygon points="42,18 46,10 50,18" fill="#FFD4B8" />
+          
+          {/* Head */}
+          <ellipse cx="32" cy="28" rx="18" ry="14" fill="#C5A572" />
+          
+          {/* Face */}
+          <ellipse cx="32" cy="30" rx="14" ry="10" fill="#E8D5B5" />
+          
+          {/* Eyes */}
+          {blinkFrame ? (
+            <>
+              <line x1="22" y1="26" x2="28" y2="26" stroke="#4A3728" strokeWidth="2" strokeLinecap="round" />
+              <line x1="36" y1="26" x2="42" y2="26" stroke="#4A3728" strokeWidth="2" strokeLinecap="round" />
+            </>
+          ) : (
+            <>
+              <ellipse cx="25" cy="26" rx="4" ry={catState === "purring" ? 3 : 4} fill="#4A3728" />
+              <ellipse cx="39" cy="26" rx="4" ry={catState === "purring" ? 3 : 4} fill="#4A3728" />
+              {/* Eye shine */}
+              <circle cx="26" cy="25" r="1.5" fill="white" />
+              <circle cx="40" cy="25" r="1.5" fill="white" />
+            </>
+          )}
+          
+          {/* Nose */}
+          <ellipse cx="32" cy="32" rx="2" ry="1.5" fill="#FFB6C1" />
+          
+          {/* Mouth */}
+          <path 
+            d="M 29 34 Q 32 37 35 34" 
+            fill="none" 
+            stroke="#4A3728" 
+            strokeWidth="1.5" 
+            strokeLinecap="round"
+          />
+          {catState === "purring" && (
+            <path 
+              d="M 26 35 Q 32 40 38 35" 
+              fill="none" 
+              stroke="#4A3728" 
+              strokeWidth="1" 
+              strokeLinecap="round"
+              opacity="0.5"
+            />
+          )}
+          
+          {/* Whiskers */}
+          <g stroke="#4A3728" strokeWidth="0.8" opacity="0.6">
+            <line x1="12" y1="30" x2="22" y2="32" />
+            <line x1="12" y1="34" x2="22" y2="34" />
+            <line x1="42" y1="32" x2="52" y2="30" />
+            <line x1="42" y1="34" x2="52" y2="34" />
+          </g>
+          
+          {/* Body */}
+          <ellipse cx="32" cy="48" rx="14" ry="12" fill="#C5A572" />
+          <ellipse cx="32" cy="50" rx="10" ry="8" fill="#E8D5B5" />
+          
+          {/* Paws */}
+          <ellipse cx="22" cy="56" rx="5" ry="3" fill="#C5A572" />
+          <ellipse cx="42" cy="56" rx="5" ry="3" fill="#C5A572" />
+          
+          {/* Tail */}
+          <path 
+            d={catState === "wagging" 
+              ? "M 46 48 Q 58 40 54 30" 
+              : catState === "dancing"
+              ? "M 46 48 Q 60 45 56 35"
+              : "M 46 48 Q 56 44 52 36"
+            }
+            fill="none" 
+            stroke="#C5A572" 
+            strokeWidth="6" 
+            strokeLinecap="round"
+            className={catState === "wagging" ? "origin-left" : ""}
+            style={{
+              transition: "d 0.3s ease-in-out"
+            }}
+          />
+          
+          {/* Crown for royal touch */}
+          <g transform="translate(32, 6)">
+            <polygon 
+              points="-8,8 -6,0 -3,6 0,-2 3,6 6,0 8,8" 
+              fill="#FFD700"
+              stroke="#DAA520"
+              strokeWidth="0.5"
+            />
+            {/* Crown gems */}
+            <circle cx="0" cy="2" r="1.5" fill="#E53E3E" />
+            <circle cx="-4" cy="4" r="1" fill="#48BB78" />
+            <circle cx="4" cy="4" r="1" fill="#4299E1" />
+          </g>
+        </svg>
+        
+        {/* Emotion indicators */}
+        {catState === "purring" && (
+          <div className="absolute -right-2 top-1/2 text-sm animate-pulse">
+            💤
+          </div>
+        )}
+        {catState === "dancing" && (
+          <>
+            <div className="absolute -left-3 top-0 text-xs animate-bounce" style={{ animationDelay: "0.1s" }}>✨</div>
+            <div className="absolute -right-3 top-2 text-xs animate-bounce" style={{ animationDelay: "0.2s" }}>✨</div>
+          </>
+        )}
+      </div>
+      
+      {/* State label */}
+      <div 
+        className="text-center mt-2 text-xs font-medium capitalize"
+        style={{ color: '#C5A572' }}
+      >
+        {catState === "sitting" && "🐱 Sitting patiently..."}
+        {catState === "blinking" && "😺 Watching carefully..."}
+        {catState === "wagging" && "😸 Getting excited..."}
+        {catState === "purring" && "😻 Almost there..."}
+        {catState === "dancing" && "🎉 So close!"}
+      </div>
+    </div>
+  );
+}
+
 // Retry limit management using localStorage
 const STORAGE_KEY = "lumepet_generation_limits";
 
@@ -976,11 +1158,11 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
 
   return (
     <div className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto overscroll-contain ${isClosing ? 'pointer-events-none' : ''}`}>
-      {/* Backdrop */}
+      {/* Backdrop - disabled during generation to prevent accidental close */}
       <div 
         className={`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'animate-fade-out' : ''}`}
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
-        onClick={handleReset}
+        onClick={stage === "generating" ? undefined : handleReset}
       />
       
       {/* Content - no overflow here, let outer container handle scrolling */}
@@ -1352,25 +1534,12 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
           </div>
         )}
 
-        {/* Generating Stage - Elegant Loading */}
+        {/* Generating Stage - Elegant Loading with Tamagotchi Cat */}
         {stage === "generating" && (
           <div className="p-6 sm:p-8 flex flex-col items-center justify-center min-h-[400px]">
-            {/* Floating LumePet Logo with enhanced glow */}
-            <div 
-              className="mb-8 relative"
-              style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
-            >
-              <Image
-                src="/samples/LumePet2.png"
-                alt="LumePet"
-                width={120}
-                height={120}
-                className="object-contain animate-float"
-                style={{
-                  filter: 'drop-shadow(0 0 20px rgba(197, 165, 114, 0.5)) drop-shadow(0 0 40px rgba(197, 165, 114, 0.3))'
-                }}
-                priority
-              />
+            {/* Tamagotchi-style Cat Animation */}
+            <div className="mb-6 relative">
+              <TamagotchiCat progress={generationProgress} />
             </div>
             
             {/* Creating your masterpiece title */}

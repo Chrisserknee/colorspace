@@ -528,6 +528,10 @@ a:not(.btn-primary):not(.btn-secondary):not([class*="block"]) {
   animation: wiggle 0.5s ease-in-out;
 }
 
+.animate-wiggle {
+  animation: wiggle 0.4s ease-in-out infinite;
+}
+
 .animate-shake {
   animation: shake 0.5s ease-in-out;
 }
