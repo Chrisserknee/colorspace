@@ -131,6 +131,19 @@ function SuccessContent() {
   const [rainbowBridgeData, setRainbowBridgeData] = useState<RainbowBridgeData | null>(null);
   const [selectedCanvas, setSelectedCanvas] = useState<CanvasSize>("16x16");
   const [isOrderingCanvas, setIsOrderingCanvas] = useState(false);
+  const [isCanvasTransitioning, setIsCanvasTransitioning] = useState(false);
+
+  // Smooth canvas size transition handler
+  const handleCanvasChange = (newSize: CanvasSize) => {
+    if (newSize === selectedCanvas) return;
+    setIsCanvasTransitioning(true);
+    setTimeout(() => {
+      setSelectedCanvas(newSize);
+      setTimeout(() => {
+        setIsCanvasTransitioning(false);
+      }, 50);
+    }, 150);
+  };
 
   // Function to render text overlay on canvas
   const renderTextOverlay = useCallback(async (imageUrl: string, name: string, quote: string): Promise<string> => {
@@ -665,6 +678,8 @@ function SuccessContent() {
                   className="absolute overflow-hidden"
                   style={{
                     zIndex: 1,
+                    transition: 'opacity 150ms ease-in-out, top 200ms ease-out, left 200ms ease-out, width 200ms ease-out, height 200ms ease-out',
+                    opacity: isCanvasTransitioning ? 0 : 1,
                     ...(selectedCanvas === "16x16" ? {
                       // 16x16: EXACT pixel coordinates from Photoshop
                       // Image: 1024x1024, Canvas: (281,184) to (792,689)
@@ -706,7 +721,11 @@ function SuccessContent() {
                 alt="Room mockup"
                 fill
                 className="object-cover"
-                style={{ zIndex: 2 }}
+                style={{ 
+                  zIndex: 2,
+                  transition: 'opacity 150ms ease-in-out',
+                  opacity: isCanvasTransitioning ? 0 : 1,
+                }}
                 unoptimized
               />
             </div>
@@ -718,6 +737,8 @@ function SuccessContent() {
                 background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
                 color: '#B8B2A8',
                 zIndex: 3,
+                transition: 'opacity 150ms ease-in-out',
+                opacity: isCanvasTransitioning ? 0 : 1,
               }}
             >
               {selectedCanvas === "16x16" ? "16×16 Premium Canvas" : "12×12 Gallery Canvas"}
@@ -729,7 +750,7 @@ function SuccessContent() {
             {CANVAS_OPTIONS.map((option) => (
               <button
                 key={option.size}
-                onClick={() => setSelectedCanvas(option.size)}
+                onClick={() => handleCanvasChange(option.size)}
                 className="relative p-4 rounded-lg transition-all text-left"
                 style={{
                   backgroundColor: selectedCanvas === option.size 
