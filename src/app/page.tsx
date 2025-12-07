@@ -60,6 +60,7 @@ export default function Home() {
   const [lastCreation, setLastCreation] = useState<{ imageId: string; previewUrl: string } | null>(null);
   const [viewingLastCreation, setViewingLastCreation] = useState(false);
   const [hasAnyCreations, setHasAnyCreations] = useState(false);
+  const [justGenerated, setJustGenerated] = useState(false); // Highlight My Creations after generation
 
   // Check for email param (session restore) or pending image from pack purchase
   useEffect(() => {
@@ -126,9 +127,32 @@ export default function Home() {
   };
 
   const handleReset = () => {
+    // Check if user just generated something (has creations now)
+    const hasCreationsNow = hasCreations();
+    
     setSelectedFile(null);
     setViewingLastCreation(false);
     setShowFlowFromEmail(false);
+    
+    // Refresh creations state
+    setHasAnyCreations(hasCreationsNow);
+    
+    // If they now have creations (either new or existing), highlight the button
+    if (hasCreationsNow) {
+      setJustGenerated(true);
+      // Clear the highlight after 8 seconds
+      setTimeout(() => setJustGenerated(false), 8000);
+    }
+    
+    // Refresh last creation
+    const savedLastCreation = getLastCreation();
+    if (savedLastCreation) {
+      setLastCreation({
+        imageId: savedLastCreation.imageId,
+        previewUrl: savedLastCreation.previewUrl,
+      });
+    }
+    
     // Also clear any pending image
     if (typeof window !== "undefined") {
       localStorage.removeItem("lumepet_pending_image");
@@ -167,15 +191,38 @@ export default function Home() {
 
       {/* My Creations Button - static, centered above How It Works */}
       {!selectedFile && !showFlowFromEmail && !viewingLastCreation && hasAnyCreations && (
-        <div className="flex justify-center py-6 -mt-8">
+        <div className="flex flex-col items-center py-6 -mt-8 gap-2">
+          {/* "Your portrait is ready!" message when just generated */}
+          {justGenerated && (
+            <div 
+              className="text-sm font-medium animate-bounce"
+              style={{ 
+                color: '#C5A572',
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+              }}
+            >
+              ✨ Your portrait is saved! ✨
+            </div>
+          )}
           <button
-            onClick={() => setIsCreationsModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+            onClick={() => {
+              setIsCreationsModalOpen(true);
+              setJustGenerated(false); // Clear highlight when clicked
+            }}
+            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
+              justGenerated ? 'animate-pulse scale-105' : ''
+            }`}
             style={{
-              background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.15) 0%, rgba(197, 165, 114, 0.08) 100%)',
-              border: '1px solid rgba(197, 165, 114, 0.3)',
+              background: justGenerated 
+                ? 'linear-gradient(135deg, rgba(197, 165, 114, 0.35) 0%, rgba(197, 165, 114, 0.2) 100%)'
+                : 'linear-gradient(135deg, rgba(197, 165, 114, 0.15) 0%, rgba(197, 165, 114, 0.08) 100%)',
+              border: justGenerated 
+                ? '2px solid rgba(197, 165, 114, 0.6)'
+                : '1px solid rgba(197, 165, 114, 0.3)',
               color: '#C5A572',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(197, 165, 114, 0.1)',
+              boxShadow: justGenerated
+                ? '0 4px 30px rgba(197, 165, 114, 0.4), 0 0 25px rgba(197, 165, 114, 0.3), 0 0 50px rgba(197, 165, 114, 0.15)'
+                : '0 4px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(197, 165, 114, 0.1)',
             }}
           >
             <svg 
