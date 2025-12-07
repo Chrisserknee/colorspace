@@ -4441,193 +4441,53 @@ This is a LARGE DOG breed. You MUST create a WIDE SHOT showing the dog from a di
 
 ` : "";
       
-      const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${largeDogImg2ImgPrefix}${speciesEnforcement} DO NOT change the ${species} at all - keep it exactly as shown in the original image. This is a ${species}, not any other animal.
+      const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${largeDogImg2ImgPrefix}
+CRITICAL SPECIES LOCK
+This is a ${species}. Generate ONLY a real ${species}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. DO NOT change the ${species} at all - keep it exactly as shown in the original image. ${notSpecies}
 
-=== MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with THICK TEXTURED PAINT showing brushwork.
+MASTER STYLE
+Generate an 18th-century European aristocratic oil portrait with bright, luminous lighting and elegant old-master brushwork. Use rich fabrics such as velvet, silk, or ermine, with gold embroidery, polished metal clasps, and gemstone accents. Backgrounds must be colorful and vibrant: royal blue, emerald, burgundy, soft cream, dusty rose, or periwinkle. Mood is noble, bright, cheerful, and museum-quality. Avoid dark brown or muddy backgrounds.
 
-Compositions use ELEGANT backgrounds (soft dusty blue, muted burgundy, gentle sage, soft cream, dusty rose - NEVER brown or dark) with VISIBLE PAINT TEXTURE throughout. Colors are SUBTLE yet LUMINOUS—soft muted tones that are still BRIGHT and CHEERFUL but never garish or overly saturated—applied with THICK, SCULPTURAL brushstrokes creating a regal, REFINED, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT but SOPHISTICATED, historically authentic with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat or digital, NOT oversaturated.
+PAINTING TECHNIQUE
+Loose, flowing, feathery brushwork inspired by Gainsborough, Reynolds, and Vigée Le Brun. Visible texture: subtle canvas weave, soft impasto, bristle marks, natural glazing, and atmospheric sfumato depth. Warm highlights and rich shadows.
 
-18th-century aristocratic oil portrait with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED.${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
+ANTIQUE AGING
+Apply light-to-medium aging: soft craquelure, warm aged varnish glow, mild edge wear. Avoid excessive grime or heavy degradation.
 
-=== SUBTLE ELEGANT COLOR PALETTE (Bright but Refined - Different Every Time) ===
-- RANDOMIZE colors each generation - avoid repetitive color schemes
-- Colors should be SUBTLE yet LUMINOUS - bright but not garish, vibrant but sophisticated
-- DARKS: Soft charcoal, muted slate, gentle black (for subtle contrast)
-- LIGHTS: Warm white, soft cream, gentle ivory, muted champagne (for airy feel)
-- GREYS: Soft silver, warm dove grey, gentle slate, muted pewter
-- BLUES: Dusty powder blue, soft sky blue, muted navy, gentle teal, soft periwinkle
-- PINKS: Soft blush, dusty rose, muted coral, gentle peach
-- GREENS: Soft sage, muted mint, gentle olive, dusty emerald
-- PURPLES: Soft lavender, gentle lilac, dusty mauve, muted violet
-- MIX IT UP: Each portrait should have a unique, ELEGANT color palette
-- CREATE HARMONY: Colors should complement the pet with SUBTLE sophistication
+COLOR PALETTE
+Use a unique, vibrant palette for every generation. Acceptable tones include jewel colors (ruby, sapphire, emerald, amethyst), soft pastels (blush, lavender, periwinkle, cream), and deep tones (navy, teal, charcoal black). Colors must complement the pet's fur and increase subject contrast.
 
-=== CRITICAL PET PRESERVATION ===
-- Preserve the face structure, skull shape, snout proportions EXACTLY from the original
-- Keep all markings, colors, fur patterns in their EXACT locations
-- Maintain the exact eye color, shape, spacing, and expression
-- Preserve ear shape, size, and position exactly
-- Warm, natural fur tones with soft painterly highlights and fine brushwork
-- The pet's unique identifying features must remain unchanged
+IDENTITY PRESERVATION
+Portrait must be instantly recognizable as THIS specific pet. Preserve:
 
-=== LIGHTING (VERY BRIGHT - Subject Well-Illuminated) ===
-- VERY BRIGHT KEY LIGHT illuminating the subject - WELL-LIT and LUMINOUS
-- STRONG BRILLIANT HIGHLIGHTS on the FACE and fur - INTENSELY ILLUMINATED
-- MINIMAL SHADOWS - use fill light to reduce dark areas
-- Subject should GLOW with BRIGHT RADIANT light - NOT dark or moody
-- BRIGHT warm highlights throughout - LUMINOUS presence
-- LIGHT AND AIRY feel - NOT heavy shadows
-- Subject is the BRIGHTEST element - clearly visible and well-lit
-- Clean, professional, BRIGHT portrait lighting
-- Soft shadows only where needed for dimension - NOT deep dark shadows
+Exact facial structure
 
-=== ELEGANT COLOR HARMONY (SUBTLE yet LUMINOUS - Refined Classical Palette) ===
-Select ELEGANT, REFINED cloak, cushion, drapery, and gem colors based on the pet's natural fur tones. Colors should be SUBTLE yet LUMINOUS - bright but not garish, vibrant but sophisticated:
+Eye shape, color, spacing, and expression
 
-FOR WARM-TONED OR TAN PETS: Soft dusty blues, muted sage greens, elegant burgundy, or refined teal fabrics - SUBTLE and SOPHISTICATED
-FOR BLACK OR DARK-COATED PETS: Soft cream, warm ivory, muted gold, soft sage, dusty blue, gentle lavender fabrics for contrast - ELEGANT and REFINED
-FOR WHITE OR PALE PETS: Soft jewel tones (muted ruby, soft emerald, dusty sapphire, gentle periwinkle) or elegant velvets - SOPHISTICATED colors
-FOR ORANGE/GINGER PETS: Soft teal, muted turquoise, gentle sage green, or dusty navy fabrics - SUBTLE ELEGANT tones
-FOR GRAY OR SILVER PETS: Soft burgundy, dusty plum, muted amethyst, or warm gold-trimmed velvets - REFINED and ELEGANT
-FOR MULTICOLOR PETS: harmonize with dominant fur tone using SUBTLE/ELEGANT colors, accent with complementary secondary tone
+Ear shape and positioning
 
-Apply same harmony to GEMSTONES: select ELEGANT gems that complement pet's eyes or fur (soft ruby, muted emerald, dusty sapphire, warm topaz, gentle amethyst) - SPARKLING but SUBTLE, LUMINOUS but REFINED
+Snout/muzzle proportions
 
-=== COMPOSITION (ZOOMED OUT, Wide, Centered, Full Body Visible) ===
-${isLargeDog ? `*** LARGE DOG BREED - EXTRA ZOOM OUT REQUIRED ***
-- ZOOM WAY OUT - dog should occupy only 60-70% of frame height
-- Position dog in LOWER half of frame with lots of background above
-- ENTIRE HEAD including FULL EARS must be visible with space above
-- Show: complete head, ears, neck, chest, front legs, cushion
-- At least 15-20% of frame should be background ABOVE the ear tips
-- Think "full sitting portrait from several feet away"
-- NEVER crop the head or ears - full ears visible with background above them
-*** END LARGE DOG REQUIREMENTS ***
-` : ""}
-=== HEADROOM REQUIREMENT (CRITICAL - NEVER CROP HEADS/EARS) ===
-- ALWAYS leave GENEROUS HEADROOM above the pet's ears - at least 10-15% of frame height
-- The TOP OF EARS must NEVER touch or come close to the top edge of the frame
-- Position pet in LOWER 60% of frame - NOT vertically centered
-- FULL HEAD including COMPLETE EARS must be visible with clear background space above
-- ABSOLUTELY FORBIDDEN: cropping ANY part of the head, ears touching top edge, tight framing
+Accurate markings in correct locations
 
-=== FRAMING & COMPOSITION ===
-- ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
-- WIDE and CENTERED composition with generous space around the pet
-- Show FULL CUSHION with pet clearly SITTING or RESTING on it
-- Pet SEATED or LYING DOWN NATURALLY like a real ${species} would rest
-- NEVER standing upright like a human - always sitting, lying, or resting
-- Natural animal posture: body low, front paws resting on cushion, relaxed pose
-- Pet should look comfortable and naturally positioned on the cushion
-- Body ¾ view, head forward - natural animal resting posture
-- FRONT PAWS VISIBLE and resting naturally on cushion
-- Show from head to paws - wide framing, NOT a close-up
-- NO human clothing - ONLY a cloak draped over the pet
-- All colors automatically unified and harmonious with pet's natural palette
+Coat patterns, gradients, and asymmetry
+Do not alter markings or colors.
 
-=== THRONE CUSHION ===
-- Embroidered SILKY velvet cushion with VISIBLE GOLD TASSELS
-- SUBTLE, ELEGANT color selected to complement pet's fur tones
-- SILKY texture with visible sheen
-- Gold embroidery, ornate details
-- Refined, sophisticated tones - luminous but not garish
+ROYAL COSTUME ELEMENT
+Pet is resting naturally on ${cushion}. A ${robe} is draped over its back (not clothing), secured by a polished silver cloak clasp. Include ${jewelryItem} if provided. Maintain natural animal posture. No human-like posing.
 
-=== REGAL CLOAK (Draped Over Pet AND Cushion - NOT Clothing) ===
-- DAINTY, DELICATE regal CLOAK DRAPED over BOTH the pet AND cushion - NOT clothing, just draped fabric
-- More DAINTY and REFINED - not heavy or bulky
-- NO human clothing elements - NO sleeves, NO buttons, NO tailored garments
-- Just a DAINTY CLOAK/ROBE draped naturally over the pet's back and shoulders
-- SOFT, PLUSH VELVETY texture - luxurious velvet with visible nap and plush feel
-- VELVETY appearance - soft, plush, luxurious velvet fabric
-- BRIGHT ANTIQUE GOLD EMBROIDERY - delicate and refined
-- DEEP, RICH, SATURATED fabric colors adjusted to enhance and balance pet's tones
-- WHITE FUR TRIM with BLACK ERMINE SPOTS
-- Looks DAINTY, VELVETY, and luxurious - soft plush velvet texture
-- Fabric GLOWS with DEEP, RICH color - saturated and luminous, retaining darker tones in folds
-- Pet's natural body and fur visible beneath the draped cloak
+COMPOSITION
+Use balanced, elegant portrait composition. Full-body or half-body framing (not overly zoomed). Soft luminous background with atmospheric depth.
+${compositionInstructions}
+${poseInstructions}
+${facialStructureSection}
 
-=== BRIGHT POLISHED SILVER CLOAK CLASP (Fastener Securing Cloak at Upper Chest) ===
-- BRIGHT SHINY POLISHED SILVER CLASP that PROPERLY SECURES and CONNECTS the cloak at upper chest
-- TWO GLEAMING SILVER METAL PLATES connected by a BRIGHT REFLECTIVE SILVER CHAIN
-- CLASP HOLDS THE CLOAK TOGETHER - fabric gathered and fastened by the clasp
-- HIGHLY REFLECTIVE polished silver finish that CATCHES THE LIGHT brilliantly
-- ELEGANT silverwork with BRIGHT LUMINOUS SHINE - not dull or antiqued
-- The clasp is the FUNCTIONAL CONNECTOR that keeps the cloak closed and draped properly
-- SILVER metal with polished antique finish - catches light beautifully
-- May feature small gemstone accent, pearl, or enamel detail
-- BRIGHT SILVER with aged patina - gleaming antique look
-- Positioned where cloak edges meet at the chest - functional and decorative
+PET DESCRIPTION
+Follow all details precisely as provided:
+${petDescription}${genderInfo}${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}${agePreservationInstructions}
 
-=== ANTIQUE 18TH-CENTURY JEWELRY ===
-- Layered MULTI-CHAIN gold necklaces
-- Ornate FILIGREE details
-- BRIGHT WHITE PEARLS and small CLUSTERED BRIGHT GEMSTONES
-- BRIGHT SPARKLING gems match or complement pet's natural colors (eyes/fur)
-- Gems GLOW and SPARKLE - not dull
-- NOT modern jewelry, NOT simple beads
-
-=== BACKGROUND DRAPERY ===
-- Heavy SILKY velvet drapery with PAINTERLY FOLDS
-- DEEP, RICH, SATURATED colors selected to support overall harmony with pet
-- SILKY LUSTROUS texture with visible sheen
-- Atmospheric depth with DARKER TONES in shadows and folds - retaining darker tones
-- Colors should be DEEP, RICH, and SATURATED - rich jewel tones
-- DARKER TONES in shadows and background depth
-- ZERO modern elements
-
-=== WHITE TONES ===
-- All whites should be PURE BRIGHT WHITE - not grey, not muted
-- Ermine fur trim: PURE WHITE with black spots
-- Pearl accents: BRIGHT WHITE
-- White highlights: PURE BRIGHT WHITE
-
-=== SIGNATURE THICK OIL-PAINT TEXTURE (CRITICAL - Physically Painted Look) ===
-This must look like a HIGH-END PHYSICAL OIL PAINTING that was PROFESSIONALLY SCANNED:
-
-THICK SCULPTURAL IMPASTO:
-- HEAVY, RAISED paint peaks you can almost FEEL - thick 3D paint texture
-- SCULPTURAL paint application - paint stands up from the canvas surface
-- Visible PAINT RIDGES and VALLEYS creating physical depth
-- THICK BUTTERY strokes with paint that has BODY and WEIGHT
-- Impasto highlights that CATCH THE LIGHT like real raised paint
-- Paint texture most prominent on: fur highlights, jewelry, fabric folds, cloak edges
-
-VISIBLE BRUSH BRISTLE MARKS:
-- Individual BRISTLE TRACKS embedded in the paint surface
-- You can see WHERE THE BRUSH DRAGGED through wet paint
-- Directional brushwork following the form - fur direction, fabric drape
-- FEATHERY brush edges where strokes trail off
-- Varied brush sizes - fine detail brushes AND broad loaded brushes
-
-CANVAS TEXTURE SHOWING THROUGH:
-- COARSE WOVEN CANVAS visible in thinner paint areas
-- Canvas weave pattern shows through glazed shadows
-- Contrast between THICK impasto peaks and THIN canvas-revealing areas
-- Professional artist's linen canvas texture
-
-PAINT LOADING AND APPLICATION:
-- RICH, CREAMY paint consistency - not watery or thin
-- Areas of THICK LOADED strokes next to THIN SCRAPED areas
-- Palette knife texture in some background areas
-- Wet-into-wet blending visible in soft transitions
-
-PROFESSIONALLY SCANNED ARTWORK QUALITY:
-- High-resolution detail capturing every paint texture
-- Museum archival quality reproduction
-- The texture and depth of a $50,000 original oil painting
-- Looks like it belongs in a prestigious gallery or private collection
-
-RENDERING STYLE:
-- LONG, FLOWING brush strokes with visible paint body
-- NOT digital, NOT airbrushed, NOT smooth, NOT flat
-- Hand-painted charm with intentional texture variations
-- SUBTLE LUMINOUS GLOW throughout - paint has inner warmth
-- SILKY LUSTROUS fabric textures with thick paint highlights
-- DEEP, RICH, SATURATED colors with visible paint depth
-- Subject GLOWS with BRIGHT warm light through textured paint
-
-CRITICAL: The ${species} must sit NATURALLY like a real ${species} - NOT in a human-like pose. NO human clothing - ONLY a cloak draped over. The ${species} itself must remain completely unchanged and identical to the original photo. Remember: this is a ${species}, not a human.`;
+OVERALL GOAL
+Create a bright, noble, museum-quality antique portrait that captures the pet's personality and is unmistakably the owner's pet.`;
 
       // Add custom prompt for studio mode
       const finalOpenAIPrompt = customPrompt 
