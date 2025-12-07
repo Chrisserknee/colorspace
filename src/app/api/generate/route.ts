@@ -3862,11 +3862,14 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     const useStableDiffusion = false; // Disabled - using OpenAI img2img
     const sdModel = process.env.SD_MODEL || "sdxl-img2img"; // Not used when SD is disabled
     
-    // OpenAI img2img enabled by default
-    const useOpenAIImg2Img = process.env.USE_OPENAI_IMG2IMG !== "false" && process.env.OPENAI_API_KEY; // Default to true unless explicitly disabled
-    const useComposite = !useStableDiffusion && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
-    const useStyleTransfer = !useStableDiffusion && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
-    const useIPAdapter = !useStableDiffusion && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
+    // Leonardo AI - for dev testing only
+    const useLeonardo = process.env.USE_LEONARDO === "true" && process.env.LEONARDO_API_KEY;
+    
+    // OpenAI img2img enabled by default (unless Leonardo is enabled)
+    const useOpenAIImg2Img = !useLeonardo && process.env.USE_OPENAI_IMG2IMG !== "false" && process.env.OPENAI_API_KEY; // Default to true unless explicitly disabled
+    const useComposite = !useStableDiffusion && !useLeonardo && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
+    const useStyleTransfer = !useStableDiffusion && !useLeonardo && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
+    const useIPAdapter = !useStableDiffusion && !useLeonardo && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
     
     console.log("=== IMAGE GENERATION ===");
     console.log("Environment check:");
@@ -3884,6 +3887,8 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
       }
     }
     console.log("- SD_MODEL:", process.env.SD_MODEL || `${sdModel} (default)`);
+    console.log("- USE_LEONARDO:", process.env.USE_LEONARDO || "not set", useLeonardo ? "✅ ACTIVE" : "");
+    console.log("- LEONARDO_API_KEY:", process.env.LEONARDO_API_KEY ? "set" : "not set");
     console.log("- USE_OPENAI_IMG2IMG:", process.env.USE_OPENAI_IMG2IMG || "not set");
     console.log("- USE_COMPOSITE:", process.env.USE_COMPOSITE || "not set");
     console.log("- USE_STYLE_TRANSFER:", process.env.USE_STYLE_TRANSFER || "not set");
@@ -4065,14 +4070,16 @@ A dual royal Victorian antique oil portrait featuring ${petCountWord} pets, rend
     } else {
       // === SINGLE PET GENERATION PATH (Original) ===
     
-    const modelName = useOpenAIImg2Img ? "OpenAI img2img (images.edit)"
+    const modelName = useLeonardo ? "🎨 Leonardo AI (Kino XL) - DEV TESTING"
+      : useOpenAIImg2Img ? "OpenAI img2img (images.edit)"
       : useStableDiffusion ? `⚠️ Stable Diffusion (${sdModel}) - LOCAL TESTING ONLY`
       : useComposite ? "Composite (segment + scene + blend)"
       : useStyleTransfer ? "Style Transfer + GPT Refinement" 
       : useIPAdapter ? "IP-Adapter SDXL (identity preservation)" 
       : "GPT-Image-1 (OpenAI)";
     console.log("Model selected:", modelName);
-    console.log("Selection reason:", useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true (default)"
+    console.log("Selection reason:", useLeonardo ? "USE_LEONARDO=true (⚠️ DEV TESTING ONLY)"
+      : useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true (default)"
       : useStableDiffusion ? `USE_STABLE_DIFFUSION=true, SD_MODEL=${sdModel} (⚠️ LOCAL TESTING ONLY - DO NOT DEPLOY)`
       : useComposite ? "USE_COMPOSITE=true"
       : useStyleTransfer ? "USE_STYLE_TRANSFER=true"
@@ -4179,6 +4186,83 @@ CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match t
         console.error("❌ Stable Diffusion generation failed:", sdError);
         const errorMessage = sdError instanceof Error ? sdError.message : String(sdError);
         throw new Error(`Stable Diffusion generation failed (${sdModel}): ${errorMessage}`);
+      }
+    } else if (useLeonardo) {
+      // ⚠️ LEONARDO AI PATH - DEV TESTING ONLY ⚠️
+      console.log("🎨🎨🎨 LEONARDO AI MODE - DEV TESTING ONLY 🎨🎨🎨");
+      
+      const useLeonardoImg2Img = process.env.LEONARDO_IMG2IMG !== "false"; // Default to img2img
+      console.log(`📌 Mode: ${useLeonardoImg2Img ? "img2img (transform pet photo)" : "text-to-image"}`);
+      console.log("📌 Using Leonardo Kino XL model");
+      
+      const { leonardoImg2Img, leonardoTextToImage, LEONARDO_MODELS } = await import("@/lib/leonardo");
+      
+      // Build Leonardo prompt - focused on TRANSFORMING to oil painting style
+      // The img2img will preserve pet identity, prompt should focus on STYLE TRANSFORMATION
+      const leonardoPrompt = `Transform this photo into a MASTERPIECE 18th-century Victorian royal oil painting portrait.
+
+PAINTING TRANSFORMATION (CRITICAL):
+- Convert to THICK IMPASTO oil paint with visible brushstrokes
+- Heavy sculptural texture, palette knife ridges, bristle marks
+- Rich glazing layers like Gainsborough or Reynolds masterwork
+- Antique craquelure, aged varnish patina, museum quality
+- NOT a photo - must look like 300-year-old oil painting
+
+ROYAL STYLING TO ADD:
+- Elegant cream/ivory/champagne velvet cloak draped over shoulders
+- Ornate gold clasp with gemstones at chest
+- Layered gold chains with ruby/emerald pendant
+- Luxurious velvet cushion (ruby, emerald, or sapphire)
+- Dark atmospheric background (deep navy, burgundy, forest green)
+
+LIGHTING:
+- Dramatic Rembrandt-style lighting
+- Luminous glow on subject
+- Rich shadows, golden highlights
+
+This is a ${species}. Keep the exact face, markings, and features of this specific pet while transforming into an aristocratic royal oil painting.`;
+
+      console.log("📝 Leonardo prompt:", leonardoPrompt.substring(0, 300) + "...");
+      
+      try {
+        // Strength: Higher = more transformation, Lower = more photo preservation
+        // Need HIGH strength (0.8+) to actually transform into painting style
+        const leonardoStrength = parseFloat(process.env.LEONARDO_STRENGTH || "0.85");
+        const leonardoGuidance = parseFloat(process.env.LEONARDO_GUIDANCE || "12");
+        
+        console.log(`⚙️ Leonardo settings: strength=${leonardoStrength}, guidance=${leonardoGuidance}`);
+        
+        if (useLeonardoImg2Img) {
+          console.log("🖼️ Attempting img2img generation...");
+          try {
+            firstGeneratedBuffer = await leonardoImg2Img(buffer, leonardoPrompt, {
+              strength: leonardoStrength,
+              modelId: LEONARDO_MODELS.KINO_XL,
+              guidanceScale: leonardoGuidance,
+              negativePrompt: "photo, photograph, realistic, modern, digital, smooth, blurry, low quality, distorted, deformed, ugly, bad anatomy, wrong animal, human, anthropomorphic, cartoon, anime, 3d render",
+            });
+            console.log("✅ Leonardo img2img generation complete!");
+          } catch (img2imgError) {
+            console.warn("⚠️ Leonardo img2img failed, falling back to text-to-image:", img2imgError);
+            console.log("🖼️ Falling back to text-to-image generation...");
+            firstGeneratedBuffer = await leonardoTextToImage(leonardoPrompt, {
+              modelId: LEONARDO_MODELS.KINO_XL,
+              guidanceScale: leonardoGuidance,
+            });
+            console.log("✅ Leonardo text-to-image fallback complete!");
+          }
+        } else {
+          console.log("🖼️ Using text-to-image generation (LEONARDO_IMG2IMG=false)...");
+          firstGeneratedBuffer = await leonardoTextToImage(leonardoPrompt, {
+            modelId: LEONARDO_MODELS.KINO_XL,
+            guidanceScale: leonardoGuidance,
+          });
+          console.log("✅ Leonardo text-to-image generation complete!");
+        }
+      } catch (leonardoError) {
+        console.error("❌ Leonardo generation failed:", leonardoError);
+        const errorMessage = leonardoError instanceof Error ? leonardoError.message : String(leonardoError);
+        throw new Error(`Leonardo generation failed: ${errorMessage}`);
       }
     } else if (useOpenAIImg2Img) {
       // Use OpenAI img2img for primary generation
@@ -4403,107 +4487,167 @@ This is a LARGE DOG breed. You MUST create a WIDE SHOT showing the dog from a di
 ` : "";
       
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${largeDogImg2ImgPrefix}
-=== TOP PRIORITY REQUIREMENTS (FOLLOW THESE FIRST) ===
-
-The cloak must ALWAYS include a visible silver or gold connecting chain and an ornate functional clasp.
-
-Jewelry must be extremely shiny, bright, gleaming, ornate, and luxurious.
-
-Metal must be light gold or bright polished silver only (never dark, dull, or antique metal).
-
-Cloaks must be lighter-colored, luminous, elegant, and regal, with refined Victorian/royal influence.
-
-The portrait must look heavily ornate, aristocratic, intricate, and antique, never simple or minimal.
-
-=== CRITICAL SPECIES LOCK ===
+CRITICAL SPECIES LOCK
 This is a ${species}. Generate ONLY a real ${species}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. Do NOT generate: ${notSpecies}.
 
-=== MASTER STYLE – VICTORIAN ROYAL OIL PORTRAIT ===
-18th-century European aristocratic oil portrait with bright, luminous lighting on the pet and a darker, rich background (navy, emerald, burgundy, charcoal, midnight blue). Opulent, ornate Victorian-royal aesthetic. Composition must feel regal, elevated, historically authentic. Deeply textured, thick impasto oil paint.
+MASTER STYLE
+18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a darker, rich background (navy, deep emerald, burgundy, charcoal, midnight blue). Maintain a regal, elegant, historically authentic atmosphere with refined composition and classical staging.
+Increase overall ornateness and incorporate stronger Victorian-royal influence throughout—the environment, fabrics, patterns, textures, and decorative elements should feel more lavish, detailed, and aristocratic.
 
-=== THICK OIL PAINTING TECHNIQUE ===
-Use extremely thick, dimensional oil paint: heavy impasto, raised brush strokes, sculptural pigment, palette-knife ridges, visible bristle texture.
+PAINTING TECHNIQUE – EXTREMELY THICK OIL
+Use very thick, sculptural oil paint with heavy impasto, raised brush strokes, bristle definition, palette-knife ridges, layered pigment, and physical 3D texture. Brushwork must be visibly hand-painted and dimensional.
 
-=== ANTIQUE AGING ===
-Soft craquelure, warm aged varnish glow, light edge wear.
+ANTIQUE AGING
+Soft craquelure, warm aged varnish glow, and light edge wear. Maintain elegance.
 
-=== COLOR PALETTE ===
-A unique palette each generation. Cloaks use refined, luminous tones. Backgrounds remain deep and rich to highlight the subject.
+COLOR PALETTE
+A unique palette each generation. Backgrounds remain darker. Cloaks and royal garments should use refined, luminous tones. Colors must enhance the pet and those garments.
 
-=== IDENTITY PRESERVATION ===
-The portrait must be unmistakably THIS exact pet. Preserve: facial structure, markings, coloration, asymmetry, eye shape, snout shape, ear position. Do NOT alter colors or markings.
+IDENTITY PRESERVATION
+The portrait must be unmistakably THIS exact pet. Preserve all facial structure, markings, eye shape, proportion, coloring, gradients, asymmetry, snout shape, and ear position. Do not alter markings or colors.
 
-=== ROYAL ENVIRONMENT & PILLOWS ===
-Pillows must frequently be different colors, never repeating the same palette.
-Use bright, vivid, noble colors (ruby red, sapphire blue, emerald, amethyst, gold, teal, rose, turquoise).
-Include ornate Victorian patterns: brocade, damask, embroidered gold thread, scrolling motifs.
-Textures: velvet, woven silk, embroidered linen.
-Pillows must enhance the overall royal atmosphere.
+ENHANCED ROYAL ENVIRONMENT & PILLOW REQUIREMENTS:
 
-=== ROYAL WARDROBE – CLOAK, GARMENTS, CLASP ===
-The pet rests naturally on ${cushion}. A ${robe} is draped over its back as a true royal cloak (never a blanket).
+Pillows must frequently appear in different colors, not repeating the same tones each generation.
+
+Use brighter, richer, more vibrant colors for pillows (ruby, sapphire, emerald, amethyst, gold, teal, rose, turquoise).
+
+Pillows should feature ornate Victorian royal patterns such as brocade, damask, embroidered gold thread, floral scrollwork, or regal geometric motifs.
+
+Textures may include velvet, silk, embroidered linen, or other noble materials.
+
+Pillow patterns and colors must elevate the royal atmosphere and amplify the Victorian opulence of the portrait.
+
+ROYAL WARDROBE – CLOAK, GARMENTS, AND CLASP
+The pet rests naturally on ${cushion}. A ${robe} is draped over its back as a true cloak.
+
+ELEGANCE REQUIREMENT:
+Clothing must be exceptionally elegant, royal, and luxurious, reflecting the highest aristocratic fashion of the 18th century.
+The cloak and garments must feel crafted for nobility, using only rich, refined, elevated materials.
+Increase overall Victorian-royal refinement: more ornate trims, subtle baroque motifs, elevated textile complexity when appropriate.
 
 CLOAK REQUIREMENTS:
-- Lighter, luminous, elegant colors: cream, ivory, pale gold, champagne, silver-blue, sky blue, soft rose, light lavender
-- Silky or satin-like texture with flowing folds and natural sheen
-- Embroidery, woven patterns, ornate Victorian embellishments
-- Must elevate the portrait to aristocratic grandeur
+
+Cloak must be lighter-colored, luminous, elegant, and visually stunning
+
+Colors may include: cream, ivory, pale gold, champagne, silver-blue, sky blue, soft rose, light lavender
+
+Silky or satin-like with flowing, graceful folds and natural sheen
+
+Embroidery, woven patterns, or subtle embellishments encouraged when appropriate
+
+Cloak must elevate the portrait to a royal, high-status appearance
 
 CLASP REQUIREMENTS:
-- MUST ALWAYS be present
-- Round, ornate, engraved metal clasp
-- Polished gold or bright silver, matching the jewelry metal
-- Highly reflective, ceremonial, luxurious
 
-=== JEWELRY REQUIREMENTS ===
-- Extremely elegant, ornate, royal, refined
-- Polished gold or 925 silver only
-- Small bright gemstones with vivid sparkle
-- Designs must feel handcrafted for nobility
-- Jewelry must look shiny, radiant, gleaming, reflective
+A functional cloak clasp at the upper chest holds the garment securely
 
-ENHANCED JEWELRY SHINE RULE:
-- Jewelry must appear EXTRA shiny with crisp highlights
-- Metal should glow with bright reflectivity
-- Gemstones must show deep brilliance and clarity
+The clasp must match the jewelry metal
 
-=== REFERENCE-MATCHING DETAILS ===
+Made of polished gold or bright 925 silver
 
-JEWELRY STYLE (MATCH REFERENCE):
-- Multiple layered gold chains
-- Central ornate gemstone pendant framed in decorative filigree
-- Jewelry must rest naturally across chest
-- Feel heavy, aristocratic, handcrafted
+Ornate, engraved, aristocratic detailing
 
-CLOAK CLASP (MATCH REFERENCE):
-- Round ornate polished metal clasp
-- Engraved, aristocratic detailing
-- High-shine reflective surface
-- Correct scale and placement
+JEWELRY REQUIREMENTS:
 
-CLOAK CONSTRUCTION (MATCH REFERENCE):
-- Rich noble fabric with deep folds, heavy drape
-- Elegant baroque patterns
-- Ermine-style fur trim with black spots
-- Cloak color rotates each generation (blue, crimson, emerald, gold, purple)
-- Maintain consistent luxury level
+Jewelry must be extremely elegant, royal, and refined
 
-=== COMPOSITION RULES ===
-Pet should often be shown farther away. More of the body visible. Cloak, clasp, jewelry, pillows, and environment must all be fully visible. Use classical portrait symmetry and staging.
+Use polished gold or 925 silver
 
-=== POSE REQUIREMENT ===
-Serene, natural, Renaissance-inspired pose. Relaxed posture. Elegant presence. Avoid stiff posing.
+Small, bright gemstones with vivid sparkle
 
-=== VARIABLE SECTIONS ===
+Designs must look handcrafted for nobility, never simple or plain
+
+ENHANCED JEWELRY BEAUTY & SHINE REQUIREMENT:
+The jewelry must be exceptionally beautiful, luxurious, and visually striking.
+Use polished 925 sterling silver or polished gold only.
+
+Jewelry must appear extra shiny, radiant, and reflective with crisp highlights
+
+Metal should have a bright, gleaming finish and realistic reflections
+
+Designs must feel ornate, premium, and aristocratically handcrafted
+
+Gemstones must have high brilliance and clarity
+
+Jewelry must significantly elevate the royal aesthetic of the portrait
+
+MATCH JEWELRY, CLASP & CLOAK STYLE FROM REFERENCE IMAGE
+
+JEWELRY STYLE REQUIREMENT (MATCH REFERENCE):
+The pet must wear jewelry styled like the reference image:
+
+Multiple layered gold chains, stacked in elegant tiers
+
+A central ornate gemstone pendant framed in decorative filigree
+
+Jewelry should rest on the chest naturally, just like the example
+
+Gold must be extremely polished, warm, and shiny
+
+Overall design must feel royal, heavy, ornate, and handcrafted
+
+CLOAK CLASP REQUIREMENT (MATCH REFERENCE):
+The cloak clasp must closely match the style shown:
+
+A round, ornate, polished metal clasp (gold or 925 silver)
+
+Embossed/engraved aristocratic detailing
+
+High-shine finish with strong reflections
+
+Sits at the chest in the same placement/scale as in the reference
+
+Must look luxurious, heavy, ceremonial, and regal
+
+CLOAK STYLE REQUIREMENT (MATCH REFERENCE):
+The cloak must follow the same construction style and silhouette as the reference while changing colors each generation:
+
+Rich, noble fabric with deep folds, heavy drape, and elegant weight
+
+Detailed gold filigree or baroque patterns similar to the example
+
+Ermine-style fur trim with black spots, thick texture, and natural variation
+
+Cloak must feel ceremonial, royal, Victorian/18th-century, and powerfully ornate
+
+Cloak color should change frequently (deep blue, crimson, emerald, purple, gold, etc.)
+
+Maintain a consistent luxury level matching the reference image
+
+COMPOSITION – SUBJECT OFTEN FARTHER AWAY
+The pet must not always be close-up. Frequently show:
+
+The subject farther away
+
+More body visible
+
+More cloak, garments, clasp, ornate pillows, and decorative environment
+
+Classical portrait composition with richer, elaborate staging
+
+POSE REQUIREMENT – RELAXED, NATURAL, RENAISSANCE-LIKE
+The pet should often appear in a serene, natural pose:
+
+Relaxed posture
+
+Calm, candid presence
+
+Graceful, Renaissance-inspired positioning
+Avoid stiff or rigid posing.
+
+Use provided variables:
 ${compositionInstructions}
 ${poseInstructions}
 ${facialStructureSection}
 
-=== PET DESCRIPTION ===
+PET DESCRIPTION
+Follow all provided details exactly:
 ${petDescription}${genderInfo}${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}${agePreservationInstructions}
 
-=== OVERALL GOAL ===
-A luminous, ornate, regal Victorian antique oil portrait with: extremely thick dimensional oil paint, darker backgrounds, highly detailed jewelry and cloaks modeled after the reference, lighter elegant cloak colors, ornate pillows, visible chains and clasps, Renaissance-inspired serenity. The portrait must remain instantly recognizable as this exact pet.`;
+OVERALL GOAL
+A luminous, regal antique oil portrait with extremely thick, dimensional paint; darker backgrounds; ornate Victorian styling; extremely detailed jewelry and cloaks modeled after the reference; vibrant ornate pillows; a rich composition showing more of the figure; and a serene Renaissance-inspired natural pose.
+The portrait must remain instantly recognizable as this specific pet.`;
 
       // Add custom prompt for studio mode
       const finalOpenAIPrompt = customPrompt 
