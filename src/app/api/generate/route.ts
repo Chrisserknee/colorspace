@@ -3909,141 +3909,50 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
       // Create a prompt for transforming the image with all pets into a royal portrait
       // Using img2img preserves all pets' identities from the original photo
       // IMPORTANT: This prompt mirrors the single-pet prompt structure for consistent style
-      const multiPetImg2ImgPrompt = `CRITICAL: These are ${speciesDescription}. Keep ALL ${petCount} pets exactly as shown - preserve all animals precisely.
+      const multiPetImg2ImgPrompt = `CRITICAL SPECIES LOCK
+These are ${speciesDescription}. Keep ALL ${petCount} pets exactly as shown - preserve all animals precisely. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. DO NOT change any of the pets at all - keep them exactly as shown in the original image. ${notSpecies}
 
-=== MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and THICK SCULPTURAL OIL PAINT TEXTURE. This must look like a PHYSICALLY PAINTED masterpiece with VISIBLE IMPASTO - raised paint peaks, brush bristle marks, and rich buttery paint application. Subjects are dressed in RICHLY VARIED colored cloaks (RANDOMIZE: burgundy, emerald, royal blue, gold, cream, dusty rose, purple, forest green - NOT always pink and blue) fastened with SHINY SILVER or GOLD clasps, adorned with PEARL NECKLACES, gold chains, and gemstone jewelry. Fabrics rendered with THICK TEXTURED PAINT showing brushwork.
+MASTER STYLE
+Generate an 18th-century European aristocratic oil portrait of ${petCountWord} pets with bright, luminous lighting and elegant old-master brushwork. Use rich fabrics such as velvet, silk, or ermine, with gold embroidery, polished metal clasps, and gemstone accents. Backgrounds must be colorful and vibrant: royal blue, emerald, burgundy, soft cream, dusty rose, or periwinkle. Mood is noble, bright, cheerful, and museum-quality. Avoid dark brown or muddy backgrounds.
 
-Compositions use VARIED ELEGANT BACKGROUNDS (RANDOMIZE: charcoal, cream, dusty blue, soft pink, sage green, lavender, ivory, burgundy - VARIETY is key) with VISIBLE PAINT TEXTURE throughout. Colors are VIBRANT yet LUMINOUS—rich tones that are BRIGHT and REGAL—applied with THICK, SCULPTURAL brushstrokes creating a regal, SOPHISTICATED, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT and COLORFUL, with the TACTILE QUALITY of a real oil painting. NOT monotone, NOT always pastels.
+PAINTING TECHNIQUE
+Loose, flowing, feathery brushwork inspired by Gainsborough, Reynolds, and Vigée Le Brun. Visible texture: subtle canvas weave, soft impasto, bristle marks, natural glazing, and atmospheric sfumato depth. Warm highlights and rich shadows.
 
-18th-century aristocratic oil portrait of ${petCountWord} pets with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED. BRIGHT but ELEGANT aesthetic.
+ANTIQUE AGING
+Apply light-to-medium aging: soft craquelure, warm aged varnish glow, mild edge wear. Avoid excessive grime or heavy degradation.
 
-=== CRITICAL - PRESERVE ALL ${petCount} PETS' IDENTITIES EXACTLY ===
+COLOR PALETTE
+Use a unique, vibrant palette for every generation. Acceptable tones include jewel colors (ruby, sapphire, emerald, amethyst), soft pastels (blush, lavender, periwinkle, cream), and deep tones (navy, teal, charcoal black). Colors must complement the pets' fur and increase subject contrast. RANDOMIZE colors each generation - avoid repetitive pink/blue schemes. Each pet can have a DIFFERENT colored cloak - variety is beautiful.
+
+IDENTITY PRESERVATION
+Portrait must be instantly recognizable as THESE SPECIFIC pets together. Preserve for ALL ${petCount} pets:
+
+Exact facial structure for each pet
+
+Eye shape, color, spacing, and expression for each pet
+
+Ear shape and positioning for each pet
+
+Snout/muzzle proportions for each pet
+
+Accurate markings in correct locations for each pet
+
+Coat patterns, gradients, and asymmetry for each pet
+Do not alter markings or colors.
+
+ROYAL COSTUME ELEMENT
+Pets are resting naturally together on a large embroidered velvet cushion. Each pet has a regal cloak draped over its back (not clothing), secured by a polished silver or gold cloak clasp. Include elegant jewelry for each pet. Maintain natural animal posture. No human-like posing.
+
+COMPOSITION
+Use balanced, elegant portrait composition for ${petCountWord} pets together. VERY ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies with space around them. Pet(s) should occupy only 60-70% of frame height. WIDE and CENTERED composition with all pets clearly visible. AMPLE HEADROOM above ALL pets - at least 15% of frame as background above tallest ears. Position pets CLOSE TOGETHER like companions - arranged naturally.
+
+PET DESCRIPTIONS
+Follow all details precisely as provided for each pet:
 ${petDescriptionsList}
-${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : ""}
-- Preserve ALL pets' face structures, skull shapes, snout proportions EXACTLY
-- Keep all markings, colors, fur patterns in their EXACT locations for EACH pet
-- Maintain the exact eye color, shape, spacing, and expression for ALL
-- Preserve ear shapes, sizes, and positions exactly for EACH pet
-- The unique identifying features of ALL ${petCount} pets must remain unchanged
+${multiPetCombinedDescription ? `Together: ${multiPetCombinedDescription}` : ""}
 
-=== COMPOSITION - ${petCountWord} PETS TOGETHER (ADAPTED FOR SPECIES) ===
-- VERY ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies with space around them
-- Pet(s) should occupy only 60-70% of frame height - leave generous margins
-- WIDE and CENTERED composition with all pets clearly visible
-- AMPLE HEADROOM above ALL pets - at least 15% of frame as background above tallest ears
-- Position pets CLOSE TOGETHER like companions - arranged naturally
-
-=== SPECIES-ADAPTIVE POSING - NATURALLY RELAXED ===
-- FOR HORSES/PONIES/LARGE ANIMALS: Standing naturally side-by-side or slightly staggered, show FULL BODIES from head to hooves, relaxed noble posture, decorated with royal blankets/bridles instead of cloaks, pastoral or stable background
-- FOR DOGS/CATS: LYING DOWN or LOUNGING TOGETHER on LARGE shared cushion - NOT sitting stiffly upright. Natural relaxed poses like:
-  * Both pets lying down side by side, bodies touching companionably
-  * One pet lying, one in relaxed seated position leaning against the other
-  * Both in sphinx pose or gentle curl together
-  * Relaxed and comfortable, like napping together on their favorite spot
-- FOR BIRDS: Perched together on ornate stand or branch, show full plumage, relaxed posture
-- FOR EXOTIC PETS (rabbits, ferrets, guinea pigs, etc.): Natural resting/lounging pose appropriate to species
-
-=== FORBIDDEN MULTI-PET POSES ===
-❌ Both pets sitting perfectly upright like statues
-❌ Stiff, rigid, formal posed positions
-❌ Perfectly symmetrical arrangements
-❌ Standing on hind legs or humanoid poses
-❌ Generic "pet portrait" stiff sitting pose
-
-=== MANDATORY MULTI-PET POSE QUALITIES ===
-✓ NATURALLY RELAXED - muscles loose, bodies settled into cushion
-✓ COMPANIONABLE - positioned like pets who love being together
-✓ ASYMMETRICAL - not perfectly mirrored, natural arrangement
-✓ COMFORTABLE - both pets look genuinely at ease
-✓ AUTHENTIC - like a candid moment of pets resting together
-- Natural family/companion pose - they should look like they belong together
-- Pets can be at slightly different angles (some forward, some slightly turned)
-- Create visual balance - all pets should be equally prominent and visible
-- ALL subjects well-lit and clearly defined - no pet hidden or in shadow
-
-=== VIBRANT COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
-- RANDOMIZE colors each generation - avoid repetitive pink/blue schemes
-- VARIETY IS KEY: Each multi-pet portrait should have a UNIQUE color palette
-- DARKS for drama: Charcoal black, rich black, deep slate, deep burgundy, forest green, navy
-- LIGHTS for elegance: Pure white, soft cream, ivory, champagne, pearl
-- GREYS: Silver grey, warm grey, dove grey, slate
-- BLUES: Powder blue, sky blue, navy, teal, sapphire, periwinkle, royal blue
-- PINKS/REDS: Soft pink, dusty rose, coral, peach, burgundy, crimson, blush
-- GREENS: Emerald, sage, mint, forest green, olive, hunter green
-- PURPLES: Lavender, lilac, mauve, dusty purple, royal purple, plum
-- GOLDS/BROWNS: Warm gold, bronze, caramel, rich brown, amber
-- MIX IT UP: Each portrait should have a unique, different color palette
-- CREATE CONTRAST: Colors should make the pets stand out beautifully
-- AVOID always using pink and blue - vary dramatically between generations
-
-=== LIGHTING (VERY BRIGHT - All Subjects Well-Illuminated) ===
-- VERY BRIGHT KEY LIGHT illuminating ALL ${petCount} pets - WELL-LIT and LUMINOUS
-- STRONG BRILLIANT HIGHLIGHTS on ALL faces and fur - INTENSELY ILLUMINATED
-- MINIMAL SHADOWS - use fill light to reduce dark areas
-- ALL subjects should GLOW with BRIGHT RADIANT light
-- LIGHT AND AIRY feel - NOT heavy shadows, NOT dark, NOT gloomy
-- ALL pets are the BRIGHTEST elements - clearly visible and well-lit
-- Ensure even lighting across all subjects - no pet in shadow
-- BRIGHT OVERALL COMPOSITION - cheerful and luminous
-
-=== THRONE CUSHION (Extra Large - Fits All ${petCount} Pets - VARIED COLORS) ===
-- EXTRA LARGE embroidered SILKY velvet cushion that comfortably fits ALL ${petCount} pets
-- RANDOMIZE cushion color: burgundy, emerald, navy, gold, cream, dusty rose, royal purple, forest green, champagne
-- SILKY texture with visible sheen and luminous quality
-- GOLD or SILVER embroidery, ornate details, tassels
-- Wide enough for all pets to sit comfortably together
-- The cushion color should COMPLEMENT the pets' fur colors
-
-=== REGAL CLOAKS (One Draped Over Each Pet - VARIED COLORS) ===
-- DAINTY, DELICATE regal CLOAK DRAPED over EACH pet
-- RANDOMIZE cloak colors - pick from this FULL RANGE:
-  * RICH TONES: Deep burgundy, emerald green, royal blue, deep purple, forest green, navy
-  * WARM TONES: Warm gold, bronze, caramel, amber, coral, peach
-  * COOL TONES: Silver grey, dusty blue, teal, sage, mint
-  * SOFT TONES: Blush pink, lavender, cream, champagne, ivory
-- Each pet can have a DIFFERENT colored cloak - variety is beautiful
-- DO NOT default to pink and blue - use the FULL color range
-- Coordinating but not necessarily matching - visual harmony matters
-- More DAINTY and REFINED - not heavy or bulky
-- NO human clothing elements - NO sleeves, NO buttons
-
-=== JEWELRY & ACCESSORIES (SILVER, GOLD, PEARLS) ===
-- SHINY SILVER or GOLD cloak clasps - gleaming, polished, reflective
-- GOLD chains and pendants - bright and luminous
-- PEARL NECKLACES on each pet - elegant strings of lustrous pearls
-- Gemstone accents - sparkling rubies, sapphires, emeralds
-- Delicate filigree details in gold or silver
-- All pets should look regal and dignified with beautiful jewelry
-
-=== SIGNATURE THICK OIL-PAINT TEXTURE (CRITICAL - Physically Painted Look) ===
-This must look like a HIGH-END PHYSICAL OIL PAINTING that was PROFESSIONALLY SCANNED:
-
-THICK SCULPTURAL IMPASTO:
-- HEAVY, RAISED paint peaks you can almost FEEL - thick 3D paint texture
-- SCULPTURAL paint application - paint stands up from the canvas surface
-- Visible PAINT RIDGES and VALLEYS creating physical depth
-- THICK BUTTERY strokes with paint that has BODY and WEIGHT
-- Impasto highlights that CATCH THE LIGHT like real raised paint
-
-VISIBLE BRUSH BRISTLE MARKS:
-- Individual BRISTLE TRACKS embedded in the paint surface
-- Directional brushwork following the form - fur direction, fabric drape
-- FEATHERY brush edges where strokes trail off
-
-CANVAS TEXTURE & PAINT APPLICATION:
-- COARSE WOVEN CANVAS visible in thinner paint areas
-- RICH, CREAMY paint consistency - not watery or thin
-- Areas of THICK LOADED strokes next to THIN SCRAPED areas
-
-PROFESSIONALLY SCANNED ARTWORK QUALITY:
-- High-resolution detail capturing every paint texture
-- Museum archival quality reproduction
-- The texture and depth of a $50,000 original oil painting
-- Classical oil painting technique - Gainsborough, Reynolds, Vigée Le Brun style
-- NOT digital, NOT airbrushed, NOT smooth, NOT flat
-
-CRITICAL: ALL ${petCount} pets must look EXACTLY like themselves in the original photo. This is a portrait of THESE ${petCount} SPECIFIC pets together - their identities must be instantly recognizable.`;
+OVERALL GOAL
+Create a bright, noble, museum-quality antique portrait that captures the pets' personalities together and is unmistakably the owner's pets.`;
 
       console.log("Multi-pet img2img prompt length:", multiPetImg2ImgPrompt.length);
       

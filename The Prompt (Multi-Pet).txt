@@ -1,0 +1,50 @@
+CRITICAL SPECIES LOCK
+These are ${speciesDescription}. Keep ALL ${petCount} pets exactly as shown - preserve all animals precisely. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. DO NOT generate: ${notSpecies}.
+
+MASTER STYLE
+Generate an 18th-century European aristocratic oil portrait of ${petCountWord} pets with bright, luminous lighting and elegant old-master brushwork. Use rich fabrics such as velvet, silk, or ermine, with gold embroidery, polished metal clasps, and gemstone accents. Backgrounds must be colorful and vibrant: royal blue, emerald, burgundy, soft cream, dusty rose, or periwinkle. Mood is noble, bright, cheerful, and museum-quality. Avoid dark brown or muddy backgrounds.
+
+PAINTING TECHNIQUE
+Loose, flowing, feathery brushwork inspired by Gainsborough, Reynolds, and Vigée Le Brun. Visible texture: subtle canvas weave, soft impasto, bristle marks, natural glazing, and atmospheric sfumato depth. Warm highlights and rich shadows.
+
+ANTIQUE AGING
+Apply light-to-medium aging: soft craquelure, warm aged varnish glow, mild edge wear. Avoid excessive grime or heavy degradation.
+
+COLOR PALETTE
+Use a unique, vibrant palette for every generation. Acceptable tones include jewel colors (ruby, sapphire, emerald, amethyst), soft pastels (blush, lavender, periwinkle, cream), and deep tones (navy, teal, charcoal black). Colors must complement the pets' fur and increase subject contrast. RANDOMIZE colors each generation - avoid repetitive pink/blue schemes. Each pet can have a DIFFERENT colored cloak - variety is beautiful.
+
+IDENTITY PRESERVATION
+Portrait must be instantly recognizable as THESE SPECIFIC pets together. Preserve for ALL ${petCount} pets:
+
+Exact facial structure for each pet
+
+Eye shape, color, spacing, and expression for each pet
+
+Ear shape and positioning for each pet
+
+Snout/muzzle proportions for each pet
+
+Accurate markings in correct locations for each pet
+
+Coat patterns, gradients, and asymmetry for each pet
+Do not alter markings or colors.
+
+ROYAL COSTUME ELEMENT
+Pets are resting naturally together on ${cushion}. Each pet has a ${robe} draped over its back (not clothing), secured by a polished silver or gold cloak clasp. Include ${jewelryItem} for each pet. Maintain natural animal posture. No human-like posing.
+
+COMPOSITION
+Use balanced, elegant portrait composition for ${petCountWord} pets together. VERY ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies with space around them. Pet(s) should occupy only 60-70% of frame height. WIDE and CENTERED composition with all pets clearly visible. AMPLE HEADROOM above ALL pets - at least 15% of frame as background above tallest ears. Position pets CLOSE TOGETHER like companions - arranged naturally.
+
+Use provided variables:
+${compositionInstructions}
+${poseInstructions}
+${facialStructureSection}
+
+PET DESCRIPTIONS
+Follow all details precisely as provided for each pet:
+${petDescriptionsList}
+${multiPetCombinedDescription ? `Together: ${multiPetCombinedDescription}` : ""}
+
+OVERALL GOAL
+Create a bright, noble, museum-quality antique portrait that captures the pets' personalities together and is unmistakably the owner's pets.
+
