@@ -5,16 +5,6 @@ import { sendCanvasUpsellEmail } from "@/lib/lumeEmails";
 // Secret key to prevent unauthorized access
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || process.env.CRON_SECRET;
 
-// Target customers for this campaign
-const TARGET_CUSTOMERS = [
-  "chrisserknee@gmail.com",
-  "rdeleon6@aol.com",
-  "doltongang@cox.net",
-  "verbie@comcast.net",
-  "carmenwolff@icloud.com",
-  "heidi@cypresspointclub.org",
-];
-
 async function getCustomerImageId(email: string): Promise<string | null> {
   // First check paying_customers table
   const { data: customer } = await supabase
@@ -38,48 +28,52 @@ async function getCustomerImageId(email: string): Promise<string | null> {
   return metadata?.[0]?.id || null;
 }
 
-export async function POST(request: Request) {
+// GET: Send canvas upsell to a specific email
+// Usage: /api/send-canvas-upsell?key=YOUR_KEY&email=customer@example.com
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const key = url.searchParams.get("key");
+  const email = url.searchParams.get("email");
+  
+  if (!INTERNAL_API_KEY || key !== INTERNAL_API_KEY) {
+    return NextResponse.json({ error: "Unauthorized - add ?key=YOUR_KEY" }, { status: 401 });
+  }
+  
+  if (!email) {
+    return NextResponse.json({ error: "Missing email parameter - add &email=customer@example.com" }, { status: 400 });
+  }
+  
   try {
-    // Verify authorization
-    const authHeader = request.headers.get("authorization");
-    const providedKey = authHeader?.replace("Bearer ", "");
+    const imageId = await getCustomerImageId(email);
     
-    if (!INTERNAL_API_KEY || providedKey !== INTERNAL_API_KEY) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!imageId) {
+      return NextResponse.json({ 
+        success: false, 
+        error: `No image found for ${email}. Customer may not exist in database.` 
+      }, { status: 404 });
     }
-
-    const results: { email: string; status: string; imageId?: string; error?: string }[] = [];
-
-    for (const email of TARGET_CUSTOMERS) {
-      const imageId = await getCustomerImageId(email);
+    
+    const result = await sendCanvasUpsellEmail(email, imageId, 1);
+    
+    if (result.success) {
+      // Mark email 1 as sent
+      await supabase
+        .from("paying_customers")
+        .update({ canvas_email_1_sent_at: new Date().toISOString() })
+        .eq("email", email.toLowerCase().trim());
       
-      if (!imageId) {
-        results.push({ email, status: "skipped", error: "No image found" });
-        continue;
-      }
-      
-      const result = await sendCanvasUpsellEmail(email, imageId);
-      
-      if (result.success) {
-        results.push({ email, status: "sent", imageId });
-      } else {
-        results.push({ email, status: "failed", imageId, error: result.error });
-      }
-      
-      // Small delay between emails
-      await new Promise(resolve => setTimeout(resolve, 300));
+      return NextResponse.json({
+        success: true,
+        message: `Canvas upsell email sent to ${email}`,
+        imageId
+      });
+    } else {
+      return NextResponse.json({
+        success: false,
+        error: result.error,
+        imageId
+      }, { status: 500 });
     }
-
-    const sent = results.filter(r => r.status === "sent").length;
-    const failed = results.filter(r => r.status === "failed").length;
-    const skipped = results.filter(r => r.status === "skipped").length;
-
-    return NextResponse.json({
-      success: true,
-      summary: { sent, failed, skipped, total: TARGET_CUSTOMERS.length },
-      results
-    });
-
   } catch (error) {
     console.error("Canvas upsell email error:", error);
     return NextResponse.json(
@@ -89,23 +83,58 @@ export async function POST(request: Request) {
   }
 }
 
-// Also support GET for easy browser testing (with auth)
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const key = url.searchParams.get("key");
-  
-  if (!INTERNAL_API_KEY || key !== INTERNAL_API_KEY) {
-    return NextResponse.json({ error: "Unauthorized - add ?key=YOUR_KEY" }, { status: 401 });
-  }
-  
-  // Convert to POST request internally
-  const newRequest = new Request(request.url, {
-    method: "POST",
-    headers: {
-      "authorization": `Bearer ${key}`
+// POST: Send canvas upsell via JSON body
+export async function POST(request: Request) {
+  try {
+    const authHeader = request.headers.get("authorization");
+    const providedKey = authHeader?.replace("Bearer ", "");
+    
+    if (!INTERNAL_API_KEY || providedKey !== INTERNAL_API_KEY) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-  });
-  
-  return POST(newRequest);
+
+    const body = await request.json();
+    const email = body.email;
+    
+    if (!email) {
+      return NextResponse.json({ error: "Missing email in request body" }, { status: 400 });
+    }
+    
+    const imageId = await getCustomerImageId(email);
+    
+    if (!imageId) {
+      return NextResponse.json({ 
+        success: false, 
+        error: `No image found for ${email}` 
+      }, { status: 404 });
+    }
+    
+    const result = await sendCanvasUpsellEmail(email, imageId, 1);
+    
+    if (result.success) {
+      await supabase
+        .from("paying_customers")
+        .update({ canvas_email_1_sent_at: new Date().toISOString() })
+        .eq("email", email.toLowerCase().trim());
+      
+      return NextResponse.json({
+        success: true,
+        message: `Canvas upsell email sent to ${email}`,
+        imageId
+      });
+    } else {
+      return NextResponse.json({
+        success: false,
+        error: result.error
+      }, { status: 500 });
+    }
+
+  } catch (error) {
+    console.error("Canvas upsell email error:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
 }
 
