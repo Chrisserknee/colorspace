@@ -880,7 +880,9 @@ async function generateWithStableDiffusion(
         } else if (firstItem instanceof URL || (firstItem && firstItem.href)) {
           // Array item is itself a URL object
           imageUrl = firstItem.href || firstItem.toString();
-          console.log("✅ Got URL object from array, converted to string:", imageUrl.substring(0, 80));
+          if (imageUrl) {
+            console.log("✅ Got URL object from array, converted to string:", imageUrl.substring(0, 80));
+          }
         } else if (typeof firstItem === 'object' && firstItem !== null) {
           console.log("📦 First item is object");
           console.log("📦 Object keys:", Object.keys(firstItem));
@@ -890,7 +892,9 @@ async function generateWithStableDiffusion(
           // Check if it's a URL object directly
           if (firstItem.href || firstItem instanceof URL) {
             imageUrl = firstItem.href || firstItem.toString();
-            console.log("✅ Array item is URL object, converted:", imageUrl.substring(0, 80));
+            if (imageUrl) {
+              console.log("✅ Array item is URL object, converted:", imageUrl.substring(0, 80));
+            }
           } else if ('url' in firstItem) {
             const urlValue = (firstItem as { url: string | (() => string | Promise<string> | any) }).url;
             console.log("📦 url property type:", typeof urlValue);
@@ -909,7 +913,9 @@ async function generateWithStableDiffusion(
               } else if (urlResult && (urlResult.href || urlResult instanceof URL)) {
                 // URL object - use .href property for the string URL (most reliable)
                 imageUrl = urlResult.href || urlResult.toString();
-                console.log("✅ url() returned URL object, converted to string:", imageUrl.substring(0, 80));
+                if (imageUrl) {
+                  console.log("✅ url() returned URL object, converted to string:", imageUrl.substring(0, 80));
+                }
               } else if (urlResult && typeof urlResult.toString === 'function') {
                 const stringResult = urlResult.toString();
                 // Check if toString() gives us a URL-like string
