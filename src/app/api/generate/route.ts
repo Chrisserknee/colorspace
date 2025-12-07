@@ -1056,14 +1056,13 @@ async function generateWithStableDiffusion(
         console.error("❌ Unexpected output type:", typeof output, "value:", output);
         throw new Error(`No valid image output from SD model. Type: ${typeof output}`);
       }
+      console.log(`✅ SD generation complete (${model}), buffer size: ${buffer.length} bytes`);
+      return buffer;
     } catch (error) {
       console.error("❌ Error processing SD output:", error);
       console.error("❌ Output was:", JSON.stringify(output, null, 2));
       throw error;
     }
-    
-    console.log(`✅ SD generation complete (${model}), buffer size: ${buffer.length} bytes`);
-    return buffer;
     
   } catch (error) {
     console.error(`❌ SD generation error (${model}):`, error);
