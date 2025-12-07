@@ -634,18 +634,36 @@ async function generateWithStableDiffusion(
       // Flux with img2img capability using a community model
       console.log("🚀 Using Flux img2img (lucataco/flux-dev-lora)...");
       
-      output = await replicate.run(
-        "lucataco/flux-dev-lora:a22c463f11808638ad5e2ebd582e07a469031f48dd567366fb4c6fdab91d614d",
-        {
-          input: {
-            image: imageDataUrl,
-            prompt: prompt,
-            strength: sdStrength,
-            num_inference_steps: sdSteps,
-            guidance_scale: sdGuidanceScale,
+      try {
+        // Try latest version first
+        output = await replicate.run(
+          "lucataco/flux-dev-lora", // Use latest version
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              strength: sdStrength,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+            }
           }
-        }
-      );
+        );
+      } catch (versionError) {
+        console.log("⚠️ Latest version failed, trying specific version...");
+        // Fallback to specific version
+        output = await replicate.run(
+          "lucataco/flux-dev-lora:a22c463f11808638ad5e2ebd582e07a469031f48dd567366fb4c6fdab91d614d",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              strength: sdStrength,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+            }
+          }
+        );
+      }
     } else if (model === "sd3") {
       // Stable Diffusion 3 - Latest SD model
       console.log("🚀 Using Stable Diffusion 3 (stability-ai/stable-diffusion-3)...");
@@ -667,23 +685,46 @@ async function generateWithStableDiffusion(
       // SDXL with img2img for identity preservation
       console.log("🚀 Using SDXL img2img for identity preservation...");
       
-      output = await replicate.run(
-        "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-        {
-          input: {
-            image: imageDataUrl,
-            prompt: prompt,
-            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
-            prompt_strength: sdStrength,
-            num_inference_steps: sdSteps,
-            guidance_scale: sdGuidanceScale,
-            scheduler: "K_EULER_ANCESTRAL",
-            refine: "expert_ensemble_refiner",
-            high_noise_frac: 0.8,
-            num_outputs: 1,
+      try {
+        // Try latest version first (more reliable)
+        output = await replicate.run(
+          "stability-ai/sdxl", // Use latest version
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
+              prompt_strength: sdStrength,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+              refine: "expert_ensemble_refiner",
+              high_noise_frac: 0.8,
+              num_outputs: 1,
+            }
           }
-        }
-      );
+        );
+      } catch (versionError) {
+        console.log("⚠️ Latest version failed, trying specific version...");
+        // Fallback to specific version
+        output = await replicate.run(
+          "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
+              prompt_strength: sdStrength,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+              refine: "expert_ensemble_refiner",
+              high_noise_frac: 0.8,
+              num_outputs: 1,
+            }
+          }
+        );
+      }
     } else if (model === "sdxl-controlnet") {
       // SDXL with ControlNet for better structure preservation
       console.log("🚀 Using SDXL ControlNet (canny) for structure preservation...");
@@ -706,19 +747,38 @@ async function generateWithStableDiffusion(
       // IP-Adapter FaceID for face preservation (works great for pet faces too)
       console.log("🚀 Using IP-Adapter FaceID for face preservation...");
       
-      output = await replicate.run(
-        "lucataco/ip-adapter-faceid-sdxl:0626a057f7d2cd0dc1cd7e9faeb6e5bb57e0a09f4e5c8c6e5fe17ea40e8c1c03",
-        {
-          input: {
-            image: imageDataUrl,
-            prompt: prompt,
-            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
-            ip_adapter_scale: ipAdapterScale,
-            num_inference_steps: sdSteps,
-            guidance_scale: sdGuidanceScale,
+      // Try latest version first, fallback to specific version if needed
+      try {
+        output = await replicate.run(
+          "lucataco/ip-adapter-faceid-sdxl", // Use latest version
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
+              ip_adapter_scale: ipAdapterScale,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+            }
           }
-        }
-      );
+        );
+      } catch (versionError) {
+        console.log("⚠️ Latest version failed, trying specific version...");
+        // Fallback to specific version
+        output = await replicate.run(
+          "lucataco/ip-adapter-faceid-sdxl:0626a057f7d2cd0dc1cd7e9faeb6e5bb57e0a09f4e5c8c6e5fe17ea40e8c1c03",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
+              ip_adapter_scale: ipAdapterScale,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+            }
+          }
+        );
+      }
     } else {
       throw new Error(`Unknown SD model: ${model}. Use: flux, flux-img2img, sd3, sdxl-img2img, sdxl-controlnet, ip-adapter-faceid`);
     }
@@ -922,6 +982,26 @@ async function generateWithStableDiffusion(
     
   } catch (error) {
     console.error(`❌ SD generation error (${model}):`, error);
+    
+    // Provide helpful error message for version/permission errors
+    if (error && typeof error === 'object' && 'message' in error) {
+      const errorMsg = String(error.message);
+      if (errorMsg.includes('422') || errorMsg.includes('Invalid version') || errorMsg.includes('not permitted')) {
+        const alternativeModels = model === 'ip-adapter-faceid' 
+          ? 'Try: SD_MODEL=sdxl-img2img or SD_MODEL=sdxl-controlnet'
+          : model === 'flux-img2img'
+          ? 'Try: SD_MODEL=sdxl-img2img or SD_MODEL=ip-adapter-faceid'
+          : 'Try: SD_MODEL=sdxl-img2img';
+        
+        throw new Error(
+          `Replicate model version error for ${model}. The model version may be outdated or you may not have permission.\n` +
+          `Suggested fix: Set a different model in .env.local:\n` +
+          `${alternativeModels}\n` +
+          `Original error: ${errorMsg}`
+        );
+      }
+    }
+    
     throw error;
   }
 }
@@ -3679,9 +3759,9 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     console.log("🔍 DEBUG - Comparison check:", sdEnvValue === "true", "(should be true if env var is set correctly)");
     
     const useStableDiffusion = sdEnvValue === "true" && hasReplicateToken;
-    // Default to ip-adapter-faceid for best identity preservation (works great for pet faces too)
-    // Alternatives: sdxl-controlnet (structure), sdxl-img2img (balance), flux-img2img (quality)
-    const sdModel = process.env.SD_MODEL || "ip-adapter-faceid";
+    // Default to sdxl-img2img for stability and reliability
+    // Alternatives: ip-adapter-faceid (best identity, but may have version issues), sdxl-controlnet (structure), flux-img2img (quality)
+    const sdModel = process.env.SD_MODEL || "sdxl-img2img";
     
     // OpenAI DISABLED - Using Stable Diffusion only
     const useOpenAIImg2Img = false; // Disabled - using SD only
