@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import Gallery from "@/components/Gallery";
@@ -61,6 +61,7 @@ export default function Home() {
   const [viewingLastCreation, setViewingLastCreation] = useState(false);
   const [hasAnyCreations, setHasAnyCreations] = useState(false);
   const [justGenerated, setJustGenerated] = useState(false); // Highlight My Creations after generation
+  const myCreationsRef = useRef<HTMLDivElement>(null); // Ref to scroll to My Creations button
 
   // Check for email param (session restore) or pending image from pack purchase
   useEffect(() => {
@@ -137,11 +138,22 @@ export default function Home() {
     // Refresh creations state
     setHasAnyCreations(hasCreationsNow);
     
-    // If they now have creations (either new or existing), highlight the button
+    // If they now have creations (either new or existing), highlight the button and scroll to it
     if (hasCreationsNow) {
       setJustGenerated(true);
-      // Clear the highlight after 8 seconds
-      setTimeout(() => setJustGenerated(false), 8000);
+      
+      // Scroll to the My Creations button after a brief delay (let the UI render first)
+      setTimeout(() => {
+        if (myCreationsRef.current) {
+          myCreationsRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' // Center the button in the viewport
+          });
+        }
+      }, 300);
+      
+      // Clear the highlight after 10 seconds
+      setTimeout(() => setJustGenerated(false), 10000);
     }
     
     // Refresh last creation
@@ -191,7 +203,7 @@ export default function Home() {
 
       {/* My Creations Button - static, centered above How It Works */}
       {!selectedFile && !showFlowFromEmail && !viewingLastCreation && hasAnyCreations && (
-        <div className="flex flex-col items-center py-6 -mt-8 gap-2">
+        <div ref={myCreationsRef} className="flex flex-col items-center py-6 -mt-8 gap-2">
           {/* "Your portrait is ready!" message when just generated */}
           {justGenerated && (
             <div 
