@@ -730,24 +730,56 @@ async function generateWithStableDiffusion(
       if (Array.isArray(output) && output.length > 0) {
         console.log("📦 Output is array, length:", output.length);
         const firstItem = output[0];
-        let imageUrl: string;
+        console.log("📦 First item type:", typeof firstItem, "value:", firstItem);
+        let imageUrl: string | undefined;
         
         if (typeof firstItem === 'string') {
           imageUrl = firstItem;
-        } else if (typeof firstItem === 'object' && firstItem !== null && 'url' in firstItem) {
-          const urlValue = (firstItem as { url: string | (() => string | Promise<string>) }).url;
-          if (typeof urlValue === 'function') {
-            imageUrl = await urlValue();
+          console.log("✅ Got string URL from array");
+        } else if (typeof firstItem === 'object' && firstItem !== null) {
+          console.log("📦 First item is object, keys:", Object.keys(firstItem));
+          if ('url' in firstItem) {
+            const urlValue = (firstItem as { url: string | (() => string | Promise<string> | any) }).url;
+            console.log("📦 url property type:", typeof urlValue);
+            
+            if (typeof urlValue === 'function') {
+              console.log("🔗 Calling url() function...");
+              const urlResult = await urlValue();
+              console.log("🔗 url() returned type:", typeof urlResult, "value:", typeof urlResult === 'string' ? urlResult.substring(0, 100) : urlResult);
+              
+              // Handle if url() returns a string, URL object, or other
+              if (typeof urlResult === 'string') {
+                imageUrl = urlResult;
+              } else if (urlResult instanceof URL) {
+                imageUrl = urlResult.toString();
+              } else if (urlResult && typeof urlResult.toString === 'function') {
+                imageUrl = urlResult.toString();
+              } else {
+                throw new Error(`url() returned non-string type: ${typeof urlResult}. Value: ${JSON.stringify(urlResult)}`);
+              }
+            } else if (typeof urlValue === 'string') {
+              imageUrl = urlValue;
+              console.log("✅ Got string URL from object.url property");
+            } else {
+              throw new Error(`url property is not a string or function: ${typeof urlValue}`);
+            }
           } else {
-            imageUrl = urlValue;
+            // Maybe it's a FileOutput object - try to stringify it
+            console.log("⚠️ Object doesn't have 'url' property, trying toString...");
+            const stringified = String(firstItem);
+            if (stringified.startsWith('http')) {
+              imageUrl = stringified;
+            } else {
+              throw new Error(`Unexpected array item format. Object keys: ${Object.keys(firstItem).join(', ')}`);
+            }
           }
         } else {
           throw new Error(`Unexpected array item type: ${typeof firstItem}`);
         }
         
-        console.log("📥 Downloading from URL:", imageUrl);
+        console.log("📥 Final imageUrl:", imageUrl, "type:", typeof imageUrl);
         if (!imageUrl || typeof imageUrl !== 'string') {
-          throw new Error(`Invalid URL: ${imageUrl}`);
+          throw new Error(`Invalid URL: ${imageUrl} (type: ${typeof imageUrl})`);
         }
         // Validate URL format before fetching
         try {
