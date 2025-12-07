@@ -4438,15 +4438,13 @@ ENHANCED ROYAL ENVIRONMENT & PILLOW REQUIREMENTS:
 
 Pillows must frequently appear in different colors, not repeating the same tones each generation.
 
-Use brighter, richer, more vibrant colors for pillows (e.g., ruby red, sapphire blue, emerald green, amethyst purple, gold, teal, rose, deep turquoise).
+Use brighter, richer, more vibrant colors for pillows (ruby, sapphire, emerald, amethyst, gold, teal, rose, turquoise).
 
-Pillows should feature ornate Victorian royal designs such as brocade, damask, embroidered gold thread, floral scrollwork, or regal geometric motifs.
+Pillows should feature ornate Victorian royal patterns such as brocade, damask, embroidered gold thread, floral scrollwork, or regal geometric motifs.
 
-Textures may include velvet, woven silk, embroidered linen, or other noble materials.
+Textures may include velvet, silk, embroidered linen, or other noble materials.
 
-Pillow patterns and colors must elevate the royal atmosphere and help make the entire environment feel more Victorian, ornate, and richly decorated.
-
-This section modifies environment only—no conflict with existing cloak or wardrobe rules.
+Pillow patterns and colors must elevate the royal atmosphere and amplify the Victorian opulence of the portrait.
 
 ROYAL WARDROBE – CLOAK, GARMENTS, AND CLASP
 The pet rests naturally on ${cushion}. A ${robe} is draped over its back as a true cloak.
@@ -4502,6 +4500,49 @@ Gemstones must have high brilliance and clarity
 
 Jewelry must significantly elevate the royal aesthetic of the portrait
 
+MATCH JEWELRY, CLASP & CLOAK STYLE FROM REFERENCE IMAGE
+
+JEWELRY STYLE REQUIREMENT (MATCH REFERENCE):
+The pet must wear jewelry styled like the reference image:
+
+Multiple layered gold chains, stacked in elegant tiers
+
+A central ornate gemstone pendant framed in decorative filigree
+
+Jewelry should rest on the chest naturally, just like the example
+
+Gold must be extremely polished, warm, and shiny
+
+Overall design must feel royal, heavy, ornate, and handcrafted
+
+CLOAK CLASP REQUIREMENT (MATCH REFERENCE):
+The cloak clasp must closely match the style shown:
+
+A round, ornate, polished metal clasp (gold or 925 silver)
+
+Embossed/engraved aristocratic detailing
+
+High-shine finish with strong reflections
+
+Sits at the chest in the same placement/scale as in the reference
+
+Must look luxurious, heavy, ceremonial, and regal
+
+CLOAK STYLE REQUIREMENT (MATCH REFERENCE):
+The cloak must follow the same construction style and silhouette as the reference while changing colors each generation:
+
+Rich, noble fabric with deep folds, heavy drape, and elegant weight
+
+Detailed gold filigree or baroque patterns similar to the example
+
+Ermine-style fur trim with black spots, thick texture, and natural variation
+
+Cloak must feel ceremonial, royal, Victorian/18th-century, and powerfully ornate
+
+Cloak color should change frequently (deep blue, crimson, emerald, purple, gold, etc.)
+
+Maintain a consistent luxury level matching the reference image
+
 COMPOSITION – SUBJECT OFTEN FARTHER AWAY
 The pet must not always be close-up. Frequently show:
 
@@ -4509,20 +4550,18 @@ The subject farther away
 
 More body visible
 
-More cloak, garments, clasp, ornate Victorian pillows, and decorative environment
+More cloak, garments, clasp, ornate pillows, and decorative environment
 
-Classical portrait composition with richer, more elaborate staging
+Classical portrait composition with richer, elaborate staging
 
 POSE REQUIREMENT – RELAXED, NATURAL, RENAISSANCE-LIKE
-The pet should often appear in a serene, natural, Renaissance-inspired pose:
+The pet should often appear in a serene, natural pose:
 
 Relaxed posture
 
 Calm, candid presence
 
-Graceful positioning of the body
-
-A timeless, tranquil elegance reminiscent of Renaissance portrait subjects
+Graceful, Renaissance-inspired positioning
 Avoid stiff or rigid posing.
 
 Use provided variables:
@@ -4535,7 +4574,8 @@ Follow all provided details exactly:
 ${petDescription}${genderInfo}${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}${agePreservationInstructions}
 
 OVERALL GOAL
-A luminous, regal antique oil portrait with extremely thick, dimensional oil paint; darker backgrounds; elevated, Victorian-royal clothing and jewelry; ornate, vibrant pillows with rich patterns; a silky luminous cloak held by an ornate clasp; a composition showing more of the figure; and a serene Renaissance-inspired natural pose. The portrait must remain instantly recognizable as this specific pet.`;
+A luminous, regal antique oil portrait with extremely thick, dimensional paint; darker backgrounds; ornate Victorian styling; extremely detailed jewelry and cloaks modeled after the reference; vibrant ornate pillows; a rich composition showing more of the figure; and a serene Renaissance-inspired natural pose.
+The portrait must remain instantly recognizable as this specific pet.`;
 
       // Add custom prompt for studio mode
       const finalOpenAIPrompt = customPrompt 
