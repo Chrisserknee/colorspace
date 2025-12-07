@@ -2139,7 +2139,7 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
     
-    console.log("Using OpenAI for vision (GPT-4o) and image generation (DALL-E 3)");
+    console.log("Using OpenAI for vision analysis (GPT-4o) only. Image generation: Stable Diffusion (OpenAI disabled)");
 
     // Form data already parsed above for studio mode check
     const imageFile = formData.get("image") as File | null;
@@ -3678,11 +3678,11 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     const useStableDiffusion = sdEnvValue === "true" && hasReplicateToken;
     const sdModel = process.env.SD_MODEL || "flux-img2img"; // Default to img2img for identity preservation
     
-    // Only use OpenAI if SD is NOT enabled
-    const useOpenAIImg2Img = !useStableDiffusion && process.env.USE_OPENAI_IMG2IMG === "true" && process.env.OPENAI_API_KEY;
-    const useComposite = !useStableDiffusion && !useOpenAIImg2Img && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
-    const useStyleTransfer = !useStableDiffusion && !useOpenAIImg2Img && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
-    const useIPAdapter = !useStableDiffusion && !useOpenAIImg2Img && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
+    // OpenAI DISABLED - Using Stable Diffusion only
+    const useOpenAIImg2Img = false; // Disabled - using SD only
+    const useComposite = !useStableDiffusion && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
+    const useStyleTransfer = !useStableDiffusion && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
+    const useIPAdapter = !useStableDiffusion && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
     
     console.log("=== IMAGE GENERATION ===");
     console.log("Environment check:");
@@ -3872,47 +3872,27 @@ CRITICAL: ALL ${petCount} pets must look EXACTLY like themselves in the original
       console.log("Multi-pet img2img prompt length:", multiPetImg2ImgPrompt.length);
       
       try {
-        // Use OpenAI img2img (images.edit) to transform the photo while preserving both pets
-        console.log("🎨 Using OpenAI img2img for multi-pet portrait...");
+        // Use Stable Diffusion for multi-pet portrait (OpenAI disabled)
+        console.log("🎨 Using Stable Diffusion for multi-pet portrait...");
+        console.log(`📌 SD Model: ${sdModel}`);
         
-        // Process the original image buffer for OpenAI
-        const processedForOpenAI = await sharp(buffer)
+        // Process the original image buffer for SD
+        const processedForSD = await sharp(buffer)
           .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
           .png()
           .toBuffer();
         
-        // Convert buffer to File for OpenAI API
-        const uint8Array = new Uint8Array(processedForOpenAI);
-        const imageBlob = new Blob([uint8Array], { type: "image/png" });
-        const imageFile2 = new File([imageBlob], "multi-pet-photo.png", { type: "image/png" });
+        // Convert to data URL format for SD models
+        const sdBase64 = processedForSD.toString("base64");
+        const sdDataUrl = `data:image/png;base64,${sdBase64}`;
         
-        const multiPetResponse = await openai.images.edit({
-          model: "gpt-image-1",
-          image: imageFile2,
-          prompt: multiPetImg2ImgPrompt,
-          n: 1,
-          size: "1024x1024",
-        });
+        console.log(`📤 Sending multi-pet image to SD model ${sdModel} (${processedForSD.length} bytes)`);
         
-        const multiPetImageData = multiPetResponse.data?.[0];
-        if (!multiPetImageData) {
-          throw new Error("No image generated for multi-pet portrait");
-        }
-        
-        if (multiPetImageData.b64_json) {
-          firstGeneratedBuffer = Buffer.from(multiPetImageData.b64_json, "base64");
-          console.log("✅ Multi-pet portrait generated (base64)");
-        } else if (multiPetImageData.url) {
-          console.log("Downloading multi-pet portrait from URL...");
-          const downloadResponse = await fetch(multiPetImageData.url);
-          if (!downloadResponse.ok) {
-            throw new Error(`Failed to download multi-pet image: ${downloadResponse.status}`);
-          }
-          firstGeneratedBuffer = Buffer.from(await downloadResponse.arrayBuffer());
-          console.log("✅ Multi-pet portrait generated (URL download)");
-        } else {
-          throw new Error("No image data in multi-pet response");
-        }
+        firstGeneratedBuffer = await generateWithStableDiffusion(
+          sdDataUrl,
+          multiPetImg2ImgPrompt,
+          sdModel
+        );
         
         console.log("✅ Multi-pet portrait generated successfully!");
         console.log("Buffer size:", firstGeneratedBuffer.length);
@@ -3929,18 +3909,16 @@ CRITICAL: ALL ${petCount} pets must look EXACTLY like themselves in the original
       // === SINGLE PET GENERATION PATH (Original) ===
     
     const modelName = useStableDiffusion ? `⚠️ Stable Diffusion (${sdModel}) - LOCAL TESTING ONLY`
-      : useOpenAIImg2Img ? "OpenAI img2img (images.edit)"
       : useComposite ? "Composite (segment + scene + blend)"
       : useStyleTransfer ? "Style Transfer + GPT Refinement" 
       : useIPAdapter ? "IP-Adapter SDXL (identity preservation)" 
-      : "GPT-Image-1 (OpenAI)";
+      : "⚠️ ERROR: No generation model available. Set USE_STABLE_DIFFUSION=true";
     console.log("Model selected:", modelName);
     console.log("Selection reason:", useStableDiffusion ? `USE_STABLE_DIFFUSION=true, SD_MODEL=${sdModel} (⚠️ LOCAL TESTING ONLY - DO NOT DEPLOY)`
-      : useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true" 
       : useComposite ? "USE_COMPOSITE=true"
       : useStyleTransfer ? "USE_STYLE_TRANSFER=true"
       : useIPAdapter ? "USE_IP_ADAPTER=true"
-      : "No model flags set, using default GPT-Image-1");
+      : "⚠️ ERROR: No model enabled. OpenAI disabled. Set USE_STABLE_DIFFUSION=true");
     console.log("Generation type:", useSecretCredit ? "SECRET CREDIT (un-watermarked)" : usePackCredit ? "PACK CREDIT (watermarked)" : "FREE (watermarked)");
     console.log("⚠️ IMPORTANT: All generation types (free, pack credit, secret credit) use the SAME model:", modelName);
     console.log("⚠️ The only difference is watermarking - generation model is identical for all types.");
@@ -4023,11 +4001,9 @@ CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match t
         const errorMessage = sdError instanceof Error ? sdError.message : String(sdError);
         throw new Error(`Stable Diffusion generation failed (${sdModel}): ${errorMessage}`);
       }
-    } else if (useOpenAIImg2Img) {
-      // Use OpenAI img2img for primary generation
-      console.log("🎨 Using OpenAI img2img (images.edit) for primary generation...");
-      console.log("📌 Pet identity will be preserved from original image");
-      console.log("📌 Transforming pet photo directly into late 18th-century aristocratic portrait");
+    } else if (false) { // OpenAI disabled - this path will never execute
+      // OpenAI img2img DISABLED - Using Stable Diffusion only
+      throw new Error("OpenAI img2img is disabled. Use Stable Diffusion instead (set USE_STABLE_DIFFUSION=true)");
       
       // Create a focused prompt for OpenAI img2img
       // OpenAI's images.edit works best with SHORT, CLEAR instructions
@@ -4479,8 +4455,8 @@ CRITICAL: The ${species} must sit NATURALLY like a real ${species} - NOT in a hu
       const styleTransferBuffer = await applyStyleTransfer(base64Image);
       console.log("✅ Style transfer complete (Stage 1)");
       
-      // Stage 2: GPT Refinement for quality enhancement (if enabled)
-      const enableGptRefinement = process.env.ENABLE_GPT_REFINEMENT !== "false"; // Default to true
+      // Stage 2: GPT Refinement DISABLED (OpenAI disabled)
+      const enableGptRefinement = false; // Disabled - OpenAI image generation is disabled
       
       if (enableGptRefinement) {
         console.log("🎨 Applying GPT-Image-1 refinement (Stage 2)...");
@@ -4583,6 +4559,10 @@ The ${species} should match the reference image exactly - same face, markings, c
       
       console.log("✅ IP-Adapter generation complete");
     } else {
+      // OpenAI DISABLED - This fallback should never execute if SD is enabled
+      throw new Error("⚠️ OpenAI image generation is disabled. Please set USE_STABLE_DIFFUSION=true in .env.local to use Stable Diffusion for image generation.");
+      
+      // OLD CODE - DISABLED
       // Use GPT-Image-1 (original approach)
       console.log("🎨 Using GPT-Image-1 for generation...");
       
