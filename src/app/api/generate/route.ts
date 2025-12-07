@@ -865,7 +865,7 @@ async function generateWithStableDiffusion(
     console.log("SD output value:", JSON.stringify(output, null, 2).substring(0, 500)); // Log first 500 chars
 
     // Handle various output formats from Replicate
-    let buffer: Buffer;
+    let buffer: Buffer = Buffer.alloc(0); // Initialize to empty buffer
     
     try {
       if (Array.isArray(output) && output.length > 0) {
@@ -3966,13 +3966,21 @@ Ornate, engraved, aristocratic detailing
 
 JEWELRY REQUIREMENTS:
 
-Jewelry must be extremely elegant, royal, and refined
+Jewelry must be EXQUISITELY BEAUTIFUL - museum-quality heirloom pieces
 
-Use polished gold or 925 silver
+Use HIGHLY POLISHED gold or sterling 925 silver with mirror-like shine
 
-Small, bright gemstones with vivid sparkle
+Gemstones must be BRILLIANTLY CUT with exceptional clarity and fire - rubies, sapphires, emeralds, diamonds, pearls
 
-Designs must look handcrafted for nobility, never simple or plain
+Include INTRICATE FILIGREE work, delicate scrollwork, and hand-engraved details
+
+Layer multiple pieces: elegant necklaces, pendants, chains, and brooches
+
+Pearl strands with lustrous, creamy overtones
+
+Designs must appear handcrafted by master jewelers for royalty - never mass-produced or plain
+
+Each piece should catch the light and sparkle magnificently
 
 COMPOSITION – SUBJECTS OFTEN FARTHER AWAY
 The pets must not always be close-up. Frequently show:
@@ -4454,13 +4462,21 @@ Ornate, engraved, aristocratic detailing
 
 JEWELRY REQUIREMENTS:
 
-Jewelry must be extremely elegant, royal, and refined
+Jewelry must be EXQUISITELY BEAUTIFUL - museum-quality heirloom pieces
 
-Use polished gold or 925 silver
+Use HIGHLY POLISHED gold or sterling 925 silver with mirror-like shine
 
-Small, bright gemstones with vivid sparkle
+Gemstones must be BRILLIANTLY CUT with exceptional clarity and fire - rubies, sapphires, emeralds, diamonds, pearls
 
-Designs must look handcrafted for nobility, never simple or plain
+Include INTRICATE FILIGREE work, delicate scrollwork, and hand-engraved details
+
+Layer multiple pieces: elegant necklaces, pendants, chains, and brooches
+
+Pearl strands with lustrous, creamy overtones
+
+Designs must appear handcrafted by master jewelers for royalty - never mass-produced or plain
+
+Each piece should catch the light and sparkle magnificently
 
 COMPOSITION – SUBJECT OFTEN FARTHER AWAY
 The pet must not always be close-up. Frequently show:
