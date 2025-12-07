@@ -99,8 +99,8 @@ const saveLimits = (limits: GenerationLimits) => {
 };
 
 const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: string; hasPackCredits?: boolean } => {
-  // Free tier: 3 total free generations
-  const freeLimit = 3;
+  // Free tier: 2 total free generations
+  const freeLimit = 2;
   const freeUsed = limits.freeGenerations;
   
   // Each purchase grants 2 additional watermarked generations
@@ -989,7 +989,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
   const handleRetry = () => {
     const limits = getLimits();
     
-    // Check overall generation limit (user gets 3 free generations total)
+    // Check overall generation limit (user gets 2 free generations total)
     const check = canGenerate(limits);
     if (!check.allowed) {
       setError(check.reason || "Generation limit reached.");
@@ -997,8 +997,8 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }
     
     // Check if user still has free generations remaining
-    if (limits.freeGenerations >= 3) {
-      setError("You've used your 3 free generations. Purchase a pack to unlock more!");
+    if (limits.freeGenerations >= 2) {
+      setError("You've used your 2 free generations. Purchase a pack to unlock more!");
       return;
     }
     
@@ -1342,7 +1342,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
             <span>
               {generationLimits.packCredits > 0 
                 ? `${generationLimits.packCredits} portrait${generationLimits.packCredits !== 1 ? 's' : ''}`
-                : `${Math.max(0, 3 - generationLimits.freeGenerations)} free`
+                : `${Math.max(0, 2 - generationLimits.freeGenerations)} free`
               }
             </span>
           </div>
@@ -1450,9 +1450,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                     {generationLimits.packCredits > 0 ? (
                       `✨ ${generationLimits.packCredits} watermarked generation${generationLimits.packCredits !== 1 ? 's' : ''} remaining`
                     ) : generationLimits.purchases > 0 ? (
-                      `✨ ${3 + (generationLimits.purchases * 2) - generationLimits.freeGenerations} generations remaining`
+                      `✨ ${2 + (generationLimits.purchases * 2) - generationLimits.freeGenerations} generations remaining`
                     ) : (
-                      `✨ ${3 - generationLimits.freeGenerations} free generation${3 - generationLimits.freeGenerations !== 1 ? 's' : ''} remaining`
+                      `✨ ${2 - generationLimits.freeGenerations} free generation${2 - generationLimits.freeGenerations !== 1 ? 's' : ''} remaining`
                     )}
                   </p>
                 ) : (
@@ -2057,11 +2057,11 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
               {(() => {
                 const limits = getLimits();
                 const check = canGenerate(limits);
-                const hasRemainingFreeGens = limits.freeGenerations < 3;
+                const hasRemainingFreeGens = limits.freeGenerations < 2;
                 const canRetry = check.allowed && hasRemainingFreeGens;
                 
                 if (canRetry) {
-                  const remaining = 3 - limits.freeGenerations;
+                  const remaining = 2 - limits.freeGenerations;
                   return (
                     <button 
                       onClick={handleRetry}
