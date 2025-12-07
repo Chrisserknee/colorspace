@@ -954,9 +954,10 @@ async function generateWithStableDiffusion(
         
         // Final conversion check - handle URL objects that might have slipped through
         if (imageUrl && typeof imageUrl !== 'string') {
-          if (imageUrl instanceof URL || (imageUrl && imageUrl.href)) {
+          const urlObj = imageUrl as any;
+          if (urlObj instanceof URL || (urlObj && urlObj.href)) {
             console.log("🔄 Converting URL object to string...");
-            imageUrl = imageUrl.href || imageUrl.toString();
+            imageUrl = urlObj.href || urlObj.toString();
           } else {
             throw new Error(`Invalid URL type: ${typeof imageUrl}. Value: ${imageUrl}`);
           }
