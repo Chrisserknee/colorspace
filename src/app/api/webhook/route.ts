@@ -6,6 +6,49 @@ import { sendCanvasUpsellEmail } from "@/lib/lumeEmails";
 import { createFullCanvasOrder, CanvasSize, ShippingAddress } from "@/lib/printify";
 import { trackServerCompletePayment } from "@/lib/tiktok-server";
 
+// Determine traffic source from UTM params and referrer
+function getTrafficSource(metadata: Stripe.Metadata | null): string {
+  if (!metadata) return "Direct";
+  
+  const utmMedium = metadata.utm_medium?.toLowerCase() || "";
+  const utmSource = metadata.utm_source?.toLowerCase() || "";
+  
+  // Check for paid traffic indicators
+  const paidMediums = ["paid", "cpc", "cpm", "ppc", "ad", "ads", "sponsored", "retargeting"];
+  const isPaid = paidMediums.some(m => utmMedium.includes(m)) || 
+                 utmMedium === "paidsocial" ||
+                 utmSource.includes("fb_ad") ||
+                 utmSource.includes("ig_ad");
+  
+  if (isPaid) return "Paid Ad";
+  
+  // Check for organic social
+  const referrer = metadata.referrer?.toLowerCase() || "";
+  if (referrer.includes("facebook.com") || referrer.includes("fb.com") || 
+      referrer.includes("instagram.com") || referrer.includes("tiktok.com") ||
+      referrer.includes("twitter.com") || referrer.includes("x.com")) {
+    return "Organic Social";
+  }
+  
+  // Check for search traffic
+  if (referrer.includes("google.") || referrer.includes("bing.") || 
+      referrer.includes("yahoo.") || referrer.includes("duckduckgo.")) {
+    return "Organic Search";
+  }
+  
+  // If there's a referrer but not social/search, it's referral
+  if (referrer && referrer !== "" && !referrer.includes("lumepet")) {
+    return "Referral";
+  }
+  
+  // No UTM, no referrer = Direct
+  if (!metadata.utm_source && !referrer) {
+    return "Direct";
+  }
+  
+  return "Organic";
+}
+
 // Initialize Stripe lazily to avoid build-time errors
 function getStripe(): Stripe {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -103,6 +146,7 @@ export async function POST(request: NextRequest) {
               // Add to customers table (separate list of paying customers)
               try {
                 const isRainbowBridge = session.metadata?.style === 'rainbow-bridge';
+                const trafficSource = getTrafficSource(session.metadata);
                 await addCustomer(customerEmail, {
                   purchaseType: isRainbowBridge ? 'rainbow-bridge' : 'portrait',
                   imageId: imageId,
@@ -110,6 +154,7 @@ export async function POST(request: NextRequest) {
                   context: {
                     petName: session.metadata?.petName,
                     style: session.metadata?.style,
+                    trafficSource,
                     // UTM attribution data
                     utm_source: session.metadata?.utm_source,
                     utm_medium: session.metadata?.utm_medium,
@@ -117,7 +162,7 @@ export async function POST(request: NextRequest) {
                     referrer: session.metadata?.referrer,
                   }
                 });
-                console.log(`🎉 Customer added to paying_customers table: ${customerEmail}`);
+                console.log(`🎉 Customer added to paying_customers table: ${customerEmail} (${trafficSource})`);
                 if (session.metadata?.utm_source) {
                   console.log(`📊 Attribution: source=${session.metadata.utm_source}, medium=${session.metadata.utm_medium}`);
                 }
@@ -217,11 +262,13 @@ export async function POST(request: NextRequest) {
             
             // Add to customers table (separate list of paying customers)
             try {
+              const trafficSource = getTrafficSource(session.metadata);
               await addCustomer(customerEmail, {
                 purchaseType: 'pack',
                 stripeSessionId: session.id,
                 context: {
                   packType: session.metadata?.packType,
+                  trafficSource,
                   // UTM attribution data
                   utm_source: session.metadata?.utm_source,
                   utm_medium: session.metadata?.utm_medium,
@@ -229,7 +276,7 @@ export async function POST(request: NextRequest) {
                   referrer: session.metadata?.referrer,
                 }
               });
-              console.log(`🎉 Customer added to paying_customers table (pack): ${customerEmail}`);
+              console.log(`🎉 Customer added to paying_customers table (pack): ${customerEmail} (${trafficSource})`);
               if (session.metadata?.utm_source) {
                 console.log(`📊 Attribution: source=${session.metadata.utm_source}, medium=${session.metadata.utm_medium}`);
               }
@@ -334,6 +381,7 @@ export async function POST(request: NextRequest) {
               // Add customer if not already added and mark as canvas purchaser
               if (customerEmail) {
                 try {
+                  const trafficSource = getTrafficSource(session.metadata);
                   await addCustomer(customerEmail, {
                     purchaseType: 'canvas',
                     imageId: canvasImageId,
@@ -341,6 +389,12 @@ export async function POST(request: NextRequest) {
                     context: {
                       canvasSize: canvasSize,
                       printifyOrderId: printifyResult.orderId,
+                      trafficSource,
+                      // UTM attribution data
+                      utm_source: session.metadata?.utm_source,
+                      utm_medium: session.metadata?.utm_medium,
+                      utm_campaign: session.metadata?.utm_campaign,
+                      referrer: session.metadata?.referrer,
                     }
                   });
                   
