@@ -3515,6 +3515,11 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     // Check SD mode - must be explicitly "true" (string) and REPLICATE_API_TOKEN must be set
     const sdEnvValue = process.env.USE_STABLE_DIFFUSION;
     const hasReplicateToken = !!process.env.REPLICATE_API_TOKEN;
+    
+    // Debug: Show exact value and type
+    console.log("🔍 DEBUG - USE_STABLE_DIFFUSION value:", JSON.stringify(sdEnvValue), "type:", typeof sdEnvValue);
+    console.log("🔍 DEBUG - Comparison check:", sdEnvValue === "true", "(should be true if env var is set correctly)");
+    
     const useStableDiffusion = sdEnvValue === "true" && hasReplicateToken;
     const sdModel = process.env.SD_MODEL || "flux-img2img"; // Default to img2img for identity preservation
     
@@ -3526,14 +3531,18 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     
     console.log("=== IMAGE GENERATION ===");
     console.log("Environment check:");
-    console.log("- USE_STABLE_DIFFUSION:", sdEnvValue || "not set", sdEnvValue === "true" ? "✅ ENABLED" : "❌ NOT ENABLED", "(⚠️ LOCAL TESTING ONLY)");
+    console.log("- USE_STABLE_DIFFUSION:", sdEnvValue === undefined ? "❌ undefined (not set)" : sdEnvValue === "true" ? "✅ true (ENABLED)" : `⚠️ "${sdEnvValue}" (NOT "true")`, "(⚠️ LOCAL TESTING ONLY)");
     console.log("- REPLICATE_API_TOKEN:", hasReplicateToken ? "✅ set" : "❌ not set");
     console.log("- SD Mode Active:", useStableDiffusion ? "✅ YES" : "❌ NO");
-    if (!useStableDiffusion && sdEnvValue !== "true") {
-      console.log("⚠️ To enable SD mode, set USE_STABLE_DIFFUSION=true in .env.local");
-    }
-    if (!useStableDiffusion && !hasReplicateToken) {
-      console.log("⚠️ REPLICATE_API_TOKEN is required for SD mode");
+    if (!useStableDiffusion) {
+      if (sdEnvValue === undefined) {
+        console.log("⚠️ USE_STABLE_DIFFUSION is not set. Add USE_STABLE_DIFFUSION=true to .env.local");
+      } else if (sdEnvValue !== "true") {
+        console.log(`⚠️ USE_STABLE_DIFFUSION is set to "${sdEnvValue}" but should be "true" (exact string match required)`);
+      }
+      if (!hasReplicateToken) {
+        console.log("⚠️ REPLICATE_API_TOKEN is required for SD mode");
+      }
     }
     console.log("- SD_MODEL:", process.env.SD_MODEL || `${sdModel} (default)`);
     console.log("- USE_OPENAI_IMG2IMG:", process.env.USE_OPENAI_IMG2IMG || "not set");
