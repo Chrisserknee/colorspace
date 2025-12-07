@@ -656,8 +656,8 @@ async function generateWithStableDiffusion(
   // Lower strength = more identity preserved (0.5-0.7 recommended for pets)
   const sdGuidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
   const sdSteps = parseInt(process.env.SD_STEPS || "30");
-  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.65"); // Lowered from 0.75 for better identity preservation
-  const ipAdapterScale = parseFloat(process.env.IP_ADAPTER_SCALE || "0.85"); // Higher = more identity (0.7-0.9)
+  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.6"); // Lowered to 0.6 to reduce weird artifacts and preserve more identity
+  const ipAdapterScale = parseFloat(process.env.IP_ADAPTER_SCALE || "0.9"); // Increased to 0.9 for maximum identity preservation
 
   console.log("SD parameters:");
   console.log("- Guidance scale:", sdGuidanceScale);
@@ -740,7 +740,7 @@ async function generateWithStableDiffusion(
           {
             input: {
               prompt: prompt,
-              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture",
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
               cfg_scale: sdGuidanceScale,
               steps: sdSteps,
               output_format: "png",
@@ -762,7 +762,7 @@ async function generateWithStableDiffusion(
               input: {
                 image: imageDataUrl,
                 prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
                 prompt_strength: sdStrength,
                 num_inference_steps: sdSteps,
                 guidance_scale: sdGuidanceScale,
@@ -784,7 +784,7 @@ async function generateWithStableDiffusion(
               input: {
                 image: imageDataUrl,
                 prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
                 prompt_strength: sdStrength,
                 num_inference_steps: sdSteps,
                 guidance_scale: sdGuidanceScale,
@@ -808,7 +808,7 @@ async function generateWithStableDiffusion(
             input: {
               image: imageDataUrl,
               prompt: prompt,
-              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated",
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
               condition_scale: 0.8, // How much to follow the structure
               num_inference_steps: sdSteps,
               guidance_scale: sdGuidanceScale,
@@ -830,7 +830,7 @@ async function generateWithStableDiffusion(
               input: {
                 image: imageDataUrl,
                 prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
                 ip_adapter_scale: ipAdapterScale,
                 num_inference_steps: sdSteps,
                 guidance_scale: sdGuidanceScale,
@@ -848,7 +848,7 @@ async function generateWithStableDiffusion(
               input: {
                 image: imageDataUrl,
                 prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
                 ip_adapter_scale: ipAdapterScale,
                 num_inference_steps: sdSteps,
                 guidance_scale: sdGuidanceScale,
@@ -4109,9 +4109,7 @@ CRITICAL: ALL ${petCount} pets must look EXACTLY like themselves in the original
       console.log("📌 Available models: flux, flux-img2img, sd3, sdxl-img2img, sdxl-controlnet, ip-adapter-faceid");
       
       // Build a focused prompt for Stable Diffusion
-      const sdPrompt = `${selectedPalette.name} color palette royal pet portrait.
-
-A ${species} in a refined 18th-century European aristocratic oil painting style.
+      const sdPrompt = `A ${species} in a refined 18th-century European aristocratic oil painting style.
 
 PET IDENTITY (CRITICAL - PRESERVE EXACTLY):
 ${petDescription}
@@ -4123,34 +4121,56 @@ ${selectedPose.description}
 - ${selectedPose.pawPosition}
 - Expression: ${selectedPose.expression}
 
-COLOR PALETTE "${selectedPalette.name}":
-- Background: ${selectedPalette.background}
-- Cloak: ${selectedPalette.cloakColor}
-- Cushion: ${selectedPalette.cushionColor}
-- Lighting: ${selectedPalette.lighting}
-- Mood: ${selectedPalette.mood}
-
 COMPOSITION:
 - FULL BODY visible - zoomed out, showing from head to paws
 - Pet occupies 50-60% of frame height
 - Plenty of headroom above ears
 - Natural relaxed pose, NOT sitting upright like a statue
-- Pet lying down or resting comfortably
+- Pet lying down or resting comfortably on cushion
+- Simple centered composition, pet is the focus
 
-CLOTHING:
-- ONE simple velvet cloak draped loosely over back
-- Thin silver clasp at chest
-- NO heavy robes, NO excessive jewelry
-- Pet's body mostly visible under the cloak
+CLOTHING (MINIMAL):
+- ONE simple velvet cloak draped loosely over back/shoulders only
+- Thin silver clasp at chest securing the cloak
+- NO hats, NO crowns, NO headwear of any kind
+- NO floating objects, NO decorative items above head
+- NO excessive jewelry, NO multiple necklaces
+- NO heavy robes, NO elaborate costumes
+- Pet's natural body and fur mostly visible under the simple cloak
+
+BACKGROUND:
+- ${selectedPalette.background}
+- Simple, elegant background - NOT elaborate architecture
+- NO columns, NO staircases, NO complex interior scenes
+- Focus on the pet, background should be subtle
+
+CUSHION:
+- ${selectedPalette.cushionColor}
+- Simple velvet cushion beneath the pet
+- Pet resting naturally on the cushion
+
+COLOR PALETTE "${selectedPalette.name}":
+- Cloak: ${selectedPalette.cloakColor}
+- Lighting: ${selectedPalette.lighting}
+- Mood: ${selectedPalette.mood}
+- Soft, muted, harmonious colors (not oversaturated)
 
 STYLE:
 - 18th-century European aristocratic oil painting
-- Soft, muted, harmonious colors (not oversaturated)
 - Visible brushstrokes, impasto texture
 - Gainsborough/Reynolds/Vigée Le Brun style
 - Museum-quality masterpiece
 
-CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match the description exactly - same fur color, markings, eye color, facial features.`;
+FORBIDDEN ELEMENTS:
+- NO hats, crowns, or headwear
+- NO floating objects or decorative items
+- NO elaborate architecture in background
+- NO excessive jewelry or accessories
+- NO weird artifacts or strange objects
+- NO human clothing elements
+- NO standing upright poses
+
+CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match the description exactly - same fur color, markings, eye color, facial features. Simple, elegant, natural portrait.`;
 
       console.log("SD prompt length:", sdPrompt.length);
       
