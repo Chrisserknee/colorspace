@@ -26,7 +26,11 @@ function getTrafficSource(metadata: Stripe.Metadata | null): string {
   const referrer = metadata.referrer?.toLowerCase() || "";
   if (referrer.includes("facebook.com") || referrer.includes("fb.com") || 
       referrer.includes("instagram.com") || referrer.includes("tiktok.com") ||
-      referrer.includes("twitter.com") || referrer.includes("x.com")) {
+      referrer.includes("twitter.com") || referrer.includes("x.com") ||
+      referrer.includes("pinterest.com") || referrer.includes("youtube.com") ||
+      referrer.includes("linkedin.com") || referrer.includes("snapchat.com") ||
+      referrer.includes("reddit.com") || referrer.includes("threads.net") ||
+      referrer.includes("nextdoor.com")) {
     return "Organic Social";
   }
   
