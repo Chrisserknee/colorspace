@@ -339,14 +339,13 @@ export default async function BlogPostPage({
             </div>
           </header>
 
-          {/* Featured Image Placeholder */}
+          {/* Featured Image */}
           <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-12 bg-gradient-to-br from-[#242424] to-[#1A1A1A] border border-[rgba(197,165,114,0.1)]">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <span className="text-6xl mb-4 block">👑</span>
-                <span className="text-[#7A756D] text-sm">Featured Image</span>
-              </div>
-            </div>
+            <img 
+              src={post.coverImage} 
+              alt={post.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
 
           {/* Content */}
