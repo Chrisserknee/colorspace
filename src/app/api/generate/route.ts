@@ -568,6 +568,66 @@ async function generateWithOpenAIImg2Img(
   }
 }
 
+// Retry helper for Replicate API calls with exponential backoff for rate limits
+async function retryReplicateCall<T>(
+  callFn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 2000
+): Promise<T> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await callFn();
+    } catch (error: any) {
+      lastError = error;
+      const errorMsg = error?.message || String(error);
+      const errorStatus = error?.status || error?.statusCode;
+      
+      // Check if it's a rate limit error (429)
+      const isRateLimit = errorStatus === 429 || errorMsg.includes('429') || errorMsg.includes('rate limit') || errorMsg.includes('throttled');
+      
+      if (isRateLimit && attempt < maxRetries) {
+        // Extract retry_after from error if available
+        let retryAfter = baseDelay;
+        try {
+          // Try to extract from error message first (Replicate includes it in the detail)
+          const errorMsgStr = String(error?.message || error);
+          const retryMatch = errorMsgStr.match(/resets in ~(\d+)s/i) || errorMsgStr.match(/retry_after[":\s]+(\d+)/i);
+          if (retryMatch && retryMatch[1]) {
+            retryAfter = Math.max(parseInt(retryMatch[1]) * 1000, baseDelay);
+          }
+          
+          // Also try to get from response if available
+          if (error && typeof error === 'object' && 'response' in error) {
+            const response = (error as any).response;
+            if (response) {
+              const errorData = await response.json().catch(() => ({}));
+              if (errorData.retry_after) {
+                retryAfter = Math.max(errorData.retry_after * 1000, baseDelay);
+              }
+            }
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+        
+        // Exponential backoff: use retry_after if available, otherwise exponential
+        const delay = retryAfter > baseDelay ? retryAfter : baseDelay * Math.pow(2, attempt - 1);
+        const delaySeconds = Math.ceil(delay / 1000);
+        console.log(`⏳ Rate limit hit (attempt ${attempt}/${maxRetries}). Waiting ${delaySeconds}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // If not a rate limit error or out of retries, throw immediately
+      throw error;
+    }
+  }
+  
+  throw lastError || new Error("Replicate API call failed after retries");
+}
+
 // ⚠️ STABLE DIFFUSION GENERATION - LOCAL TESTING ONLY - DO NOT DEPLOY TO PRODUCTION ⚠️
 // This function uses advanced Stable Diffusion models for experimentation
 // Available models: "flux", "sd3", "sdxl-img2img"
@@ -617,18 +677,20 @@ async function generateWithStableDiffusion(
       // Flux doesn't support img2img directly, so we use the text-to-image with detailed description
       // For identity preservation, we'd need to use Flux with IP-Adapter or ControlNet
       // For now, using flux-dev-lora which can accept reference images
-      output = await replicate.run(
-        "black-forest-labs/flux-dev",
-        {
-          input: {
-            prompt: prompt,
-            guidance: sdGuidanceScale,
-            num_inference_steps: sdSteps,
-            output_format: "png",
-            output_quality: 100,
-            aspect_ratio: "1:1",
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "black-forest-labs/flux-dev",
+          {
+            input: {
+              prompt: prompt,
+              guidance: sdGuidanceScale,
+              num_inference_steps: sdSteps,
+              output_format: "png",
+              output_quality: 100,
+              aspect_ratio: "1:1",
+            }
           }
-        }
+        )
       );
     } else if (model === "flux-img2img") {
       // Flux with img2img capability using a community model
@@ -636,50 +698,56 @@ async function generateWithStableDiffusion(
       
       try {
         // Try latest version first
-        output = await replicate.run(
-          "lucataco/flux-dev-lora", // Use latest version
-          {
-            input: {
-              image: imageDataUrl,
-              prompt: prompt,
-              strength: sdStrength,
-              num_inference_steps: sdSteps,
-              guidance_scale: sdGuidanceScale,
+        output = await retryReplicateCall(() =>
+          replicate.run(
+            "lucataco/flux-dev-lora", // Use latest version
+            {
+              input: {
+                image: imageDataUrl,
+                prompt: prompt,
+                strength: sdStrength,
+                num_inference_steps: sdSteps,
+                guidance_scale: sdGuidanceScale,
+              }
             }
-          }
+          )
         );
       } catch (versionError) {
         console.log("⚠️ Latest version failed, trying specific version...");
         // Fallback to specific version
-        output = await replicate.run(
-          "lucataco/flux-dev-lora:a22c463f11808638ad5e2ebd582e07a469031f48dd567366fb4c6fdab91d614d",
-          {
-            input: {
-              image: imageDataUrl,
-              prompt: prompt,
-              strength: sdStrength,
-              num_inference_steps: sdSteps,
-              guidance_scale: sdGuidanceScale,
+        output = await retryReplicateCall(() =>
+          replicate.run(
+            "lucataco/flux-dev-lora:a22c463f11808638ad5e2ebd582e07a469031f48dd567366fb4c6fdab91d614d",
+            {
+              input: {
+                image: imageDataUrl,
+                prompt: prompt,
+                strength: sdStrength,
+                num_inference_steps: sdSteps,
+                guidance_scale: sdGuidanceScale,
+              }
             }
-          }
+          )
         );
       }
     } else if (model === "sd3") {
       // Stable Diffusion 3 - Latest SD model
       console.log("🚀 Using Stable Diffusion 3 (stability-ai/stable-diffusion-3)...");
       
-      output = await replicate.run(
-        "stability-ai/stable-diffusion-3",
-        {
-          input: {
-            prompt: prompt,
-            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture",
-            cfg_scale: sdGuidanceScale,
-            steps: sdSteps,
-            output_format: "png",
-            aspect_ratio: "1:1",
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "stability-ai/stable-diffusion-3",
+          {
+            input: {
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture",
+              cfg_scale: sdGuidanceScale,
+              steps: sdSteps,
+              output_format: "png",
+              aspect_ratio: "1:1",
+            }
           }
-        }
+        )
       );
     } else if (model === "sdxl-img2img") {
       // SDXL with img2img for identity preservation
@@ -687,61 +755,67 @@ async function generateWithStableDiffusion(
       
       try {
         // Try latest version first (more reliable)
-        output = await replicate.run(
-          "stability-ai/sdxl", // Use latest version
-          {
-            input: {
-              image: imageDataUrl,
-              prompt: prompt,
-              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
-              prompt_strength: sdStrength,
-              num_inference_steps: sdSteps,
-              guidance_scale: sdGuidanceScale,
-              scheduler: "K_EULER_ANCESTRAL",
-              refine: "expert_ensemble_refiner",
-              high_noise_frac: 0.8,
-              num_outputs: 1,
+        output = await retryReplicateCall(() =>
+          replicate.run(
+            "stability-ai/sdxl", // Use latest version
+            {
+              input: {
+                image: imageDataUrl,
+                prompt: prompt,
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
+                prompt_strength: sdStrength,
+                num_inference_steps: sdSteps,
+                guidance_scale: sdGuidanceScale,
+                scheduler: "K_EULER_ANCESTRAL",
+                refine: "expert_ensemble_refiner",
+                high_noise_frac: 0.8,
+                num_outputs: 1,
+              }
             }
-          }
+          )
         );
       } catch (versionError) {
         console.log("⚠️ Latest version failed, trying specific version...");
         // Fallback to specific version
-        output = await replicate.run(
-          "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-          {
-            input: {
-              image: imageDataUrl,
-              prompt: prompt,
-              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
-              prompt_strength: sdStrength,
-              num_inference_steps: sdSteps,
-              guidance_scale: sdGuidanceScale,
-              scheduler: "K_EULER_ANCESTRAL",
-              refine: "expert_ensemble_refiner",
-              high_noise_frac: 0.8,
-              num_outputs: 1,
+        output = await retryReplicateCall(() =>
+          replicate.run(
+            "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
+            {
+              input: {
+                image: imageDataUrl,
+                prompt: prompt,
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
+                prompt_strength: sdStrength,
+                num_inference_steps: sdSteps,
+                guidance_scale: sdGuidanceScale,
+                scheduler: "K_EULER_ANCESTRAL",
+                refine: "expert_ensemble_refiner",
+                high_noise_frac: 0.8,
+                num_outputs: 1,
+              }
             }
-          }
+          )
         );
       }
     } else if (model === "sdxl-controlnet") {
       // SDXL with ControlNet for better structure preservation
       console.log("🚀 Using SDXL ControlNet (canny) for structure preservation...");
       
-      output = await replicate.run(
-        "lucataco/sdxl-controlnet:06d6fae3b75ab68a28cd2900afa6033166910dd09fd9751047043a5a8cf13ef1",
-        {
-          input: {
-            image: imageDataUrl,
-            prompt: prompt,
-            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated",
-            condition_scale: 0.8, // How much to follow the structure
-            num_inference_steps: sdSteps,
-            guidance_scale: sdGuidanceScale,
-            scheduler: "K_EULER_ANCESTRAL",
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "lucataco/sdxl-controlnet:06d6fae3b75ab68a28cd2900afa6033166910dd09fd9751047043a5a8cf13ef1",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated",
+              condition_scale: 0.8, // How much to follow the structure
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+            }
           }
-        }
+        )
       );
     } else if (model === "ip-adapter-faceid") {
       // IP-Adapter FaceID for face preservation (works great for pet faces too)
@@ -749,34 +823,38 @@ async function generateWithStableDiffusion(
       
       // Try latest version first, fallback to specific version if needed
       try {
-        output = await replicate.run(
-          "lucataco/ip-adapter-faceid-sdxl", // Use latest version
-          {
-            input: {
-              image: imageDataUrl,
-              prompt: prompt,
-              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
-              ip_adapter_scale: ipAdapterScale,
-              num_inference_steps: sdSteps,
-              guidance_scale: sdGuidanceScale,
+        output = await retryReplicateCall(() =>
+          replicate.run(
+            "lucataco/ip-adapter-faceid-sdxl", // Use latest version
+            {
+              input: {
+                image: imageDataUrl,
+                prompt: prompt,
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
+                ip_adapter_scale: ipAdapterScale,
+                num_inference_steps: sdSteps,
+                guidance_scale: sdGuidanceScale,
+              }
             }
-          }
+          )
         );
       } catch (versionError) {
         console.log("⚠️ Latest version failed, trying specific version...");
         // Fallback to specific version
-        output = await replicate.run(
-          "lucataco/ip-adapter-faceid-sdxl:0626a057f7d2cd0dc1cd7e9faeb6e5bb57e0a09f4e5c8c6e5fe17ea40e8c1c03",
-          {
-            input: {
-              image: imageDataUrl,
-              prompt: prompt,
-              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
-              ip_adapter_scale: ipAdapterScale,
-              num_inference_steps: sdSteps,
-              guidance_scale: sdGuidanceScale,
+        output = await retryReplicateCall(() =>
+          replicate.run(
+            "lucataco/ip-adapter-faceid-sdxl:0626a057f7d2cd0dc1cd7e9faeb6e5bb57e0a09f4e5c8c6e5fe17ea40e8c1c03",
+            {
+              input: {
+                image: imageDataUrl,
+                prompt: prompt,
+                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
+                ip_adapter_scale: ipAdapterScale,
+                num_inference_steps: sdSteps,
+                guidance_scale: sdGuidanceScale,
+              }
             }
-          }
+          )
         );
       }
     } else {
@@ -986,6 +1064,20 @@ async function generateWithStableDiffusion(
     // Provide helpful error message for version/permission errors
     if (error && typeof error === 'object' && 'message' in error) {
       const errorMsg = String(error.message);
+      
+      // Rate limit errors (429)
+      if (errorMsg.includes('429') || errorMsg.includes('rate limit') || errorMsg.includes('throttled') || errorMsg.includes('Too Many Requests')) {
+        throw new Error(
+          `Replicate rate limit exceeded. You have less than $5 credit, so you're limited to 6 requests per minute.\n` +
+          `The request will automatically retry with exponential backoff. If this persists:\n` +
+          `1. Add more credit to your Replicate account (minimum $5)\n` +
+          `2. Wait a few minutes between generations\n` +
+          `3. Reduce batch size in Studio mode\n` +
+          `Original error: ${errorMsg}`
+        );
+      }
+      
+      // Version/permission errors (422)
       if (errorMsg.includes('422') || errorMsg.includes('Invalid version') || errorMsg.includes('not permitted')) {
         const alternativeModels = model === 'ip-adapter-faceid' 
           ? 'Try: SD_MODEL=sdxl-img2img or SD_MODEL=sdxl-controlnet'
