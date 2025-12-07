@@ -3516,14 +3516,15 @@ COMPOSITION REQUIREMENT: ZOOMED OUT - FULL BODY VISIBLE
 - Generous space around the pet on all sides
 - Camera PULLED BACK - as if viewing from across a room
 
-CLOTHING REQUIREMENT: MINIMAL - SIMPLE ELEGANT CLOAK ONLY
+CLOTHING REQUIREMENT: SIMPLE CLOAK + ONE ELEGANT NECKLACE
 - ONE simple velvet CLOAK draped loosely over the pet's back/shoulders
 - CLOAK COLOR FOR THIS PORTRAIT: ${selectedPalette.cloakColor}
 - Cloak secured by a THIN SILVER CLASP at the chest - small and elegant, not bulky
+- ONE ELEGANT NECKLACE around the pet's neck - this is MANDATORY, NOT optional
+- The necklace should be clearly visible and beautiful - pearls, gems, or gold
 - NO heavy robes, NO multiple layers, NO elaborate costumes
-- NO ermine trim, NO excessive decorations, NO jewelry overload
 - The pet's BODY should be mostly visible UNDER the cloak
-- Think: light elegant draping, NOT heavy ceremonial robes
+- Think: light elegant draping with one statement necklace
 - The cloak should look like it could slip off naturally
 
 COLOR PALETTE FOR THIS PORTRAIT: "${selectedPalette.name}"
@@ -3538,13 +3539,14 @@ COLOR PALETTE FOR THIS PORTRAIT: "${selectedPalette.name}"
 ❌ DO NOT: Close-up head shot
 ❌ DO NOT: Cropped body - must show full body
 ❌ DO NOT: Heavy elaborate clothing covering the body
-❌ DO NOT: Multiple necklaces and excessive jewelry
+❌ DO NOT: Multiple necklaces - ONE elegant necklace only
 ❌ DO NOT: Stiff formal pose
 ❌ DO NOT: Harsh oversaturated colors
 
 ✓ MUST DO: ${selectedPose.name} pose as described above
 ✓ MUST DO: Full body visible, zoomed out wide shot
 ✓ MUST DO: Simple cloak with thin silver clasp
+✓ MUST DO: ONE ELEGANT NECKLACE around the pet's neck - pearls, gems, or gold
 ✓ MUST DO: Natural relaxed position on cushion
 ✓ MUST DO: Use the "${selectedPalette.name}" color palette specified above
 ✓ MUST DO: Soft, refined, harmonious coloring
