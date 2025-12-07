@@ -749,6 +749,12 @@ async function generateWithStableDiffusion(
         if (!imageUrl || typeof imageUrl !== 'string') {
           throw new Error(`Invalid URL: ${imageUrl}`);
         }
+        // Validate URL format before fetching
+        try {
+          new URL(imageUrl);
+        } catch (urlError) {
+          throw new Error(`Invalid URL format from Replicate: ${imageUrl}. Error: ${urlError instanceof Error ? urlError.message : String(urlError)}`);
+        }
         const response = await fetch(imageUrl);
         if (!response.ok) throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
         buffer = Buffer.from(await response.arrayBuffer());
@@ -797,6 +803,12 @@ async function generateWithStableDiffusion(
             if (!url.startsWith('http')) {
               throw new Error(`Invalid URL format: ${url}`);
             }
+            // Validate URL format before fetching
+            try {
+              new URL(url);
+            } catch (urlError) {
+              throw new Error(`Invalid URL format from Replicate: ${url}. Error: ${urlError instanceof Error ? urlError.message : String(urlError)}`);
+            }
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
             buffer = Buffer.from(await response.arrayBuffer());
@@ -812,6 +824,12 @@ async function generateWithStableDiffusion(
         console.log("📥 Downloading from direct URL string:", output);
         if (!output.startsWith('http')) {
           throw new Error(`Invalid URL string: ${output}`);
+        }
+        // Validate URL format before fetching
+        try {
+          new URL(output);
+        } catch (urlError) {
+          throw new Error(`Invalid URL format from Replicate: ${output}. Error: ${urlError instanceof Error ? urlError.message : String(urlError)}`);
         }
         const response = await fetch(output);
         if (!response.ok) throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
@@ -3923,13 +3941,18 @@ CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match t
       
       console.log(`📤 Sending image to SD model ${sdModel} (${processedForSD.length} bytes)`);
       
-      firstGeneratedBuffer = await generateWithStableDiffusion(
-        sdDataUrl,
-        sdPrompt,
-        sdModel
-      );
-      
-      console.log("✅ Stable Diffusion generation complete");
+      try {
+        firstGeneratedBuffer = await generateWithStableDiffusion(
+          sdDataUrl,
+          sdPrompt,
+          sdModel
+        );
+        console.log("✅ Stable Diffusion generation complete");
+      } catch (sdError) {
+        console.error("❌ Stable Diffusion generation failed:", sdError);
+        const errorMessage = sdError instanceof Error ? sdError.message : String(sdError);
+        throw new Error(`Stable Diffusion generation failed (${sdModel}): ${errorMessage}`);
+      }
     } else if (useOpenAIImg2Img) {
       // Use OpenAI img2img for primary generation
       console.log("🎨 Using OpenAI img2img (images.edit) for primary generation...");
@@ -4692,29 +4715,48 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     // Upload HD image to Supabase Storage (always un-watermarked, without text)
     // Note: For Rainbow Bridge, the client will upload the text-overlay version separately
     console.log(`📤 Uploading HD image to pet-portraits bucket: ${imageId}-hd.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
-    const hdUrl = await uploadImage(
-      generatedBuffer,
-      `${imageId}-hd.png`,
-      "image/png"
-    );
-    console.log(`✅ HD image uploaded successfully: ${hdUrl.substring(0, 80)}...`);
+    let hdUrl: string;
+    try {
+      hdUrl = await uploadImage(
+        generatedBuffer,
+        `${imageId}-hd.png`,
+        "image/png"
+      );
+      console.log(`✅ HD image uploaded successfully: ${hdUrl.substring(0, 80)}...`);
+    } catch (uploadError) {
+      console.error("❌ Failed to upload HD image:", uploadError);
+      throw new Error(`Failed to upload HD image: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
+    }
 
     // Upload preview to Supabase Storage (without text)
     console.log(`📤 Uploading preview image to pet-portraits bucket: ${imageId}-preview.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
-    const previewUrl = await uploadImage(
-      previewBuffer,
-      `${imageId}-preview.png`,
-      "image/png"
-    );
-    console.log(`✅ Preview image uploaded successfully: ${previewUrl.substring(0, 80)}...`);
+    let previewUrl: string;
+    try {
+      previewUrl = await uploadImage(
+        previewBuffer,
+        `${imageId}-preview.png`,
+        "image/png"
+      );
+      console.log(`✅ Preview image uploaded successfully: ${previewUrl.substring(0, 80)}...`);
+    } catch (uploadError) {
+      console.error("❌ Failed to upload preview image:", uploadError);
+      throw new Error(`Failed to upload preview image: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
+    }
 
     // Validate URLs before saving
     try {
+      console.log("🔍 Validating URLs...");
+      console.log("🔍 HD URL:", hdUrl.substring(0, 100));
+      console.log("🔍 Preview URL:", previewUrl.substring(0, 100));
       new URL(hdUrl);
       new URL(previewUrl);
+      console.log("✅ URLs are valid");
     } catch (urlError) {
-      console.error("Invalid URL format:", urlError);
-      throw new Error("Failed to generate valid image URLs");
+      console.error("❌ Invalid URL format:");
+      console.error("❌ HD URL:", hdUrl);
+      console.error("❌ Preview URL:", previewUrl);
+      console.error("❌ URL Error:", urlError);
+      throw new Error(`Failed to generate valid image URLs. HD: ${hdUrl.substring(0, 50)}..., Preview: ${previewUrl.substring(0, 50)}...`);
     }
 
     // Validate imageId is a valid UUID
