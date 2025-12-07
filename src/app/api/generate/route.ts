@@ -921,7 +921,7 @@ async function generateWithStableDiffusion(
                 // Check if toString() gives us a URL-like string
                 if (stringResult.startsWith('http')) {
                   imageUrl = stringResult;
-                  console.log("✅ url() returned object, toString() gave URL string:", imageUrl.substring(0, 80));
+                  console.log("✅ url() returned object, toString() gave URL string:", stringResult.substring(0, 80));
                 } else {
                   console.error("❌ toString() didn't give URL:", stringResult);
                   throw new Error(`url() returned object but toString() didn't give URL: ${stringResult}`);
