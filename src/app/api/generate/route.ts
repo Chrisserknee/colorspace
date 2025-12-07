@@ -568,6 +568,206 @@ async function generateWithOpenAIImg2Img(
   }
 }
 
+// ⚠️ STABLE DIFFUSION GENERATION - LOCAL TESTING ONLY - DO NOT DEPLOY TO PRODUCTION ⚠️
+// This function uses advanced Stable Diffusion models for experimentation
+// Available models: "flux", "sd3", "sdxl-img2img"
+async function generateWithStableDiffusion(
+  referenceImageBase64: string,
+  prompt: string,
+  model: string = "flux"
+): Promise<Buffer> {
+  console.log("=== ⚠️ STABLE DIFFUSION GENERATION (LOCAL TESTING ONLY) ===");
+  console.log(`📌 Model: ${model}`);
+  
+  if (!process.env.REPLICATE_API_TOKEN) {
+    throw new Error("REPLICATE_API_TOKEN not configured");
+  }
+  
+  const replicate = new Replicate({
+    auth: process.env.REPLICATE_API_TOKEN,
+  });
+
+  // Convert base64 to data URL if needed
+  const imageDataUrl = referenceImageBase64.startsWith("data:") 
+    ? referenceImageBase64 
+    : `data:image/jpeg;base64,${referenceImageBase64}`;
+
+  // Get SD-specific parameters from environment
+  const sdGuidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
+  const sdSteps = parseInt(process.env.SD_STEPS || "30");
+  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.75"); // For img2img - how much to change
+
+  console.log("SD parameters:");
+  console.log("- Guidance scale:", sdGuidanceScale);
+  console.log("- Steps:", sdSteps);
+  console.log("- Strength (img2img):", sdStrength);
+  console.log("- Prompt length:", prompt.length);
+
+  try {
+    let output: unknown;
+    
+    if (model === "flux") {
+      // Flux - Most advanced, highest quality
+      // Using flux-dev for better quality (flux-schnell is faster but lower quality)
+      console.log("🚀 Using Flux Dev (black-forest-labs/flux-dev)...");
+      
+      // Flux doesn't support img2img directly, so we use the text-to-image with detailed description
+      // For identity preservation, we'd need to use Flux with IP-Adapter or ControlNet
+      // For now, using flux-dev-lora which can accept reference images
+      output = await replicate.run(
+        "black-forest-labs/flux-dev",
+        {
+          input: {
+            prompt: prompt,
+            guidance: sdGuidanceScale,
+            num_inference_steps: sdSteps,
+            output_format: "png",
+            output_quality: 100,
+            aspect_ratio: "1:1",
+          }
+        }
+      );
+    } else if (model === "flux-img2img") {
+      // Flux with img2img capability using a community model
+      console.log("🚀 Using Flux img2img (lucataco/flux-dev-lora)...");
+      
+      output = await replicate.run(
+        "lucataco/flux-dev-lora:a22c463f11808638ad5e2ebd582e07a469031f48dd567366fb4c6fdab91d614d",
+        {
+          input: {
+            image: imageDataUrl,
+            prompt: prompt,
+            strength: sdStrength,
+            num_inference_steps: sdSteps,
+            guidance_scale: sdGuidanceScale,
+          }
+        }
+      );
+    } else if (model === "sd3") {
+      // Stable Diffusion 3 - Latest SD model
+      console.log("🚀 Using Stable Diffusion 3 (stability-ai/stable-diffusion-3)...");
+      
+      output = await replicate.run(
+        "stability-ai/stable-diffusion-3",
+        {
+          input: {
+            prompt: prompt,
+            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture",
+            cfg_scale: sdGuidanceScale,
+            steps: sdSteps,
+            output_format: "png",
+            aspect_ratio: "1:1",
+          }
+        }
+      );
+    } else if (model === "sdxl-img2img") {
+      // SDXL with img2img for identity preservation
+      console.log("🚀 Using SDXL img2img for identity preservation...");
+      
+      output = await replicate.run(
+        "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
+        {
+          input: {
+            image: imageDataUrl,
+            prompt: prompt,
+            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors",
+            prompt_strength: sdStrength,
+            num_inference_steps: sdSteps,
+            guidance_scale: sdGuidanceScale,
+            scheduler: "K_EULER_ANCESTRAL",
+            refine: "expert_ensemble_refiner",
+            high_noise_frac: 0.8,
+            num_outputs: 1,
+          }
+        }
+      );
+    } else if (model === "sdxl-controlnet") {
+      // SDXL with ControlNet for better structure preservation
+      console.log("🚀 Using SDXL ControlNet (canny) for structure preservation...");
+      
+      output = await replicate.run(
+        "lucataco/sdxl-controlnet:06d6fae3b75ab68a28cd2900afa6033166910dd09fd9751047043a5a8cf13ef1",
+        {
+          input: {
+            image: imageDataUrl,
+            prompt: prompt,
+            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated",
+            condition_scale: 0.8, // How much to follow the structure
+            num_inference_steps: sdSteps,
+            guidance_scale: sdGuidanceScale,
+            scheduler: "K_EULER_ANCESTRAL",
+          }
+        }
+      );
+    } else if (model === "ip-adapter-faceid") {
+      // IP-Adapter FaceID for face preservation (works great for pet faces too)
+      console.log("🚀 Using IP-Adapter FaceID for face preservation...");
+      
+      output = await replicate.run(
+        "lucataco/ip-adapter-faceid-sdxl:0626a057f7d2cd0dc1cd7e9faeb6e5bb57e0a09f4e5c8c6e5fe17ea40e8c1c03",
+        {
+          input: {
+            image: imageDataUrl,
+            prompt: prompt,
+            negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
+            ip_adapter_scale: 0.8,
+            num_inference_steps: sdSteps,
+            guidance_scale: sdGuidanceScale,
+          }
+        }
+      );
+    } else {
+      throw new Error(`Unknown SD model: ${model}. Use: flux, flux-img2img, sd3, sdxl-img2img, sdxl-controlnet, ip-adapter-faceid`);
+    }
+
+    console.log("SD generation complete, output type:", typeof output);
+
+    // Handle various output formats from Replicate
+    let buffer: Buffer;
+    
+    if (Array.isArray(output) && output.length > 0) {
+      const imageUrl = typeof output[0] === 'string' ? output[0] : (output[0] as { url: string }).url;
+      console.log("Downloading from URL...");
+      const response = await fetch(imageUrl);
+      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
+      buffer = Buffer.from(await response.arrayBuffer());
+    } else if (typeof output === 'object' && output !== null) {
+      // Handle FileOutput or object with url
+      const fileOutput = output as { url?: () => string | Promise<string> } | { url: string };
+      let url: string;
+      
+      if ('url' in fileOutput) {
+        if (typeof fileOutput.url === 'function') {
+          url = await fileOutput.url();
+        } else {
+          url = fileOutput.url;
+        }
+        console.log("Downloading from URL...");
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
+        buffer = Buffer.from(await response.arrayBuffer());
+      } else {
+        throw new Error("Unexpected output format from SD model");
+      }
+    } else if (typeof output === 'string') {
+      // Direct URL
+      console.log("Downloading from direct URL...");
+      const response = await fetch(output);
+      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
+      buffer = Buffer.from(await response.arrayBuffer());
+    } else {
+      throw new Error("No valid image output from SD model");
+    }
+    
+    console.log(`✅ SD generation complete (${model}), buffer size: ${buffer.length} bytes`);
+    return buffer;
+    
+  } catch (error) {
+    console.error(`❌ SD generation error (${model}):`, error);
+    throw error;
+  }
+}
+
 // Generate image using IP-Adapter for maximum pet identity preservation
 // IP-Adapter uses the reference image to preserve subject identity while applying style
 async function generateWithIPAdapter(
@@ -3304,19 +3504,25 @@ FULL BODY PORTRAIT - ${isVeryLargeAnimal(detectedBreed, petDescription) ? "MAXIM
 RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
 
     // Determine which model to use for generation
-    // Priority: OpenAI img2img > Stable Diffusion > Composite > Style Transfer > IP-Adapter > FLUX > GPT-Image-1
-    // OpenAI img2img gets highest priority when explicitly enabled
+    // Priority: Stable Diffusion (LOCAL TESTING ONLY) > OpenAI img2img > Composite > Style Transfer > IP-Adapter > GPT-Image-1
+    // 
+    // ⚠️ USE_STABLE_DIFFUSION is for LOCAL TESTING ONLY - DO NOT DEPLOY TO PRODUCTION
+    // This enables advanced Stable Diffusion models (Flux, SD3) for experimentation
     // 
     // CRITICAL: All generation types (free, pack credit, secret credit) use the SAME model selection logic.
     // The only difference is watermarking - the actual generation is identical for all types.
     // useSecretCredit and usePackCredit do NOT affect model selection - only watermarking.
-    const useOpenAIImg2Img = process.env.USE_OPENAI_IMG2IMG === "true" && process.env.OPENAI_API_KEY;
-    const useComposite = !useOpenAIImg2Img && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
-    const useStyleTransfer = !useOpenAIImg2Img && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
-    const useIPAdapter = !useOpenAIImg2Img && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
+    const useStableDiffusion = process.env.USE_STABLE_DIFFUSION === "true" && process.env.REPLICATE_API_TOKEN;
+    const sdModel = process.env.SD_MODEL || "flux"; // "flux", "sd3", "sdxl-img2img"
+    const useOpenAIImg2Img = !useStableDiffusion && process.env.USE_OPENAI_IMG2IMG === "true" && process.env.OPENAI_API_KEY;
+    const useComposite = !useStableDiffusion && !useOpenAIImg2Img && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
+    const useStyleTransfer = !useStableDiffusion && !useOpenAIImg2Img && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
+    const useIPAdapter = !useStableDiffusion && !useOpenAIImg2Img && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
     
     console.log("=== IMAGE GENERATION ===");
     console.log("Environment check:");
+    console.log("- USE_STABLE_DIFFUSION:", process.env.USE_STABLE_DIFFUSION || "not set", "(⚠️ LOCAL TESTING ONLY)");
+    console.log("- SD_MODEL:", process.env.SD_MODEL || "flux (default)");
     console.log("- USE_OPENAI_IMG2IMG:", process.env.USE_OPENAI_IMG2IMG || "not set");
     console.log("- USE_COMPOSITE:", process.env.USE_COMPOSITE || "not set");
     console.log("- USE_STYLE_TRANSFER:", process.env.USE_STYLE_TRANSFER || "not set");
@@ -3546,13 +3752,15 @@ CRITICAL: ALL ${petCount} pets must look EXACTLY like themselves in the original
     } else {
       // === SINGLE PET GENERATION PATH (Original) ===
     
-    const modelName = useOpenAIImg2Img ? "OpenAI img2img (images.edit)"
+    const modelName = useStableDiffusion ? `⚠️ Stable Diffusion (${sdModel}) - LOCAL TESTING ONLY`
+      : useOpenAIImg2Img ? "OpenAI img2img (images.edit)"
       : useComposite ? "Composite (segment + scene + blend)"
       : useStyleTransfer ? "Style Transfer + GPT Refinement" 
       : useIPAdapter ? "IP-Adapter SDXL (identity preservation)" 
       : "GPT-Image-1 (OpenAI)";
     console.log("Model selected:", modelName);
-    console.log("Selection reason:", useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true" 
+    console.log("Selection reason:", useStableDiffusion ? `USE_STABLE_DIFFUSION=true, SD_MODEL=${sdModel} (⚠️ LOCAL TESTING ONLY - DO NOT DEPLOY)`
+      : useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true" 
       : useComposite ? "USE_COMPOSITE=true"
       : useStyleTransfer ? "USE_STYLE_TRANSFER=true"
       : useIPAdapter ? "USE_IP_ADAPTER=true"
@@ -3563,7 +3771,77 @@ CRITICAL: ALL ${petCount} pets must look EXACTLY like themselves in the original
     console.log("Detected species:", species);
     console.log("Species enforcement:", notSpecies);
     
-    if (useOpenAIImg2Img) {
+    // ⚠️ STABLE DIFFUSION PATH - LOCAL TESTING ONLY ⚠️
+    if (useStableDiffusion) {
+      console.log("⚠️⚠️⚠️ STABLE DIFFUSION MODE - LOCAL TESTING ONLY ⚠️⚠️⚠️");
+      console.log(`📌 Using SD model: ${sdModel}`);
+      console.log("📌 Available models: flux, flux-img2img, sd3, sdxl-img2img, sdxl-controlnet, ip-adapter-faceid");
+      
+      // Build a focused prompt for Stable Diffusion
+      const sdPrompt = `${selectedPalette.name} color palette royal pet portrait.
+
+A ${species} in a refined 18th-century European aristocratic oil painting style.
+
+PET IDENTITY (CRITICAL - PRESERVE EXACTLY):
+${petDescription}
+
+POSE: ${selectedPose.name}
+${selectedPose.description}
+- ${selectedPose.bodyPosition}
+- ${selectedPose.headPosition}
+- ${selectedPose.pawPosition}
+- Expression: ${selectedPose.expression}
+
+COLOR PALETTE "${selectedPalette.name}":
+- Background: ${selectedPalette.background}
+- Cloak: ${selectedPalette.cloakColor}
+- Cushion: ${selectedPalette.cushionColor}
+- Lighting: ${selectedPalette.lighting}
+- Mood: ${selectedPalette.mood}
+
+COMPOSITION:
+- FULL BODY visible - zoomed out, showing from head to paws
+- Pet occupies 50-60% of frame height
+- Plenty of headroom above ears
+- Natural relaxed pose, NOT sitting upright like a statue
+- Pet lying down or resting comfortably
+
+CLOTHING:
+- ONE simple velvet cloak draped loosely over back
+- Thin silver clasp at chest
+- NO heavy robes, NO excessive jewelry
+- Pet's body mostly visible under the cloak
+
+STYLE:
+- 18th-century European aristocratic oil painting
+- Soft, muted, harmonious colors (not oversaturated)
+- Visible brushstrokes, impasto texture
+- Gainsborough/Reynolds/Vigée Le Brun style
+- Museum-quality masterpiece
+
+CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match the description exactly - same fur color, markings, eye color, facial features.`;
+
+      console.log("SD prompt length:", sdPrompt.length);
+      
+      // Process image for SD
+      const processedForSD = await sharp(buffer)
+        .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
+        .png()
+        .toBuffer();
+      
+      const sdBase64 = processedForSD.toString("base64");
+      
+      // Use img2img models for better identity preservation
+      const effectiveModel = ["flux", "sd3"].includes(sdModel) ? sdModel : sdModel;
+      
+      firstGeneratedBuffer = await generateWithStableDiffusion(
+        sdBase64,
+        sdPrompt,
+        effectiveModel
+      );
+      
+      console.log("✅ Stable Diffusion generation complete");
+    } else if (useOpenAIImg2Img) {
       // Use OpenAI img2img for primary generation
       console.log("🎨 Using OpenAI img2img (images.edit) for primary generation...");
       console.log("📌 Pet identity will be preserved from original image");
