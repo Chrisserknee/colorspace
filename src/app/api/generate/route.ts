@@ -4420,6 +4420,7 @@ This is a ${species}. Generate ONLY a real ${species}. No human features, no hyb
 
 MASTER STYLE
 18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a darker, rich background (navy, deep emerald, burgundy, charcoal, midnight blue). Maintain a regal, elegant, historically authentic atmosphere with refined composition and classical staging.
+Increase overall ornateness and incorporate stronger Victorian-royal influence throughout—the environment, fabrics, patterns, textures, and decorative elements should feel more lavish, detailed, and aristocratic.
 
 PAINTING TECHNIQUE – EXTREMELY THICK OIL
 Use very thick, sculptural oil paint with heavy impasto, raised brush strokes, bristle definition, palette-knife ridges, layered pigment, and physical 3D texture. Brushwork must be visibly hand-painted and dimensional.
@@ -4433,16 +4434,31 @@ A unique palette each generation. Backgrounds remain darker. Cloaks and royal ga
 IDENTITY PRESERVATION
 The portrait must be unmistakably THIS exact pet. Preserve all facial structure, markings, eye shape, proportion, coloring, gradients, asymmetry, snout shape, and ear position. Do not alter markings or colors.
 
+ENHANCED ROYAL ENVIRONMENT & PILLOW REQUIREMENTS:
+
+Pillows must frequently appear in different colors, not repeating the same tones each generation.
+
+Use brighter, richer, more vibrant colors for pillows (e.g., ruby red, sapphire blue, emerald green, amethyst purple, gold, teal, rose, deep turquoise).
+
+Pillows should feature ornate Victorian royal designs such as brocade, damask, embroidered gold thread, floral scrollwork, or regal geometric motifs.
+
+Textures may include velvet, woven silk, embroidered linen, or other noble materials.
+
+Pillow patterns and colors must elevate the royal atmosphere and help make the entire environment feel more Victorian, ornate, and richly decorated.
+
+This section modifies environment only—no conflict with existing cloak or wardrobe rules.
+
 ROYAL WARDROBE – CLOAK, GARMENTS, AND CLASP
 The pet rests naturally on ${cushion}. A ${robe} is draped over its back as a true cloak.
 
 ELEGANCE REQUIREMENT:
 Clothing must be exceptionally elegant, royal, and luxurious, reflecting the highest aristocratic fashion of the 18th century.
 The cloak and garments must feel crafted for nobility, using only rich, refined, elevated materials.
+Increase overall Victorian-royal refinement: more ornate trims, subtle baroque motifs, elevated textile complexity when appropriate.
 
 CLOAK REQUIREMENTS:
 
-The cloak must be lighter-colored, luminous, elegant, and visually stunning
+Cloak must be lighter-colored, luminous, elegant, and visually stunning
 
 Colors may include: cream, ivory, pale gold, champagne, silver-blue, sky blue, soft rose, light lavender
 
@@ -4464,21 +4480,27 @@ Ornate, engraved, aristocratic detailing
 
 JEWELRY REQUIREMENTS:
 
-Jewelry must be EXQUISITELY BEAUTIFUL - museum-quality heirloom pieces
+Jewelry must be extremely elegant, royal, and refined
 
-Use HIGHLY POLISHED gold or sterling 925 silver with mirror-like shine
+Use polished gold or 925 silver
 
-Gemstones must be BRILLIANTLY CUT with exceptional clarity and fire - rubies, sapphires, emeralds, diamonds, pearls
+Small, bright gemstones with vivid sparkle
 
-Include INTRICATE FILIGREE work, delicate scrollwork, and hand-engraved details
+Designs must look handcrafted for nobility, never simple or plain
 
-Layer multiple pieces: elegant necklaces, pendants, chains, and brooches
+ENHANCED JEWELRY BEAUTY & SHINE REQUIREMENT:
+The jewelry must be exceptionally beautiful, luxurious, and visually striking.
+Use polished 925 sterling silver or polished gold only.
 
-Pearl strands with lustrous, creamy overtones
+Jewelry must appear extra shiny, radiant, and reflective with crisp highlights
 
-Designs must appear handcrafted by master jewelers for royalty - never mass-produced or plain
+Metal should have a bright, gleaming finish and realistic reflections
 
-Each piece should catch the light and sparkle magnificently
+Designs must feel ornate, premium, and aristocratically handcrafted
+
+Gemstones must have high brilliance and clarity
+
+Jewelry must significantly elevate the royal aesthetic of the portrait
 
 COMPOSITION – SUBJECT OFTEN FARTHER AWAY
 The pet must not always be close-up. Frequently show:
@@ -4487,9 +4509,9 @@ The subject farther away
 
 More body visible
 
-More cloak, garments, clasp, and environment included
+More cloak, garments, clasp, ornate Victorian pillows, and decorative environment
 
-Classical portrait composition
+Classical portrait composition with richer, more elaborate staging
 
 POSE REQUIREMENT – RELAXED, NATURAL, RENAISSANCE-LIKE
 The pet should often appear in a serene, natural, Renaissance-inspired pose:
@@ -4501,7 +4523,6 @@ Calm, candid presence
 Graceful positioning of the body
 
 A timeless, tranquil elegance reminiscent of Renaissance portrait subjects
-
 Avoid stiff or rigid posing.
 
 Use provided variables:
@@ -4514,7 +4535,7 @@ Follow all provided details exactly:
 ${petDescription}${genderInfo}${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}${agePreservationInstructions}
 
 OVERALL GOAL
-A luminous, regal antique oil portrait with extremely thick, dimensional oil paint; darker backgrounds; elevated, royal clothing and jewelry; a silky luminous cloak held by an ornate clasp; a composition showing more of the figure; and a serene Renaissance-inspired natural pose. The portrait must remain instantly recognizable as this specific pet.`;
+A luminous, regal antique oil portrait with extremely thick, dimensional oil paint; darker backgrounds; elevated, Victorian-royal clothing and jewelry; ornate, vibrant pillows with rich patterns; a silky luminous cloak held by an ornate clasp; a composition showing more of the figure; and a serene Renaissance-inspired natural pose. The portrait must remain instantly recognizable as this specific pet.`;
 
       // Add custom prompt for studio mode
       const finalOpenAIPrompt = customPrompt 
