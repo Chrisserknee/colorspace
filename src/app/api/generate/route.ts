@@ -165,28 +165,34 @@ function getCompositionForSize(breed: string, petDescription: string, species: s
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest`;
   }
   
-  // Standard composition for smaller pets - STILL needs headroom
+  // Standard composition for smaller pets - ZOOMED OUT with headroom
   return `COMPOSITION:
-=== CRITICAL FRAMING - HEADROOM REQUIRED ===
-- ALWAYS leave GENEROUS HEADROOM above the pet's ears - at least 10% of frame height
+=== CRITICAL FRAMING - ZOOMED OUT, NOT CLOSE-UP ===
+- PULL BACK from subject - pet should occupy only 65-75% of frame height (NOT filling the frame)
+- ALWAYS leave GENEROUS HEADROOM above the pet's ears - at least 15% of frame height
 - The TOP OF EARS must NEVER touch or approach the top edge of the frame
-- Position subject in LOWER 60% of the frame - NOT centered vertically
-- FULL HEAD visible including COMPLETE EARS with space above them
+- Position subject in LOWER 55% of the frame - NOT centered vertically
+- FULL HEAD visible including COMPLETE EARS with AMPLE space above them
+- Show HEAD, NECK, CHEST, and UPPER BODY - not just the face
 - DO NOT crop ANY part of the head or ears - ever
 
 === POSITIONING ===
 - Subject LOW and CENTRAL on ornate velvet throne cushion
+- Camera positioned FURTHER BACK than typical portrait - show more of the pet
 - NATURAL body position - comfortable, relaxed, at ease
-- Front paws visible, positioned naturally
+- Front paws visible, positioned naturally on the cushion
 - Cloak draped naturally with realistic fabric folds
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
 - Authentic, genuine expression
+- WIDER FRAMING showing the pet in their full regal glory
 
 === ABSOLUTELY FORBIDDEN ===
+- NEVER frame too tight or too close to the pet
 - NEVER crop the top of the head
 - NEVER crop ANY part of the ears
 - NEVER let ears touch the top edge of frame
-- NEVER center subject vertically - always leave headroom above`;
+- NEVER center subject vertically - always leave headroom above
+- NEVER make the pet fill the entire frame - leave breathing room`;
 }
 
 // Rainbow Bridge memorial quotes - randomly selected for each portrait
@@ -1741,9 +1747,9 @@ export async function POST(request: NextRequest) {
                 text: `This image contains ${detectedPetCount} pets. Analyze ALL ${detectedPetCount} pets for a royal portrait.
 
 For EACH pet, provide:
-1. SPECIES: [DOG], [CAT], [BIRD], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [RAT], or [EXOTIC]
-2. BREED: Specific breed/variety or "Mixed"
-3. SIZE & BUILD: Size (tiny/small/medium/large/giant) + body type (petite, compact, stocky, athletic, muscular, slender, lanky, fluffy, barrel-chested, leggy, chunky)
+1. SPECIES: [DOG], [CAT], [BIRD], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [PONY], [DONKEY], [GOAT], [PIG], [LLAMA], [ALPACA], [RAT], or [EXOTIC]
+2. BREED: Specific breed/variety or "Mixed" (for horses: Arabian, Quarter Horse, Thoroughbred, etc.)
+3. SIZE & BUILD: Size (tiny/small/medium/large/giant/massive) + body type (petite, compact, stocky, athletic, muscular, slender, lanky, fluffy, barrel-chested, leggy, chunky, powerful)
 4. COLORS: Fur color, markings, patterns
 5. FACE: Eye color, distinctive features
 6. BODY: Notable proportions (long body, short legs, broad chest, big paws, etc.)
@@ -1779,8 +1785,8 @@ Brief description of how they look together, noting their relative sizes and pos
         const description = petMatch ? petMatch[1].trim() : "a beloved pet";
         petDescriptions.push(description);
         
-        // Extract species
-        const speciesMatch = description.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC)\]/i);
+        // Extract species (expanded list for exotic pets)
+        const speciesMatch = description.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|PONY|DONKEY|GOAT|PIG|LLAMA|ALPACA|RAT|EXOTIC)\]/i);
         const species = speciesMatch ? speciesMatch[1].toUpperCase() : 
                    description.toLowerCase().includes("dog") ? "DOG" : 
                    description.toLowerCase().includes("cat") ? "CAT" : "PET";
@@ -1815,7 +1821,7 @@ Brief description of how they look together, noting their relative sizes and pos
               text: `Analyze this pet photo with EXTREME PRECISION for identity preservation. The goal is to capture THIS EXACT pet's unique appearance so it can be recreated perfectly.
 
 SUPPORTED SPECIES (use these exact tags):
-[DOG], [CAT], [BIRD], [FISH], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [RAT], [EXOTIC]
+[DOG], [CAT], [BIRD], [FISH], [RABBIT], [HAMSTER], [GUINEA PIG], [REPTILE], [FERRET], [TURTLE], [HORSE], [PONY], [DONKEY], [GOAT], [PIG], [LLAMA], [ALPACA], [RAT], [EXOTIC]
 
 Provide an EXTREMELY DETAILED description focusing on what makes THIS SPECIFIC pet unique:
 
@@ -1927,7 +1933,7 @@ Format your response as a detailed paragraph that could be used to recreate this
     });
 
     // Extract species from the description (format: [DOG], [CAT], etc.)
-    const speciesMatch = petDescription.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|RAT|EXOTIC|PET)\]/i);
+    const speciesMatch = petDescription.match(/\[(DOG|CAT|BIRD|FISH|RABBIT|HAMSTER|GUINEA PIG|REPTILE|FERRET|TURTLE|HORSE|PONY|DONKEY|GOAT|PIG|LLAMA|ALPACA|RAT|EXOTIC|PET)\]/i);
     let species = speciesMatch ? speciesMatch[1].toUpperCase() : "";
     
     // Extract age/stage from the description
@@ -1969,8 +1975,20 @@ Format your response as a detailed paragraph that could be used to recreate this
         species = "FERRET";
       } else if (lowerDesc.includes("turtle") || lowerDesc.includes("tortoise")) {
         species = "TURTLE";
-      } else if (lowerDesc.includes("horse") || lowerDesc.includes("pony") || lowerDesc.includes("equine")) {
+      } else if (lowerDesc.includes("horse") || lowerDesc.includes("mare") || lowerDesc.includes("stallion") || lowerDesc.includes("foal") || lowerDesc.includes("equine")) {
         species = "HORSE";
+      } else if (lowerDesc.includes("pony") || lowerDesc.includes("shetland")) {
+        species = "PONY";
+      } else if (lowerDesc.includes("donkey") || lowerDesc.includes("mule") || lowerDesc.includes("burro")) {
+        species = "DONKEY";
+      } else if (lowerDesc.includes("goat") || lowerDesc.includes("kid goat") || lowerDesc.includes("billy") || lowerDesc.includes("nanny goat")) {
+        species = "GOAT";
+      } else if (lowerDesc.includes("pig") || lowerDesc.includes("piglet") || lowerDesc.includes("hog") || lowerDesc.includes("potbelly") || lowerDesc.includes("pot belly")) {
+        species = "PIG";
+      } else if (lowerDesc.includes("llama")) {
+        species = "LLAMA";
+      } else if (lowerDesc.includes("alpaca")) {
+        species = "ALPACA";
       } else if (lowerDesc.includes("rat") || lowerDesc.includes("mouse")) {
         species = "RAT";
       } else {
@@ -1996,7 +2014,7 @@ Format your response as a detailed paragraph that could be used to recreate this
     // Validate species with a direct image check - helps ensure accuracy for dogs/cats
     // For other species, we trust the initial detection
     const commonSpecies = ["DOG", "CAT"];
-    const allValidSpecies = ["DOG", "CAT", "BIRD", "FISH", "RABBIT", "HAMSTER", "GUINEA PIG", "REPTILE", "FERRET", "TURTLE", "HORSE", "RAT", "EXOTIC"];
+    const allValidSpecies = ["DOG", "CAT", "BIRD", "FISH", "RABBIT", "HAMSTER", "GUINEA PIG", "REPTILE", "FERRET", "TURTLE", "HORSE", "PONY", "DONKEY", "GOAT", "PIG", "LLAMA", "ALPACA", "RAT", "EXOTIC"];
     
     if (commonSpecies.includes(species) || !species || species === "PET") {
       console.log("🔍 Performing species validation check for dog/cat...");
@@ -2012,7 +2030,7 @@ Format your response as a detailed paragraph that could be used to recreate this
                   text: `Look at this image VERY CAREFULLY. What type of pet is this?
 
 Identify the species. Respond with ONLY ONE of these words:
-DOG, CAT, BIRD, FISH, RABBIT, HAMSTER, GUINEA PIG, REPTILE, FERRET, TURTLE, HORSE, RAT, or EXOTIC
+DOG, CAT, BIRD, FISH, RABBIT, HAMSTER, GUINEA PIG, REPTILE, FERRET, TURTLE, HORSE, PONY, DONKEY, GOAT, PIG, LLAMA, ALPACA, RAT, or EXOTIC
 
 Key identification features:
 - DOG: Larger snout/muzzle, canine facial structure
@@ -2025,7 +2043,13 @@ Key identification features:
 - REPTILE: Scales (lizard, gecko, snake, bearded dragon)
 - FERRET: Long body, small face
 - TURTLE: Shell
-- HORSE: Equine features
+- HORSE: Large equine, long face, mane
+- PONY: Smaller equine, stocky build
+- DONKEY: Long ears, equine body
+- GOAT: Horns or horn buds, rectangular pupils, beard
+- PIG: Snout, curly tail, round body
+- LLAMA: Long neck, banana-shaped ears, woolly
+- ALPACA: Smaller than llama, fluffy face, woolly
 - RAT: Long tail, pointed face
 - EXOTIC: Other unique pets
 
@@ -2103,7 +2127,13 @@ Respond with ONLY the species name.`,
       "REPTILE": "CRITICAL: This is a REPTILE. Preserve scales and reptilian features.",
       "FERRET": "CRITICAL: This is a FERRET. Preserve long body and small face.",
       "TURTLE": "CRITICAL: This is a TURTLE. Preserve shell and reptilian features.",
-      "HORSE": "CRITICAL: This is a HORSE. Preserve equine features and proportions.",
+      "HORSE": "CRITICAL: This is a HORSE. Preserve equine features, long face, mane, and proportions. Show full majestic body.",
+      "PONY": "CRITICAL: This is a PONY. Preserve smaller equine features, stocky build. Show full body.",
+      "DONKEY": "CRITICAL: This is a DONKEY. Preserve long ears, equine body. Show full body.",
+      "GOAT": "CRITICAL: This is a GOAT. Preserve horns/horn buds, rectangular pupils, beard if present.",
+      "PIG": "CRITICAL: This is a PIG. Preserve snout, round body, curly tail.",
+      "LLAMA": "CRITICAL: This is a LLAMA. Preserve long neck, banana-shaped ears, woolly coat. Show full body.",
+      "ALPACA": "CRITICAL: This is an ALPACA. Preserve fluffy face, woolly coat, smaller than llama. Show full body.",
       "RAT": "CRITICAL: This is a RAT. Preserve pointed face and long tail.",
     };
     const notSpecies = speciesEnforcement[species] || `CRITICAL: This is a ${species}. DO NOT generate any other animal. Generate ONLY a ${species}.`;
@@ -2653,8 +2683,8 @@ The following facial structure analysis MUST be preserved exactly:
 ${facialStructureAnalysis}
 ` : "";
 
-    // Determine if this is a large animal that needs different composition
-    const largeAnimals = ["HORSE", "PONY"];
+    // Determine if this is a large animal that needs different composition (full body, zoomed out)
+    const largeAnimals = ["HORSE", "PONY", "DONKEY", "LLAMA", "ALPACA", "GOAT", "PIG"];
     const isLargeAnimal = largeAnimals.includes(species);
     
     // Check if this is a large dog breed that needs more headroom
@@ -2690,18 +2720,21 @@ ${facialStructureAnalysis}
 - ABSOLUTELY FORBIDDEN: cropping ANY part of the head or ears
 - Think "full upper body portrait" not "head shot"` : `
 === COMPOSITION (CRITICAL - Follow Exactly) ===
-*** HEADROOM IS MANDATORY - NEVER CROP EARS OR HEAD ***
-- ALWAYS leave GENEROUS HEADROOM above ears - at least 10% of frame height as background
+*** ZOOMED OUT FRAMING - SHOW MORE OF THE PET ***
+- PULL BACK from subject - pet should occupy only 65-75% of frame height
+- ALWAYS leave GENEROUS HEADROOM above ears - at least 15% of frame height as background
 - TOP OF EARS must NEVER touch or approach the top edge of frame
-- Subject positioned LOW in frame - NOT centered vertically
-- FULL HEAD including COMPLETE EARS must be visible with clear space above
+- Subject positioned in LOWER HALF of frame - NOT centered vertically
+- FULL HEAD including COMPLETE EARS must be visible with AMPLE space above them
+- Show HEAD, NECK, CHEST, and UPPER BODY - more of the pet visible
 - Body ¾ VIEW, head forward or slightly angled - classical portrait posture
 - FRONT PAWS VISIBLE and resting on cushion - signature trait
 - Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest PROPERLY SECURING THE CLOAK - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, clasp HOLDS THE CLOAK TOGETHER at the chest
-- MEDIUM CLOSE-UP framing: chest to top of head with HEADROOM (NOT full body, NOT face only)
+- WIDER FRAMING: Show from cushion to well above head - NOT a tight close-up
+- Camera positioned FURTHER BACK than typical portrait distance
 - Camera at pet's eye level or slightly above
-- ABSOLUTELY FORBIDDEN: cropping ANY part of head/ears, letting ears touch top edge`;
+- ABSOLUTELY FORBIDDEN: cropping ANY part of head/ears, letting ears touch top edge, framing too tight/close`;
 
     // Species-specific pose instructions
     const poseInstructions = isLargeAnimal ? `
@@ -3097,19 +3130,23 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - Preserve ear shapes, sizes, and positions exactly for EACH pet
 - The unique identifying features of ALL ${petCount} pets must remain unchanged
 
-=== COMPOSITION - ${petCountWord} PETS SITTING NATURALLY TOGETHER ===
-- ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies, not just heads
-- WIDE and CENTERED composition with all pets visible
-- Show LARGE CUSHION that comfortably fits ALL ${petCount} pets
-- ALL pets SEATED or LYING DOWN NATURALLY together
+=== COMPOSITION - ${petCountWord} PETS TOGETHER (ADAPTED FOR SPECIES) ===
+- VERY ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies with space around them
+- Pet(s) should occupy only 60-70% of frame height - leave generous margins
+- WIDE and CENTERED composition with all pets clearly visible
+- AMPLE HEADROOM above ALL pets - at least 15% of frame as background above tallest ears
 - Position pets CLOSE TOGETHER like companions - arranged naturally
-- NEVER standing upright like humans - always sitting, lying, or resting
-- Natural animal posture for EACH: body low, front paws resting on cushion
-- ALL pets should look comfortable and naturally positioned together
+
+=== SPECIES-ADAPTIVE POSING ===
+- FOR HORSES/PONIES/LARGE ANIMALS: Standing proudly side-by-side or slightly staggered, show FULL BODIES from head to hooves, noble equine posture, decorated with royal blankets/bridles instead of cloaks, pastoral or stable background
+- FOR DOGS/CATS: Seated or lying on LARGE shared cushion, front paws visible, wearing cloaks with clasps
+- FOR BIRDS: Perched together on ornate stand or branch, show full plumage
+- FOR EXOTIC PETS (rabbits, ferrets, guinea pigs, etc.): Natural resting pose appropriate to species on cushion or appropriate surface
+- NEVER standing upright like humans - always in natural animal posture
 - Natural family/companion pose - they should look like they belong together
-- FRONT PAWS VISIBLE for all pets, resting naturally on the shared cushion
 - Pets can be at slightly different angles (some forward, some slightly turned)
 - Create visual balance - all pets should be equally prominent and visible
+- ALL subjects well-lit and clearly defined - no pet hidden or in shadow
 
 === VIBRANT COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
 - RANDOMIZE colors each generation - avoid repetitive pink/blue schemes
