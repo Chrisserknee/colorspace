@@ -263,6 +263,23 @@ function SuccessContent() {
     grantPurchaseBonus(type || undefined, packType || undefined);
   }, [type, packType]);
   
+  // Scroll to canvas section if #canvas hash is in URL (from email links)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#canvas') {
+      // Wait for page content to render, then scroll
+      const scrollToCanvas = () => {
+        const canvasSection = document.getElementById('canvas');
+        if (canvasSection) {
+          canvasSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+      // Try immediately, then retry after content loads
+      setTimeout(scrollToCanvas, 100);
+      setTimeout(scrollToCanvas, 500);
+      setTimeout(scrollToCanvas, 1000);
+    }
+  }, []);
+  
   // Track ref to prevent duplicate TikTok events
   const tiktokTrackedRef = useRef(false);
   
