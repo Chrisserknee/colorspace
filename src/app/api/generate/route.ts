@@ -59,90 +59,72 @@ function getRandomBackgroundColor(): string {
   return PORTRAIT_BACKGROUND_COLORS[Math.floor(Math.random() * PORTRAIT_BACKGROUND_COLORS.length)];
 }
 
-// Natural relaxed pet poses - each portrait should use a DIFFERENT pose for variety
+// Natural relaxed pet poses - LYING DOWN focused for variety and authenticity
 const NATURAL_PET_POSES = [
-  // Relaxed lying/reclining poses (most natural)
+  // LYING DOWN poses - these should be the most common
   {
-    name: "COZY LOUNGE",
-    description: "Pet lying down comfortably on side, head resting on front paws, completely relaxed and at ease. Body weight settled, eyes soft and content. Like a pet napping by the fireplace.",
-    bodyPosition: "lying on side or stomach, body weight fully settled",
-    headPosition: "resting gently on front paws or cushion",
-    pawPosition: "front paws extended forward or tucked under chin",
-    expression: "soft, peaceful, content - maybe slightly sleepy"
+    name: "PEACEFUL SPRAWL",
+    description: "Pet lying flat on stomach, front legs extended forward, back legs relaxed behind or to side. Head may rest on paws or be lifted slightly. Completely relaxed full-body sprawl on cushion.",
+    bodyPosition: "lying flat on stomach, FULL BODY visible sprawled on cushion",
+    headPosition: "resting on front paws OR lifted slightly looking at viewer",
+    pawPosition: "front legs stretched forward, back legs visible behind - ALL FOUR LEGS SHOWING",
+    expression: "peaceful, content, relaxed"
   },
   {
-    name: "SPHINX REST",
-    description: "Pet in classic sphinx pose - lying down with front paws extended forward, chest down on cushion, head up and alert but relaxed. Dignified but comfortable.",
-    bodyPosition: "lying down in sphinx position, chest resting on surface",
-    headPosition: "held up naturally, not strained",
-    pawPosition: "front paws extended forward, parallel",
-    expression: "calm, observant, dignified but relaxed"
+    name: "SIDE LOUNGE",
+    description: "Pet lying on their side, body curved naturally, all four legs visible and relaxed. Head turned toward viewer. Like a pet napping in a sunbeam.",
+    bodyPosition: "lying on side, FULL BODY visible, natural curve to body",
+    headPosition: "resting on cushion or lifted slightly toward viewer",
+    pawPosition: "ALL FOUR LEGS visible - front paws together, back legs relaxed",
+    expression: "drowsy, warm, content"
   },
   {
-    name: "GENTLE CURL",
-    description: "Pet curled slightly to one side, body forming a gentle C-shape, creating a cozy compact silhouette. Tail may wrap around body. Completely at ease.",
-    bodyPosition: "gently curled, body forming soft curve",
-    headPosition: "turned slightly, looking over shoulder or toward viewer",
-    pawPosition: "tucked comfortably, one paw may be visible",
-    expression: "warm, content, inviting"
-  },
-  // Relaxed seated poses (not stiff)
-  {
-    name: "CASUAL SIT",
-    description: "Pet sitting but RELAXED - weight shifted slightly to one side, not perfectly centered. One paw slightly forward. Like sitting casually, not posing for a photo.",
-    bodyPosition: "sitting with weight slightly off-center, natural lean",
-    headPosition: "tilted gently to one side or turned slightly",
-    pawPosition: "asymmetrical - one forward, one back or to side",
-    expression: "natural, curious, or thoughtful"
+    name: "SPHINX POSE",
+    description: "Classic sphinx position - lying down with chest on cushion, front paws extended forward parallel, head held up with dignity. Back legs tucked beside body.",
+    bodyPosition: "lying in sphinx pose, chest down, FULL BODY visible on cushion",
+    headPosition: "held up regally but relaxed",
+    pawPosition: "front paws extended forward parallel, back legs visible tucked at sides",
+    expression: "noble, calm, observant"
   },
   {
-    name: "SLEEPY SETTLE",
-    description: "Pet settled down but not fully lying - halfway between sitting and lying, like about to drift off to sleep. Heavy-lidded eyes, completely relaxed muscles.",
-    bodyPosition: "settled low, weight sinking into cushion",
-    headPosition: "slightly lowered, may be tilted",
-    pawPosition: "front paws crossed or loosely arranged",
-    expression: "drowsy, serene, peaceful - heavy-lidded eyes"
+    name: "COZY CURL",
+    description: "Pet curled into a comfortable ball shape, body forming C-curve, paws tucked in, tail may wrap around. Viewed from slight angle to show full body.",
+    bodyPosition: "curled comfortably, FULL BODY in rounded shape on cushion",
+    headPosition: "resting on paws or cushion, turned toward viewer",
+    pawPosition: "front paws tucked under or beside chin, back legs curled",
+    expression: "cozy, sleepy, utterly content"
   },
   {
-    name: "CONTENT RECLINE",
-    description: "Pet leaning back against the cushion, front legs extended forward, relaxed and confident. Like lounging on a favorite spot.",
-    bodyPosition: "leaning back, torso slightly reclined",
-    headPosition: "held comfortably, may be tilted back slightly",
-    pawPosition: "front paws extended forward casually",
-    expression: "confident, content, comfortable"
-  },
-  // Semi-alert relaxed poses
-  {
-    name: "SOFT ATTENTION",
-    description: "Pet in relaxed seated position, head turned slightly as if something caught their attention. Alert eyes but relaxed body. Natural curiosity without tension.",
-    bodyPosition: "seated but loose, no rigid posture",
-    headPosition: "turned to one side, ears naturally positioned",
-    pawPosition: "front paws resting naturally, not perfectly aligned",
-    expression: "gentle curiosity, soft alertness"
+    name: "RELAXED RECLINE",
+    description: "Pet lying back against cushion at an angle, front legs extended, back legs visible to the side. Body at slight diagonal showing full length.",
+    bodyPosition: "reclined against cushion, FULL BODY LENGTH visible at slight angle",
+    headPosition: "resting back against cushion, looking at viewer",
+    pawPosition: "front legs extended casually, back legs visible to side",
+    expression: "relaxed, confident, at ease"
   },
   {
-    name: "QUIET DIGNITY",
-    description: "Pet in a noble but completely relaxed pose - presence without stiffness. Body language says 'I am comfortable and at peace.' Natural authority without trying.",
-    bodyPosition: "relaxed but with natural grace, weight even",
-    headPosition: "held naturally, perhaps slight noble tilt",
-    pawPosition: "one paw slightly in front of the other",
-    expression: "serene, wise, peaceful nobility"
+    name: "LAZY STRETCH",
+    description: "Pet mid-stretch or just finishing a stretch, body long and extended, front paws reaching forward, back legs stretched behind. Maximum body length visible.",
+    bodyPosition: "stretched out long, MAXIMUM BODY LENGTH visible on cushion",
+    headPosition: "low, between front paws or resting on them",
+    pawPosition: "front paws stretched FAR forward, back legs extended behind",
+    expression: "blissful, relaxed, comfortable"
   },
   {
-    name: "DREAMY GAZE",
-    description: "Pet with soft, distant expression, as if lost in pleasant thoughts. Body completely relaxed, almost meditative. Eyes focused softly or looking slightly away.",
-    bodyPosition: "settled and still, fully relaxed",
-    headPosition: "held softly, gaze not directly at viewer",
-    pawPosition: "paws relaxed, not posed",
-    expression: "dreamy, thoughtful, introspective"
+    name: "DROWSY SETTLE",
+    description: "Pet settled into cushion as if about to fall asleep, body weight sunk down, eyes half-closed or soft. Full body visible, all muscles relaxed.",
+    bodyPosition: "sunk into cushion, FULL BODY relaxed and visible",
+    headPosition: "lowered, resting comfortably, may be tilted",
+    pawPosition: "all paws relaxed and visible in natural positions",
+    expression: "drowsy, heavy-lidded, peaceful"
   },
   {
-    name: "WARM WELCOME",
-    description: "Pet in relaxed position with warm, welcoming expression. Body language open and inviting. Like greeting a beloved owner after they've been away.",
-    bodyPosition: "relaxed but engaged, slight forward lean",
-    headPosition: "turned toward viewer with interest",
-    pawPosition: "one paw may be slightly raised or extended",
-    expression: "warm, loving, welcoming"
+    name: "REGAL REST",
+    description: "Pet lying down in dignified pose, head held up with quiet nobility, body stretched elegantly on cushion. All four legs arranged gracefully.",
+    bodyPosition: "lying down elegantly, FULL BODY displayed on cushion",
+    headPosition: "held up with natural dignity, not stiff",
+    pawPosition: "front legs together extended forward, back legs visible to side",
+    expression: "dignified, serene, peacefully noble"
   }
 ];
 
@@ -2844,46 +2826,18 @@ KEY ${species} QUALITIES:
 - Eyes intelligent and gentle
 - Muscular form visible under royal drapery
 - Hooves visible and properly proportioned
-- Tail natural and flowing` : (() => {
-      const pose = getRandomNaturalPose();
-      console.log(`🎨 Selected random pose: ${pose.name}`);
-      return `
-=== POSE: "${pose.name}" - THIS EXACT POSE IS MANDATORY ===
-*** CRITICAL: Generate THIS SPECIFIC pose - not a generic sitting pose ***
+- Tail natural and flowing` : `
+=== POSE REINFORCEMENT - LYING DOWN FULL BODY ===
+The pet MUST be LYING DOWN on the cushion - NOT sitting upright.
+- FULL BODY must be visible including ALL FOUR LEGS
+- Pet should be SPRAWLED, LOUNGING, or in SPHINX pose
+- Show the pet from a DISTANCE - zoomed out wide shot
+- Simple velvet cloak draped loosely with THIN SILVER CLASP only
+- NO excessive jewelry, NO heavy robes, NO elaborate costume
+- The pet's natural body should be mostly visible under the light cloak
 
-SELECTED POSE DESCRIPTION:
-${pose.description}
-
-EXACT BODY POSITION: ${pose.bodyPosition}
-EXACT HEAD POSITION: ${pose.headPosition}  
-EXACT PAW POSITION: ${pose.pawPosition}
-EXACT EXPRESSION: ${pose.expression}
-
-=== ABSOLUTELY FORBIDDEN POSES - DO NOT GENERATE THESE ===
-❌ STIFF UPRIGHT SITTING - pet sitting perfectly straight like a statue
-❌ RIGID POSTURE - any pose that looks forced or unnatural
-❌ PERFECTLY SYMMETRICAL - paws aligned perfectly, body centered exactly
-❌ STANDING ON HIND LEGS - never standing upright like a human
-❌ FORMAL PORTRAIT POSE - stiff, staged, artificial looking
-❌ ALERT/TENSE POSTURE - ears fully perked, body rigid, ready to spring
-❌ GENERIC "PET PORTRAIT" POSE - the typical stiff formal sitting pose
-
-=== MANDATORY POSE QUALITIES ===
-✓ NATURALLY RELAXED - muscles loose, body weight settled into cushion
-✓ ASYMMETRICAL - paws not perfectly aligned, body has natural lean or curve
-✓ COMFORTABLE - the pet looks genuinely at ease, not "posing"
-✓ AUTHENTIC - like a candid moment captured, not a staged photo
-✓ UNIQUE - this pose should feel different from other portraits
-✓ WARM - the overall feeling should be of a beloved pet in their happy place
-
-THE ${species} MUST BE:
-- LYING DOWN, LOUNGING, or in a RELAXED SEATED position
-- Looking COMFORTABLE and NATURAL - like at home on their favorite spot
-- NOT stiff, NOT rigid, NOT perfectly posed
-- Cloak draped naturally over relaxed body - soft plush velvety texture
-- Front paws visible but in NATURAL RELAXED position (not perfectly placed)
-- Expression GENUINE and SOFT - not staring intensely at camera`;
-    })();
+❌ FORBIDDEN: Upright sitting, close-up shots, heavy clothing
+✓ REQUIRED: Lying down, full body visible, simple cloak only`;
 
     // Add critical framing instruction at the very start for large dogs
     const largeDogFramingPrefix = isLargeDog ? `
@@ -2898,14 +2852,61 @@ THIS IS A LARGE DOG BREED. You MUST zoom out and show a WIDE SHOT.
 
 ` : "";
 
-    const generationPrompt = `${largeDogFramingPrefix}CRITICAL SPECIES REQUIREMENT: THIS IS A ${species}. YOU MUST GENERATE A ${species}. ${notSpecies} REPEAT: THIS IS A ${species} - GENERATE ONLY A ${species}. DO NOT GENERATE THE WRONG SPECIES.
+    // Get random pose for this generation
+    const selectedPose = getRandomNaturalPose();
+    console.log(`🎨 Selected pose for generation: ${selectedPose.name}`);
+    
+    const generationPrompt = `${largeDogFramingPrefix}
+*******************************************************************
+*** MANDATORY POSE & COMPOSITION - READ FIRST - FOLLOW EXACTLY ***
+*******************************************************************
+
+POSE REQUIREMENT: "${selectedPose.name}"
+The pet MUST be in this pose: ${selectedPose.description}
+- Body: ${selectedPose.bodyPosition}
+- Head: ${selectedPose.headPosition}
+- Paws: ${selectedPose.pawPosition}
+- Expression: ${selectedPose.expression}
+
+COMPOSITION REQUIREMENT: ZOOMED OUT - FULL BODY VISIBLE
+- Frame the pet from a DISTANCE - show the ENTIRE BODY including ALL FOUR LEGS
+- Pet should occupy only 50-60% of the frame height - NOT a close-up
+- WIDE SHOT showing pet lying/lounging on an ornate cushion
+- Full legs and paws clearly visible - do not crop the body
+- Generous space around the pet on all sides
+- Camera PULLED BACK - as if viewing from across a room
+
+CLOTHING REQUIREMENT: MINIMAL - SIMPLE ELEGANT CLOAK ONLY
+- ONE simple velvet CLOAK draped loosely over the pet's back/shoulders
+- Cloak secured by a THIN SILVER CLASP at the chest - small and elegant, not bulky
+- NO heavy robes, NO multiple layers, NO elaborate costumes
+- NO ermine trim, NO excessive decorations, NO jewelry overload
+- The pet's BODY should be mostly visible UNDER the cloak
+- Think: light elegant draping, NOT heavy ceremonial robes
+- The cloak should look like it could slip off naturally
+
+❌ DO NOT: Sitting upright like a statue
+❌ DO NOT: Close-up head shot
+❌ DO NOT: Cropped body - must show full body
+❌ DO NOT: Heavy elaborate clothing covering the body
+❌ DO NOT: Multiple necklaces and excessive jewelry
+❌ DO NOT: Stiff formal pose
+
+✓ MUST DO: ${selectedPose.name} pose as described above
+✓ MUST DO: Full body visible, zoomed out wide shot
+✓ MUST DO: Simple cloak with thin silver clasp
+✓ MUST DO: Natural relaxed position on cushion
+
+*******************************************************************
+
+CRITICAL SPECIES REQUIREMENT: THIS IS A ${species}. YOU MUST GENERATE A ${species}. ${notSpecies} REPEAT: THIS IS A ${species} - GENERATE ONLY A ${species}. DO NOT GENERATE THE WRONG SPECIES.
 
 THIS IS A ${species}. Generate a ${species}. ${notSpecies}
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. Subjects are dressed in richly embroidered cloaks fastened with ornate metal clasps, often adorned with gold chains, gemstone jewelry, and decorative pendants. Fabrics include velvet, silk, and ermine trim rendered with meticulous realism.
+A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. The pet wears ONLY a simple velvet cloak draped loosely, secured by a THIN ELEGANT SILVER CLASP - no heavy costumes or excessive clothing. The pet's natural body should be mostly visible.
 
-Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) that occasionally feature a single object, architectural detail, or a rich wall drapery to add depth. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
+Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) with the pet shown in FULL BODY from a DISTANCE. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
 
 === VIBRANT COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
 - RANDOMIZE colors each generation - avoid repetitive color schemes
