@@ -59,6 +59,98 @@ function getRandomBackgroundColor(): string {
   return PORTRAIT_BACKGROUND_COLORS[Math.floor(Math.random() * PORTRAIT_BACKGROUND_COLORS.length)];
 }
 
+// Natural relaxed pet poses - each portrait should use a DIFFERENT pose for variety
+const NATURAL_PET_POSES = [
+  // Relaxed lying/reclining poses (most natural)
+  {
+    name: "COZY LOUNGE",
+    description: "Pet lying down comfortably on side, head resting on front paws, completely relaxed and at ease. Body weight settled, eyes soft and content. Like a pet napping by the fireplace.",
+    bodyPosition: "lying on side or stomach, body weight fully settled",
+    headPosition: "resting gently on front paws or cushion",
+    pawPosition: "front paws extended forward or tucked under chin",
+    expression: "soft, peaceful, content - maybe slightly sleepy"
+  },
+  {
+    name: "SPHINX REST",
+    description: "Pet in classic sphinx pose - lying down with front paws extended forward, chest down on cushion, head up and alert but relaxed. Dignified but comfortable.",
+    bodyPosition: "lying down in sphinx position, chest resting on surface",
+    headPosition: "held up naturally, not strained",
+    pawPosition: "front paws extended forward, parallel",
+    expression: "calm, observant, dignified but relaxed"
+  },
+  {
+    name: "GENTLE CURL",
+    description: "Pet curled slightly to one side, body forming a gentle C-shape, creating a cozy compact silhouette. Tail may wrap around body. Completely at ease.",
+    bodyPosition: "gently curled, body forming soft curve",
+    headPosition: "turned slightly, looking over shoulder or toward viewer",
+    pawPosition: "tucked comfortably, one paw may be visible",
+    expression: "warm, content, inviting"
+  },
+  // Relaxed seated poses (not stiff)
+  {
+    name: "CASUAL SIT",
+    description: "Pet sitting but RELAXED - weight shifted slightly to one side, not perfectly centered. One paw slightly forward. Like sitting casually, not posing for a photo.",
+    bodyPosition: "sitting with weight slightly off-center, natural lean",
+    headPosition: "tilted gently to one side or turned slightly",
+    pawPosition: "asymmetrical - one forward, one back or to side",
+    expression: "natural, curious, or thoughtful"
+  },
+  {
+    name: "SLEEPY SETTLE",
+    description: "Pet settled down but not fully lying - halfway between sitting and lying, like about to drift off to sleep. Heavy-lidded eyes, completely relaxed muscles.",
+    bodyPosition: "settled low, weight sinking into cushion",
+    headPosition: "slightly lowered, may be tilted",
+    pawPosition: "front paws crossed or loosely arranged",
+    expression: "drowsy, serene, peaceful - heavy-lidded eyes"
+  },
+  {
+    name: "CONTENT RECLINE",
+    description: "Pet leaning back against the cushion, front legs extended forward, relaxed and confident. Like lounging on a favorite spot.",
+    bodyPosition: "leaning back, torso slightly reclined",
+    headPosition: "held comfortably, may be tilted back slightly",
+    pawPosition: "front paws extended forward casually",
+    expression: "confident, content, comfortable"
+  },
+  // Semi-alert relaxed poses
+  {
+    name: "SOFT ATTENTION",
+    description: "Pet in relaxed seated position, head turned slightly as if something caught their attention. Alert eyes but relaxed body. Natural curiosity without tension.",
+    bodyPosition: "seated but loose, no rigid posture",
+    headPosition: "turned to one side, ears naturally positioned",
+    pawPosition: "front paws resting naturally, not perfectly aligned",
+    expression: "gentle curiosity, soft alertness"
+  },
+  {
+    name: "QUIET DIGNITY",
+    description: "Pet in a noble but completely relaxed pose - presence without stiffness. Body language says 'I am comfortable and at peace.' Natural authority without trying.",
+    bodyPosition: "relaxed but with natural grace, weight even",
+    headPosition: "held naturally, perhaps slight noble tilt",
+    pawPosition: "one paw slightly in front of the other",
+    expression: "serene, wise, peaceful nobility"
+  },
+  {
+    name: "DREAMY GAZE",
+    description: "Pet with soft, distant expression, as if lost in pleasant thoughts. Body completely relaxed, almost meditative. Eyes focused softly or looking slightly away.",
+    bodyPosition: "settled and still, fully relaxed",
+    headPosition: "held softly, gaze not directly at viewer",
+    pawPosition: "paws relaxed, not posed",
+    expression: "dreamy, thoughtful, introspective"
+  },
+  {
+    name: "WARM WELCOME",
+    description: "Pet in relaxed position with warm, welcoming expression. Body language open and inviting. Like greeting a beloved owner after they've been away.",
+    bodyPosition: "relaxed but engaged, slight forward lean",
+    headPosition: "turned toward viewer with interest",
+    pawPosition: "one paw may be slightly raised or extended",
+    expression: "warm, loving, welcoming"
+  }
+];
+
+// Helper to get a random natural pose
+function getRandomNaturalPose(): typeof NATURAL_PET_POSES[0] {
+  return NATURAL_PET_POSES[Math.floor(Math.random() * NATURAL_PET_POSES.length)];
+}
+
 // Large dog breeds that need zoomed-out composition to show full head and body
 const LARGE_DOG_BREEDS = [
   // Giant breeds
@@ -2752,25 +2844,46 @@ KEY ${species} QUALITIES:
 - Eyes intelligent and gentle
 - Muscular form visible under royal drapery
 - Hooves visible and properly proportioned
-- Tail natural and flowing` : `
-=== POSE: NATURAL AND RELAXED (Varied Positions) ===
-Choose ONE of these natural, comfortable poses - NOT always stiffly upright:
-- RELAXED RECLINE: Pet lounging comfortably, slightly reclined against cushion, relaxed posture
-- SOFT SETTLE: Pet settled down naturally, paws tucked or crossed casually, at ease
-- GENTLE TILT: Head tilted slightly to one side with curious or thoughtful expression
-- COZY CURL: Body slightly curved, comfortable and content, like resting by a fire
-- DIGNIFIED REST: Upright but relaxed, not stiff - natural noble bearing without tension
-- SLEEPY ELEGANCE: Slightly drowsy, heavy-lidded eyes, peaceful and serene expression
-- ALERT BUT CALM: Ears relaxed (not fully perked), attentive but comfortable
+- Tail natural and flowing` : (() => {
+      const pose = getRandomNaturalPose();
+      console.log(`🎨 Selected random pose: ${pose.name}`);
+      return `
+=== POSE: "${pose.name}" - THIS EXACT POSE IS MANDATORY ===
+*** CRITICAL: Generate THIS SPECIFIC pose - not a generic sitting pose ***
 
-KEY POSE QUALITIES:
-- The ${species} should look COMFORTABLE and AT EASE - not posed stiffly
-- Natural body language - relaxed shoulders, soft posture, genuine expression
-- Front paws visible, positioned naturally (crossed, tucked, or resting)
-- Head position can vary: straight, tilted, slightly turned - whatever feels natural
-- Expression should feel AUTHENTIC - not forced or artificial
-- Cloak draped naturally over body - soft plush velvety texture
-- Overall feeling of a beloved pet captured in a quiet, comfortable moment`;
+SELECTED POSE DESCRIPTION:
+${pose.description}
+
+EXACT BODY POSITION: ${pose.bodyPosition}
+EXACT HEAD POSITION: ${pose.headPosition}  
+EXACT PAW POSITION: ${pose.pawPosition}
+EXACT EXPRESSION: ${pose.expression}
+
+=== ABSOLUTELY FORBIDDEN POSES - DO NOT GENERATE THESE ===
+❌ STIFF UPRIGHT SITTING - pet sitting perfectly straight like a statue
+❌ RIGID POSTURE - any pose that looks forced or unnatural
+❌ PERFECTLY SYMMETRICAL - paws aligned perfectly, body centered exactly
+❌ STANDING ON HIND LEGS - never standing upright like a human
+❌ FORMAL PORTRAIT POSE - stiff, staged, artificial looking
+❌ ALERT/TENSE POSTURE - ears fully perked, body rigid, ready to spring
+❌ GENERIC "PET PORTRAIT" POSE - the typical stiff formal sitting pose
+
+=== MANDATORY POSE QUALITIES ===
+✓ NATURALLY RELAXED - muscles loose, body weight settled into cushion
+✓ ASYMMETRICAL - paws not perfectly aligned, body has natural lean or curve
+✓ COMFORTABLE - the pet looks genuinely at ease, not "posing"
+✓ AUTHENTIC - like a candid moment captured, not a staged photo
+✓ UNIQUE - this pose should feel different from other portraits
+✓ WARM - the overall feeling should be of a beloved pet in their happy place
+
+THE ${species} MUST BE:
+- LYING DOWN, LOUNGING, or in a RELAXED SEATED position
+- Looking COMFORTABLE and NATURAL - like at home on their favorite spot
+- NOT stiff, NOT rigid, NOT perfectly posed
+- Cloak draped naturally over relaxed body - soft plush velvety texture
+- Front paws visible but in NATURAL RELAXED position (not perfectly placed)
+- Expression GENUINE and SOFT - not staring intensely at camera`;
+    })();
 
     // Add critical framing instruction at the very start for large dogs
     const largeDogFramingPrefix = isLargeDog ? `
@@ -3137,12 +3250,29 @@ ${multiPetCombinedDescription ? `- Together: ${multiPetCombinedDescription}` : "
 - AMPLE HEADROOM above ALL pets - at least 15% of frame as background above tallest ears
 - Position pets CLOSE TOGETHER like companions - arranged naturally
 
-=== SPECIES-ADAPTIVE POSING ===
-- FOR HORSES/PONIES/LARGE ANIMALS: Standing proudly side-by-side or slightly staggered, show FULL BODIES from head to hooves, noble equine posture, decorated with royal blankets/bridles instead of cloaks, pastoral or stable background
-- FOR DOGS/CATS: Seated or lying on LARGE shared cushion, front paws visible, wearing cloaks with clasps
-- FOR BIRDS: Perched together on ornate stand or branch, show full plumage
-- FOR EXOTIC PETS (rabbits, ferrets, guinea pigs, etc.): Natural resting pose appropriate to species on cushion or appropriate surface
-- NEVER standing upright like humans - always in natural animal posture
+=== SPECIES-ADAPTIVE POSING - NATURALLY RELAXED ===
+- FOR HORSES/PONIES/LARGE ANIMALS: Standing naturally side-by-side or slightly staggered, show FULL BODIES from head to hooves, relaxed noble posture, decorated with royal blankets/bridles instead of cloaks, pastoral or stable background
+- FOR DOGS/CATS: LYING DOWN or LOUNGING TOGETHER on LARGE shared cushion - NOT sitting stiffly upright. Natural relaxed poses like:
+  * Both pets lying down side by side, bodies touching companionably
+  * One pet lying, one in relaxed seated position leaning against the other
+  * Both in sphinx pose or gentle curl together
+  * Relaxed and comfortable, like napping together on their favorite spot
+- FOR BIRDS: Perched together on ornate stand or branch, show full plumage, relaxed posture
+- FOR EXOTIC PETS (rabbits, ferrets, guinea pigs, etc.): Natural resting/lounging pose appropriate to species
+
+=== FORBIDDEN MULTI-PET POSES ===
+❌ Both pets sitting perfectly upright like statues
+❌ Stiff, rigid, formal posed positions
+❌ Perfectly symmetrical arrangements
+❌ Standing on hind legs or humanoid poses
+❌ Generic "pet portrait" stiff sitting pose
+
+=== MANDATORY MULTI-PET POSE QUALITIES ===
+✓ NATURALLY RELAXED - muscles loose, bodies settled into cushion
+✓ COMPANIONABLE - positioned like pets who love being together
+✓ ASYMMETRICAL - not perfectly mirrored, natural arrangement
+✓ COMFORTABLE - both pets look genuinely at ease
+✓ AUTHENTIC - like a candid moment of pets resting together
 - Natural family/companion pose - they should look like they belong together
 - Pets can be at slightly different angles (some forward, some slightly turned)
 - Create visual balance - all pets should be equally prominent and visible
