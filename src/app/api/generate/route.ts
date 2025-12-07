@@ -877,7 +877,7 @@ async function generateWithStableDiffusion(
         if (typeof firstItem === 'string') {
           imageUrl = firstItem;
           console.log("✅ Got string URL from array");
-        } else if (firstItem instanceof URL || (firstItem && firstItem.href)) {
+        } else if ((firstItem as any) instanceof URL || (firstItem && (firstItem as any).href)) {
           // Array item is itself a URL object
           imageUrl = firstItem.href || firstItem.toString();
           if (imageUrl) {
@@ -890,7 +890,7 @@ async function generateWithStableDiffusion(
           console.log("📦 Full object:", JSON.stringify(firstItem, null, 2).substring(0, 500));
           
           // Check if it's a URL object directly
-          if (firstItem.href || firstItem instanceof URL) {
+          if ((firstItem as any).href || (firstItem as any) instanceof URL) {
             imageUrl = firstItem.href || firstItem.toString();
             if (imageUrl) {
               console.log("✅ Array item is URL object, converted:", imageUrl.substring(0, 80));
@@ -905,12 +905,12 @@ async function generateWithStableDiffusion(
               console.log("🔗 url() returned type:", typeof urlResult, "value:", typeof urlResult === 'string' ? urlResult.substring(0, 100) : urlResult);
               
               // Handle if url() returns a string, URL object, or other
-              console.log("🔍 urlResult type check:", typeof urlResult, "has href:", !!urlResult?.href, "instanceof URL:", urlResult instanceof URL);
+              console.log("🔍 urlResult type check:", typeof urlResult, "has href:", !!(urlResult as any)?.href, "instanceof URL:", (urlResult as any) instanceof URL);
               
               if (typeof urlResult === 'string') {
                 imageUrl = urlResult;
                 console.log("✅ url() returned string");
-              } else if (urlResult && (urlResult.href || urlResult instanceof URL)) {
+              } else if (urlResult && ((urlResult as any).href || (urlResult as any) instanceof URL)) {
                 // URL object - use .href property for the string URL (most reliable)
                 imageUrl = urlResult.href || urlResult.toString();
                 if (imageUrl) {
@@ -993,7 +993,7 @@ async function generateWithStableDiffusion(
             // Handle if url() returns a ReadableStream or other non-string
             if (typeof urlResult === 'string') {
               url = urlResult;
-            } else if (urlResult instanceof ReadableStream || (urlResult && typeof (urlResult as any).getReader === 'function')) {
+            } else if ((urlResult as any) instanceof ReadableStream || (urlResult && typeof (urlResult as any).getReader === 'function')) {
               // If it's a ReadableStream, we need to read it directly
               console.log("📥 Reading from ReadableStream...");
               const reader = (urlResult as ReadableStream).getReader();
