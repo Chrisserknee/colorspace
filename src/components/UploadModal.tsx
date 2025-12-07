@@ -293,7 +293,7 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
             <span className="font-medium" style={{ color: colors.tipAccent }}>💡 Tip:</span>{" "}
             {isRainbowBridge 
               ? "Photos where you can clearly see their face create the most beautiful memorials."
-              : "Photos with up to 4 pets work great! We'll auto-detect and create a portrait for all your furry friends."
+              : "Clear, front-facing photos work best for beautiful portraits."
             }
           </p>
         </div>
