@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fixEmailTypos } from "./validation";
 
 // Create Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -374,7 +375,13 @@ export async function addRoyalClubSubscriber(
   } = {}
 ): Promise<{ success: boolean; isNew: boolean; error?: string }> {
   try {
-    const normalizedEmail = email.toLowerCase().trim();
+    // Auto-fix email typos before saving
+    const { email: fixedEmail, wasFixed, fixes } = fixEmailTypos(email);
+    const normalizedEmail = fixedEmail.toLowerCase().trim();
+    
+    if (wasFixed) {
+      console.log(`📧 Auto-fixed email typo: "${email}" → "${normalizedEmail}" (${fixes.join(", ")})`);
+    }
     const now = new Date().toISOString();
     
     // Check if already subscribed
@@ -533,7 +540,13 @@ export async function upsertLumeLead(
   source: string = 'checkout'
 ): Promise<{ lead: LumeLead | null; isNew: boolean; error?: string }> {
   try {
-    const normalizedEmail = email.toLowerCase().trim();
+    // Auto-fix email typos before saving
+    const { email: fixedEmail, wasFixed, fixes } = fixEmailTypos(email);
+    const normalizedEmail = fixedEmail.toLowerCase().trim();
+    
+    if (wasFixed) {
+      console.log(`📧 Auto-fixed email typo: "${email}" → "${normalizedEmail}" (${fixes.join(", ")})`);
+    }
     
     // First check if email exists
     const { data: existingLead, error: selectError } = await supabase
@@ -779,7 +792,13 @@ export async function addCustomer(
   } = {}
 ): Promise<{ customer: Customer | null; isNew: boolean; error?: string }> {
   try {
-    const normalizedEmail = email.toLowerCase().trim();
+    // Auto-fix email typos before saving
+    const { email: fixedEmail, wasFixed, fixes } = fixEmailTypos(email);
+    const normalizedEmail = fixedEmail.toLowerCase().trim();
+    
+    if (wasFixed) {
+      console.log(`📧 Auto-fixed email typo: "${email}" → "${normalizedEmail}" (${fixes.join(", ")})`);
+    }
     const now = new Date().toISOString();
     
     // Check if customer already exists
