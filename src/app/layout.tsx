@@ -9,16 +9,32 @@ export const metadata: Metadata = {
   title: "LumePet | Turn Your Pet Into a Masterpiece",
   description: "Transform your beloved pet into a stunning royal oil painting portrait. Upload a photo and watch the magic happen.",
   keywords: ["pet portrait", "royal art", "pet painting", "oil painting", "pet masterpiece"],
+  manifest: "/site.webmanifest",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
     ],
-    apple: "/favicon.svg",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/favicon.svg",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "LumePet",
   },
   openGraph: {
     title: "LumePet | Turn Your Pet Into a Masterpiece",
     description: "Transform your beloved pet into a stunning royal oil painting portrait.",
     type: "website",
+    siteName: "LumePet",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "msapplication-TileColor": "#D4AF37",
   },
 };
 
