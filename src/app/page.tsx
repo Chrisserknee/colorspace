@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import Gallery from "@/components/Gallery";
@@ -61,8 +61,6 @@ export default function Home() {
   const [viewingLastCreation, setViewingLastCreation] = useState(false);
   const [hasAnyCreations, setHasAnyCreations] = useState(false);
   const [justGenerated, setJustGenerated] = useState(false); // Highlight My Creations after generation
-  const [scrollLocked, setScrollLocked] = useState(false); // Lock screen on My Creations button
-  const myCreationsRef = useRef<HTMLDivElement>(null); // Ref to scroll to My Creations button
 
   // Check for email param (session restore) or pending image from pack purchase
   useEffect(() => {
@@ -139,31 +137,9 @@ export default function Home() {
     // Refresh creations state
     setHasAnyCreations(hasCreationsNow);
     
-    // If they now have creations (either new or existing), highlight the button and scroll to it
+    // If they now have creations (either new or existing), highlight the button
     if (hasCreationsNow) {
       setJustGenerated(true);
-      
-      // Scroll to the My Creations button after a brief delay (let the UI render first)
-      setTimeout(() => {
-        if (myCreationsRef.current) {
-          myCreationsRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' // Center the button in the viewport
-          });
-          
-          // Lock scrolling after the smooth scroll completes
-          setTimeout(() => {
-            setScrollLocked(true);
-            document.body.style.overflow = 'hidden';
-            
-            // Unlock scrolling after 3.5 seconds
-            setTimeout(() => {
-              setScrollLocked(false);
-              document.body.style.overflow = '';
-            }, 3500);
-          }, 600); // Wait for smooth scroll to finish
-        }
-      }, 300);
       
       // Clear the highlight after 12 seconds
       setTimeout(() => setJustGenerated(false), 12000);
@@ -214,19 +190,9 @@ export default function Home() {
       {/* Hero Section */}
       <Hero onUploadClick={handleUploadClick} />
 
-      {/* Overlay to dim the screen when scroll is locked */}
-      {scrollLocked && (
-        <div 
-          className="fixed inset-0 z-40 pointer-events-none transition-opacity duration-500"
-          style={{
-            background: 'radial-gradient(circle at center 40%, transparent 0%, transparent 15%, rgba(0,0,0,0.7) 50%)',
-          }}
-        />
-      )}
-
       {/* My Creations Button - static, centered above How It Works */}
       {!selectedFile && !showFlowFromEmail && !viewingLastCreation && hasAnyCreations && (
-        <div ref={myCreationsRef} className={`flex flex-col items-center py-6 -mt-8 gap-2 ${scrollLocked ? 'relative z-50' : ''}`}>
+        <div className="flex flex-col items-center py-6 -mt-8 gap-2">
           {/* "Your portrait is ready!" message when just generated */}
           {justGenerated && (
             <div 
@@ -243,9 +209,6 @@ export default function Home() {
             onClick={() => {
               setIsCreationsModalOpen(true);
               setJustGenerated(false);
-              // Unlock scroll when they click the button
-              setScrollLocked(false);
-              document.body.style.overflow = '';
             }}
             className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
               justGenerated ? 'animate-pulse scale-105' : ''
@@ -275,19 +238,6 @@ export default function Home() {
             </svg>
             <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>My Creations</span>
           </button>
-          
-          {/* Hint text during scroll lock */}
-          {scrollLocked && (
-            <div 
-              className="text-xs mt-2 animate-pulse"
-              style={{ 
-                color: 'rgba(197, 165, 114, 0.8)',
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-              }}
-            >
-              Tap to view your portraits
-            </div>
-          )}
         </div>
       )}
 
