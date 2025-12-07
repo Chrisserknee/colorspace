@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { saveMetadata, getMetadata, addCustomer, markSubscriberAsPurchased, supabase } from "@/lib/supabase";
 import { sendPortraitEmail } from "@/lib/email";
+import { sendCanvasUpsellEmail } from "@/lib/lumeEmails";
 import { createFullCanvasOrder, CanvasSize, ShippingAddress } from "@/lib/printify";
 import { trackServerCompletePayment } from "@/lib/tiktok-server";
 
@@ -153,6 +154,24 @@ export async function POST(request: NextRequest) {
                 console.log(`📧 Confirmation email sent to ${customerEmail}`);
               } else {
                 console.warn(`⚠️ Failed to send email: ${emailResult.error}`);
+              }
+              
+              // Send canvas upsell email immediately after purchase
+              try {
+                const upsellResult = await sendCanvasUpsellEmail(customerEmail, imageId, 1);
+                if (upsellResult.success) {
+                  // Mark email 1 as sent in the database
+                  await supabase
+                    .from("paying_customers")
+                    .update({ canvas_email_1_sent_at: new Date().toISOString() })
+                    .eq("email", customerEmail.toLowerCase().trim());
+                  console.log(`🖼️ Canvas upsell email sent to ${customerEmail}`);
+                } else {
+                  console.warn(`⚠️ Failed to send canvas upsell email: ${upsellResult.error}`);
+                }
+              } catch (upsellError) {
+                console.warn(`⚠️ Canvas upsell email error:`, upsellError);
+                // Don't fail the webhook for upsell email errors
               }
             }
           } catch (error) {
