@@ -211,7 +211,7 @@ export default function UploadModal({ isOpen, onClose, onFileSelected, theme = "
             {isRainbowBridge ? "Choose Your Pet's Photo" : "Choose Your Pet Photo"}
           </h3>
           <p style={{ color: colors.subtitleColor }}>
-            {isRainbowBridge ? "Select a cherished photo of your beloved companion" : "Select a clear, well-lit photo of your pet (up to 4 pets OK!)"}
+            {isRainbowBridge ? "Select a cherished photo of your beloved companion" : "Select a clear, well-lit photo of your pet"}
           </p>
         </div>
 
