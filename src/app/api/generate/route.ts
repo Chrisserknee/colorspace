@@ -3935,54 +3935,68 @@ A unique palette each generation. Backgrounds remain darker. Cloaks and royal ga
 IDENTITY PRESERVATION
 The portrait must be unmistakably THESE EXACT pets together. Preserve for ALL ${petCount} pets: all facial structure, markings, eye shape, proportion, coloring, gradients, asymmetry, snout shape, and ear position. Do not alter markings or colors.
 
-ROYAL WARDROBE – CLOAK, GARMENTS, AND CLASP
-Pets rest naturally together on a large embroidered velvet cushion. Each pet has a cloak draped over its back as a true cloak.
+=== MULTI-PET PORTRAIT REQUIREMENTS — ELEGANCE, COMPOSITION, AND MATCHED ROYALTY ===
 
-ELEGANCE REQUIREMENT:
-Clothing must be exceptionally elegant, royal, and luxurious, reflecting the highest aristocratic fashion of the 18th century.
-The cloaks and garments must feel crafted for nobility, using only rich, refined, elevated materials.
+CLOAK ELEGANCE & CONSTRUCTION (MULTI-PET VERSION):
 
-CLOAK REQUIREMENTS:
+Each pet must wear a cloak that is MORE ELEGANT, LUMINOUS, and REFINED than single-pet portraits.
 
-Each cloak must be lighter-colored, luminous, elegant, and visually stunning
+Cloaks should use lighter, brighter noble colors such as: ivory, champagne, soft gold, pale blue, sky blue, silver-lavender, soft rose, silver-green
 
-Colors may include: cream, ivory, pale gold, champagne, silver-blue, sky blue, soft rose, light lavender
+Cloaks must NEVER look like simple blankets — each cloak must ALWAYS include:
+- A visible silver or gold CONNECTING CHAIN across the chest
+- A functional ORNATE CLASP (round, engraved, polished, matched to jewelry metal)
 
-Silky or satin-like with flowing, graceful folds and natural sheen
+Cloaks must maintain deep folds, royal drape, baroque patterns, and fur trim seen in reference style.
 
-Embroidery, woven patterns, or subtle embellishments encouraged when appropriate
+Cloak colors should DIFFER between pets but remain within the same royal palette family.
 
-Each cloak must elevate the portrait to a royal, high-status appearance
+JEWELRY REQUIREMENTS (MULTI-PET VERSION):
 
-Each pet can have a different colored cloak
+Jewelry must be EVEN MORE beautiful, shiny, ornate, and gleaming than single-pet portraits.
 
-CLASP REQUIREMENTS:
+Use light bright gold or light luminous 925 silver ONLY.
 
-A functional cloak clasp at the upper chest holds each garment securely
+Metal should have HIGH SHINE, crisp reflections, and a shimmering surface.
 
-The clasp must match the jewelry metal
+Pendants should be LARGER and MORE EYE-CATCHING in multi-pet compositions.
 
-Made of polished gold or bright 925 silver
+Gemstones must be extremely vivid with bright internal glow, brilliance, and clarity.
 
-Ornate, engraved, aristocratic detailing
+Pets may wear layered jewelry, elegant chains, or paired pendants that visually complement each other.
 
-JEWELRY REQUIREMENTS:
+Jewelry style must complement across pets — not identical, but sharing the same visual luxury level.
 
-Jewelry must be EXQUISITELY BEAUTIFUL - museum-quality heirloom pieces
+Jewelry must always feel royal, handcrafted, aristocratic, and NEVER minimal.
 
-Use HIGHLY POLISHED gold or sterling 925 silver with mirror-like shine
+MULTI-PET COMPOSITION RULES:
 
-Gemstones must be BRILLIANTLY CUT with exceptional clarity and fire - rubies, sapphires, emeralds, diamonds, pearls
+The overall portrait must become MORE ELEGANT, BALANCED, and SYMMETRICALLY COMPOSED when two or more pets are present.
 
-Include INTRICATE FILIGREE work, delicate scrollwork, and hand-engraved details
+Place pets in a HARMONIOUS ARRANGEMENT, both posed naturally with serene, Renaissance-inspired presence.
 
-Layer multiple pieces: elegant necklaces, pendants, chains, and brooches
+Ensure BOTH cloaks are fully visible and elegantly draped.
 
-Pearl strands with lustrous, creamy overtones
+Show more of the ORNATE PILLOWS beneath them, using:
+- Brighter colors (ruby, sapphire, emerald, amethyst, gold, teal)
+- Victorian brocade patterns
+- Gold embroidery or damask motifs
 
-Designs must appear handcrafted by master jewelers for royalty - never mass-produced or plain
+Lighting must be slightly BRIGHTER, SOFTER, and MORE LUMINOUS, especially on the cloaks and jewelry.
 
-Each piece should catch the light and sparkle magnificently
+Each pet must maintain its own spotlight, yet the overall portrait should feel GRAND, UNIFIED, and ELEVATED.
+
+ENHANCED ELEGANCE REQUIREMENT (MULTI-PET EDITION):
+
+When multiple pets appear, the portrait must become:
+- MORE ORNATE
+- MORE VICTORIAN-ROYAL
+- MORE LUMINOUS and REFINED
+- MORE DETAILED in cloak texture, fur trim, pillow patterns, and background richness
+
+The final image should feel like a DOUBLE ROYAL PORTRAIT commissioned by historical nobility.
+
+=== END MULTI-PET REQUIREMENTS ===
 
 COMPOSITION – SUBJECTS OFTEN FARTHER AWAY
 The pets must not always be close-up. Frequently show:
@@ -4016,7 +4030,7 @@ ${petDescriptionsList}
 ${multiPetCombinedDescription ? `Together: ${multiPetCombinedDescription}` : ""}
 
 OVERALL GOAL
-A luminous, regal antique oil portrait with extremely thick, dimensional oil paint; darker backgrounds; elevated, royal clothing and jewelry; silky luminous cloaks held by ornate clasps; a composition showing more of the figures; and serene Renaissance-inspired natural poses. The portrait must remain instantly recognizable as these specific pets.`;
+A luminous, regal antique oil portrait of ${petCountWord} pets with extremely thick, dimensional oil paint; darker backgrounds; elevated Victorian-royal clothing and jewelry MORE ORNATE than single-pet portraits; visible connecting chains and ornate clasps; silky luminous cloaks in coordinating but different colors; ornate vibrant pillows with Victorian patterns; a balanced symmetrical composition showing more of the figures; and serene Renaissance-inspired natural poses. The portrait must feel like a GRAND DOUBLE ROYAL PORTRAIT and remain instantly recognizable as these specific pets.`;
 
       console.log("Multi-pet img2img prompt length:", multiPetImg2ImgPrompt.length);
       
