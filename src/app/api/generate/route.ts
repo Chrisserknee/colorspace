@@ -3512,8 +3512,13 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     // CRITICAL: All generation types (free, pack credit, secret credit) use the SAME model selection logic.
     // The only difference is watermarking - the actual generation is identical for all types.
     // useSecretCredit and usePackCredit do NOT affect model selection - only watermarking.
-    const useStableDiffusion = process.env.USE_STABLE_DIFFUSION === "true" && process.env.REPLICATE_API_TOKEN;
-    const sdModel = process.env.SD_MODEL || "flux"; // "flux", "sd3", "sdxl-img2img"
+    // Check SD mode - must be explicitly "true" (string) and REPLICATE_API_TOKEN must be set
+    const sdEnvValue = process.env.USE_STABLE_DIFFUSION;
+    const hasReplicateToken = !!process.env.REPLICATE_API_TOKEN;
+    const useStableDiffusion = sdEnvValue === "true" && hasReplicateToken;
+    const sdModel = process.env.SD_MODEL || "flux-img2img"; // Default to img2img for identity preservation
+    
+    // Only use OpenAI if SD is NOT enabled
     const useOpenAIImg2Img = !useStableDiffusion && process.env.USE_OPENAI_IMG2IMG === "true" && process.env.OPENAI_API_KEY;
     const useComposite = !useStableDiffusion && !useOpenAIImg2Img && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
     const useStyleTransfer = !useStableDiffusion && !useOpenAIImg2Img && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
@@ -3521,14 +3526,21 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     
     console.log("=== IMAGE GENERATION ===");
     console.log("Environment check:");
-    console.log("- USE_STABLE_DIFFUSION:", process.env.USE_STABLE_DIFFUSION || "not set", "(⚠️ LOCAL TESTING ONLY)");
-    console.log("- SD_MODEL:", process.env.SD_MODEL || "flux (default)");
+    console.log("- USE_STABLE_DIFFUSION:", sdEnvValue || "not set", sdEnvValue === "true" ? "✅ ENABLED" : "❌ NOT ENABLED", "(⚠️ LOCAL TESTING ONLY)");
+    console.log("- REPLICATE_API_TOKEN:", hasReplicateToken ? "✅ set" : "❌ not set");
+    console.log("- SD Mode Active:", useStableDiffusion ? "✅ YES" : "❌ NO");
+    if (!useStableDiffusion && sdEnvValue !== "true") {
+      console.log("⚠️ To enable SD mode, set USE_STABLE_DIFFUSION=true in .env.local");
+    }
+    if (!useStableDiffusion && !hasReplicateToken) {
+      console.log("⚠️ REPLICATE_API_TOKEN is required for SD mode");
+    }
+    console.log("- SD_MODEL:", process.env.SD_MODEL || `${sdModel} (default)`);
     console.log("- USE_OPENAI_IMG2IMG:", process.env.USE_OPENAI_IMG2IMG || "not set");
     console.log("- USE_COMPOSITE:", process.env.USE_COMPOSITE || "not set");
     console.log("- USE_STYLE_TRANSFER:", process.env.USE_STYLE_TRANSFER || "not set");
     console.log("- USE_IP_ADAPTER:", process.env.USE_IP_ADAPTER || "not set");
     console.log("- OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "set" : "not set");
-    console.log("- REPLICATE_API_TOKEN:", process.env.REPLICATE_API_TOKEN ? "set" : "not set");
     console.log("- IS_MULTI_PET:", isMultiPet ? "true" : "false");
     
     let firstGeneratedBuffer: Buffer;
@@ -3829,15 +3841,16 @@ CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match t
         .png()
         .toBuffer();
       
+      // Convert to data URL format for SD models
       const sdBase64 = processedForSD.toString("base64");
+      const sdDataUrl = `data:image/png;base64,${sdBase64}`;
       
-      // Use img2img models for better identity preservation
-      const effectiveModel = ["flux", "sd3"].includes(sdModel) ? sdModel : sdModel;
+      console.log(`📤 Sending image to SD model ${sdModel} (${processedForSD.length} bytes)`);
       
       firstGeneratedBuffer = await generateWithStableDiffusion(
-        sdBase64,
+        sdDataUrl,
         sdPrompt,
-        effectiveModel
+        sdModel
       );
       
       console.log("✅ Stable Diffusion generation complete");
