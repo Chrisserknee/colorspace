@@ -593,14 +593,17 @@ async function generateWithStableDiffusion(
     : `data:image/jpeg;base64,${referenceImageBase64}`;
 
   // Get SD-specific parameters from environment
+  // Lower strength = more identity preserved (0.5-0.7 recommended for pets)
   const sdGuidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
   const sdSteps = parseInt(process.env.SD_STEPS || "30");
-  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.75"); // For img2img - how much to change
+  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.65"); // Lowered from 0.75 for better identity preservation
+  const ipAdapterScale = parseFloat(process.env.IP_ADAPTER_SCALE || "0.85"); // Higher = more identity (0.7-0.9)
 
   console.log("SD parameters:");
   console.log("- Guidance scale:", sdGuidanceScale);
   console.log("- Steps:", sdSteps);
   console.log("- Strength (img2img):", sdStrength);
+  console.log("- IP-Adapter scale:", ipAdapterScale, "(higher = more identity preserved)");
   console.log("- Prompt length:", prompt.length);
 
   try {
@@ -710,7 +713,7 @@ async function generateWithStableDiffusion(
             image: imageDataUrl,
             prompt: prompt,
             negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated",
-            ip_adapter_scale: 0.8,
+            ip_adapter_scale: ipAdapterScale,
             num_inference_steps: sdSteps,
             guidance_scale: sdGuidanceScale,
           }
@@ -3676,7 +3679,9 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
     console.log("🔍 DEBUG - Comparison check:", sdEnvValue === "true", "(should be true if env var is set correctly)");
     
     const useStableDiffusion = sdEnvValue === "true" && hasReplicateToken;
-    const sdModel = process.env.SD_MODEL || "flux-img2img"; // Default to img2img for identity preservation
+    // Default to ip-adapter-faceid for best identity preservation (works great for pet faces too)
+    // Alternatives: sdxl-controlnet (structure), sdxl-img2img (balance), flux-img2img (quality)
+    const sdModel = process.env.SD_MODEL || "ip-adapter-faceid";
     
     // OpenAI DISABLED - Using Stable Diffusion only
     const useOpenAIImg2Img = false; // Disabled - using SD only
