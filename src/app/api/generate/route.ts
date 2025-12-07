@@ -3910,49 +3910,112 @@ RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHW
       // Using img2img preserves all pets' identities from the original photo
       // IMPORTANT: This prompt mirrors the single-pet prompt structure for consistent style
       const multiPetImg2ImgPrompt = `CRITICAL SPECIES LOCK
-These are ${speciesDescription}. Keep ALL ${petCount} pets exactly as shown - preserve all animals precisely. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. DO NOT change any of the pets at all - keep them exactly as shown in the original image. ${notSpecies}
+These are ${speciesDescription}. Generate ONLY real ${speciesDescription}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. Do NOT generate: ${notSpecies}.
 
 MASTER STYLE
-Generate an 18th-century European aristocratic oil portrait of ${petCountWord} pets with bright, luminous lighting and elegant old-master brushwork. Use rich fabrics such as velvet, silk, or ermine, with gold embroidery, polished metal clasps, and gemstone accents. Backgrounds must be colorful and vibrant: royal blue, emerald, burgundy, soft cream, dusty rose, or periwinkle. Mood is noble, bright, cheerful, and museum-quality. Avoid dark brown or muddy backgrounds.
+18th-century European aristocratic oil portrait of ${petCountWord} pets with bright, luminous lighting on the subjects and a darker, rich background (navy, deep emerald, burgundy, charcoal, midnight blue). Maintain a regal, elegant, historically accurate atmosphere with refined composition and classical staging.
 
-PAINTING TECHNIQUE
-Loose, flowing, feathery brushwork inspired by Gainsborough, Reynolds, and Vigée Le Brun. Visible texture: subtle canvas weave, soft impasto, bristle marks, natural glazing, and atmospheric sfumato depth. Warm highlights and rich shadows.
+PAINTING TECHNIQUE – EXTREMELY THICK OIL
+The painting must use very thick, defined, sculptural oil paint:
+
+Heavy impasto across major forms
+
+Strong, bold, raised brush strokes clearly visible
+
+Deep texture where paint stands up from the canvas
+
+Directional bristle marks that carve into the paint
+
+Palette knife-like ridges and layered pigment
+
+Subtle canvas weave only in thinner areas
+
+Color blending should feel physical, not digital
+
+Brushwork must read as thick, hand-painted, and three-dimensional, never smooth or flat.
 
 ANTIQUE AGING
-Apply light-to-medium aging: soft craquelure, warm aged varnish glow, mild edge wear. Avoid excessive grime or heavy degradation.
+Soft craquelure, warm aged varnish glow, mild edge wear. Keep aging elegant, not overly distressed.
 
 COLOR PALETTE
-Use a unique, vibrant palette for every generation. Acceptable tones include jewel colors (ruby, sapphire, emerald, amethyst), soft pastels (blush, lavender, periwinkle, cream), and deep tones (navy, teal, charcoal black). Colors must complement the pets' fur and increase subject contrast. RANDOMIZE colors each generation - avoid repetitive pink/blue schemes. Each pet can have a DIFFERENT colored cloak - variety is beautiful.
+A unique palette every time. The background is darker for contrast. Clothing, cloaks, and jewelry may use jewel tones or soft pastels. All colors must enhance visibility of the pets and cloaks. Each pet can have a DIFFERENT colored cloak - variety is beautiful.
 
 IDENTITY PRESERVATION
 Portrait must be instantly recognizable as THESE SPECIFIC pets together. Preserve for ALL ${petCount} pets:
 
-Exact facial structure for each pet
+Exact facial structure and proportions for each pet
 
-Eye shape, color, spacing, and expression for each pet
+Eye shape, spacing, color, and expression for each pet
 
-Ear shape and positioning for each pet
+Markings in their correct locations for each pet
+
+True fur colors and gradients for each pet
+
+Asymmetry for each pet
 
 Snout/muzzle proportions for each pet
 
-Accurate markings in correct locations for each pet
+Ear shape and positioning for each pet
 
-Coat patterns, gradients, and asymmetry for each pet
-Do not alter markings or colors.
+No alteration of markings or colors.
 
-ROYAL COSTUME ELEMENT
-Pets are resting naturally together on a large embroidered velvet cushion. Each pet has a regal cloak draped over its back (not clothing), secured by a polished silver or gold cloak clasp. Include elegant jewelry for each pet. Maintain natural animal posture. No human-like posing.
+ROYAL WARDROBE – CLOAK AND CLASP
+Pets are placed naturally together on a large embroidered velvet cushion. Each pet has a cloak draped over its back as a true cloak.
 
-COMPOSITION
-Use balanced, elegant portrait composition for ${petCountWord} pets together. VERY ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies with space around them. Pet(s) should occupy only 60-70% of frame height. WIDE and CENTERED composition with all pets clearly visible. AMPLE HEADROOM above ALL pets - at least 15% of frame as background above tallest ears. Position pets CLOSE TOGETHER like companions - arranged naturally.
+CLOAK REQUIREMENTS:
+
+Each cloak must be lighter-colored, elegant, beautiful, luminous, and refined
+
+Silky or satin-like with flowing folds
+
+Cloaks must glow slightly against the darker background
+
+Cloak colors should vary (cream, ivory, pale gold, light lavender, sky blue, soft rose, silver blue, champagne)
+
+Each pet can have a different colored cloak
+
+CLASP REQUIREMENTS:
+
+A functional cloak clasp holds each cloak together at the upper chest
+
+Clasp design must match the jewelry
+
+Polished gold or bright 925 silver
+
+Engraved, ornate, historically accurate design
+
+Refined, elegant craftsmanship
+
+JEWELRY REQUIREMENTS:
+
+Jewelry must look very elegant and precious, not simple
+
+Gold or 925 silver with small, bright gemstones
+
+Gemstones must sparkle with clarity
+
+Designs should feel aristocratic, detailed, and refined
+
+COMPOSITION – SUBJECTS FURTHER AWAY
+The pets must NOT always be close-up. Use varied framing:
+
+Frequently show the subjects farther away
+
+More of the bodies visible
+
+More of the cloaks, clasps, and environment included
+
+Balanced portrait composition, not a tight headshot
+
+VERY ZOOMED OUT FRAMING - show ALL ${petCount} pets' full bodies with space around them. Pet(s) should occupy only 60-70% of frame height. WIDE and CENTERED composition with all pets clearly visible. AMPLE HEADROOM above ALL pets - at least 15% of frame as background above tallest ears. Position pets CLOSE TOGETHER like companions - arranged naturally.
 
 PET DESCRIPTIONS
-Follow all details precisely as provided for each pet:
+Follow all details precisely:
 ${petDescriptionsList}
 ${multiPetCombinedDescription ? `Together: ${multiPetCombinedDescription}` : ""}
 
 OVERALL GOAL
-Create a bright, noble, museum-quality antique portrait that captures the pets' personalities together and is unmistakably the owner's pets.`;
+A luminous, regal antique oil portrait with extremely thick, defined oil brush strokes, a darker background, a farther-away composition, more elegant gold or 925 silver jewelry, and lighter, more beautiful silky cloaks held together by matching ornate clasps. The portrait must remain unmistakably these pets.`;
 
       console.log("Multi-pet img2img prompt length:", multiPetImg2ImgPrompt.length);
       
@@ -4352,51 +4415,112 @@ This is a LARGE DOG breed. You MUST create a WIDE SHOT showing the dog from a di
       
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${largeDogImg2ImgPrefix}
 CRITICAL SPECIES LOCK
-This is a ${species}. Generate ONLY a real ${species}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. DO NOT change the ${species} at all - keep it exactly as shown in the original image. ${notSpecies}
+This is a ${species}. Generate ONLY a real ${species}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. Do NOT generate: ${notSpecies}.
 
 MASTER STYLE
-Generate an 18th-century European aristocratic oil portrait with bright, luminous lighting and elegant old-master brushwork. Use rich fabrics such as velvet, silk, or ermine, with gold embroidery, polished metal clasps, and gemstone accents. Backgrounds must be colorful and vibrant: royal blue, emerald, burgundy, soft cream, dusty rose, or periwinkle. Mood is noble, bright, cheerful, and museum-quality. Avoid dark brown or muddy backgrounds.
+18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a darker, rich background (navy, deep emerald, burgundy, charcoal, midnight blue). Maintain a regal, elegant, historically accurate atmosphere with refined composition and classical staging.
 
-PAINTING TECHNIQUE
-Loose, flowing, feathery brushwork inspired by Gainsborough, Reynolds, and Vigée Le Brun. Visible texture: subtle canvas weave, soft impasto, bristle marks, natural glazing, and atmospheric sfumato depth. Warm highlights and rich shadows.
+PAINTING TECHNIQUE – EXTREMELY THICK OIL
+The painting must use very thick, defined, sculptural oil paint:
+
+Heavy impasto across major forms
+
+Strong, bold, raised brush strokes clearly visible
+
+Deep texture where paint stands up from the canvas
+
+Directional bristle marks that carve into the paint
+
+Palette knife-like ridges and layered pigment
+
+Subtle canvas weave only in thinner areas
+
+Color blending should feel physical, not digital
+
+Brushwork must read as thick, hand-painted, and three-dimensional, never smooth or flat.
 
 ANTIQUE AGING
-Apply light-to-medium aging: soft craquelure, warm aged varnish glow, mild edge wear. Avoid excessive grime or heavy degradation.
+Soft craquelure, warm aged varnish glow, mild edge wear. Keep aging elegant, not overly distressed.
 
 COLOR PALETTE
-Use a unique, vibrant palette for every generation. Acceptable tones include jewel colors (ruby, sapphire, emerald, amethyst), soft pastels (blush, lavender, periwinkle, cream), and deep tones (navy, teal, charcoal black). Colors must complement the pet's fur and increase subject contrast.
+A unique palette every time. The background is darker for contrast. Clothing, cloaks, and jewelry may use jewel tones or soft pastels. All colors must enhance visibility of the pet and cloak.
 
 IDENTITY PRESERVATION
 Portrait must be instantly recognizable as THIS specific pet. Preserve:
 
-Exact facial structure
+Exact facial structure and proportions
 
-Eye shape, color, spacing, and expression
+Eye shape, spacing, color, and expression
 
-Ear shape and positioning
+Markings in their correct locations
+
+True fur colors and gradients
+
+Asymmetry
 
 Snout/muzzle proportions
 
-Accurate markings in correct locations
+Ear shape and positioning
 
-Coat patterns, gradients, and asymmetry
-Do not alter markings or colors.
+No alteration of markings or colors.
 
-ROYAL COSTUME ELEMENT
-Pet is resting naturally on ${cushion}. A ${robe} is draped over its back (not clothing), secured by a polished silver cloak clasp. Include ${jewelryItem} if provided. Maintain natural animal posture. No human-like posing.
+ROYAL WARDROBE – CLOAK AND CLASP
+The pet is placed naturally on ${cushion}. A ${robe} is draped over its back as a true cloak.
 
-COMPOSITION
-Use balanced, elegant portrait composition. Full-body or half-body framing (not overly zoomed). Soft luminous background with atmospheric depth.
+CLOAK REQUIREMENTS:
+
+Cloak must be lighter-colored, elegant, beautiful, luminous, and refined
+
+Silky or satin-like with flowing folds
+
+Cloak must glow slightly against the darker background
+
+Cloak color should vary (cream, ivory, pale gold, light lavender, sky blue, soft rose, silver blue, champagne)
+
+CLASP REQUIREMENTS:
+
+A functional cloak clasp holds the cloak together at the upper chest
+
+Clasp design must match the jewelry
+
+Polished gold or bright 925 silver
+
+Engraved, ornate, historically accurate design
+
+Refined, elegant craftsmanship
+
+JEWELRY REQUIREMENTS:
+
+Jewelry must look very elegant and precious, not simple
+
+Gold or 925 silver with small, bright gemstones
+
+Gemstones must sparkle with clarity
+
+Designs should feel aristocratic, detailed, and refined
+
+COMPOSITION – SUBJECT FURTHER AWAY
+The pet must NOT always be close-up. Use varied framing:
+
+Frequently show the subject farther away
+
+More of the body visible
+
+More of the cloak, clasp, and environment included
+
+Balanced portrait composition, not a tight headshot
+
+Use provided variables:
 ${compositionInstructions}
 ${poseInstructions}
 ${facialStructureSection}
 
 PET DESCRIPTION
-Follow all details precisely as provided:
+Follow all details precisely:
 ${petDescription}${genderInfo}${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}${agePreservationInstructions}
 
 OVERALL GOAL
-Create a bright, noble, museum-quality antique portrait that captures the pet's personality and is unmistakably the owner's pet.`;
+A luminous, regal antique oil portrait with extremely thick, defined oil brush strokes, a darker background, a farther-away composition, more elegant gold or 925 silver jewelry, and a lighter, more beautiful silky cloak held together by a matching ornate clasp. The portrait must remain unmistakably this pet.`;
 
       // Add custom prompt for studio mode
       const finalOpenAIPrompt = customPrompt 
