@@ -721,42 +721,109 @@ async function generateWithStableDiffusion(
     }
 
     console.log("SD generation complete, output type:", typeof output);
+    console.log("SD output value:", JSON.stringify(output, null, 2).substring(0, 500)); // Log first 500 chars
 
     // Handle various output formats from Replicate
     let buffer: Buffer;
     
-    if (Array.isArray(output) && output.length > 0) {
-      const imageUrl = typeof output[0] === 'string' ? output[0] : (output[0] as { url: string }).url;
-      console.log("Downloading from URL...");
-      const response = await fetch(imageUrl);
-      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
-      buffer = Buffer.from(await response.arrayBuffer());
-    } else if (typeof output === 'object' && output !== null) {
-      // Handle FileOutput or object with url
-      const fileOutput = output as { url?: () => string | Promise<string> } | { url: string };
-      let url: string;
-      
-      if ('url' in fileOutput) {
-        if (typeof fileOutput.url === 'function') {
-          url = await fileOutput.url();
+    try {
+      if (Array.isArray(output) && output.length > 0) {
+        console.log("📦 Output is array, length:", output.length);
+        const firstItem = output[0];
+        let imageUrl: string;
+        
+        if (typeof firstItem === 'string') {
+          imageUrl = firstItem;
+        } else if (typeof firstItem === 'object' && firstItem !== null && 'url' in firstItem) {
+          const urlValue = (firstItem as { url: string | (() => string | Promise<string>) }).url;
+          if (typeof urlValue === 'function') {
+            imageUrl = await urlValue();
+          } else {
+            imageUrl = urlValue;
+          }
         } else {
-          url = fileOutput.url;
+          throw new Error(`Unexpected array item type: ${typeof firstItem}`);
         }
-        console.log("Downloading from URL...");
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
+        
+        console.log("📥 Downloading from URL:", imageUrl);
+        if (!imageUrl || typeof imageUrl !== 'string') {
+          throw new Error(`Invalid URL: ${imageUrl}`);
+        }
+        const response = await fetch(imageUrl);
+        if (!response.ok) throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
+        buffer = Buffer.from(await response.arrayBuffer());
+      } else if (typeof output === 'object' && output !== null) {
+        // Handle FileOutput or object with url
+        console.log("📦 Output is object, keys:", Object.keys(output));
+        const fileOutput = output as { url?: string | (() => string | Promise<string>) } | { url: string };
+        
+        if ('url' in fileOutput && fileOutput.url !== undefined) {
+          let url: string | null = null;
+          let streamHandled = false;
+          
+          if (typeof fileOutput.url === 'function') {
+            console.log("🔗 url is a function, calling it...");
+            const urlResult = await fileOutput.url();
+            console.log("🔗 url() returned:", typeof urlResult, typeof urlResult === 'string' ? urlResult.substring(0, 100) : urlResult);
+            
+            // Handle if url() returns a ReadableStream or other non-string
+            if (typeof urlResult === 'string') {
+              url = urlResult;
+            } else if (urlResult instanceof ReadableStream || (urlResult && typeof (urlResult as any).getReader === 'function')) {
+              // If it's a ReadableStream, we need to read it directly
+              console.log("📥 Reading from ReadableStream...");
+              const reader = (urlResult as ReadableStream).getReader();
+              const chunks: Uint8Array[] = [];
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                if (value) chunks.push(value);
+              }
+              buffer = Buffer.concat(chunks.map(chunk => Buffer.from(chunk)));
+              console.log(`✅ Read ${buffer.length} bytes from stream`);
+              streamHandled = true;
+            } else {
+              throw new Error(`url() returned unexpected type: ${typeof urlResult}. Value: ${JSON.stringify(urlResult)}`);
+            }
+          } else if (typeof fileOutput.url === 'string') {
+            url = fileOutput.url;
+          } else {
+            throw new Error(`url property is not a string or function: ${typeof fileOutput.url}`);
+          }
+          
+          // Only fetch if we got a URL string (not a stream)
+          if (!streamHandled && url) {
+            console.log("📥 Downloading from URL:", url);
+            if (!url.startsWith('http')) {
+              throw new Error(`Invalid URL format: ${url}`);
+            }
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
+            buffer = Buffer.from(await response.arrayBuffer());
+          } else if (!streamHandled) {
+            throw new Error("No URL or stream available from output");
+          }
+        } else {
+          console.error("❌ Object output missing 'url' property. Output:", JSON.stringify(output, null, 2).substring(0, 500));
+          throw new Error("Unexpected output format from SD model: object without 'url' property");
+        }
+      } else if (typeof output === 'string') {
+        // Direct URL
+        console.log("📥 Downloading from direct URL string:", output);
+        if (!output.startsWith('http')) {
+          throw new Error(`Invalid URL string: ${output}`);
+        }
+        const response = await fetch(output);
+        if (!response.ok) throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
         buffer = Buffer.from(await response.arrayBuffer());
       } else {
-        throw new Error("Unexpected output format from SD model");
+        console.error("❌ Unexpected output type:", typeof output, "value:", output);
+        throw new Error(`No valid image output from SD model. Type: ${typeof output}`);
       }
-    } else if (typeof output === 'string') {
-      // Direct URL
-      console.log("Downloading from direct URL...");
-      const response = await fetch(output);
-      if (!response.ok) throw new Error(`Failed to download: ${response.status}`);
-      buffer = Buffer.from(await response.arrayBuffer());
-    } else {
-      throw new Error("No valid image output from SD model");
+    } catch (error) {
+      console.error("❌ Error processing SD output:", error);
+      console.error("❌ Output was:", JSON.stringify(output, null, 2));
+      throw error;
     }
     
     console.log(`✅ SD generation complete (${model}), buffer size: ${buffer.length} bytes`);
