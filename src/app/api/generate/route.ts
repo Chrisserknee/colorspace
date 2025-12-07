@@ -165,15 +165,28 @@ function getCompositionForSize(breed: string, petDescription: string, species: s
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest`;
   }
   
-  // Standard composition for smaller pets
+  // Standard composition for smaller pets - STILL needs headroom
   return `COMPOSITION:
+=== CRITICAL FRAMING - HEADROOM REQUIRED ===
+- ALWAYS leave GENEROUS HEADROOM above the pet's ears - at least 10% of frame height
+- The TOP OF EARS must NEVER touch or approach the top edge of the frame
+- Position subject in LOWER 60% of the frame - NOT centered vertically
+- FULL HEAD visible including COMPLETE EARS with space above them
+- DO NOT crop ANY part of the head or ears - ever
+
+=== POSITIONING ===
 - Subject LOW and CENTRAL on ornate velvet throne cushion
 - NATURAL body position - comfortable, relaxed, at ease
 - Front paws visible, positioned naturally
 - Cloak draped naturally with realistic fabric folds
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest SECURING THE CLOAK CLOSED - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, catches the light brilliantly
 - Authentic, genuine expression
-- FULL HEAD visible including ears - do not crop`;
+
+=== ABSOLUTELY FORBIDDEN ===
+- NEVER crop the top of the head
+- NEVER crop ANY part of the ears
+- NEVER let ears touch the top edge of frame
+- NEVER center subject vertically - always leave headroom above`;
 }
 
 // Rainbow Bridge memorial quotes - randomly selected for each portrait
@@ -2677,13 +2690,18 @@ ${facialStructureAnalysis}
 - ABSOLUTELY FORBIDDEN: cropping ANY part of the head or ears
 - Think "full upper body portrait" not "head shot"` : `
 === COMPOSITION (CRITICAL - Follow Exactly) ===
-- Subject positioned LOW and CENTRAL - resting on cushion, not standing or floating
+*** HEADROOM IS MANDATORY - NEVER CROP EARS OR HEAD ***
+- ALWAYS leave GENEROUS HEADROOM above ears - at least 10% of frame height as background
+- TOP OF EARS must NEVER touch or approach the top edge of frame
+- Subject positioned LOW in frame - NOT centered vertically
+- FULL HEAD including COMPLETE EARS must be visible with clear space above
 - Body ¾ VIEW, head forward or slightly angled - classical portrait posture
 - FRONT PAWS VISIBLE and resting on cushion - signature trait
 - Cloak draped over body + cushion - looks heavy, rests naturally with realistic folds
 - BRIGHT POLISHED SILVER CLOAK CLASP at upper chest PROPERLY SECURING THE CLOAK - two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver finish, clasp HOLDS THE CLOAK TOGETHER at the chest
-- MEDIUM CLOSE-UP framing: chest to top of head (NOT full body, NOT face only)
-- Camera at pet's eye level or slightly above`;
+- MEDIUM CLOSE-UP framing: chest to top of head with HEADROOM (NOT full body, NOT face only)
+- Camera at pet's eye level or slightly above
+- ABSOLUTELY FORBIDDEN: cropping ANY part of head/ears, letting ears touch top edge`;
 
     // Species-specific pose instructions
     const poseInstructions = isLargeAnimal ? `
@@ -3537,8 +3555,17 @@ ${isLargeDog ? `*** LARGE DOG BREED - EXTRA ZOOM OUT REQUIRED ***
 - Think "full sitting portrait from several feet away"
 - NEVER crop the head or ears - full ears visible with background above them
 *** END LARGE DOG REQUIREMENTS ***
-` : ""}- ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
-- WIDE and CENTERED composition with space around the pet
+` : ""}
+=== HEADROOM REQUIREMENT (CRITICAL - NEVER CROP HEADS/EARS) ===
+- ALWAYS leave GENEROUS HEADROOM above the pet's ears - at least 10-15% of frame height
+- The TOP OF EARS must NEVER touch or come close to the top edge of the frame
+- Position pet in LOWER 60% of frame - NOT vertically centered
+- FULL HEAD including COMPLETE EARS must be visible with clear background space above
+- ABSOLUTELY FORBIDDEN: cropping ANY part of the head, ears touching top edge, tight framing
+
+=== FRAMING & COMPOSITION ===
+- ZOOMED OUT FRAMING - show MORE of the pet's body, not just head/shoulders
+- WIDE and CENTERED composition with generous space around the pet
 - Show FULL CUSHION with pet clearly SITTING or RESTING on it
 - Pet SEATED or LYING DOWN NATURALLY like a real ${species} would rest
 - NEVER standing upright like a human - always sitting, lying, or resting
