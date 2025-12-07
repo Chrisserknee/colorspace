@@ -40,23 +40,125 @@ async function analyzeImageDarkness(imageBuffer: Buffer): Promise<{ isDark: bool
   }
 }
 
-// Background colors for portrait variety - randomly selected for each portrait
-const PORTRAIT_BACKGROUND_COLORS = [
-  // Cool tones
-  "powder blue", "sky blue", "soft teal", "sapphire blue", "navy blue", "periwinkle", "slate blue",
-  // Warm tones
-  "soft pink", "dusty rose", "blush pink", "peach", "coral", "champagne", "warm cream",
-  // Neutrals
-  "charcoal black", "soft grey", "silver grey", "warm ivory", "pure white", "cream",
-  // Greens
-  "emerald green", "sage green", "mint green", "forest green", "olive green",
-  // Purples
-  "soft lavender", "lilac", "dusty purple", "mauve", "plum",
+// Portrait style palettes - each creates a unique mood
+const PORTRAIT_PALETTES = [
+  // SOFT & LIGHT palettes
+  {
+    name: "SOFT DAWN",
+    background: "soft muted peach with gentle warm undertones",
+    mood: "warm, gentle, serene",
+    cloakColor: "dusty rose velvet with subtle gold thread",
+    cushionColor: "warm cream with soft gold embroidery",
+    lighting: "soft diffused morning light, gentle and warm"
+  },
+  {
+    name: "MISTY LAVENDER",
+    background: "soft hazy lavender grey, dreamy and ethereal",
+    mood: "peaceful, dreamy, romantic",
+    cloakColor: "pale lilac velvet with silver accents",
+    cushionColor: "soft grey-lavender with pearl details",
+    lighting: "soft filtered light, gentle purple undertones"
+  },
+  {
+    name: "GENTLE SAGE",
+    background: "muted sage green with soft grey undertones",
+    mood: "calm, natural, tranquil",
+    cloakColor: "soft moss green velvet with gold trim",
+    cushionColor: "warm cream with sage embroidery",
+    lighting: "soft natural light, gentle and soothing"
+  },
+  {
+    name: "POWDER BLUE SERENITY",
+    background: "soft powder blue fading to pale grey",
+    mood: "serene, airy, calm",
+    cloakColor: "pale sky blue velvet with silver clasp",
+    cushionColor: "soft cream with blue accents",
+    lighting: "cool soft daylight, gentle and clear"
+  },
+  {
+    name: "WARM CREAM",
+    background: "soft warm cream with golden undertones",
+    mood: "classic, timeless, elegant",
+    cloakColor: "rich burgundy velvet with gold details",
+    cushionColor: "ivory velvet with gold tassels",
+    lighting: "warm golden afternoon light"
+  },
+  // MEDIUM TONES
+  {
+    name: "DUSTY TEAL",
+    background: "muted teal blue-green, sophisticated",
+    mood: "refined, sophisticated, calm",
+    cloakColor: "deep teal velvet with gold embroidery",
+    cushionColor: "warm gold velvet with teal accents",
+    lighting: "balanced warm-cool light"
+  },
+  {
+    name: "ANTIQUE ROSE",
+    background: "muted dusty rose with grey undertones",
+    mood: "vintage, romantic, soft",
+    cloakColor: "soft mauve velvet with pearl details",
+    cushionColor: "dusty pink with gold thread",
+    lighting: "soft romantic candlelight glow"
+  },
+  {
+    name: "SOFT SLATE",
+    background: "gentle blue-grey slate, neutral and elegant",
+    mood: "modern, clean, refined",
+    cloakColor: "charcoal velvet with silver clasp",
+    cushionColor: "soft grey with silver embroidery",
+    lighting: "soft diffused studio light"
+  },
+  // DARK & DRAMATIC palettes
+  {
+    name: "DEEP NIGHT",
+    background: "rich deep charcoal black with subtle warmth",
+    mood: "dramatic, mysterious, regal",
+    cloakColor: "deep burgundy velvet with gold trim",
+    cushionColor: "dark wine velvet with gold tassels",
+    lighting: "dramatic candlelight, warm highlights on dark"
+  },
+  {
+    name: "MIDNIGHT BLUE",
+    background: "deep midnight navy blue, rich and dark",
+    mood: "noble, dramatic, sophisticated",
+    cloakColor: "royal blue velvet with silver details",
+    cushionColor: "navy velvet with silver embroidery",
+    lighting: "moonlight effect, cool silver highlights"
+  },
+  {
+    name: "FOREST SHADOW",
+    background: "deep forest green with dark shadows",
+    mood: "rich, earthy, dramatic",
+    cloakColor: "deep emerald velvet with gold clasp",
+    cushionColor: "dark green velvet with gold accents",
+    lighting: "warm candlelight against dark green"
+  },
+  {
+    name: "PLUM DUSK",
+    background: "deep plum purple fading to dark",
+    mood: "luxurious, dramatic, royal",
+    cloakColor: "deep purple velvet with gold trim",
+    cushionColor: "dark plum velvet with gold tassels",
+    lighting: "warm golden light against rich purple"
+  },
+  {
+    name: "WARM CHARCOAL",
+    background: "warm charcoal grey with subtle brown undertones",
+    mood: "classic, timeless, distinguished",
+    cloakColor: "deep grey velvet with silver clasp",
+    cushionColor: "charcoal velvet with silver details",
+    lighting: "soft dramatic light, classic portrait style"
+  }
 ];
 
-// Helper to get a random background color
+// Helper to get a random palette
+function getRandomPalette(): typeof PORTRAIT_PALETTES[0] {
+  return PORTRAIT_PALETTES[Math.floor(Math.random() * PORTRAIT_PALETTES.length)];
+}
+
+// Legacy function for backwards compatibility
 function getRandomBackgroundColor(): string {
-  return PORTRAIT_BACKGROUND_COLORS[Math.floor(Math.random() * PORTRAIT_BACKGROUND_COLORS.length)];
+  return getRandomPalette().background;
 }
 
 // Natural relaxed pet poses - LYING DOWN focused for variety and authenticity
@@ -2852,9 +2954,11 @@ THIS IS A LARGE DOG BREED. You MUST zoom out and show a WIDE SHOT.
 
 ` : "";
 
-    // Get random pose for this generation
+    // Get random pose and palette for this generation - ensures uniqueness
     const selectedPose = getRandomNaturalPose();
-    console.log(`🎨 Selected pose for generation: ${selectedPose.name}`);
+    const selectedPalette = getRandomPalette();
+    console.log(`🎨 Selected pose: ${selectedPose.name}`);
+    console.log(`🎨 Selected palette: ${selectedPalette.name} (${selectedPalette.mood})`);
     
     const generationPrompt = `${largeDogFramingPrefix}
 *******************************************************************
@@ -2878,6 +2982,7 @@ COMPOSITION REQUIREMENT: ZOOMED OUT - FULL BODY VISIBLE
 
 CLOTHING REQUIREMENT: MINIMAL - SIMPLE ELEGANT CLOAK ONLY
 - ONE simple velvet CLOAK draped loosely over the pet's back/shoulders
+- CLOAK COLOR FOR THIS PORTRAIT: ${selectedPalette.cloakColor}
 - Cloak secured by a THIN SILVER CLASP at the chest - small and elegant, not bulky
 - NO heavy robes, NO multiple layers, NO elaborate costumes
 - NO ermine trim, NO excessive decorations, NO jewelry overload
@@ -2885,17 +2990,28 @@ CLOTHING REQUIREMENT: MINIMAL - SIMPLE ELEGANT CLOAK ONLY
 - Think: light elegant draping, NOT heavy ceremonial robes
 - The cloak should look like it could slip off naturally
 
+COLOR PALETTE FOR THIS PORTRAIT: "${selectedPalette.name}"
+- BACKGROUND: ${selectedPalette.background}
+- MOOD: ${selectedPalette.mood}
+- CUSHION: ${selectedPalette.cushionColor}
+- LIGHTING: ${selectedPalette.lighting}
+- Use SOFT, MUTED tones - not overly saturated or harsh
+- Colors should feel harmonious and refined
+
 ❌ DO NOT: Sitting upright like a statue
 ❌ DO NOT: Close-up head shot
 ❌ DO NOT: Cropped body - must show full body
 ❌ DO NOT: Heavy elaborate clothing covering the body
 ❌ DO NOT: Multiple necklaces and excessive jewelry
 ❌ DO NOT: Stiff formal pose
+❌ DO NOT: Harsh oversaturated colors
 
 ✓ MUST DO: ${selectedPose.name} pose as described above
 ✓ MUST DO: Full body visible, zoomed out wide shot
 ✓ MUST DO: Simple cloak with thin silver clasp
 ✓ MUST DO: Natural relaxed position on cushion
+✓ MUST DO: Use the "${selectedPalette.name}" color palette specified above
+✓ MUST DO: Soft, refined, harmonious coloring
 
 *******************************************************************
 
@@ -2904,21 +3020,30 @@ CRITICAL SPECIES REQUIREMENT: THIS IS A ${species}. YOU MUST GENERATE A ${specie
 THIS IS A ${species}. Generate a ${species}. ${notSpecies}
 
 === MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A highly refined 18th-century European aristocratic oil-portrait style featuring BRIGHT LUMINOUS lighting and smooth old-master brushwork. The pet wears ONLY a simple velvet cloak draped loosely, secured by a THIN ELEGANT SILVER CLASP - no heavy costumes or excessive clothing. The pet's natural body should be mostly visible.
+A refined 18th-century European aristocratic oil-portrait style featuring SOFT, MUTED, HARMONIOUS colors and smooth old-master brushwork. The pet wears ONLY a simple velvet cloak draped loosely, secured by a THIN ELEGANT SILVER CLASP - no heavy costumes or excessive clothing. The pet's natural body should be mostly visible.
 
-Compositions use COLORFUL backgrounds (royal blue, burgundy, forest green, soft cream, dusty rose - NEVER brown or dark) with the pet shown in FULL BODY from a DISTANCE. Colors are VIBRANT and LUMINOUS—BRIGHT REDS, GREENS, BLUES, and GOLDS—creating a regal, CHEERFUL, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT, and historically authentic. NOT dark, NOT gloomy.
+THIS PORTRAIT USES THE "${selectedPalette.name}" PALETTE:
+- Background: ${selectedPalette.background}
+- Cloak: ${selectedPalette.cloakColor}
+- Cushion: ${selectedPalette.cushionColor}
+- Lighting: ${selectedPalette.lighting}
+- Overall mood: ${selectedPalette.mood}
 
-=== VIBRANT COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
-- RANDOMIZE colors each generation - avoid repetitive color schemes
-- DARKS: Charcoal black, rich black, deep slate (for dramatic contrast)
-- LIGHTS: Pure white, soft cream, ivory, champagne (for airy feel)
-- GREYS: Silver grey, warm grey, dove grey, slate
-- BLUES: Powder blue, sky blue, navy, teal, sapphire, periwinkle
-- PINKS: Soft pink, dusty rose, blush, coral, peach
-- GREENS: Emerald, sage, mint, forest green, olive
-- PURPLES: Lavender, lilac, mauve, dusty purple
-- MIX IT UP: Each portrait should have a unique, different color palette
-- CREATE CONTRAST: Colors should make the pet stand out beautifully
+Colors should be SOFT and REFINED - muted tones, gentle harmonies, NOT harsh or oversaturated. Think soft watercolor elegance rather than bright poster colors. The overall mood is noble, elegant, and historically authentic with a gentle, refined quality.
+
+=== SOFT COLOR APPROACH (This Portrait: "${selectedPalette.name}") ===
+USE THESE SPECIFIC COLORS FOR THIS PORTRAIT:
+- Background: ${selectedPalette.background}
+- Cloak: ${selectedPalette.cloakColor}  
+- Cushion: ${selectedPalette.cushionColor}
+
+COLOR QUALITIES:
+- SOFT and MUTED - not harsh or oversaturated
+- HARMONIOUS - colors should blend and complement each other
+- REFINED - elegant, subtle tonal variations
+- GENTLE - avoid jarring contrasts or neon-bright colors
+- The palette should feel cohesive and intentional
+- Colors should enhance the pet, not compete with it
 
 === IDENTITY PRESERVATION - MOST CRITICAL - READ CAREFULLY ===
 This portrait MUST be instantly recognizable as THIS SPECIFIC ${species}. The owner should look at the portrait and immediately feel "That's MY pet!" NOT "that's A pet that looks similar."
