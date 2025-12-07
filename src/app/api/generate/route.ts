@@ -2370,7 +2370,49 @@ Respond with ONLY the species name.`,
         "DELICATE PERIWINKLE velvet cloak with silver star embroidery, twilight feminine softness, PURE BRIGHT WHITE fur trim, celestial grace"
       ];
       robe = feminineRobes[Math.floor(Math.random() * feminineRobes.length)];
+    } else if (gender === "male") {
+      // REFINED MASCULINE robes - soft, elegant, NOT harsh or overly bold
+      const refinedMasculineRobes = [
+        // Soft blues and greens
+        "ELEGANT DUSTY BLUE velvet cloak with subtle silver embroidery, soft refined texture, PURE WHITE ermine fur trim, gentleman's sophisticated grace",
+        "REFINED SOFT SAGE velvet cloak with delicate gold botanical patterns, gentle green tones, CREAM WHITE fur trim, understated woodland elegance",
+        "DISTINGUISHED POWDER BLUE velvet cloak with pearl button accents, soft airy texture, PURE BRIGHT WHITE fur trim, gentle aristocratic charm",
+        // Warm neutrals
+        "SOPHISTICATED WARM CREAM velvet cloak with gold filigree embroidery, soft ivory tones, PURE WHITE ermine fur trim, refined neutral elegance",
+        "ELEGANT CHAMPAGNE velvet cloak with rose gold thread detailing, warm soft tones, CREAM WHITE fur trim, gentle golden sophistication",
+        "REFINED SOFT TAUPE velvet cloak with silver embroidery accents, muted earth tones, PURE WHITE fur trim, understated nobility",
+        // Soft burgundies and mauves
+        "GENTLE DUSTY BURGUNDY velvet cloak with gold thread patterns, softened wine tones, PURE BRIGHT WHITE ermine fur trim, refined warmth",
+        "ELEGANT SOFT MAUVE velvet cloak with silver botanical embroidery, muted purple-pink, CREAM WHITE fur trim, sophisticated softness",
+        "REFINED DUSTY ROSE velvet cloak with gold accent embroidery, soft masculine pink, PURE WHITE fur trim, gentle modern elegance",
+        // Soft navies and grays
+        "DISTINGUISHED SOFT NAVY velvet cloak with pearl and gold accents, gentle deep blue, PURE WHITE ermine fur trim, refined nautical charm",
+        "ELEGANT SILVER-GRAY velvet cloak with subtle gold embroidery, soft pewter tones, CREAM WHITE fur trim, sophisticated neutrality",
+        "REFINED SLATE BLUE velvet cloak with delicate silver patterns, soft blue-gray, PURE BRIGHT WHITE fur trim, gentle distinguished look",
+        // Light and elegant
+        "SOFT PERIWINKLE velvet cloak with silver star embroidery, gentle purple-blue, PURE WHITE fur trim, dreamy refined elegance",
+        "ELEGANT SOFT MINT velvet cloak with gold leaf patterns, fresh gentle green, CREAM WHITE fur trim, spring gentleman aesthetic",
+        "REFINED PALE LAVENDER velvet cloak with silver filigree, soft purple tones, PURE WHITE ermine fur trim, gentle sophistication"
+      ];
+      robe = refinedMasculineRobes[Math.floor(Math.random() * refinedMasculineRobes.length)];
       
+      // Refined masculine jewelry - elegant, NOT overly bold
+      const refinedMasculineJewelry = [
+        "elegant gold chain necklace with small pearl pendant and tiny sapphire accent, refined gentleman's accessory, sophisticated simplicity",
+        "refined antique gold necklace with delicate emerald and pearl cluster, understated elegance, not overly bold",
+        "distinguished gold chain with small medallion pendant featuring pearl center, gentle masculine refinement",
+        "elegant layered gold chains with tiny gem accents (sapphire, pearl), sophisticated but soft presentation",
+        "refined gold necklace with small cameo pendant and pearl drops, gentle Victorian masculine elegance",
+        "delicate gold chain with small ruby and pearl cluster pendant, warm refined sophistication",
+        "elegant silver and gold mixed chain necklace with small pearl accents, modern refined gentleman style",
+        "distinguished gold necklace with small amethyst and pearl pendant, soft purple accents, gentle elegance",
+        "refined antique gold chain with tiny diamond and pearl cluster, understated luxury, not flashy",
+        "elegant gold necklace with small aquamarine and pearl pendant, soft blue tones, refined coastal charm"
+      ];
+      jewelryItem = refinedMasculineJewelry[Math.floor(Math.random() * refinedMasculineJewelry.length)];
+    }
+    
+    if (gender === "female") {
       // Finer, more delicate jewelry for female pets - EXPANDED variety
       const feminineJewelry = [
         // Original options
@@ -2476,6 +2518,20 @@ This is a FEMALE ${species} - apply feminine aesthetic:
 - FINER jewelry - more delicate, smaller gems, intricate filigree
 - GENTLER visual tone - softer lighting, more graceful composition
 - Overall elegant feminine refinement` : "";
+    
+    // Add SOFTENED masculine aesthetic for male pets - refined elegance, NOT harsh or overly masculine
+    const masculineAesthetic = gender === "male" ? `
+=== REFINED MASCULINE AESTHETIC ===
+This is a MALE ${species} - apply a SOFTENED, ELEGANT masculine aesthetic:
+- SOFT yet distinguished cloak colors - dusty blues, soft sage, muted burgundy, warm cream, gentle navy
+- AVOID harsh or overly bold colors - no bright reds, no stark blacks alone
+- REFINED fabrics with SOFT textures - velvet with gentle sheen, NOT stiff or harsh
+- ELEGANT jewelry with subtle sophistication - gold chains with pearls, refined gemstones
+- Light FEMININE ACCENTS are welcome - soft pastels, delicate embroidery, pearl details
+- GENTLE, WARM lighting - soft and inviting, NOT dramatic or harsh
+- Overall look should be ELEGANT and REFINED, not rugged or overly masculine
+- Think "gentle nobleman" NOT "warrior king"
+- Soft, approachable, sophisticated appearance that appeals to modern aesthetic preferences` : "";
 
     // Add angelic luminous treatment for white cats
     const whiteCatTreatment = isWhiteCat ? `
@@ -2773,7 +2829,7 @@ ${compositionInstructions}
 ${poseInstructions}
 ${facialStructureSection}
 === THE ${species} - DETAILED DESCRIPTION ===
-${petDescription}${genderInfo}${feminineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
+${petDescription}${genderInfo}${feminineAesthetic}${masculineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
 
 === CRITICAL: EXACT MATCHING ===
 The generated pet MUST match the description EXACTLY:
@@ -3273,6 +3329,19 @@ This is a FEMALE ${species} - apply feminine aesthetic:
 - Overall elegant feminine refinement
 ` : "";
 
+      const masculineAestheticForOpenAI = gender === "male" ? `
+=== REFINED MASCULINE AESTHETIC ===
+This is a MALE ${species} - apply a SOFTENED, ELEGANT masculine aesthetic:
+- SOFT yet distinguished cloak colors - dusty blues, soft sage, muted burgundy, warm cream, gentle navy
+- AVOID harsh or overly bold colors - no bright reds, no stark blacks alone
+- REFINED fabrics with SOFT textures - velvet with gentle sheen, NOT stiff or harsh
+- ELEGANT jewelry with subtle sophistication - gold chains with pearls, refined gemstones
+- Light FEMININE ACCENTS are welcome - soft pastels, delicate embroidery, pearl details
+- GENTLE, WARM lighting - soft and inviting, NOT dramatic or harsh
+- Overall look should be ELEGANT and REFINED, not rugged or overly masculine
+- Think "gentle nobleman" NOT "warrior king"
+` : "";
+
       const whiteCatTreatmentForOpenAI = isWhiteCatForOpenAI ? `
 === WHITE CAT - ANGELIC LUMINOUS TREATMENT ===
 This is a WHITE CAT - apply angelic luminous aesthetic:
@@ -3412,7 +3481,7 @@ A highly refined 18th-century European aristocratic oil-portrait style featuring
 
 Compositions use ELEGANT backgrounds (soft dusty blue, muted burgundy, gentle sage, soft cream, dusty rose - NEVER brown or dark) with VISIBLE PAINT TEXTURE throughout. Colors are SUBTLE yet LUMINOUS—soft muted tones that are still BRIGHT and CHEERFUL but never garish or overly saturated—applied with THICK, SCULPTURAL brushstrokes creating a regal, REFINED, museum-quality atmosphere. The overall mood is noble, elegant, BRIGHT but SOPHISTICATED, historically authentic with the TACTILE QUALITY of a real oil painting. NOT dark, NOT gloomy, NOT flat or digital, NOT oversaturated.
 
-18th-century aristocratic oil portrait with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED.${feminineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
+18th-century aristocratic oil portrait with SIGNATURE THICK PAINT TEXTURE. Late 18th-century European aristocratic portraiture (1770-1830) - Georgian/Regency/Napoleonic era. Like Gainsborough, Reynolds, Vigée Le Brun with their characteristic SUBTLE, REFINED color palettes and RICH IMPASTO TECHNIQUE. NOT Renaissance. NOT digital. Looks PHYSICALLY PAINTED.${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}
 
 === SUBTLE ELEGANT COLOR PALETTE (Bright but Refined - Different Every Time) ===
 - RANDOMIZE colors each generation - avoid repetitive color schemes
