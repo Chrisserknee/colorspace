@@ -736,9 +736,21 @@ async function generateWithStableDiffusion(
         if (typeof firstItem === 'string') {
           imageUrl = firstItem;
           console.log("✅ Got string URL from array");
+        } else if (firstItem instanceof URL || (firstItem && firstItem.href)) {
+          // Array item is itself a URL object
+          imageUrl = firstItem.href || firstItem.toString();
+          console.log("✅ Got URL object from array, converted to string:", imageUrl.substring(0, 80));
         } else if (typeof firstItem === 'object' && firstItem !== null) {
-          console.log("📦 First item is object, keys:", Object.keys(firstItem));
-          if ('url' in firstItem) {
+          console.log("📦 First item is object");
+          console.log("📦 Object keys:", Object.keys(firstItem));
+          console.log("📦 Object values:", Object.values(firstItem));
+          console.log("📦 Full object:", JSON.stringify(firstItem, null, 2).substring(0, 500));
+          
+          // Check if it's a URL object directly
+          if (firstItem.href || firstItem instanceof URL) {
+            imageUrl = firstItem.href || firstItem.toString();
+            console.log("✅ Array item is URL object, converted:", imageUrl.substring(0, 80));
+          } else if ('url' in firstItem) {
             const urlValue = (firstItem as { url: string | (() => string | Promise<string> | any) }).url;
             console.log("📦 url property type:", typeof urlValue);
             
@@ -748,13 +760,27 @@ async function generateWithStableDiffusion(
               console.log("🔗 url() returned type:", typeof urlResult, "value:", typeof urlResult === 'string' ? urlResult.substring(0, 100) : urlResult);
               
               // Handle if url() returns a string, URL object, or other
+              console.log("🔍 urlResult type check:", typeof urlResult, "has href:", !!urlResult?.href, "instanceof URL:", urlResult instanceof URL);
+              
               if (typeof urlResult === 'string') {
                 imageUrl = urlResult;
-              } else if (urlResult instanceof URL) {
-                imageUrl = urlResult.toString();
+                console.log("✅ url() returned string");
+              } else if (urlResult && (urlResult.href || urlResult instanceof URL)) {
+                // URL object - use .href property for the string URL (most reliable)
+                imageUrl = urlResult.href || urlResult.toString();
+                console.log("✅ url() returned URL object, converted to string:", imageUrl.substring(0, 80));
               } else if (urlResult && typeof urlResult.toString === 'function') {
-                imageUrl = urlResult.toString();
+                const stringResult = urlResult.toString();
+                // Check if toString() gives us a URL-like string
+                if (stringResult.startsWith('http')) {
+                  imageUrl = stringResult;
+                  console.log("✅ url() returned object, toString() gave URL string:", imageUrl.substring(0, 80));
+                } else {
+                  console.error("❌ toString() didn't give URL:", stringResult);
+                  throw new Error(`url() returned object but toString() didn't give URL: ${stringResult}`);
+                }
               } else {
+                console.error("❌ url() returned unexpected type:", typeof urlResult, urlResult);
                 throw new Error(`url() returned non-string type: ${typeof urlResult}. Value: ${JSON.stringify(urlResult)}`);
               }
             } else if (typeof urlValue === 'string') {
@@ -777,7 +803,19 @@ async function generateWithStableDiffusion(
           throw new Error(`Unexpected array item type: ${typeof firstItem}`);
         }
         
-        console.log("📥 Final imageUrl:", imageUrl, "type:", typeof imageUrl);
+        console.log("📥 Final imageUrl before conversion:", imageUrl, "type:", typeof imageUrl);
+        
+        // Final conversion check - handle URL objects that might have slipped through
+        if (imageUrl && typeof imageUrl !== 'string') {
+          if (imageUrl instanceof URL || (imageUrl && imageUrl.href)) {
+            console.log("🔄 Converting URL object to string...");
+            imageUrl = imageUrl.href || imageUrl.toString();
+          } else {
+            throw new Error(`Invalid URL type: ${typeof imageUrl}. Value: ${imageUrl}`);
+          }
+        }
+        
+        console.log("📥 Final imageUrl after conversion:", imageUrl, "type:", typeof imageUrl);
         if (!imageUrl || typeof imageUrl !== 'string') {
           throw new Error(`Invalid URL: ${imageUrl} (type: ${typeof imageUrl})`);
         }
