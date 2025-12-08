@@ -20,7 +20,6 @@ const heroPortraits: HeroPortrait[] = [
 ];
 
 export default function Hero({ onUploadClick }: HeroProps) {
-  const [portraitCount, setPortraitCount] = useState<number>(335);
   const [selectedPortrait, setSelectedPortrait] = useState<HeroPortrait | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -50,20 +49,6 @@ export default function Hero({ onUploadClick }: HeroProps) {
       document.body.style.overflow = "";
     };
   }, [selectedPortrait, closeLightbox]);
-  
-  useEffect(() => {
-    // Fetch current portrait count
-    fetch("/api/stats")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.portraitsCreated) {
-          setPortraitCount(data.portraitsCreated);
-        }
-      })
-      .catch(() => {
-        // Keep default count on error
-      });
-  }, []);
 
   return (
     <section className="min-h-[85vh] flex flex-col items-center justify-center px-4 sm:px-6 pt-2 sm:pt-4 pb-6 sm:pb-10 relative overflow-hidden w-full">
@@ -172,18 +157,6 @@ export default function Hero({ onUploadClick }: HeroProps) {
         >
           Upload a photo — we&apos;ll turn it into a luxurious, hand-painted work of art 
           you&apos;ll treasure for a lifetime.
-        </p>
-
-        {/* Portrait caption */}
-        <p 
-          className="text-xs sm:text-sm mb-4 animate-fade-in-up delay-250 tracking-wide"
-          style={{ 
-            color: '#7A756D',
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontStyle: 'italic'
-          }}
-        >
-          Every portrait is crafted with rich oil-painting depth and museum-grade detail.
         </p>
 
         {/* Sample portraits */}
@@ -318,13 +291,14 @@ export default function Hero({ onUploadClick }: HeroProps) {
           </p>
         </div>
 
-        {/* Social Proof Counter */}
+        {/* Social Proof */}
         <div className="mt-6 animate-fade-in-up delay-500">
           <p className="text-sm" style={{ color: '#7A756D' }}>
+            Trusted by over{" "}
             <span style={{ color: '#C5A572', fontWeight: '500' }}>
-              {portraitCount.toLocaleString()}+
+              5,000
             </span>
-            {" "}portraits created
+            {" "}pet parents
           </p>
         </div>
 
