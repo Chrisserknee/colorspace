@@ -169,12 +169,14 @@ export default function Gallery() {
                 className="group cursor-pointer"
                 onClick={() => setSelectedImage(sample)}
               >
-                {/* Frame */}
-                <div className="ornate-frame">
-                  <div 
-                    className="relative aspect-[3/4] overflow-hidden rounded"
-                    style={{ backgroundColor: '#1A1A1A' }}
-                  >
+                {/* Image with glow effect */}
+                <div 
+                  className="relative aspect-[3/4] overflow-hidden rounded-lg transition-all duration-300 group-hover:scale-[1.02]"
+                  style={{ 
+                    backgroundColor: '#1A1A1A',
+                    boxShadow: '0 0 20px rgba(197, 165, 114, 0.3), 0 0 40px rgba(197, 165, 114, 0.15)',
+                  }}
+                >
                     {/* Actual Image */}
                     <Image
                       src={sample.image}
@@ -210,7 +212,6 @@ export default function Gallery() {
                       </div>
                     </div>
                   </div>
-                </div>
 
                 {/* Caption */}
                 <div className="mt-2 sm:mt-4 text-center">
