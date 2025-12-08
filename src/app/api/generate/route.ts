@@ -1366,10 +1366,17 @@ async function generateRoyalScene(
 SCENE ELEMENTS:
 - LUSTROUS velvet cushion with VISIBLE PILE texture catching light, GLEAMING gold embroidery with METALLIC SHEEN, ornate gold tassels
 - SUMPTUOUS velvet royal robe with RICH SATURATED color, BRILLIANT gold filigree trim that SHIMMERS, natural draping folds
-- SPARKLING jewelry: pearls with IRIDESCENT overtones, gems with INTERNAL FIRE and light refraction
 - Cream/ivory RUFFLED LACE COLLAR with delicate texture details, Elizabethan ruff style
 - RICH SATURATED velvet curtain draped to one side creating atmospheric depth
 - LUMINOUS background matching the SPECIFIED BACKGROUND COLOR - NOT BROWN
+
+LUXURIOUS JEWELRY & METALLICS (WOW FACTOR):
+- LIQUID GOLD: Gold jewelry that looks MOLTEN and DRIPPING with warm light - not flat or dull
+- GLEAMING PEARLS: Iridescent luster with subtle pink/blue reflections, luminous from within
+- DIAMOND SPARKLE: Tiny points of pure white BRILLIANT light on gems - like captured starlight
+- SPARKLING GEMS: Ruby, emerald, sapphire with INTERNAL FIRE and light refraction - ALIVE with color
+- HIGHLY POLISHED SILVER: Mirror-bright reflective surfaces that catch and throw light
+- METALLIC DEPTH: Multiple layers of reflection in gold and silver - not flat metallic paint
 
 BACKGROUND COLOR - SPECIFIC FOR THIS PORTRAIT:
 - USE THIS EXACT BACKGROUND COLOR: ${getRandomBackgroundColor().toUpperCase()}
@@ -1380,12 +1387,13 @@ BACKGROUND COLOR - SPECIFIC FOR THIS PORTRAIT:
 VIVID SATURATED COLORS:
 - BRILLIANT jewel-toned velvet cushion - colors that SING with vibrancy
 - RICH SATURATED burgundy/crimson robe with LUSTROUS sheen
-- GLEAMING gold embroidery with true METALLIC reflection quality
+- GLEAMING gold embroidery with true METALLIC reflection quality - LIQUID GOLD appearance
 - DEEP SATURATED forest green or royal blue curtain accent
 - LUMINOUS background using the SPECIFIED BACKGROUND COLOR from above
 - LUSTROUS cream/ivory lace with subtle warm undertones
-- SPARKLING gems: vivid ruby, rich emerald, deep sapphire with BRILLIANT internal fire
+- SPARKLING gems: vivid ruby, rich emerald, deep sapphire with BRILLIANT internal fire - ALIVE with light
 - VELVETY deep blacks with subtle undertones - never flat or grey
+- IRIDESCENT PEARLS: Glowing with inner light, pink and blue overtones
 
 AUTHENTIC OIL PAINTING LIGHTING - BRIGHT AND CHEERFUL:
 - BRILLIANT BRIGHT warm golden key light making everything RADIATE
@@ -3760,26 +3768,40 @@ BRUSHWORK - LOOSE, FLOWING, EXPRESSIVE:
 - IMPASTO RIDGES: Thick raised paint creating 3D texture on highlights - you could feel it with your fingers
 - SCUMBLED ROUGHNESS: Broken color, dry brush dragging, unblended areas for textural interest
 
-PAINT TEXTURE - EXTREMELY ROUGH AND WEATHERED:
-- THICK AND THIN CONTRAST: Heavy impasto peaks in lights, thin scraped glazes in shadows
+PAINT TEXTURE - EXTREME SCULPTURAL IMPASTO (CRITICAL FOR WOW FACTOR):
+- MOUNTAINOUS IMPASTO PEAKS: Paint so thick it creates 3-4mm RAISED RIDGES that cast their own shadows
+- SCULPTURAL RELIEF: Paint standing up from canvas like miniature mountain ranges - almost 3D
+- VAN GOGH SWIRLING THICKNESS: Visible thick swirling brushstrokes with dramatic texture
+- BUTTER-THICK PAINT: Applied straight from tube, unmixed, with palette knife - CHUNKY and DRAMATIC
+- THICK AND THIN CONTRAST: Towering impasto peaks in lights, thin scraped glazes in shadows
 - PROMINENT CANVAS WEAVE: Coarse linen texture CLEARLY visible throughout - especially in thin areas
-- HEAVY IMPASTO: Really thick, textured paint that stands up from the surface - almost sculptural
 - NATURAL IMPERFECTIONS: Paint pooling, drips, uneven loading, brush running dry, palette scrapings
 - EXTREMELY ROUGH TACTILE SURFACE: Should look like you could feel every bump and ridge
 - BROKEN JAGGED EDGES: Rough, uneven, weathered transitions - like an ancient artifact
 - DRY BRUSH SCRATCHES: Heavy scratchy, textured strokes throughout
-- PALETTE KNIFE GOUGES: Thick angular paint, scraped areas, knife marks visible
+- PALETTE KNIFE GOUGES: Thick angular paint, scraped areas, knife marks visible - AGGRESSIVE TEXTURE
 - GRANULAR TEXTURE: Paint surface should have GRIT and TOOTH - not smooth anywhere
 - CRACKS AND FISSURES: Age cracks throughout adding to textural complexity
 - WORN PEAKS: Impasto highlights worn smooth from centuries of handling
 - ACCUMULATED TEXTURE: Layers upon layers of paint, varnish, dirt, history
 
-LUMINOSITY:
-- GLOWING FROM WITHIN: Colors appear to radiate light, not just reflect it
-- BRILLIANT HIGHLIGHTS: Pure white and warm highlights that seem to EMIT light
-- RICH SATURATED DARKS: Shadows full of color, not grey or muddy
+LUMINOSITY & DRAMATIC LIGHTING (INSTANT WOW FACTOR):
+- REMBRANDT LIGHTING: Strong single golden light source from upper-left creating dramatic chiaroscuro
+- GLOWING FROM WITHIN: Colors appear to radiate light, not just reflect it - LUMINOUS quality
+- BRILLIANT HIGHLIGHTS: Pure white and warm highlights that seem to EMIT light - almost glowing
+- FUR THAT RADIATES: Each strand of fur catches light, creating a halo-like luminous effect
+- RICH SATURATED DARKS: Shadows full of color, not grey or muddy - VELVET DEEP
 - OPTICAL MIXING: Layered transparent colors create depth and vibrancy
 - WARM LIGHT BOUNCING: Reflected warm tones in shadow areas
+- MUSEUM SPOTLIGHT EFFECT: As if lit by a single warm spotlight in a grand gallery
+
+CAPTIVATING EYES (THE WOW MOMENT - CRITICAL):
+- SOULFUL EXPRESSIVE EYES: Deep, intelligent, captivating gaze that draws you in emotionally
+- WET GLOSSY EYES: Realistic moisture and depth - eyes that look ALIVE
+- BRILLIANT CATCHLIGHTS: Bright white reflections in eyes that bring them to life
+- EYES THAT FOLLOW YOU: The gaze should feel like it connects with the viewer
+- DEPTH AND SOUL: Eyes should have visible depth, not flat - multiple layers of color and reflection
+- EMOTIONAL CONNECTION: The eyes should make you feel something - wonder, love, connection
 
 FINISH QUALITY - HEAVILY AGED AND WEATHERED:
 - THICK AMBER VARNISH PATINA: HEAVY warm amber/brown/golden varnish - noticeably aged and yellowed
