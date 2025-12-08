@@ -175,6 +175,18 @@ export default function Hero({ onUploadClick }: HeroProps) {
           you&apos;ll treasure for a lifetime.
         </p>
 
+        {/* Portrait caption */}
+        <p 
+          className="text-xs sm:text-sm mb-4 animate-fade-in-up delay-250 tracking-wide"
+          style={{ 
+            color: '#7A756D',
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontStyle: 'italic'
+          }}
+        >
+          Every portrait is crafted with rich oil-painting depth and museum-grade detail.
+        </p>
+
         {/* Sample portraits */}
         <div className="flex justify-center items-end gap-3 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up delay-300">
           {/* First Portrait - Ophelia (Cat) */}
@@ -241,7 +253,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       <img 
                         src="/samples/ophelia.png" 
                         alt="Ophelia - Royal Cat Portrait"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover scale-125"
+                        style={{ objectPosition: 'center 15%' }}
                       />
                       {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -332,7 +345,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       <img 
                         src="/samples/cat1.png" 
                         alt="Sebastian - Royal Cat Portrait"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover scale-125"
+                        style={{ objectPosition: 'center 15%' }}
                       />
                       {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -423,7 +437,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       <img 
                         src="/samples/charley&Lily2.png" 
                         alt="Charley & Lily - Royal Duo Portrait"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover scale-125"
+                        style={{ objectPosition: 'center 20%' }}
                       />
                       {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
