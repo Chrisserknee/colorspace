@@ -191,7 +191,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
           {/* First Portrait - Zoey (Cat) */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-48 h-48 sm:w-52 sm:h-52 md:w-64 md:h-64 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
+              className="w-48 h-48 sm:w-52 sm:h-52 md:w-64 md:h-64 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
               onClick={() => openLightbox(heroPortraits[0])}
             >
               {/* Soft outer glow */}
@@ -244,7 +244,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
           {/* Second Portrait - Samuel (Cat) */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-48 h-48 sm:w-52 sm:h-52 md:w-64 md:h-64 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
+              className="w-48 h-48 sm:w-52 sm:h-52 md:w-64 md:h-64 transform rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
               onClick={() => openLightbox(heroPortraits[1])}
             >
               {/* Soft outer glow */}
