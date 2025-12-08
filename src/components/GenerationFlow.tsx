@@ -1537,7 +1537,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
             {/* Pricing Info */}
             <div className="text-center mb-6 p-4 rounded-xl" style={{ backgroundColor: 'rgba(197, 165, 114, 0.1)', border: '1px solid rgba(197, 165, 114, 0.2)' }}>
               <p className="text-sm" style={{ color: '#C5A572', fontWeight: '500' }}>
-                Final 4K portrait: $19.99
+                Final 4K portrait: $29.99
               </p>
               <p className="text-xs mt-1" style={{ color: '#7A756D' }}>
                 Watermarked version – free
@@ -1738,7 +1738,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                   color: '#C5A572',
                 }}
               >
-                $19.99
+                $29.99
               </span>
             </div>
 

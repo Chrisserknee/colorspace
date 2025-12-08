@@ -1269,7 +1269,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             {/* Pricing Info */}
             <div className="text-center mb-6 p-4 rounded-xl" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
               <p className="text-sm" style={{ color: '#D4AF37', fontWeight: '500' }}>
-                Final 4K portrait: $19.99
+                Final 4K portrait: $29.99
               </p>
               <p className="text-xs mt-1" style={{ color: '#8B8B8B' }}>
                 Watermarked version – free
@@ -1808,7 +1808,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
                 boxShadow: '0 8px 24px rgba(212, 175, 55, 0.35)',
               }}
             >
-              Keep {petName}&apos;s Memory — $19.99
+              Keep {petName}&apos;s Memory — $29.99
             </button>
 
             {/* Money-Back Guarantee Badge */}

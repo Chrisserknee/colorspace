@@ -77,7 +77,7 @@ const jsonLd = {
     "@type": "Offer",
     name: "Custom Pet Portrait",
     description: "Transform your pet photo into a royal oil painting masterpiece",
-    price: "19.99",
+    price: "29.99",
     priceCurrency: "USD",
   },
 };
