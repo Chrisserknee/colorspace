@@ -11,6 +11,44 @@ interface Sample {
 }
 
 const samples: Sample[] = [
+  // New gallery images first
+  {
+    id: 101,
+    title: "Noble Portrait",
+    pet: "Royal Companion",
+    image: "/samples/gallery0.png",
+  },
+  {
+    id: 102,
+    title: "Aristocratic Grace",
+    pet: "Distinguished Pet",
+    image: "/samples/gallery001.png",
+  },
+  {
+    id: 103,
+    title: "Regal Majesty",
+    pet: "Noble Spirit",
+    image: "/samples/gallery1.png",
+  },
+  {
+    id: 104,
+    title: "Royal Elegance",
+    pet: "Cherished Friend",
+    image: "/samples/gallery 2.png",
+  },
+  {
+    id: 105,
+    title: "Majestic Beauty",
+    pet: "Beloved Companion",
+    image: "/samples/gallery3.png",
+  },
+  {
+    id: 106,
+    title: "Imperial Charm",
+    pet: "Treasured Pet",
+    image: "/samples/gallery4.png",
+  },
+  // Original gallery images
   {
     id: 1,
     title: "Her Majesty Beatrix",
@@ -119,8 +157,8 @@ export default function Gallery() {
           </p>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Gallery Grid - 2 columns on mobile, 3 on tablet, 4 on desktop */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {samples.map((sample, index) => (
             <div
               key={sample.id}
@@ -175,14 +213,14 @@ export default function Gallery() {
                 </div>
 
                 {/* Caption */}
-                <div className="mt-4 text-center">
+                <div className="mt-2 sm:mt-4 text-center">
                   <h3 
-                    className="text-xl group-hover:text-[#C5A572] transition-colors"
+                    className="text-sm sm:text-lg lg:text-xl group-hover:text-[#C5A572] transition-colors"
                     style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
                   >
                     {sample.title}
                   </h3>
-                  <p className="text-sm" style={{ color: '#7A756D' }}>{sample.pet}</p>
+                  <p className="text-xs sm:text-sm hidden sm:block" style={{ color: '#7A756D' }}>{sample.pet}</p>
                 </div>
               </div>
             </div>
