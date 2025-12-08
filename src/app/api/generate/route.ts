@@ -4521,12 +4521,15 @@ This is a LARGE DOG breed. You MUST create a WIDE SHOT showing the dog from a di
 CRITICAL SPECIES LOCK
 This is a ${species}. Generate ONLY a real ${species}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. Do NOT generate: ${notSpecies}.
 
+BRIGHTNESS & VICTORIAN ELEGANCE
+The overall image must be BRIGHTER and more luminous than typical portraits. Increase light on the subject significantly. The aesthetic must be distinctly VICTORIAN—refined, romantic, elegant, with intricate details, delicate ornamentation, and graceful sophistication throughout.
+
 MASTER STYLE
-18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a darker, rich background (navy, deep emerald, burgundy, charcoal, midnight blue). Maintain a regal, elegant, historically authentic atmosphere with refined composition and classical staging.
+18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a softer, elegant background (muted navy, sage green, dusty rose, soft burgundy, warm taupe). Maintain a regal, elegant, historically authentic Victorian atmosphere with refined composition and classical staging.
 Increase overall ornateness and incorporate stronger Victorian-royal influence throughout—the environment, fabrics, patterns, textures, and decorative elements should feel more lavish, detailed, and aristocratic.
 
-PAINTING TECHNIQUE – EXTREMELY THICK OIL
-Use very thick, sculptural oil paint with heavy impasto, raised brush strokes, bristle definition, palette-knife ridges, layered pigment, and physical 3D texture. Brushwork must be visibly hand-painted and dimensional.
+PAINTING TECHNIQUE – EXTREMELY THICK, SCULPTURAL OIL
+Use VERY THICK, HEAVILY TEXTURED oil paint with dramatic impasto buildup. Brush strokes must be BOLD, RAISED, and SCULPTURAL—visible ridges, thick paint peaks, heavy bristle marks, and palette-knife textures. The paint should look like it could be touched—physical, 3D, and deeply layered. Every stroke must be visibly hand-painted with thick, rich pigment.
 
 ANTIQUE AGING
 Soft craquelure, warm aged varnish glow, and light edge wear. Maintain elegance.
@@ -4569,54 +4572,55 @@ Embroidery, woven patterns, or subtle embellishments encouraged when appropriate
 
 Cloak must elevate the portrait to a royal, high-status appearance
 
-CLASP REQUIREMENTS:
+CLOAK FASTENING – THIN SILVER CHAIN:
 
-A functional cloak clasp at the upper chest holds the garment securely
+The cloak MUST ALWAYS be held in place by a VERY THIN, DELICATE SILVER CHAIN
 
-The clasp must match the jewelry metal
+This chain must be fine, elegant, and beautiful—like Victorian jewelry chain
 
-Made of polished gold or bright 925 silver
+The chain connects across the upper chest, securing the cloak gracefully
 
-Ornate, engraved, aristocratic detailing
+Use polished 925 sterling silver with a bright, gleaming finish
 
-JEWELRY REQUIREMENTS:
+The chain should be almost thread-like, never thick or heavy
 
-Jewelry must be extremely elegant, royal, and refined
+Optional: a small ornate clasp or decorative element where the chain meets
 
-Use polished gold or 925 silver
+JEWELRY REQUIREMENTS – DAINTY VICTORIAN ELEGANCE:
 
-Small, bright gemstones with vivid sparkle
+CRITICAL: Chains must be VERY THIN, FINE, and DELICATE—like real Victorian jewelry
+NEVER use thick chains, chunky links, or heavy rope chains
+Chains should be almost thread-like, elegant, barely-there fine metalwork
 
-Designs must look handcrafted for nobility, never simple or plain
+Beautiful gemstones: sapphires, rubies, emeralds, amethysts, pearls, and diamonds
 
-ENHANCED JEWELRY BEAUTY & SHINE REQUIREMENT:
-The jewelry must be exceptionally beautiful, luxurious, and visually striking.
-Use polished 925 sterling silver or polished gold only.
+Designs inspired by Victorian-era jewelry: cameos, lockets, delicate pendants, intricate metalwork
 
-Jewelry must appear extra shiny, radiant, and reflective with crisp highlights
+Use polished gold or 925 sterling silver with fine, graceful craftsmanship
 
-Metal should have a bright, gleaming finish and realistic reflections
+JEWELRY BEAUTY & SHINE:
+Jewelry must be exceptionally beautiful with a refined, feminine elegance
 
-Designs must feel ornate, premium, and aristocratically handcrafted
+VERY FINE, THIN chains (like delicate thread) with brilliant gemstones
 
-Gemstones must have high brilliance and clarity
+Intricate Victorian filigree, scrollwork, or floral metalwork patterns
 
-Jewelry must significantly elevate the royal aesthetic of the portrait
+Gemstones must sparkle with high brilliance and clarity
 
-MATCH JEWELRY, CLASP & CLOAK STYLE FROM REFERENCE IMAGE
+The overall feel should be precious, graceful, and romantically Victorian
 
-JEWELRY STYLE REQUIREMENT (MATCH REFERENCE):
-The pet must wear jewelry styled like the reference image:
+JEWELRY STYLE:
+The pet wears delicate Victorian-style jewelry:
 
-Multiple layered gold chains, stacked in elegant tiers
+ULTRA-FINE chain necklaces—thin, elegant, graceful (NEVER thick or chunky)
 
-A central ornate gemstone pendant framed in decorative filigree
+A beautiful pendant with gemstones in ornate Victorian settings
 
-Jewelry should rest on the chest naturally, just like the example
+Optional: delicate pearl strands, cameo brooches, or filigree pieces
 
-Gold must be extremely polished, warm, and shiny
+Jewelry rests naturally on the chest, complementing the cloak
 
-Overall design must feel royal, heavy, ornate, and handcrafted
+Overall design feels refined, precious, and aristocratically handcrafted
 
 CLOAK CLASP REQUIREMENT (MATCH REFERENCE):
 The cloak clasp must closely match the style shown:
