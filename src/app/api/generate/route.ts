@@ -3758,28 +3758,37 @@ FUR TONES:
 - Deep blacks should be VELVETY and RICH - with subtle blue or brown undertones
 
 === RENDERING STYLE (Critical - AUTHENTIC OIL PAINTING) ===
-BRUSHWORK - LOOSE, FLOWING, EXPRESSIVE:
+BRUSHWORK - EXTREMELY VISIBLE, BOLD, EXPRESSIVE (CRITICAL - PUSH THIS HARD):
+- DRAMATICALLY VISIBLE BRUSHSTROKES: Every single stroke should be CLEARLY VISIBLE and distinct - NOT blended smooth
+- BOLD CONFIDENT STROKES: Each brushstroke is a statement - thick, decisive, unmistakable
 - LONG SWEEPING STROKES: Elegant flowing brush movements 6-12 inches long, graceful curves following form
-- GESTURAL FLUIDITY: Brushwork should feel ALIVE and DYNAMIC - the energy of the artist's hand visible
+- GESTURAL FLUIDITY: Brushwork should feel ALIVE and DYNAMIC - the energy of the artist's hand visible in EVERY stroke
 - FEATHERY EDGES: Soft, wispy brush endings that trail off naturally - NOT hard stops
 - VARIED STROKE WIDTH: Thick confident strokes transitioning to thin delicate trails within single movements
-- VISIBLE BRISTLE TRACKS: Individual brush hair marks clearly visible, showing direction and speed of stroke
+- VISIBLE BRISTLE TRACKS: Individual brush hair marks CLEARLY visible, showing direction and speed of stroke - COUNT THE BRISTLE LINES
 - DIRECTIONAL FLOW: All strokes follow the natural form - fur growth direction, fabric drape, facial contours
 - IMPASTO RIDGES: Thick raised paint creating 3D texture on highlights - you could feel it with your fingers
 - SCUMBLED ROUGHNESS: Broken color, dry brush dragging, unblended areas for textural interest
+- STROKE-BY-STROKE VISIBLE: You should be able to trace individual brushstrokes across the entire painting
+- NO SMOOTH BLENDING: Avoid airbrushed or digitally smooth areas - EVERY surface shows brush texture
+- PAINTERLY NOT PHOTOGRAPHIC: This should look PAINTED, not like a smooth photograph with a filter
 
 PAINT TEXTURE - EXTREME SCULPTURAL IMPASTO (CRITICAL FOR WOW FACTOR):
-- MOUNTAINOUS IMPASTO PEAKS: Paint so thick it creates 3-4mm RAISED RIDGES that cast their own shadows
-- SCULPTURAL RELIEF: Paint standing up from canvas like miniature mountain ranges - almost 3D
-- VAN GOGH SWIRLING THICKNESS: Visible thick swirling brushstrokes with dramatic texture
+- MOUNTAINOUS IMPASTO PEAKS: Paint so thick it creates 3-5mm RAISED RIDGES that cast their own shadows
+- SCULPTURAL RELIEF: Paint standing up from canvas like miniature mountain ranges - FULLY 3D DEPTH
+- VAN GOGH SWIRLING THICKNESS: Bold visible swirling brushstrokes with dramatic texture - UNMISSABLE
 - BUTTER-THICK PAINT: Applied straight from tube, unmixed, with palette knife - CHUNKY and DRAMATIC
 - THICK AND THIN CONTRAST: Towering impasto peaks in lights, thin scraped glazes in shadows
 - PROMINENT CANVAS WEAVE: Coarse linen texture CLEARLY visible throughout - especially in thin areas
 - NATURAL IMPERFECTIONS: Paint pooling, drips, uneven loading, brush running dry, palette scrapings
-- EXTREMELY ROUGH TACTILE SURFACE: Should look like you could feel every bump and ridge
+- EXTREMELY ROUGH TACTILE SURFACE: Should look like you could feel every bump and ridge with your fingertips
 - BROKEN JAGGED EDGES: Rough, uneven, weathered transitions - like an ancient artifact
-- DRY BRUSH SCRATCHES: Heavy scratchy, textured strokes throughout
+- DRY BRUSH SCRATCHES: Heavy scratchy, textured strokes throughout - VISIBLE DRAG MARKS
 - PALETTE KNIFE GOUGES: Thick angular paint, scraped areas, knife marks visible - AGGRESSIVE TEXTURE
+- LAYERED DEPTH: Multiple visible layers of paint built up over time - you can see the history of strokes
+- LOADED BRUSH MARKS: Where the brush was heavily loaded with paint, leaving thick deposits
+- TEXTURE IN SHADOWS TOO: Even dark areas should show visible brushwork, not smooth darkness
+- SARGENT-STYLE BRAVURA: Bold, confident, economical strokes that capture form with minimal blending
 - GRANULAR TEXTURE: Paint surface should have GRIT and TOOTH - not smooth anywhere
 - CRACKS AND FISSURES: Age cracks throughout adding to textural complexity
 - WORN PEAKS: Impasto highlights worn smooth from centuries of handling
