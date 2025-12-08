@@ -125,7 +125,7 @@ export async function uploadImageToLeonardo(imageBuffer: Buffer): Promise<string
   }
   
   // Add the file LAST (S3 requires file to be last)
-  const blob = new Blob([imageBuffer], { type: "image/png" });
+  const blob = new Blob([new Uint8Array(imageBuffer)], { type: "image/png" });
   formData.append("file", blob, "image.png");
   console.log("  - Added file: image.png (size:", imageBuffer.length, "bytes)");
   
