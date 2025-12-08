@@ -184,7 +184,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
             fontStyle: 'italic'
           }}
         >
-          Every portrait is crafted with rich oil-painting depth and museum-grade detail.
+          Every portrait is crafted with real oil paint texture and museum-grade detail.
         </p>
 
         {/* Sample portraits */}
@@ -267,18 +267,6 @@ export default function Hero({ onUploadClick }: HeroProps) {
                 </div>
               </div>
             </div>
-            {/* Pet Name */}
-            <p 
-              className="mt-3 text-sm sm:text-base font-medium"
-              style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: '#C5A572',
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-                letterSpacing: '0.05em'
-              }}
-            >
-              Ophelia
-            </p>
           </div>
 
           {/* Second Portrait - Sebastian (Cat) */}
