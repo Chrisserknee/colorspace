@@ -15,7 +15,7 @@ interface HeroPortrait {
 }
 
 const heroPortraits: HeroPortrait[] = [
-  { id: "ophelia", title: "Ophelia", image: "/samples/blog3 - Copy.png" },
+  { id: "ophelia", title: "Ophelia", image: "/samples/hero1.png" },
   { id: "sebastian", title: "Sebastian", image: "/samples/cat1.png" },
   { id: "charley-lily", title: "Charley & Lily", image: "/samples/charley&Lily2.png" },
 ];
@@ -251,7 +251,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                       }}
                     >
                       <img 
-                        src="/samples/blog3 - Copy.png" 
+                        src="/samples/hero1.png" 
                         alt="Ophelia - Royal Cat Portrait"
                         className="w-full h-full object-cover scale-125"
                         style={{ objectPosition: 'center 5%' }}
