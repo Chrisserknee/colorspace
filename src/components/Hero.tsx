@@ -192,77 +192,38 @@ export default function Hero({ onUploadClick }: HeroProps) {
           <div className="flex flex-col items-center">
             <div 
               className="w-48 h-48 sm:w-52 sm:h-52 md:w-64 md:h-64 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
-              style={{ padding: '2px' }}
               onClick={() => openLightbox(heroPortraits[0])}
             >
-              {/* Soft outer glow/vignette */}
+              {/* Soft outer glow */}
               <div 
                 className="absolute inset-0 rounded-2xl"
                 style={{
-                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.3) 0%, rgba(197, 165, 114, 0.15) 50%, transparent 70%)',
+                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.4) 0%, rgba(197, 165, 114, 0.2) 50%, transparent 70%)',
                   filter: 'blur(20px)',
                   zIndex: 0,
-                  transform: 'scale(1.1)'
+                  transform: 'scale(1.15)'
                 }}
               />
               
-              {/* Outer frame layer - beveled edge */}
+              {/* Portrait container */}
               <div 
-                className="absolute inset-0 rounded-2xl"
+                className="relative w-full h-full rounded-xl overflow-hidden"
                 style={{
-                  background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 20%, #C5A572 40%, #D4B896 60%, #C5A572 80%, #E8D4B0 100%)',
-                  padding: '1px',
-                  boxShadow: `
-                    0 8px 32px rgba(197, 165, 114, 0.4),
-                    0 0 0 1px rgba(197, 165, 114, 0.6),
-                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
-                    inset 0 -2px 4px rgba(166, 139, 91, 0.4)
-                  `.trim().replace(/\s+/g, ' '),
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(197, 165, 114, 0.2)',
                   zIndex: 1
                 }}
               >
-                {/* Middle frame layer - dimensional molding */}
-                <div 
-                  className="absolute inset-0.5 rounded-xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 30%, #D4B896 60%, #C5A572 100%)',
-                    padding: '0.5px',
-                    boxShadow: `
-                      inset 0 1px 2px rgba(255, 255, 255, 0.35),
-                      inset 0 -1px 2px rgba(166, 139, 91, 0.35)
-                    `.trim().replace(/\s+/g, ' ')
-                  }}
-                >
-                  {/* Inner frame layer */}
-                  <div 
-                    className="absolute inset-0.5 rounded-lg"
-                    style={{
-                      background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 25%, #C5A572 50%, #D4B896 75%, #E8D4B0 100%)',
-                      padding: '0.5px',
-                      boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.3)'
-                    }}
-                  >
-                    {/* Portrait container with inner shadow */}
-                    <div 
-                      className="relative w-full h-full rounded-md overflow-hidden"
-                      style={{
-                        boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(0, 0, 0, 0.2)'
-                      }}
-                    >
-                      <img 
-                        src="/samples/hero1.png" 
-                        alt="Zoey - Royal Cat Portrait"
-                        className="w-full h-full object-cover scale-125"
-                        style={{ objectPosition: 'center 5%' }}
-                      />
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
+                <img 
+                  src="/samples/hero1.png" 
+                  alt="Zoey - Royal Cat Portrait"
+                  className="w-full h-full object-cover scale-125"
+                  style={{ objectPosition: 'center 5%' }}
+                />
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
                 </div>
               </div>
             </div>
@@ -284,76 +245,37 @@ export default function Hero({ onUploadClick }: HeroProps) {
           <div className="flex flex-col items-center">
             <div 
               className="w-48 h-48 sm:w-52 sm:h-52 md:w-64 md:h-64 transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 relative flex-shrink-0 cursor-pointer group"
-              style={{ padding: '2px' }}
               onClick={() => openLightbox(heroPortraits[1])}
             >
-              {/* Soft outer glow/vignette */}
+              {/* Soft outer glow */}
               <div 
                 className="absolute inset-0 rounded-2xl"
                 style={{
-                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.3) 0%, rgba(197, 165, 114, 0.15) 50%, transparent 70%)',
+                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.4) 0%, rgba(197, 165, 114, 0.2) 50%, transparent 70%)',
                   filter: 'blur(20px)',
                   zIndex: 0,
-                  transform: 'scale(1.1)'
+                  transform: 'scale(1.15)'
                 }}
               />
               
-              {/* Outer frame layer - beveled edge */}
+              {/* Portrait container */}
               <div 
-                className="absolute inset-0 rounded-2xl"
+                className="relative w-full h-full rounded-xl overflow-hidden"
                 style={{
-                  background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 20%, #C5A572 40%, #D4B896 60%, #C5A572 80%, #E8D4B0 100%)',
-                  padding: '1px',
-                  boxShadow: `
-                    0 8px 32px rgba(197, 165, 114, 0.4),
-                    0 0 0 1px rgba(197, 165, 114, 0.6),
-                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
-                    inset 0 -2px 4px rgba(166, 139, 91, 0.4)
-                  `.trim().replace(/\s+/g, ' '),
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(197, 165, 114, 0.2)',
                   zIndex: 1
                 }}
               >
-                {/* Middle frame layer - dimensional molding */}
-                <div 
-                  className="absolute inset-0.5 rounded-xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #D4B896 0%, #C5A572 30%, #D4B896 60%, #C5A572 100%)',
-                    padding: '0.5px',
-                    boxShadow: `
-                      inset 0 1px 2px rgba(255, 255, 255, 0.35),
-                      inset 0 -1px 2px rgba(166, 139, 91, 0.35)
-                    `.trim().replace(/\s+/g, ' ')
-                  }}
-                >
-                  {/* Inner frame layer */}
-                  <div 
-                    className="absolute inset-0.5 rounded-lg"
-                    style={{
-                      background: 'linear-gradient(135deg, #E8D4B0 0%, #D4B896 25%, #C5A572 50%, #D4B896 75%, #E8D4B0 100%)',
-                      padding: '0.5px',
-                      boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.3)'
-                    }}
-                  >
-                    {/* Portrait container with inner shadow */}
-                    <div 
-                      className="relative w-full h-full rounded-md overflow-hidden"
-                      style={{
-                        boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(0, 0, 0, 0.2)'
-                      }}
-                    >
-                      <img 
-                        src="/samples/samuel.png" 
-                        alt="Samuel - Royal Cat Portrait"
-                        className="w-full h-full object-cover"
-                      />
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
+                <img 
+                  src="/samples/samuel.png" 
+                  alt="Samuel - Royal Cat Portrait"
+                  className="w-full h-full object-cover"
+                />
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
                 </div>
               </div>
             </div>
