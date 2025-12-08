@@ -198,10 +198,10 @@ export default function Hero({ onUploadClick }: HeroProps) {
               <div 
                 className="absolute inset-0 rounded-2xl"
                 style={{
-                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.4) 0%, rgba(197, 165, 114, 0.2) 50%, transparent 70%)',
-                  filter: 'blur(20px)',
+                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.6) 0%, rgba(197, 165, 114, 0.35) 50%, transparent 75%)',
+                  filter: 'blur(25px)',
                   zIndex: 0,
-                  transform: 'scale(1.15)'
+                  transform: 'scale(1.25)'
                 }}
               />
               
@@ -251,10 +251,10 @@ export default function Hero({ onUploadClick }: HeroProps) {
               <div 
                 className="absolute inset-0 rounded-2xl"
                 style={{
-                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.4) 0%, rgba(197, 165, 114, 0.2) 50%, transparent 70%)',
-                  filter: 'blur(20px)',
+                  background: 'radial-gradient(ellipse at center, rgba(212, 184, 150, 0.6) 0%, rgba(197, 165, 114, 0.35) 50%, transparent 75%)',
+                  filter: 'blur(25px)',
                   zIndex: 0,
-                  transform: 'scale(1.15)'
+                  transform: 'scale(1.25)'
                 }}
               />
               
