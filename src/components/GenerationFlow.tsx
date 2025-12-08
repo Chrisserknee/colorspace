@@ -1717,7 +1717,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
             
             {/* Time estimate */}
             <p className="text-xs mt-4" style={{ color: '#5A5650' }}>
-              This could take up to 60 seconds
+              This could take up to 2 minutes
             </p>
             <p className="text-xs mt-1" style={{ color: '#5A5650' }}>
               Please keep this screen open

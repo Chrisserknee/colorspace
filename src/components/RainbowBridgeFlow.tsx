@@ -1457,6 +1457,9 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
             <p className="text-xs text-center" style={{ color: '#9B8AA0' }}>
               Our artists are hand-painting {petName}&apos;s portrait...
             </p>
+            <p className="text-xs mt-3 text-center" style={{ color: '#7A7280' }}>
+              This could take up to 2 minutes
+            </p>
           </div>
         )}
 
