@@ -138,37 +138,30 @@ export default function Hero({ onUploadClick }: HeroProps) {
             fontWeight: 400,
             letterSpacing: '0.02em',
             textShadow: '0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2)',
-            lineHeight: '1.15'
+            lineHeight: '1.2'
           }}
         >
-          <span className="block mb-1.5" style={{ letterSpacing: '0.03em', fontWeight: 250 }}>
-            Turn your pet into a
-          </span>
-          <span 
-            className="relative block mx-auto text-center"
-            style={{ 
-              color: '#C5A572',
-              fontWeight: 600,
-              letterSpacing: '0.03em',
-              textShadow: `
-                0 0 8px rgba(197, 165, 114, 0.5),
-                0 0 16px rgba(197, 165, 114, 0.3),
-                0 0 24px rgba(197, 165, 114, 0.15),
-                0 2px 8px rgba(0, 0, 0, 0.4),
-                0 0 60px rgba(0, 0, 0, 0.3)
-              `.trim().replace(/\s+/g, ' ')
-            }}
-          >
-            {/* Candlelit glow effect - tighter, more focused */}
+          <span className="block" style={{ letterSpacing: '0.03em', fontWeight: 250 }}>
+            Create a{' '}
             <span 
-              className="absolute inset-0 blur-xl opacity-30 pointer-events-none"
-              style={{
-                background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(197, 165, 114, 0.6) 0%, rgba(197, 165, 114, 0.2) 50%, transparent 80%)',
-                transform: 'translateY(10%)',
-                zIndex: -1
+              className="relative"
+              style={{ 
+                color: '#C5A572',
+                fontWeight: 600,
+                letterSpacing: '0.03em',
+                fontStyle: 'italic',
+                textShadow: `
+                  0 0 8px rgba(197, 165, 114, 0.5),
+                  0 0 16px rgba(197, 165, 114, 0.3),
+                  0 0 24px rgba(197, 165, 114, 0.15),
+                  0 2px 8px rgba(0, 0, 0, 0.4),
+                  0 0 60px rgba(0, 0, 0, 0.3)
+                `.trim().replace(/\s+/g, ' ')
               }}
-            />
-            <span style={{ fontStyle: 'italic' }}>beautifully timeless</span> portrait.
+            >
+              breathtaking
+            </span>
+            {' '}custom pet portrait in minutes.
           </span>
         </h1>
 
@@ -177,8 +170,8 @@ export default function Hero({ onUploadClick }: HeroProps) {
           className="text-base sm:text-lg mb-6 sm:mb-8 animate-fade-in-up delay-200 max-w-xl mx-auto"
           style={{ color: '#B8B2A8' }}
         >
-          Upload a photo. We&apos;ll paint them like a royal oil portrait — 
-          worthy of hanging in the finest galleries of Europe.
+          Upload a photo — we&apos;ll turn it into a luxurious, hand-painted work of art 
+          you&apos;ll treasure for a lifetime.
         </p>
 
         {/* Sample portraits */}
