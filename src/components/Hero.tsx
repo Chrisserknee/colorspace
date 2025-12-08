@@ -254,7 +254,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                         src="/samples/ophelia.png" 
                         alt="Ophelia - Royal Cat Portrait"
                         className="w-full h-full object-cover scale-125"
-                        style={{ objectPosition: 'center 15%' }}
+                        style={{ objectPosition: 'center 5%' }}
                       />
                       {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -346,7 +346,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                         src="/samples/cat1.png" 
                         alt="Sebastian - Royal Cat Portrait"
                         className="w-full h-full object-cover scale-125"
-                        style={{ objectPosition: 'center 15%' }}
+                        style={{ objectPosition: 'center 5%' }}
                       />
                       {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -438,7 +438,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
                         src="/samples/charley&Lily2.png" 
                         alt="Charley & Lily - Royal Duo Portrait"
                         className="w-full h-full object-cover scale-125"
-                        style={{ objectPosition: 'center 20%' }}
+                        style={{ objectPosition: 'center 10%' }}
                       />
                       {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
