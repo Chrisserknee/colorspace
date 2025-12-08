@@ -168,10 +168,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* Support LumePet Button - Top Left (Vertical Layout) */}
+      {/* Support LumePet Button - Top Left (Vertical Layout) - Hidden on mobile */}
       <button
         onClick={() => setIsSupportModalOpen(true)}
-        className="fixed top-3 left-3 z-40 flex flex-col items-center px-3 py-2 rounded-xl transition-all duration-300 hover:scale-105 group"
+        className="fixed top-3 left-3 z-40 hidden sm:flex flex-col items-center px-3 py-2 rounded-xl transition-all duration-300 hover:scale-105 group"
         style={{
           background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.25) 0%, rgba(197, 165, 114, 0.12) 100%)',
           border: '1.5px solid rgba(197, 165, 114, 0.4)',
