@@ -30,10 +30,11 @@ export default function HowItWorks() {
     const x = clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
     updateSliderPosition(percentage);
-    hasInteractedRef.current = true;
   }, [updateSliderPosition]);
 
   const handleStart = useCallback((clientX: number) => {
+    // Immediately stop any running animation
+    hasInteractedRef.current = true;
     isDraggingRef.current = true;
     if (handleRef.current) {
       handleRef.current.style.transform = 'translate(-50%, -50%) scale(1.1)';
@@ -137,15 +138,28 @@ export default function HowItWorks() {
               let pos = 50;
               const animateTo = (target: number, duration: number) => {
                 return new Promise<void>((resolve) => {
+                  // Exit immediately if user has interacted
+                  if (hasInteractedRef.current) {
+                    resolve();
+                    return;
+                  }
+                  
                   const start = pos;
                   const startTime = performance.now();
                   const tick = (now: number) => {
+                    // Check at start of every frame - exit immediately if user interacted
+                    if (hasInteractedRef.current) {
+                      resolve();
+                      return;
+                    }
+                    
                     const elapsed = now - startTime;
                     const progress = Math.min(elapsed / duration, 1);
                     const eased = 1 - Math.pow(1 - progress, 3);
                     pos = start + (target - start) * eased;
                     updateSliderPosition(pos);
-                    if (progress < 1 && !hasInteractedRef.current) {
+                    
+                    if (progress < 1) {
                       requestAnimationFrame(tick);
                     } else {
                       resolve();
@@ -156,9 +170,13 @@ export default function HowItWorks() {
               };
               
               await animateTo(20, 800);
+              if (hasInteractedRef.current) return;
               await new Promise(r => setTimeout(r, 300));
+              if (hasInteractedRef.current) return;
               await animateTo(80, 1200);
+              if (hasInteractedRef.current) return;
               await new Promise(r => setTimeout(r, 300));
+              if (hasInteractedRef.current) return;
               await animateTo(50, 600);
             };
             
