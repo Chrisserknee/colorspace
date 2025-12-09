@@ -1605,8 +1605,11 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                     <p className="text-base font-semibold mb-2" style={{ color: '#C5A572' }}>
                       ✨ Royal Unlimited Session — $4.99
                     </p>
-                    <p className="text-xs mb-4" style={{ color: '#B8B2A8' }}>
-                      Unlimited generations for 2 hours — create as many portraits as you want!
+                    <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>
+                      Unlimited portraits for 2 hours — explore every style and find the perfect one.
+                    </p>
+                    <p className="text-xs mb-4" style={{ color: '#7A756D', fontStyle: 'italic' }}>
+                      Final 4K masterpiece sold separately.
                     </p>
                     <button
                       onClick={handleUnlimitedCheckout}
