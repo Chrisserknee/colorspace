@@ -6,9 +6,22 @@ import Image from "next/image";
 export default function HowItWorks() {
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [sliderPosition, setSliderPosition] = useState(50);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const beforeRef = useRef<HTMLDivElement>(null);
+  const positionRef = useRef(50);
   const [isDragging, setIsDragging] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+
+  // Direct DOM update for smooth performance (no React re-render)
+  const updateSliderPosition = useCallback((percentage: number) => {
+    positionRef.current = percentage;
+    if (sliderRef.current) {
+      sliderRef.current.style.left = `${percentage}%`;
+    }
+    if (beforeRef.current) {
+      beforeRef.current.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+    }
+  }, []);
 
   // Handle mouse/touch movement
   const handleMove = useCallback((clientX: number) => {
@@ -17,9 +30,9 @@ export default function HowItWorks() {
     const rect = containerRef.current.getBoundingClientRect();
     const x = clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSliderPosition(percentage);
+    updateSliderPosition(percentage);
     setHasInteracted(true);
-  }, []);
+  }, [updateSliderPosition]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -91,12 +104,10 @@ export default function HowItWorks() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !hasInteracted) {
-            // Animate from 50 to 25 to 75 to 50
             const animate = async () => {
               await new Promise(r => setTimeout(r, 500));
               if (hasInteracted) return;
               
-              // Smooth animation
               let pos = 50;
               const animateTo = (target: number, duration: number) => {
                 return new Promise<void>((resolve) => {
@@ -105,10 +116,9 @@ export default function HowItWorks() {
                   const tick = () => {
                     const elapsed = Date.now() - startTime;
                     const progress = Math.min(elapsed / duration, 1);
-                    // Ease out cubic
                     const eased = 1 - Math.pow(1 - progress, 3);
                     pos = start + (target - start) * eased;
-                    setSliderPosition(pos);
+                    updateSliderPosition(pos);
                     if (progress < 1 && !hasInteracted) {
                       requestAnimationFrame(tick);
                     } else {
@@ -138,7 +148,7 @@ export default function HowItWorks() {
     }
 
     return () => observer.disconnect();
-  }, [hasInteracted]);
+  }, [hasInteracted, updateSliderPosition]);
 
   return (
     <section ref={sectionRef} className="py-12 sm:py-20 px-6" id="how-it-works">
@@ -202,9 +212,11 @@ export default function HowItWorks() {
 
             {/* Before Image (Clipped) */}
             <div 
+              ref={beforeRef}
               className="absolute inset-0 overflow-hidden"
               style={{ 
-                clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`,
+                clipPath: 'inset(0 50% 0 0)',
+                willChange: 'clip-path',
               }}
             >
               <Image
@@ -231,11 +243,13 @@ export default function HowItWorks() {
 
             {/* Slider Handle */}
             <div 
+              ref={sliderRef}
               className="absolute top-0 bottom-0 w-1 -translate-x-1/2 z-10"
               style={{ 
-                left: `${sliderPosition}%`,
+                left: '50%',
                 backgroundColor: '#C5A572',
                 boxShadow: '0 0 20px rgba(197, 165, 114, 0.5)',
+                willChange: 'left',
               }}
             >
               {/* Handle Circle */}
