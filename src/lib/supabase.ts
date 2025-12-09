@@ -784,7 +784,7 @@ export interface Customer {
 export async function addCustomer(
   email: string,
   options: {
-    purchaseType?: 'portrait' | 'pack' | 'rainbow-bridge' | 'canvas';
+    purchaseType?: 'portrait' | 'pack' | 'rainbow-bridge' | 'canvas' | 'unlimited-session';
     imageId?: string;
     stripeSessionId?: string;
     stripeCustomerId?: string;
