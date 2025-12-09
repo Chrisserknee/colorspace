@@ -1528,13 +1528,21 @@ a:not(.btn-primary):not(.btn-secondary):not([class*="block"]) {
 /* Scroll Animation Observer Classes */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(20px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Faster reveals on mobile for quick scrolling */
+@media (max-width: 640px) {
+  .reveal {
+    transform: translateY(12px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }
 
 /* Loading Spinner */
