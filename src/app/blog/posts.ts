@@ -266,9 +266,7 @@ Our portrait process takes that photograph and elevates it—preserving every de
 
 *Have questions about what makes a good portrait photo? We're here to help. Every pet is unique, and we love helping owners capture their companion's best self.*
     `
-  }
-];
-
+  },
   {
     slug: "best-ai-pet-portrait-generators-2025",
     title: "Best AI Pet Portrait Generators in 2025: Complete Guide",
