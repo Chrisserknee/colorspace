@@ -50,12 +50,6 @@ const samples: Sample[] = [
   },
   // Original gallery images
   {
-    id: 1,
-    title: "Her Majesty Beatrix",
-    pet: "Tabby Cat",
-    image: "/samples/Gracie.png",
-  },
-  {
     id: 2,
     title: "Charley & Lily",
     pet: "Royal Duo",
@@ -72,12 +66,6 @@ const samples: Sample[] = [
     title: "Lady Bella",
     pet: "Elegant Beauty",
     image: "/samples/Bella.png",
-  },
-  {
-    id: 5,
-    title: "Lord Bailey",
-    pet: "Noble Companion",
-    image: "/samples/Bailey.png",
   },
 ];
 
