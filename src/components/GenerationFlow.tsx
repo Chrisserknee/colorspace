@@ -292,6 +292,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
   const [shareBoxHidden, setShareBoxHidden] = useState(false); // Hide after animation
   const [showRevealAnimation, setShowRevealAnimation] = useState(false); // Portrait reveal animation
   const [detectedPetCount, setDetectedPetCount] = useState<number>(1); // Backend will tell us if 2 pets detected
+  const [unlimitedCheckoutLoading, setUnlimitedCheckoutLoading] = useState(false); // Loading state for unlimited session checkout
 
   // Session restoration - check for email in URL and restore previous session
   useEffect(() => {
@@ -1122,6 +1123,47 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     handleGenerate(true);
   };
 
+  // Handle direct unlimited session checkout from preview page
+  const handleUnlimitedCheckout = async () => {
+    setUnlimitedCheckoutLoading(true);
+    
+    // Save the current pet image to localStorage so it can be restored after checkout
+    if (previewUrl) {
+      savePendingImage(previewUrl);
+    }
+    
+    // Track the checkout initiation
+    captureEvent("unlimited_session_checkout_initiated", {
+      from_preview: true,
+    });
+    
+    try {
+      // Cancel URL returns user to their pet photo with restored=true
+      const cancelUrl = `/?restored=true`;
+      
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "unlimited-session",
+          cancelUrl,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        setError(data.error || "Failed to create checkout session");
+        setUnlimitedCheckoutLoading(false);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setUnlimitedCheckoutLoading(false);
+    }
+  };
+
   // Checkout abort controller for timeout handling
   const checkoutAbortRef = useRef<AbortController | null>(null);
   const [checkoutElapsed, setCheckoutElapsed] = useState(0);
@@ -1566,18 +1608,19 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                     <p className="text-xs mb-4" style={{ color: '#B8B2A8' }}>
                       Unlimited generations for 2 hours — create as many portraits as you want!
                     </p>
-                    <a
-                      href="/pack-checkout"
+                    <button
+                      onClick={handleUnlimitedCheckout}
+                      disabled={unlimitedCheckoutLoading}
                       className="inline-block px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105"
                       style={{ 
-                        backgroundColor: '#C5A572',
+                        backgroundColor: unlimitedCheckoutLoading ? '#8B7355' : '#C5A572',
                         color: '#1A1A1A',
-                        textDecoration: 'none',
                         boxShadow: '0 4px 15px rgba(197, 165, 114, 0.4)',
+                        opacity: unlimitedCheckoutLoading ? 0.7 : 1,
                       }}
                     >
-                      ✨ Unlock Unlimited
-                    </a>
+                      {unlimitedCheckoutLoading ? "Processing..." : "✨ Unlock Unlimited"}
+                    </button>
                   </div>
                 )}
               </div>
