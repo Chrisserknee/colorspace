@@ -275,7 +275,27 @@ export default function Gallery() {
             )}
           </button>
 
-          {/* Image container */}
+          {/* Image info - positioned at top */}
+          {!isZoomed && (
+            <div 
+              className="absolute top-4 sm:top-8 left-1/2 transform -translate-x-1/2 text-center z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 
+                className="text-2xl sm:text-3xl mb-1"
+                style={{ 
+                  fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                  color: '#F0EDE8',
+                  textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)'
+                }}
+              >
+                {selectedImage.title}
+              </h3>
+              <p className="text-sm" style={{ color: '#C5A572', textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)' }}>{selectedImage.pet}</p>
+            </div>
+          )}
+
+          {/* Image container with glow */}
           <div 
             className={`relative transition-all duration-300 ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
             onClick={(e) => {
@@ -284,53 +304,47 @@ export default function Gallery() {
             }}
             style={{
               maxWidth: isZoomed ? '100%' : '90vh',
-              maxHeight: isZoomed ? '100%' : '85vh',
+              maxHeight: isZoomed ? '100%' : '75vh',
               width: isZoomed ? '100vw' : 'auto',
               height: isZoomed ? '100vh' : 'auto',
               overflow: isZoomed ? 'auto' : 'visible'
             }}
           >
-            {/* Gold frame effect */}
-            <div 
-              className={`relative ${isZoomed ? '' : 'p-1 sm:p-2'}`}
-              style={{ 
-                background: isZoomed ? 'transparent' : 'linear-gradient(135deg, #E8D4B0 0%, #C5A572 50%, #E8D4B0 100%)',
-                borderRadius: isZoomed ? '0' : '8px',
-                boxShadow: isZoomed ? 'none' : '0 25px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(197, 165, 114, 0.2)'
-              }}
-            >
-              <div className={`relative ${isZoomed ? '' : 'rounded-md overflow-hidden'}`}>
-                <Image
-                  src={selectedImage.image}
-                  alt={`${selectedImage.title} - ${selectedImage.pet}`}
-                  width={isZoomed ? 2000 : 1000}
-                  height={isZoomed ? 2000 : 1000}
-                  className="object-contain"
-                  style={{
-                    maxHeight: isZoomed ? 'none' : '80vh',
-                    width: isZoomed ? '100vw' : 'auto',
-                    height: isZoomed ? 'auto' : 'auto'
-                  }}
-                  priority
-                />
-              </div>
+            {/* Glow effect behind image */}
+            {!isZoomed && (
+              <div 
+                className="absolute inset-0 -z-10"
+                style={{
+                  background: 'radial-gradient(ellipse at center, rgba(197, 165, 114, 0.4) 0%, rgba(197, 165, 114, 0.2) 40%, transparent 70%)',
+                  filter: 'blur(40px)',
+                  transform: 'scale(1.3)',
+                }}
+              />
+            )}
+            <div className={`relative ${isZoomed ? '' : 'rounded-lg overflow-hidden'}`}>
+              <Image
+                src={selectedImage.image}
+                alt={`${selectedImage.title} - ${selectedImage.pet}`}
+                width={isZoomed ? 2000 : 1000}
+                height={isZoomed ? 2000 : 1000}
+                className="object-contain"
+                style={{
+                  maxHeight: isZoomed ? 'none' : '70vh',
+                  width: isZoomed ? '100vw' : 'auto',
+                  height: isZoomed ? 'auto' : 'auto'
+                }}
+                priority
+              />
             </div>
           </div>
 
-          {/* Image info */}
+          {/* Help text at bottom */}
           {!isZoomed && (
             <div 
-              className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-center"
+              className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 text-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 
-                className="text-2xl sm:text-3xl mb-1"
-                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
-              >
-                {selectedImage.title}
-              </h3>
-              <p className="text-sm" style={{ color: '#C5A572' }}>{selectedImage.pet}</p>
-              <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
+              <p className="text-xs" style={{ color: '#7A756D' }}>
                 Click image to zoom • Press ESC to close
               </p>
             </div>
