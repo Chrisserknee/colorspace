@@ -264,10 +264,10 @@ export default function HowItWorks() {
               </div>
             </div>
 
-            {/* Slider Handle - uses transform instead of left */}
+            {/* Slider Handle - hidden on mobile for smoother feel */}
             <div 
               ref={sliderRef}
-              className="absolute top-0 bottom-0 w-1 z-10 pointer-events-none"
+              className="hidden sm:block absolute top-0 bottom-0 w-1 z-10 pointer-events-none"
               style={{ 
                 left: 0,
                 transform: 'translateX(50%)',
