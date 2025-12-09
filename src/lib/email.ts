@@ -231,6 +231,7 @@ function getRainbowBridgeEmailHTML(confirmationId: string, downloadUrl: string, 
 </body>
 </html>
 `;
+}
 
 interface SendCanvasOrderConfirmationEmailParams {
   to: string;
