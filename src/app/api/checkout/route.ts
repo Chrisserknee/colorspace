@@ -41,11 +41,12 @@ export async function POST(request: NextRequest) {
       sanitizedEmail = sanitizeString(email.toLowerCase().trim(), 254);
     }
 
-    // Check if this is a pack purchase
-    const isPackPurchase = type === "pack";
+    // Check purchase type
+    const isUnlimitedSession = type === "unlimited-session";
+    const isPackPurchase = type === "pack"; // Legacy support
     
-    // Validate imageId format for non-pack purchases
-    if (!isPackPurchase) {
+    // Validate imageId format for individual image purchases only
+    if (!isUnlimitedSession && !isPackPurchase) {
       if (!imageId) {
         return NextResponse.json(
           { error: "Image ID is required" },
@@ -66,37 +67,18 @@ export async function POST(request: NextRequest) {
     let productDescription = CONFIG.PRODUCT_DESCRIPTION;
     let productImage: string[] = [];
 
-    if (isPackPurchase) {
-      // Pack purchase - handle different pack types
-      switch (packType) {
-        case "1-pack":
-          priceAmount = CONFIG.PACK_1_PRICE_AMOUNT;
-          productName = CONFIG.PACK_1_NAME;
-          productDescription = CONFIG.PACK_1_DESCRIPTION;
-          break;
-        case "5-pack":
-          priceAmount = CONFIG.PACK_5_PRICE_AMOUNT;
-          productName = CONFIG.PACK_5_NAME;
-          productDescription = CONFIG.PACK_5_DESCRIPTION;
-          break;
-        case "10-pack":
-          priceAmount = CONFIG.PACK_10_PRICE_AMOUNT;
-          productName = CONFIG.PACK_10_NAME;
-          productDescription = CONFIG.PACK_10_DESCRIPTION;
-          break;
-        case "2-pack":
-          // Legacy support
-          priceAmount = CONFIG.PACK_2_PRICE_AMOUNT;
-          productName = CONFIG.PACK_PRODUCT_NAME;
-          productDescription = CONFIG.PACK_PRODUCT_DESCRIPTION;
-          break;
-        default:
-          return NextResponse.json(
-            { error: "Invalid pack type" },
-            { status: 400 }
-          );
-      }
-      console.log(`Creating pack checkout session: ${packType}, price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
+    if (isUnlimitedSession) {
+      // Unlimited Session purchase - 2 hours of unlimited generations
+      priceAmount = CONFIG.UNLIMITED_SESSION_PRICE_AMOUNT;
+      productName = CONFIG.UNLIMITED_SESSION_NAME;
+      productDescription = CONFIG.UNLIMITED_SESSION_DESCRIPTION;
+      console.log(`Creating unlimited session checkout: price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
+    } else if (isPackPurchase) {
+      // Legacy pack purchase support
+      priceAmount = 499; // Default to $4.99 (same as unlimited)
+      productName = "LumePet Royal Unlimited Session";
+      productDescription = "Unlimited generations for 2 hours";
+      console.log(`Legacy pack purchase redirected to unlimited session: ${priceAmount} cents`);
     } else {
       // Individual image purchase
       // Verify the image exists in Supabase
@@ -237,14 +219,14 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: isPackPurchase 
-        ? `${baseUrl}/success?type=pack&packType=${packType}&session_id={CHECKOUT_SESSION_ID}`
+      success_url: (isUnlimitedSession || isPackPurchase)
+        ? `${baseUrl}/success?type=unlimited-session&session_id={CHECKOUT_SESSION_ID}`
         : successUrl,
       cancel_url: cancelUrl,
       metadata: {
         ...(imageId ? { imageId } : {}),
         ...(sanitizedEmail ? { customerEmail: sanitizedEmail } : {}),
-        ...(isPackPurchase ? { type: "pack", packType: sanitizeString(packType || "", 20) } : {}),
+        ...((isUnlimitedSession || isPackPurchase) ? { type: "unlimited-session" } : {}),
         // UTM attribution data
         ...(utmData?.utm_source ? { utm_source: sanitizeString(utmData.utm_source, 50) } : {}),
         ...(utmData?.utm_medium ? { utm_medium: sanitizeString(utmData.utm_medium, 50) } : {}),

@@ -108,9 +108,9 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const imageId = session.metadata?.imageId;
         const customerEmail = session.customer_details?.email;
-        const isPackPurchase = session.metadata?.type === "pack";
+        const isUnlimitedSession = session.metadata?.type === "unlimited-session" || session.metadata?.type === "pack";
         
-        if (imageId && !isPackPurchase) {
+        if (imageId && !isUnlimitedSession) {
           try {
             // Save payment metadata
             await saveMetadata(imageId, {
@@ -227,39 +227,29 @@ export async function POST(request: NextRequest) {
             console.error(`❌ Failed to process payment for image ${imageId}:`, error);
             // Log but don't throw - return 200 to prevent Stripe retries
           }
-        } else if (isPackPurchase) {
-          console.log(`📦 Pack purchase completed (session: ${session.id})`);
+        } else if (isUnlimitedSession) {
+          console.log(`✨ Unlimited session purchase completed (session: ${session.id})`);
           
-          // TikTok Events API: Track pack purchase server-side
+          // TikTok Events API: Track unlimited session purchase server-side
           try {
-            const packType = session.metadata?.packType;
-            let packValue = 5; // default
-            let packName = "Portrait Pack";
-            
-            switch (packType) {
-              case "1-pack": packValue = 5; packName = "1-Pack Portrait Credits"; break;
-              case "5-pack": packValue = 20; packName = "5-Pack Portrait Credits"; break;
-              case "10-pack": packValue = 35; packName = "10-Pack Portrait Credits"; break;
-            }
-            
             await trackServerCompletePayment({
               email: customerEmail || undefined,
-              value: packValue,
-              content_id: packType || "pack",
-              content_name: packName,
+              value: 4.99,
+              content_id: "unlimited-session",
+              content_name: "Royal Unlimited Session",
               order_id: session.id,
             });
-            console.log(`📱 TikTok server event sent: CompletePayment $${packValue} (${packName})`);
+            console.log(`📱 TikTok server event sent: CompletePayment $4.99 (Royal Unlimited Session)`);
           } catch (tiktokError) {
             console.warn("⚠️ TikTok server tracking failed:", tiktokError);
           }
           
-          // Pack purchases don't have a specific image to email about
+          // Unlimited session purchases don't have a specific image to email about
           if (customerEmail) {
             // Mark as purchased in emails table (for Royal Club conversion tracking)
             try {
               await markSubscriberAsPurchased(customerEmail);
-              console.log(`📧 Royal Club subscriber marked as converted (pack): ${customerEmail}`);
+              console.log(`📧 Royal Club subscriber marked as converted (unlimited): ${customerEmail}`);
             } catch (leadError) {
               console.warn(`⚠️ Failed to mark subscriber as purchased:`, leadError);
             }
@@ -268,10 +258,9 @@ export async function POST(request: NextRequest) {
             try {
               const trafficSource = getTrafficSource(session.metadata);
               await addCustomer(customerEmail, {
-                purchaseType: 'pack',
+                purchaseType: 'unlimited-session',
                 stripeSessionId: session.id,
                 context: {
-                  packType: session.metadata?.packType,
                   trafficSource,
                   // UTM attribution data
                   utm_source: session.metadata?.utm_source,
@@ -280,7 +269,7 @@ export async function POST(request: NextRequest) {
                   referrer: session.metadata?.referrer,
                 }
               });
-              console.log(`🎉 Customer added to paying_customers table (pack): ${customerEmail} (${trafficSource})`);
+              console.log(`🎉 Customer added to paying_customers table (unlimited): ${customerEmail} (${trafficSource})`);
               if (session.metadata?.utm_source) {
                 console.log(`📊 Attribution: source=${session.metadata.utm_source}, medium=${session.metadata.utm_medium}`);
               }

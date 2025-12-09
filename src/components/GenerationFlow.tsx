@@ -56,40 +56,84 @@ const VICTORIAN_PHRASES = [
 
 // Retry limit management using localStorage
 const STORAGE_KEY = "lumepet_generation_limits";
+const UNLIMITED_SESSION_KEY = "lumepet_unlimited_session";
 
 interface GenerationLimits {
   freeGenerations: number; // Total free generations used (starts at 0)
   freeRetriesUsed: number; // Free retries used (max 1)
   purchases: number; // Number of individual image purchases made
-  packPurchases: number; // Number of pack purchases made
-  packCredits: number; // Remaining pack generation credits (watermarked)
   bonusGranted: number; // Total bonus generations granted via secret feature (max 13)
   lastReset?: string; // Date of last reset (optional for daily limits)
 }
 
+interface UnlimitedSession {
+  expiresAt: number; // Timestamp when session expires
+  purchasedAt: number; // Timestamp when purchased
+}
+
+// Check if user has an active unlimited session
+const getUnlimitedSession = (): UnlimitedSession | null => {
+  if (typeof window === "undefined") return null;
+  const stored = localStorage.getItem(UNLIMITED_SESSION_KEY);
+  if (stored) {
+    try {
+      const session = JSON.parse(stored) as UnlimitedSession;
+      // Check if session is still valid
+      if (session.expiresAt > Date.now()) {
+        return session;
+      } else {
+        // Session expired, clean up
+        localStorage.removeItem(UNLIMITED_SESSION_KEY);
+        return null;
+      }
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
+// Get remaining time on unlimited session
+const getUnlimitedSessionTimeRemaining = (): { hours: number; minutes: number } | null => {
+  const session = getUnlimitedSession();
+  if (!session) return null;
+  const remaining = session.expiresAt - Date.now();
+  if (remaining <= 0) return null;
+  const hours = Math.floor(remaining / (1000 * 60 * 60));
+  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+  return { hours, minutes };
+};
+
+// Start an unlimited session (called after purchase)
+const startUnlimitedSession = (durationHours: number = 2) => {
+  const session: UnlimitedSession = {
+    expiresAt: Date.now() + (durationHours * 60 * 60 * 1000),
+    purchasedAt: Date.now(),
+  };
+  localStorage.setItem(UNLIMITED_SESSION_KEY, JSON.stringify(session));
+  return session;
+};
+
 const getLimits = (): GenerationLimits => {
   if (typeof window === "undefined") {
-    return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0, bonusGranted: 0 };
+    return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, bonusGranted: 0 };
   }
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
-      // Ensure new fields exist for backward compatibility
       return {
         freeGenerations: parsed.freeGenerations || 0,
         freeRetriesUsed: parsed.freeRetriesUsed || 0,
         purchases: parsed.purchases || 0,
-        packPurchases: parsed.packPurchases || 0,
-        packCredits: parsed.packCredits || 0,
-        bonusGranted: parsed.bonusGranted || 0, // Track total bonus granted
+        bonusGranted: parsed.bonusGranted || 0,
         lastReset: parsed.lastReset,
       };
     } catch {
-      return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0, bonusGranted: 0 };
+      return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, bonusGranted: 0 };
     }
   }
-  return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0, bonusGranted: 0 };
+  return { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, bonusGranted: 0 };
 };
 
 const saveLimits = (limits: GenerationLimits) => {
@@ -98,7 +142,13 @@ const saveLimits = (limits: GenerationLimits) => {
   }
 };
 
-const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: string; hasPackCredits?: boolean } => {
+const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: string; hasUnlimitedSession?: boolean } => {
+  // Check if user has an active unlimited session
+  const unlimitedSession = getUnlimitedSession();
+  if (unlimitedSession) {
+    return { allowed: true, hasUnlimitedSession: true };
+  }
+  
   // Free tier: 2 total free generations
   const freeLimit = 2;
   const freeUsed = limits.freeGenerations;
@@ -108,29 +158,27 @@ const canGenerate = (limits: GenerationLimits): { allowed: boolean; reason?: str
   const totalAllowed = freeLimit + purchaseBonus;
   const totalUsed = freeUsed;
   
-  // Check if user has pack credits (watermarked generations from $5 pack)
-  if (limits.packCredits > 0) {
-    return { allowed: true, hasPackCredits: true };
-  }
-  
   if (totalUsed >= totalAllowed) {
     return {
       allowed: false,
-      reason: `You've reached your free generation limit (${freeLimit} free generations). Purchase a pack to unlock more generations!`,
-      hasPackCredits: false,
+      reason: "unlock_unlimited", // Simple flag to show the unlock option
+      hasUnlimitedSession: false,
     };
   }
   
-  return { allowed: true, hasPackCredits: false };
+  return { allowed: true, hasUnlimitedSession: false };
 };
 
 const incrementGeneration = (isRetry: boolean = false) => {
   const limits = getLimits();
-  limits.freeGenerations += 1;
-  if (isRetry) {
-    limits.freeRetriesUsed = 1;
+  // Don't increment if user has unlimited session
+  if (!getUnlimitedSession()) {
+    limits.freeGenerations += 1;
+    if (isRetry) {
+      limits.freeRetriesUsed = 1;
+    }
+    saveLimits(limits);
   }
-  saveLimits(limits);
   return limits;
 };
 
@@ -138,23 +186,6 @@ const addPurchase = () => {
   const limits = getLimits();
   limits.purchases += 1;
   saveLimits(limits);
-  return limits;
-};
-
-const addPackPurchase = (credits: number) => {
-  const limits = getLimits();
-  limits.packPurchases += 1;
-  limits.packCredits += credits;
-  saveLimits(limits);
-  return limits;
-};
-
-const usePackCredit = () => {
-  const limits = getLimits();
-  if (limits.packCredits > 0) {
-    limits.packCredits -= 1;
-    saveLimits(limits);
-  }
   return limits;
 };
 
@@ -829,7 +860,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     // Track generation started
     captureEvent("generation_started", {
       is_retry: isRetry,
-      has_pack_credits: currentLimitsForTracking.packCredits > 0,
+      has_unlimited_session: !!getUnlimitedSession(),
       gender: gender || "not_selected",
     });
 
@@ -877,10 +908,10 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       }));
       console.log("📝 Saved pending generation session:", generationSessionId);
       
-      // Check if user has pack credits (watermarked generation from $5 pack)
-      const limits = getLimits();
-      if (limits.packCredits > 0) {
-        formData.append("usePackCredit", "true");
+      // Check if user has unlimited session (all generations are watermarked during session)
+      const hasUnlimited = !!getUnlimitedSession();
+      if (hasUnlimited) {
+        formData.append("useUnlimitedSession", "true");
       }
       
       // Check if secret credit is activated (un-watermarked generation for testing)
@@ -947,17 +978,15 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       localStorage.removeItem("lumepet_pending_generation");
       console.log("✅ Cleared pending generation - result received");
       
-      // Handle pack credit usage or increment generation count
-      const currentLimits = getLimits();
-      const usedPackCredit = currentLimits.packCredits > 0;
+      // Handle generation count - don't increment if using unlimited session
+      const hasUnlimitedSession = !!getUnlimitedSession();
       const usedSecretCredit = useSecretCredit;
       
-      if (usedPackCredit) {
-        // Use pack credit (watermarked from $5 pack)
-        const updatedLimits = usePackCredit();
-        setGenerationLimits(updatedLimits);
+      if (hasUnlimitedSession) {
+        // Unlimited session - don't decrement anything, just refresh limits
+        setGenerationLimits(getLimits());
       } else if (usedSecretCredit) {
-        // Secret credit used - increment generation count but don't use pack credit
+        // Secret credit used - increment generation count
         const updatedLimits = incrementGeneration(isRetry);
         setGenerationLimits(updatedLimits);
         setUseSecretCredit(false); // Reset secret credit flag after use
@@ -973,7 +1002,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       captureEvent("generation_completed", {
         image_id: data.imageId,
         is_retry: isRetry,
-        used_pack_credit: usedPackCredit,
+        has_unlimited_session: hasUnlimitedSession,
         used_secret_credit: usedSecretCredit,
         gender: gender || "not_selected",
       });
@@ -1240,13 +1269,8 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }
     
     // Track email submitted
-    const isPackPurchase = result.imageId === "pack";
-    console.log("isPackPurchase:", isPackPurchase);
-    
     captureEvent("email_submitted", {
-      is_pack_purchase: isPackPurchase,
-      pack_type: isPackPurchase ? "2-pack" : null,
-      image_id: isPackPurchase ? null : result.imageId,
+      image_id: result.imageId,
     });
     
     // Save session to lume_leads for email sequence and session restore
@@ -1255,8 +1279,8 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         style: "royal",
         gender: gender,
         uploadedImageUrl: uploadedImageUrl,
-        imageId: isPackPurchase ? null : result.imageId,
-        previewUrl: isPackPurchase ? null : result.previewUrl,
+        imageId: result.imageId,
+        previewUrl: result.previewUrl,
         source: "checkout",
       };
       
@@ -1278,10 +1302,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       const cancelUrl = `/?fromCheckout=true&email=${encodeURIComponent(email)}`;
       
       const requestBody = { 
-        imageId: isPackPurchase ? null : result.imageId, 
+        imageId: result.imageId, 
         email,
-        type: isPackPurchase ? "pack" : "image",
-        packType: isPackPurchase ? "2-pack" : undefined,
+        type: "image",
         cancelUrl,
         utmData: getUTMForAPI(), // Include UTM attribution data
       };
@@ -1424,8 +1447,8 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
             </svg>
             <span>
-              {generationLimits.packCredits > 0 
-                ? `${generationLimits.packCredits} portrait${generationLimits.packCredits !== 1 ? 's' : ''}`
+              {getUnlimitedSession()
+                ? `✨ Unlimited`
                 : `${Math.max(0, 2 - generationLimits.freeGenerations)} free`
               }
             </span>
@@ -1456,9 +1479,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                 setSecretClickCount(newCount);
                 
                 if (newCount >= 6) {
-                  // Grant 6 bonus credits (using packCredits for simplicity - these bypass all limits)
+                  // Grant a 2-hour unlimited session as a secret bonus
                   const limits = getLimits();
-                  const maxBonusTotal = 12;
+                  const maxBonusTotal = 2; // Max 2 secret sessions ever
                   const currentBonusGranted = limits.bonusGranted || 0;
                   
                   if (currentBonusGranted >= maxBonusTotal) {
@@ -1466,17 +1489,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                     return;
                   }
                   
-                  const remainingCapacity = maxBonusTotal - currentBonusGranted;
-                  const bonusToGrant = Math.min(6, remainingCapacity);
-                  
-                  if (bonusToGrant <= 0) {
-                    setSecretClickCount(0);
-                    return;
-                  }
-                  
-                  // Add to packCredits - these always allow generation
-                  limits.packCredits = (limits.packCredits || 0) + bonusToGrant;
-                  limits.bonusGranted = currentBonusGranted + bonusToGrant;
+                  // Grant unlimited session
+                  startUnlimitedSession(2); // 2 hours
+                  limits.bonusGranted = currentBonusGranted + 1;
                   
                   saveLimits(limits);
                   setGenerationLimits(limits);
@@ -1484,7 +1499,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                   setSecretClickCount(0);
                   
                   // Silent success - just log to console for debugging
-                  console.log(`🎁 Secret bonus: +${bonusToGrant} credits granted`);
+                  console.log(`🎁 Secret bonus: 2-hour unlimited session granted!`);
                 }
               }}
             >
@@ -1525,23 +1540,32 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
             {/* Generation Limit Display */}
             {limitCheck && (
               <div className="mb-3 p-2 rounded-xl text-center text-sm" style={{ 
-                backgroundColor: limitCheck.allowed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                border: `1px solid ${limitCheck.allowed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                color: limitCheck.allowed ? '#4ADE80' : '#F87171'
+                backgroundColor: limitCheck.allowed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(197, 165, 114, 0.1)',
+                border: `1px solid ${limitCheck.allowed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(197, 165, 114, 0.3)'}`,
+                color: limitCheck.allowed ? '#4ADE80' : '#C5A572'
               }}>
                 {limitCheck.allowed ? (
                   <p>
-                    {generationLimits.packCredits > 0 ? (
-                      `✨ ${generationLimits.packCredits} watermarked generation${generationLimits.packCredits !== 1 ? 's' : ''} remaining`
-                    ) : generationLimits.purchases > 0 ? (
-                      `✨ ${2 + (generationLimits.purchases * 2) - generationLimits.freeGenerations} generations remaining`
-                    ) : (
-                      `✨ ${2 - generationLimits.freeGenerations} free generation${2 - generationLimits.freeGenerations !== 1 ? 's' : ''} remaining`
-                    )}
+                    {(() => {
+                      const timeRemaining = getUnlimitedSessionTimeRemaining();
+                      if (timeRemaining) {
+                        return `✨ Unlimited session: ${timeRemaining.hours}h ${timeRemaining.minutes}m remaining`;
+                      } else if (generationLimits.purchases > 0) {
+                        return `✨ ${2 + (generationLimits.purchases * 2) - generationLimits.freeGenerations} generations remaining`;
+                      } else {
+                        const remaining = 2 - generationLimits.freeGenerations;
+                        return `✨ ${remaining} free generation${remaining !== 1 ? 's' : ''} remaining`;
+                      }
+                    })()}
                   </p>
                 ) : (
-                  <div className="text-center">
-                    <p className="mb-4">{limitCheck.reason}</p>
+                  <div className="text-center py-2">
+                    <p className="text-base font-semibold mb-2" style={{ color: '#C5A572' }}>
+                      ✨ Royal Unlimited Session — $4.99
+                    </p>
+                    <p className="text-xs mb-4" style={{ color: '#B8B2A8' }}>
+                      Unlimited generations for 2 hours — create as many portraits as you want!
+                    </p>
                     <a
                       href="/pack-checkout"
                       className="inline-block px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105"
@@ -1552,14 +1576,14 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                         boxShadow: '0 4px 15px rgba(197, 165, 114, 0.4)',
                       }}
                     >
-                      ✨ Unlock More Portraits
+                      ✨ Unlock Unlimited
                     </a>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Pack purchase success message */}
+            {/* Unlimited session purchase success message */}
             {showPackPurchaseSuccess && (
               <div 
                 className="mb-6 p-4 rounded-xl text-center animate-fade-in-up"
@@ -1569,10 +1593,10 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                 }}
               >
                 <p className="font-semibold" style={{ color: '#4ADE80' }}>
-                  🎉 +2 Generations Added!
+                  🎉 Unlimited Session Activated!
                 </p>
                 <p className="text-sm mt-1" style={{ color: '#B8B2A8' }}>
-                  Your pack purchase was successful. You can now generate!
+                  You have 2 hours of unlimited generations. Create away!
                 </p>
               </div>
             )}

@@ -1,72 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Suspense } from "react";
+import Image from "next/image";
 
-type PackType = "1" | "5" | "10";
-
-interface PackInfo {
-  id: PackType;
-  name: string;
-  price: string;
-  priceAmount: number;
-  portraits: number;
-  packType: string;
-  badge?: string;
-  badgeColor?: string;
-  featured?: boolean;
-}
-
-const PACKS: PackInfo[] = [
-  {
-    id: "1",
-    name: "Starter",
-    price: "$1",
-    priceAmount: 1,
-    portraits: 1,
-    packType: "1-pack",
-  },
-  {
-    id: "5",
-    name: "Popular",
-    price: "$5",
-    priceAmount: 5,
-    portraits: 5,
-    packType: "5-pack",
-    badge: "MOST POPULAR",
-    badgeColor: "#4ADE80",
-    featured: true,
-  },
-  {
-    id: "10",
-    name: "Pro",
-    price: "$10",
-    priceAmount: 10,
-    portraits: 10,
-    packType: "10-pack",
-    badge: "FOR PET PARENTS",
-    badgeColor: "#60A5FA",
-  },
-];
-
-function PackCheckoutContent() {
-  const searchParams = useSearchParams();
+function UnlimitedCheckoutContent() {
   const router = useRouter();
-  const packParam = searchParams.get("pack") as PackType | null;
-  
-  const [selectedPack, setSelectedPack] = useState<PackType>(packParam || "5");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Update selected pack when URL params change
-  useEffect(() => {
-    if (packParam && ["1", "5", "10"].includes(packParam)) {
-      setSelectedPack(packParam);
-    }
-  }, [packParam]);
-
-  const currentPack = PACKS.find(p => p.id === selectedPack) || PACKS[1];
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -74,15 +16,13 @@ function PackCheckoutContent() {
 
     try {
       // Build cancel URL to return to this page
-      const cancelUrl = `/pack-checkout?pack=${selectedPack}`;
+      const cancelUrl = `/pack-checkout`;
       
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // Email will be collected by Stripe during checkout
-          type: "pack",
-          packType: currentPack.packType,
+          type: "unlimited-session",
           cancelUrl,
         }),
       });
@@ -104,129 +44,110 @@ function PackCheckoutContent() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#0F0F0F' }}>
       <div 
-        className="w-full max-w-lg p-6 sm:p-8 rounded-2xl"
+        className="w-full max-w-md p-6 sm:p-8 rounded-2xl text-center"
         style={{ 
           backgroundColor: '#1A1A1A',
           border: '1px solid rgba(197, 165, 114, 0.3)',
         }}
       >
-        <div className="text-center mb-6">
-          <h1 
-            className="text-2xl sm:text-3xl font-semibold mb-2"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+        {/* Logo */}
+        <div className="mb-4">
+          <Image
+            src="/samples/LumePet2.png"
+            alt="LumePet"
+            width={80}
+            height={80}
+            className="mx-auto object-contain"
+            style={{
+              filter: 'drop-shadow(0 0 12px rgba(255, 220, 100, 0.4))'
+            }}
+          />
+        </div>
+
+        {/* Title */}
+        <h1 
+          className="text-2xl sm:text-3xl font-semibold mb-2"
+          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+        >
+          ✨ Royal Unlimited Session
+        </h1>
+        
+        {/* Price */}
+        <div className="mb-4">
+          <span 
+            className="text-4xl sm:text-5xl font-bold"
+            style={{ color: '#C5A572' }}
           >
-            ✨ Unlock More Portraits
-          </h1>
-          <p style={{ color: '#B8B2A8' }}>
-            Choose a pack that works for you
-          </p>
-          <p className="text-xs mt-2 italic" style={{ color: '#C5A572' }}>
-            95% of LumePet users unlock more portraits after their first 2.
-          </p>
+            $4.99
+          </span>
         </div>
 
-        {/* Pack Selection */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {PACKS.map((pack) => (
-            <button
-              key={pack.id}
-              type="button"
-              onClick={() => setSelectedPack(pack.id)}
-              className={`relative p-4 rounded-xl text-center transition-all ${
-                selectedPack === pack.id ? 'scale-105' : 'hover:scale-102'
-              }`}
-              style={{ 
-                backgroundColor: selectedPack === pack.id 
-                  ? (pack.featured ? '#C5A572' : 'rgba(197, 165, 114, 0.2)')
-                  : 'rgba(197, 165, 114, 0.08)',
-                border: selectedPack === pack.id 
-                  ? `2px solid ${pack.featured ? '#D4B896' : '#C5A572'}`
-                  : '1px solid rgba(197, 165, 114, 0.2)',
-                boxShadow: selectedPack === pack.id && pack.featured
-                  ? '0 4px 20px rgba(197, 165, 114, 0.4)'
-                  : 'none',
-              }}
-            >
-              {pack.badge && (
-                <span 
-                  className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap"
-                  style={{ backgroundColor: pack.badgeColor, color: '#1A1A1A' }}
-                >
-                  {pack.badge}
-                </span>
-              )}
-              <p 
-                className="text-xs mb-1 font-medium"
-                style={{ 
-                  color: selectedPack === pack.id && pack.featured ? '#1A1A1A' : '#B8B2A8'
-                }}
-              >
-                {pack.name}
-              </p>
-              <p 
-                className="text-2xl sm:text-3xl font-bold"
-                style={{ 
-                  color: selectedPack === pack.id 
-                    ? (pack.featured ? '#1A1A1A' : '#F0EDE8')
-                    : '#C5A572'
-                }}
-              >
-                {pack.price}
-              </p>
-              <p 
-                className="text-sm mt-1"
-                style={{ 
-                  color: selectedPack === pack.id && pack.featured ? '#2D2A26' : '#7A756D'
-                }}
-              >
-                {pack.portraits} portrait{pack.portraits > 1 ? 's' : ''}
-              </p>
-            </button>
-          ))}
-        </div>
+        {/* Description */}
+        <p className="text-base mb-6" style={{ color: '#B8B2A8' }}>
+          Create <span style={{ color: '#C5A572', fontWeight: 600 }}>unlimited portraits</span> for the next 2 hours.
+          <br />
+          <span className="text-sm">Perfect for trying different photos and styles!</span>
+        </p>
 
-        {/* Selected Pack Summary */}
+        {/* Features */}
         <div 
-          className="p-4 rounded-xl mb-6 text-center"
+          className="p-4 rounded-xl mb-6 text-left"
           style={{ 
-            backgroundColor: 'rgba(197, 165, 114, 0.1)',
+            backgroundColor: 'rgba(197, 165, 114, 0.08)',
             border: '1px solid rgba(197, 165, 114, 0.2)',
           }}
         >
-          <p className="text-sm mb-1" style={{ color: '#B8B2A8' }}>Selected:</p>
-          <p className="text-xl font-bold" style={{ color: '#C5A572' }}>
-            {currentPack.name} Pack - {currentPack.price}
-          </p>
-          <p className="text-sm" style={{ color: '#7A756D' }}>
-            {currentPack.portraits} watermarked portrait{currentPack.portraits > 1 ? 's' : ''}
-          </p>
-          <p className="text-xs mt-1" style={{ color: '#5A5650' }}>
-            4K versions available for $19.99 each
-          </p>
+          <ul className="space-y-2 text-sm" style={{ color: '#B8B2A8' }}>
+            <li className="flex items-center gap-2">
+              <span style={{ color: '#4ADE80' }}>✓</span>
+              Unlimited generations for 2 hours
+            </li>
+            <li className="flex items-center gap-2">
+              <span style={{ color: '#4ADE80' }}>✓</span>
+              Try different photos of your pets
+            </li>
+            <li className="flex items-center gap-2">
+              <span style={{ color: '#4ADE80' }}>✓</span>
+              Experiment with male & female styles
+            </li>
+            <li className="flex items-center gap-2">
+              <span style={{ color: '#4ADE80' }}>✓</span>
+              Keep your favorites, purchase later
+            </li>
+          </ul>
         </div>
 
-        <div>
-          {error && (
-            <p className="text-center text-sm mb-4" style={{ color: '#F87171' }}>
-              {error}
-            </p>
-          )}
+        {/* Note about HD */}
+        <p className="text-xs mb-6" style={{ color: '#7A756D' }}>
+          All generated portraits are watermarked previews.
+          <br />
+          Unlock any portrait in full 4K resolution for $19.99.
+        </p>
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
-            style={{ 
-              backgroundColor: loading ? '#8B7355' : '#C5A572', 
-              color: '#1A1A1A',
-              opacity: loading ? 0.7 : 1,
-            }}
-          >
-            {loading ? "Processing..." : `Continue to Payment - ${currentPack.price}`}
-          </button>
-        </div>
+        {/* Error */}
+        {error && (
+          <p className="text-center text-sm mb-4" style={{ color: '#F87171' }}>
+            {error}
+          </p>
+        )}
 
-        <div className="mt-6 text-center">
+        {/* Submit Button */}
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full py-4 rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
+          style={{ 
+            backgroundColor: loading ? '#8B7355' : '#C5A572', 
+            color: '#1A1A1A',
+            opacity: loading ? 0.7 : 1,
+            boxShadow: '0 4px 20px rgba(197, 165, 114, 0.4)',
+          }}
+        >
+          {loading ? "Processing..." : "Start Unlimited Session — $4.99"}
+        </button>
+
+        {/* Back link */}
+        <div className="mt-6">
           <button 
             onClick={() => router.back()}
             className="text-sm transition-colors hover:underline cursor-pointer bg-transparent border-none"
@@ -240,14 +161,14 @@ function PackCheckoutContent() {
   );
 }
 
-export default function PackCheckoutPage() {
+export default function UnlimitedCheckoutPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0F0F0F' }}>
         <div className="text-center" style={{ color: '#B8B2A8' }}>Loading...</div>
       </div>
     }>
-      <PackCheckoutContent />
+      <UnlimitedCheckoutContent />
     </Suspense>
   );
 }

@@ -15,10 +15,32 @@ interface RainbowBridgeData {
   timestamp: number;
 }
 
-// Grant purchase bonus generations or pack credits
-const grantPurchaseBonus = (type?: string, packType?: string) => {
+// Grant unlimited session or purchase bonus
+const grantPurchaseBonus = (type?: string) => {
   if (typeof window === "undefined") return;
   
+  // Check if this is an unlimited session purchase
+  if (type === "unlimited-session" || type === "pack") {
+    const UNLIMITED_SESSION_KEY = "lumepet_unlimited_session";
+    const sessionKey = "last_unlimited_purchase_time";
+    const lastPurchase = sessionStorage.getItem(sessionKey);
+    const now = Date.now();
+    
+    // Only grant if it's been more than 5 seconds since last grant (prevents refresh abuse)
+    if (!lastPurchase || (now - parseInt(lastPurchase)) > 5000) {
+      // Start a 2-hour unlimited session
+      const session = {
+        expiresAt: now + (2 * 60 * 60 * 1000), // 2 hours from now
+        purchasedAt: now,
+      };
+      localStorage.setItem(UNLIMITED_SESSION_KEY, JSON.stringify(session));
+      sessionStorage.setItem(sessionKey, now.toString());
+      console.log("✨ Unlimited session activated! Expires:", new Date(session.expiresAt).toLocaleString());
+    }
+    return;
+  }
+  
+  // Regular portrait purchase
   const STORAGE_KEY = "lumepet_generation_limits";
   const stored = localStorage.getItem(STORAGE_KEY);
   
@@ -26,63 +48,28 @@ const grantPurchaseBonus = (type?: string, packType?: string) => {
     freeGenerations: number; 
     freeRetriesUsed: number; 
     purchases: number;
-    packPurchases?: number;
-    packCredits?: number;
   };
   
   if (stored) {
     try {
       limits = JSON.parse(stored);
-      // Ensure new fields exist
-      limits.packPurchases = limits.packPurchases || 0;
-      limits.packCredits = limits.packCredits || 0;
     } catch {
-      limits = { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0 };
+      limits = { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0 };
     }
   } else {
-    limits = { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0, packPurchases: 0, packCredits: 0 };
+    limits = { freeGenerations: 0, freeRetriesUsed: 0, purchases: 0 };
   }
   
   // Only increment if this purchase hasn't been counted yet
-  // Check sessionStorage to prevent double-counting on page refresh
-  const sessionKey = type === "pack" ? "last_pack_purchase_time" : "last_purchase_time";
+  const sessionKey = "last_purchase_time";
   const lastPurchase = sessionStorage.getItem(sessionKey);
   const now = Date.now();
   
   // Only grant bonus if it's been more than 5 seconds since last grant (prevents refresh abuse)
   if (!lastPurchase || (now - parseInt(lastPurchase)) > 5000) {
-    if (type === "pack") {
-      limits.packPurchases = (limits.packPurchases || 0) + 1;
-      
-      // Grant credits based on pack type
-      let creditsToAdd = 0;
-      switch (packType) {
-        case "1-pack":
-          creditsToAdd = 1;
-          break;
-        case "5-pack":
-          creditsToAdd = 5;
-          break;
-        case "10-pack":
-          creditsToAdd = 10;
-          break;
-        case "2-pack":
-          // Legacy support
-          creditsToAdd = 2;
-          break;
-        default:
-          console.warn("Unknown pack type:", packType);
-          creditsToAdd = 1; // Fallback to 1
-      }
-      
-      limits.packCredits = (limits.packCredits || 0) + creditsToAdd;
-      sessionStorage.setItem("last_pack_purchase_time", now.toString());
-      console.log(`Pack purchase granted: ${creditsToAdd} credits (${packType})`);
-    } else {
-      limits.purchases += 1;
-      sessionStorage.setItem("last_purchase_time", now.toString());
-      console.log(`🎁 Purchase bonus granted: 2 additional free generations! (Total purchases: ${limits.purchases})`);
-    }
+    limits.purchases += 1;
+    sessionStorage.setItem("last_purchase_time", now.toString());
+    console.log(`🎁 Purchase bonus granted: 2 additional free generations! (Total purchases: ${limits.purchases})`);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(limits));
   }
 };
@@ -123,7 +110,6 @@ function SuccessContent() {
   const router = useRouter();
   const imageId = searchParams.get("imageId");
   const type = searchParams.get("type");
-  const packType = searchParams.get("packType");
   
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [displayImageUrl, setDisplayImageUrl] = useState<string | null>(null);
@@ -260,8 +246,8 @@ function SuccessContent() {
   
   // Grant purchase bonus when page loads (after successful payment)
   useEffect(() => {
-    grantPurchaseBonus(type || undefined, packType || undefined);
-  }, [type, packType]);
+    grantPurchaseBonus(type || undefined);
+  }, [type]);
   
   // Scroll to canvas section if #canvas hash is in URL (from email links)
   useEffect(() => {
@@ -292,24 +278,9 @@ function SuccessContent() {
     let purchaseValue = 0;
     let contentName = "Pet Portrait";
     
-    if (type === "pack") {
-      switch (packType) {
-        case "1-pack":
-          purchaseValue = 5;
-          contentName = "1-Pack Portrait Credits";
-          break;
-        case "5-pack":
-          purchaseValue = 20;
-          contentName = "5-Pack Portrait Credits";
-          break;
-        case "10-pack":
-          purchaseValue = 35;
-          contentName = "10-Pack Portrait Credits";
-          break;
-        default:
-          purchaseValue = 5;
-          contentName = "Portrait Pack";
-      }
+    if (type === "unlimited-session" || type === "pack") {
+      purchaseValue = 4.99;
+      contentName = "Royal Unlimited Session";
     } else if (type === "canvas") {
       // Canvas purchase - get value from URL or use defaults
       purchaseValue = 69; // Default to 12x12 price
@@ -322,7 +293,7 @@ function SuccessContent() {
     
     if (purchaseValue > 0) {
       trackTikTokCompletePayment({
-        content_id: imageId || packType || "purchase",
+        content_id: imageId || "unlimited-session",
         content_name: contentName,
         value: purchaseValue,
         quantity: 1,
@@ -330,11 +301,11 @@ function SuccessContent() {
       tiktokTrackedRef.current = true;
       console.log(`📱 TikTok Pixel: CompletePayment tracked - $${purchaseValue} for ${contentName}`);
     }
-  }, [type, packType, imageId]);
+  }, [type, imageId]);
 
   useEffect(() => {
-    // For pack purchases, we don't need to validate an image
-    if (type === "pack") {
+    // For unlimited session purchases, we don't need to validate an image
+    if (type === "unlimited-session" || type === "pack") {
       setIsValid(true);
       return;
     }
@@ -514,8 +485,8 @@ function SuccessContent() {
     );
   }
 
-  // Error state (skip for pack purchases which don't have an imageId)
-  if (!isValid || (!imageId && type !== "pack")) {
+  // Error state (skip for unlimited session purchases which don't have an imageId)
+  if (!isValid || (!imageId && type !== "unlimited-session" && type !== "pack")) {
     return (
       <div className="min-h-screen bg-renaissance flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
@@ -547,8 +518,8 @@ function SuccessContent() {
     );
   }
 
-  // Pack purchase success (no image to show)
-  if (type === "pack") {
+  // Unlimited session purchase success (no image to show)
+  if (type === "unlimited-session" || type === "pack") {
     // Check if there's a saved pet image to restore
     const savedPetImage = typeof window !== "undefined" ? localStorage.getItem("lumepet_pending_image") : null;
     
@@ -569,10 +540,10 @@ function SuccessContent() {
               className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4"
               style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
             >
-              Pack Purchased Successfully!
+              ✨ Unlimited Session Activated!
             </h1>
             
-            {/* Credits badge */}
+            {/* Session badge */}
             <div 
               className="inline-flex items-center gap-3 px-6 py-3 rounded-full mb-6"
               style={{ 
@@ -580,16 +551,16 @@ function SuccessContent() {
                 border: '2px solid rgba(197, 165, 114, 0.4)' 
               }}
             >
-              <span className="text-2xl">🎨</span>
+              <span className="text-2xl">👑</span>
               <span className="text-lg font-semibold" style={{ color: '#C5A572' }}>
-                +2 Generations Added!
+                2 Hours of Unlimited Generations
               </span>
             </div>
             
             <p className="text-lg mb-8" style={{ color: '#B8B2A8' }}>
               {savedPetImage 
-                ? "Your pet image is ready! Click below to continue generating."
-                : "You now have 2 watermarked generations available. Start creating your masterpieces!"}
+                ? "Your pet image is ready! Click below to continue generating unlimited portraits."
+                : "Create as many royal portraits as you want for the next 2 hours!"}
             </p>
             
             <Link 
@@ -603,7 +574,7 @@ function SuccessContent() {
             </Link>
             
             <p className="text-sm mt-4" style={{ color: '#7A756D' }}>
-              (does not include the full HD version)
+              All portraits include a watermark. Unlock any portrait in full 4K for $19.99.
             </p>
           </div>
         </div>
