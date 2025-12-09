@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
             
             // TikTok Events API: Track CompletePayment server-side
             try {
-              const amountTotal = session.amount_total ? session.amount_total / 100 : 29.99;
+              const amountTotal = session.amount_total ? session.amount_total / 100 : 19.99;
               await trackServerCompletePayment({
                 email: customerEmail || undefined,
                 value: amountTotal,

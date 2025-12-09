@@ -250,7 +250,7 @@ export default function CreationsModal({ isOpen, onClose }: CreationsModalProps)
                               Loading...
                             </span>
                           ) : (
-                            "Get 4K Version - $29.99"
+                            "Get 4K Version - $19.99"
                           )}
                         </button>
                       </div>

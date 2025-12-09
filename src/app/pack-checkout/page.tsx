@@ -201,7 +201,7 @@ function PackCheckoutContent() {
             {currentPack.portraits} watermarked portrait{currentPack.portraits > 1 ? 's' : ''}
           </p>
           <p className="text-xs mt-1" style={{ color: '#5A5650' }}>
-            4K versions available for $29.99 each
+            4K versions available for $19.99 each
           </p>
         </div>
 
