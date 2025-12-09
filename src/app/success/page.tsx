@@ -110,6 +110,7 @@ function SuccessContent() {
   const router = useRouter();
   const imageId = searchParams.get("imageId");
   const type = searchParams.get("type");
+  const sessionId = searchParams.get("session_id");
   
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [displayImageUrl, setDisplayImageUrl] = useState<string | null>(null);
@@ -119,6 +120,7 @@ function SuccessContent() {
   const [selectedCanvas, setSelectedCanvas] = useState<CanvasSize>("16x16");
   const [isOrderingCanvas, setIsOrderingCanvas] = useState(false);
   const [isCanvasTransitioning, setIsCanvasTransitioning] = useState(false);
+  const [sessionVerified, setSessionVerified] = useState<boolean | null>(null);
 
   // Smooth canvas size transition handler
   const handleCanvasChange = (newSize: CanvasSize) => {
@@ -244,10 +246,41 @@ function SuccessContent() {
     }
   }, [imageId]);
   
-  // Grant purchase bonus when page loads (after successful payment)
+  // Verify session and grant purchase bonus when page loads (after successful payment)
   useEffect(() => {
-    grantPurchaseBonus(type || undefined);
-  }, [type]);
+    // For unlimited session purchases, verify payment first
+    if ((type === "unlimited-session" || type === "pack") && sessionId) {
+      // Verify the session with Stripe
+      fetch(`/api/verify-session?session_id=${sessionId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid) {
+            // Payment verified - grant the unlimited session
+            setSessionVerified(true);
+            setIsValid(true);
+            grantPurchaseBonus(type);
+          } else {
+            // Payment not verified - don't grant session
+            console.error("Session verification failed:", data.error);
+            setSessionVerified(false);
+            setIsValid(false);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to verify session:", error);
+          setSessionVerified(false);
+          setIsValid(false);
+        });
+    } else if (type === "unlimited-session" || type === "pack") {
+      // No session_id provided - this is suspicious, don't grant
+      console.warn("Unlimited session type without session_id - not granting");
+      setSessionVerified(false);
+      setIsValid(false);
+    } else {
+      // Regular portrait purchase - grant bonus (no verification needed as imageId validates it)
+      grantPurchaseBonus(type || undefined);
+    }
+  }, [type, sessionId]);
   
   // Scroll to canvas section if #canvas hash is in URL (from email links)
   useEffect(() => {
@@ -304,9 +337,9 @@ function SuccessContent() {
   }, [type, imageId]);
 
   useEffect(() => {
-    // For unlimited session purchases, we don't need to validate an image
+    // For unlimited session purchases, wait for session verification
     if (type === "unlimited-session" || type === "pack") {
-      setIsValid(true);
+      // isValid will be set based on session verification
       return;
     }
     
@@ -520,6 +553,61 @@ function SuccessContent() {
 
   // Unlimited session purchase success (no image to show)
   if (type === "unlimited-session" || type === "pack") {
+    // Wait for session verification
+    if (sessionVerified === null) {
+      return (
+        <div className="min-h-screen bg-renaissance flex items-center justify-center p-6">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-6">
+              <div 
+                className="w-16 h-16 rounded-full animate-spin"
+                style={{ 
+                  borderWidth: '4px',
+                  borderStyle: 'solid',
+                  borderColor: 'rgba(197, 165, 114, 0.2)',
+                  borderTopColor: '#C5A572'
+                }}
+              />
+            </div>
+            <p style={{ color: '#B8B2A8' }}>Verifying your payment...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Payment verification failed
+    if (sessionVerified === false) {
+      return (
+        <div className="min-h-screen bg-renaissance flex items-center justify-center p-6">
+          <div className="max-w-md w-full text-center">
+            <div 
+              className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+            >
+              <svg className="w-10 h-10" style={{ color: '#F87171' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h1 
+              className="text-3xl font-semibold mb-4"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#F0EDE8' }}
+            >
+              Payment Verification Failed
+            </h1>
+            <p className="mb-8" style={{ color: '#B8B2A8' }}>
+              We couldn&apos;t verify your payment. Please contact support if you completed a purchase.
+            </p>
+            <Link href="/" className="btn-primary inline-flex">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Return Home
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
     // Check if there's a saved pet image to restore
     const savedPetImage = typeof window !== "undefined" ? localStorage.getItem("lumepet_pending_image") : null;
     
