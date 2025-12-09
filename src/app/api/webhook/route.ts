@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { saveMetadata, getMetadata, addCustomer, markSubscriberAsPurchased, supabase } from "@/lib/supabase";
-import { sendPortraitEmail } from "@/lib/email";
+import { sendPortraitEmail, sendCanvasOrderConfirmationEmail } from "@/lib/email";
 import { sendCanvasUpsellEmail } from "@/lib/lumeEmails";
 import { createFullCanvasOrder, CanvasSize, ShippingAddress } from "@/lib/printify";
 import { trackServerCompletePayment } from "@/lib/tiktok-server";
@@ -369,6 +369,37 @@ export async function POST(request: NextRequest) {
                 console.error(`⚠️ Failed to save canvas order to database:`, dbError);
               } else {
                 console.log(`💾 Canvas order saved to database`);
+              }
+              
+              // Send order confirmation email
+              if (customerEmail) {
+                try {
+                  const confirmationResult = await sendCanvasOrderConfirmationEmail({
+                    to: customerEmail,
+                    orderId: session.id,
+                    printifyOrderId: printifyResult.orderId,
+                    canvasSize: canvasSize,
+                    shippingAddress: {
+                      name: shippingDetails.name || `${shippingAddress.first_name} ${shippingAddress.last_name}`,
+                      line1: shippingAddress.address1,
+                      line2: shippingAddress.address2,
+                      city: shippingAddress.city,
+                      state: shippingAddress.region,
+                      postalCode: shippingAddress.zip,
+                      country: shippingAddress.country,
+                    },
+                    petName: portraitMetadata.pet_name,
+                  });
+                  
+                  if (confirmationResult.success) {
+                    console.log(`📧 Canvas order confirmation email sent to ${customerEmail}`);
+                  } else {
+                    console.warn(`⚠️ Failed to send canvas confirmation email: ${confirmationResult.error}`);
+                  }
+                } catch (emailError) {
+                  console.warn(`⚠️ Canvas confirmation email error:`, emailError);
+                  // Don't fail the webhook for email errors
+                }
               }
               
               // Add customer if not already added and mark as canvas purchaser
