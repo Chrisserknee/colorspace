@@ -14,8 +14,8 @@ const samples: Sample[] = [
   // New gallery images first
   {
     id: 101,
-    title: "Sir Winston",
-    pet: "Golden Retriever",
+    title: "Lady Anastasia",
+    pet: "White Cat",
     image: "/samples/gallery0.png",
   },
   {
