@@ -155,7 +155,7 @@ export default function Hero({ onUploadClick }: HeroProps) {
           className="text-base sm:text-lg mb-6 sm:mb-8 animate-fade-in-up delay-200 max-w-xl mx-auto"
           style={{ color: '#B8B2A8' }}
         >
-          Upload a photo — we&apos;ll turn it into a luxurious, hand-painted work of art 
+          Upload a photo — we&apos;ll turn your pet into a luxurious, hand-painted work of art 
           you&apos;ll treasure for a lifetime.
         </p>
 
