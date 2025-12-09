@@ -15,7 +15,7 @@ export default function HowItWorks() {
   // Direct DOM update for smooth performance
   const updateSliderPosition = useCallback((percentage: number) => {
     if (sliderRef.current) {
-      sliderRef.current.style.transform = `translateX(${percentage}%)`;
+      sliderRef.current.style.left = `${percentage}%`;
     }
     if (beforeRef.current) {
       beforeRef.current.style.width = `${percentage}%`;
@@ -267,14 +267,12 @@ export default function HowItWorks() {
             {/* Slider Handle - hidden on mobile for smoother feel */}
             <div 
               ref={sliderRef}
-              className="hidden sm:block absolute top-0 bottom-0 w-1 z-10 pointer-events-none"
+              className="hidden sm:block absolute top-0 bottom-0 w-1 z-10 pointer-events-none -translate-x-1/2"
               style={{ 
-                left: 0,
-                transform: 'translateX(50%)',
-                transformOrigin: 'left',
+                left: '50%',
                 backgroundColor: '#C5A572',
                 boxShadow: '0 0 20px rgba(197, 165, 114, 0.5)',
-                willChange: 'transform',
+                willChange: 'left',
               }}
             >
               {/* Handle Circle */}
