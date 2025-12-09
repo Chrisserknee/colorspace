@@ -11,6 +11,8 @@ export default function HowItWorks() {
   const handleRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
   const hasInteractedRef = useRef(false);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const isHorizontalDragRef = useRef(false);
 
   // Direct DOM update for smooth performance
   const updateSliderPosition = useCallback((percentage: number) => {
@@ -69,23 +71,52 @@ export default function HowItWorks() {
     };
 
     const onTouchStart = (e: TouchEvent) => {
-      e.preventDefault();
-      handleStart(e.touches[0].clientX);
+      const touch = e.touches[0];
+      touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+      isHorizontalDragRef.current = false;
+      // Don't prevent default yet - wait to see if it's horizontal or vertical
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!isDraggingRef.current) return;
-      e.preventDefault();
-      handleMove(e.touches[0].clientX);
+      if (!touchStartRef.current) return;
+      
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+      const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+      
+      // Determine if this is a horizontal drag (slider) or vertical scroll
+      if (!isHorizontalDragRef.current && deltaX > 10) {
+        // If horizontal movement is significant, treat as slider drag
+        if (deltaX > deltaY * 1.5) {
+          isHorizontalDragRef.current = true;
+          isDraggingRef.current = true;
+          hasInteractedRef.current = true;
+          if (handleRef.current) {
+            handleRef.current.style.transform = 'translate(-50%, -50%) scale(1.1)';
+          }
+          e.preventDefault();
+          handleMove(touch.clientX);
+          return;
+        }
+      }
+      
+      // If we've determined it's a horizontal drag, continue with slider
+      if (isHorizontalDragRef.current && isDraggingRef.current) {
+        e.preventDefault();
+        handleMove(touch.clientX);
+      }
+      // Otherwise, let the browser handle scrolling (don't prevent default)
     };
 
     const onTouchEnd = () => {
       handleEnd();
+      touchStartRef.current = null;
+      isHorizontalDragRef.current = false;
     };
 
     // Container events
     container.addEventListener('mousedown', onMouseDown);
-    container.addEventListener('touchstart', onTouchStart, { passive: false });
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
     container.addEventListener('touchmove', onTouchMove, { passive: false });
     container.addEventListener('touchend', onTouchEnd);
 
@@ -220,7 +251,7 @@ export default function HowItWorks() {
             className="relative w-full aspect-[4/5] sm:aspect-[3/4] max-w-lg mx-auto rounded-2xl overflow-hidden shadow-2xl cursor-ew-resize select-none"
             style={{ 
               boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(197, 165, 114, 0.15)',
-              touchAction: 'none',
+              touchAction: 'pan-y',
             }}
           >
             {/* After Image (Full width, underneath) */}
