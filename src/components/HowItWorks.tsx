@@ -181,6 +181,7 @@ export default function HowItWorks() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 512px"
+                quality={95}
                 priority
                 draggable={false}
               />
@@ -209,6 +210,7 @@ export default function HowItWorks() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 512px"
+                quality={95}
                 priority
                 draggable={false}
               />
