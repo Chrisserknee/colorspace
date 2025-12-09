@@ -5113,18 +5113,32 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
         descriptionPreview: finalDescription.substring(0, 100),
       });
       
-    await saveMetadata(imageId, {
+    // Build metadata object - only include generation_session_id if provided
+    // Note: generation_session_id column may not exist in DB yet, so we handle it separately
+    const metadata: Record<string, unknown> = {
       created_at: new Date().toISOString(),
-        paid: useSecretCredit, // Mark as paid only if using secret credit (testing) - pack credits are watermarked
-        pet_description: finalDescription,
+      paid: useSecretCredit, // Mark as paid only if using secret credit (testing) - pack credits are watermarked
+      pet_description: finalDescription,
       hd_url: hdUrl,
       preview_url: previewUrl,
-        generation_session_id: generationSessionId || null, // For recovering abandoned generations
-        // Note: style, pet_name, and quote fields not in portraits table schema yet
-        // Rainbow Bridge metadata: style="rainbow-bridge", pet_name, quote (stored in pet_description for now)
-        // Note: pack_generation not tracked in DB - pack credits just give watermarked generations
-        // Note: secret_generation not saved to DB (testing feature only)
-      });
+      // Note: style, pet_name, and quote fields not in portraits table schema yet
+      // Rainbow Bridge metadata: style="rainbow-bridge", pet_name, quote (stored in pet_description for now)
+      // Note: pack_generation not tracked in DB - pack credits just give watermarked generations
+      // Note: secret_generation not saved to DB (testing feature only)
+    };
+    
+    // Try to save with generation_session_id first, fall back without it if column doesn't exist
+    if (generationSessionId) {
+      try {
+        await saveMetadata(imageId, { ...metadata, generation_session_id: generationSessionId });
+      } catch (sessionIdError) {
+        // If it fails due to missing column, try without it
+        console.warn("Failed to save with generation_session_id, trying without:", sessionIdError);
+        await saveMetadata(imageId, metadata);
+      }
+    } else {
+      await saveMetadata(imageId, metadata);
+    }
     
     // Log Rainbow Bridge metadata (for development/debugging)
     if (isRainbowBridge) {
