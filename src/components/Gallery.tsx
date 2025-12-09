@@ -221,7 +221,7 @@ export default function Gallery() {
                   >
                     {sample.title}
                   </h3>
-                  <p className="text-xs sm:text-sm hidden sm:block" style={{ color: '#7A756D' }}>{sample.pet}</p>
+                  <p className="text-xs sm:text-sm" style={{ color: '#7A756D' }}>{sample.pet}</p>
                 </div>
               </div>
             </div>
