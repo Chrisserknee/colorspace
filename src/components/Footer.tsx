@@ -38,32 +38,32 @@ export default function Footer({ onContactClick }: FooterProps) {
           </div>
 
           {/* Links */}
-          <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 sm:gap-x-6 text-xs sm:text-sm" style={{ color: '#7A756D' }}>
-            <a href="#how-it-works" className="hover:text-[#C5A572] transition-colors whitespace-nowrap">
+          <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 sm:gap-x-6 sm:gap-y-2 text-xs sm:text-sm" style={{ color: '#7A756D' }}>
+            <a href="#how-it-works" className="hover:text-[#C5A572] transition-colors whitespace-nowrap leading-normal">
               How it Works
             </a>
-            <a href="#gallery" className="hover:text-[#C5A572] transition-colors whitespace-nowrap">
+            <a href="#gallery" className="hover:text-[#C5A572] transition-colors whitespace-nowrap leading-normal">
               Gallery
             </a>
-            <a href="#faq" className="hover:text-[#C5A572] transition-colors whitespace-nowrap">
+            <a href="#faq" className="hover:text-[#C5A572] transition-colors whitespace-nowrap leading-normal">
               FAQ
             </a>
-            <a href="/rainbow-bridge" className="hover:text-[#C5A572] transition-colors whitespace-nowrap">
+            <a href="/rainbow-bridge" className="hover:text-[#C5A572] transition-colors whitespace-nowrap leading-normal">
               Rainbow Bridge
             </a>
-            <a href="/about" className="hover:text-[#C5A572] transition-colors whitespace-nowrap">
+            <a href="/about" className="hover:text-[#C5A572] transition-colors whitespace-nowrap leading-normal">
               About
             </a>
             {onContactClick ? (
               <button
                 onClick={onContactClick}
-                className="hover:text-[#C5A572] transition-colors bg-transparent border-none cursor-pointer whitespace-nowrap"
-                style={{ color: '#7A756D' }}
+                className="hover:text-[#C5A572] transition-colors bg-transparent border-none cursor-pointer whitespace-nowrap leading-normal p-0 m-0 font-inherit text-inherit"
+                style={{ color: '#7A756D', fontSize: 'inherit', lineHeight: 'inherit' }}
               >
                 Contact
               </button>
             ) : (
-              <a href="#contact" className="hover:text-[#C5A572] transition-colors whitespace-nowrap">
+              <a href="#contact" className="hover:text-[#C5A572] transition-colors whitespace-nowrap leading-normal">
                 Contact
               </a>
             )}
