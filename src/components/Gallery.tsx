@@ -32,7 +32,7 @@ const samples: Sample[] = [
   },
   {
     id: 104,
-    title: "Princess Cleo",
+    title: "Prince Jasper",
     pet: "Australian Shepherd",
     image: "/samples/gallery 2.png",
   },
