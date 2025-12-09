@@ -13,6 +13,7 @@ export default function HowItWorks() {
   const hasInteractedRef = useRef(false);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const isHorizontalDragRef = useRef(false);
+  const animationFrameRef = useRef<number | null>(null);
 
   // Direct DOM update for smooth performance
   const updateSliderPosition = useCallback((percentage: number) => {
@@ -37,6 +38,11 @@ export default function HowItWorks() {
   const handleStart = useCallback((clientX: number) => {
     // Immediately stop any running animation
     hasInteractedRef.current = true;
+    // Cancel any pending animation frame
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
     isDraggingRef.current = true;
     if (handleRef.current) {
       handleRef.current.style.transform = 'translate(-50%, -50%) scale(1.1)';
@@ -91,6 +97,11 @@ export default function HowItWorks() {
           isHorizontalDragRef.current = true;
           isDraggingRef.current = true;
           hasInteractedRef.current = true;
+          // Cancel any pending animation frames immediately
+          if (animationFrameRef.current !== null) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = null;
+          }
           if (handleRef.current) {
             handleRef.current.style.transform = 'translate(-50%, -50%) scale(1.1)';
           }
@@ -180,6 +191,7 @@ export default function HowItWorks() {
                   const tick = (now: number) => {
                     // Check at start of every frame - exit immediately if user interacted
                     if (hasInteractedRef.current) {
+                      animationFrameRef.current = null;
                       resolve();
                       return;
                     }
@@ -191,12 +203,13 @@ export default function HowItWorks() {
                     updateSliderPosition(pos);
                     
                     if (progress < 1) {
-                      requestAnimationFrame(tick);
+                      animationFrameRef.current = requestAnimationFrame(tick);
                     } else {
+                      animationFrameRef.current = null;
                       resolve();
                     }
                   };
-                  requestAnimationFrame(tick);
+                  animationFrameRef.current = requestAnimationFrame(tick);
                 });
               };
               
@@ -219,7 +232,14 @@ export default function HowItWorks() {
     );
 
     observer.observe(container);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      // Cancel any pending animation frames
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
   }, [updateSliderPosition]);
 
   return (
