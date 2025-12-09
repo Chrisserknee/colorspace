@@ -1388,14 +1388,12 @@ VIVID SATURATED COLORS:
 - BRILLIANT jewel-toned velvet cushion - colors that SING with vibrancy
 - RICH SATURATED burgundy/crimson robe with LUSTROUS sheen
 - GLEAMING gold embroidery with true METALLIC reflection quality - LIQUID GOLD appearance
-- DEEP SATURATED royal blue curtain accent (prefer blue over green tones)
+- DEEP SATURATED forest green or royal blue curtain accent
 - LUMINOUS background using the SPECIFIED BACKGROUND COLOR from above
 - LUSTROUS cream/ivory lace with subtle warm undertones
 - SPARKLING gems: vivid ruby, rich emerald, deep sapphire with BRILLIANT internal fire - ALIVE with light
 - VELVETY deep blacks with subtle undertones - never flat or grey
 - IRIDESCENT PEARLS: Glowing with inner light, pink and blue overtones
-- OVERALL COMPOSITION: Minimize green tones - reduce green in backgrounds, fabrics, and overall color palette
-
 AUTHENTIC OIL PAINTING LIGHTING - BRIGHT AND CHEERFUL:
 - BRILLIANT BRIGHT warm golden key light making everything RADIATE
 - LUMINOUS UPLIFTING atmosphere - fabrics seem to GLOW from within
@@ -3736,7 +3734,7 @@ BACKGROUND (RANDOMIZE EACH GENERATION):
 - CREATE STRONG CONTRAST with pet's fur - background should make pet POP
 - BRIGHT and LUMINOUS - interesting color choices
 - NEVER brown, tan, beige, or muddy earth tones
-- OVERALL COMPOSITION: Reduce green tones throughout the image - minimize green in backgrounds, fabrics, and overall color scheme
+- COLOR BALANCE: Reduce overall green tint/color cast - avoid green grunge or green color grading throughout the image
 
 FABRICS & DRAPES:
 - SATURATED JEWEL TONES with BRILLIANT sheen: vivid ruby red, deep sapphire blue, rich emerald green, royal purple, warm amber gold
