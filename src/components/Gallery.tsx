@@ -85,11 +85,22 @@ export default function Gallery() {
   const sectionRef = useRef<HTMLElement>(null);
   const [selectedImage, setSelectedImage] = useState<Sample | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  // Close lightbox
+  // Open lightbox with animation
+  const openLightbox = useCallback((sample: Sample) => {
+    setSelectedImage(sample);
+    // Trigger animation after a brief delay
+    setTimeout(() => setIsAnimating(true), 10);
+  }, []);
+
+  // Close lightbox with animation
   const closeLightbox = useCallback(() => {
-    setSelectedImage(null);
-    setIsZoomed(false);
+    setIsAnimating(false);
+    setTimeout(() => {
+      setSelectedImage(null);
+      setIsZoomed(false);
+    }, 300);
   }, []);
 
   // Handle escape key
@@ -167,7 +178,7 @@ export default function Gallery() {
             >
               <div 
                 className="group cursor-pointer"
-                onClick={() => setSelectedImage(sample)}
+                onClick={() => openLightbox(sample)}
               >
                 {/* Image with glow effect */}
                 <div 
@@ -232,17 +243,41 @@ export default function Gallery() {
       {/* Lightbox Modal */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
+          className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 transition-all duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.95)' }}
           onClick={closeLightbox}
         >
+          {/* Magical sparkle particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(15)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full transition-all duration-700"
+                style={{
+                  width: `${4 + Math.random() * 4}px`,
+                  height: `${4 + Math.random() * 4}px`,
+                  backgroundColor: '#C5A572',
+                  left: `${10 + Math.random() * 80}%`,
+                  top: `${10 + Math.random() * 80}%`,
+                  opacity: isAnimating ? 0.6 : 0,
+                  transform: `scale(${isAnimating ? 1 : 0})`,
+                  transitionDelay: `${i * 50}ms`,
+                  boxShadow: '0 0 10px 3px rgba(197, 165, 114, 0.5)',
+                  animation: isAnimating ? `sparkle-float ${3 + Math.random() * 2}s ease-in-out infinite` : 'none',
+                  animationDelay: `${i * 100}ms`,
+                }}
+              />
+            ))}
+          </div>
+
           {/* Close button */}
           <button
             onClick={closeLightbox}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 p-2 rounded-full transition-all hover:scale-110"
+            className={`absolute top-4 right-4 sm:top-6 sm:right-6 z-10 p-2 rounded-full transition-all duration-500 hover:scale-110 ${isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
             style={{ 
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              color: '#F0EDE8'
+              color: '#F0EDE8',
+              transitionDelay: '200ms'
             }}
             aria-label="Close"
           >
@@ -257,10 +292,11 @@ export default function Gallery() {
               e.stopPropagation();
               setIsZoomed(!isZoomed);
             }}
-            className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 p-2 rounded-full transition-all hover:scale-110"
+            className={`absolute top-4 left-4 sm:top-6 sm:left-6 z-10 p-2 rounded-full transition-all duration-500 hover:scale-110 ${isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
             style={{ 
               backgroundColor: isZoomed ? 'rgba(197, 165, 114, 0.3)' : 'rgba(255, 255, 255, 0.1)',
-              color: '#F0EDE8'
+              color: '#F0EDE8',
+              transitionDelay: '250ms'
             }}
             aria-label={isZoomed ? "Zoom out" : "Zoom in"}
           >
@@ -277,7 +313,7 @@ export default function Gallery() {
 
           {/* Image container with glow */}
           <div 
-            className={`relative transition-all duration-300 ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+            className={`relative transition-all duration-500 ease-out ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'} ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
             onClick={(e) => {
               e.stopPropagation();
               setIsZoomed(!isZoomed);
@@ -290,14 +326,15 @@ export default function Gallery() {
               overflow: isZoomed ? 'auto' : 'visible'
             }}
           >
-            {/* Glow effect behind image */}
+            {/* Animated glow effect behind image */}
             {!isZoomed && (
               <div 
-                className="absolute inset-0 -z-10"
+                className={`absolute inset-0 -z-10 transition-all duration-700 ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
                 style={{
-                  background: 'radial-gradient(ellipse at center, rgba(197, 165, 114, 0.4) 0%, rgba(197, 165, 114, 0.2) 40%, transparent 70%)',
-                  filter: 'blur(40px)',
-                  transform: 'scale(1.3)',
+                  background: 'radial-gradient(ellipse at center, rgba(197, 165, 114, 0.5) 0%, rgba(197, 165, 114, 0.25) 40%, transparent 70%)',
+                  filter: 'blur(50px)',
+                  transform: 'scale(1.4)',
+                  animation: isAnimating ? 'pulse-glow 3s ease-in-out infinite' : 'none',
                 }}
               />
             )}
@@ -321,7 +358,8 @@ export default function Gallery() {
           {/* Image info - positioned at bottom */}
           {!isZoomed && (
             <div 
-              className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-center"
+              className={`absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-center transition-all duration-500 ${isAnimating ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              style={{ transitionDelay: '150ms' }}
               onClick={(e) => e.stopPropagation()}
             >
               <h3 
