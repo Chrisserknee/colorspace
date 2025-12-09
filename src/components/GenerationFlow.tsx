@@ -1608,7 +1608,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
                 ) : (
                   <div className="text-center py-2">
                     <p className="text-base font-semibold mb-2" style={{ color: '#C5A572' }}>
-                      ✨ Royal Unlimited Session — $4.99
+                      ✨ Royal Unlimited Session — $0.50
                     </p>
                     <p className="text-xs mb-3" style={{ color: '#B8B2A8' }}>
                       Unlimited portraits for 2 hours — explore every style and find the perfect one.
