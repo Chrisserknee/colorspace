@@ -168,25 +168,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* Support LumePet Button - Top Left (Vertical Layout) - Hidden on mobile */}
-      <button
-        onClick={() => setIsSupportModalOpen(true)}
-        className="fixed top-3 left-3 z-40 hidden sm:flex flex-col items-center px-3 py-2 rounded-xl transition-all duration-300 hover:scale-105 group"
-        style={{
-          background: 'linear-gradient(135deg, rgba(197, 165, 114, 0.25) 0%, rgba(197, 165, 114, 0.12) 100%)',
-          border: '1.5px solid rgba(197, 165, 114, 0.4)',
-          color: '#C5A572',
-          backdropFilter: 'blur(12px)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(197, 165, 114, 0.15)',
-        }}
-      >
-        <svg className="w-4 h-4 mb-0.5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span className="text-xs font-medium" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: '0.05em' }}>Support</span>
-        <span className="text-xs font-medium" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: '0.05em' }}>LumePet</span>
-      </button>
-
       {/* Hero Section */}
       <Hero onUploadClick={handleUploadClick} />
 
