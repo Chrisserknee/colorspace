@@ -180,8 +180,8 @@ export default function HowItWorks() {
                 alt="Royal pet portrait"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 512px"
-                quality={95}
+                sizes="(max-width: 768px) 100vw, 800px"
+                unoptimized
                 priority
                 draggable={false}
               />
@@ -209,8 +209,8 @@ export default function HowItWorks() {
                 alt="Original pet photo"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 512px"
-                quality={95}
+                sizes="(max-width: 768px) 100vw, 800px"
+                unoptimized
                 priority
                 draggable={false}
               />
