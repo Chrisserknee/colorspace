@@ -64,11 +64,93 @@ function formatDate(dateString: string): string {
 
 // Simple markdown-like rendering
 function renderContent(content: string) {
-  const lines = content.trim().split('\n');
+  // First, extract and process CTA blocks
+  const ctaRegex = /<cta>([\s\S]*?)<\/cta>/g;
+  const ctaBlocks: { placeholder: string; content: string }[] = [];
+  let ctaIndex = 0;
+  
+  let processedContent = content.replace(ctaRegex, (match, ctaContent) => {
+    const placeholder = `__CTA_PLACEHOLDER_${ctaIndex}__`;
+    ctaBlocks.push({ placeholder, content: ctaContent });
+    ctaIndex++;
+    return placeholder;
+  });
+
+  const lines = processedContent.trim().split('\n');
   const elements: React.ReactNode[] = [];
   let inList = false;
   let listItems: string[] = [];
   let key = 0;
+
+  // Helper to render CTA block
+  const renderCTA = (ctaContent: string) => {
+    // Parse the CTA content
+    const ctaLines = ctaContent.trim().split('\n');
+    let title = '';
+    let description = '';
+    let buttonText = 'Create Your Portrait';
+    let buttonLink = '/';
+
+    for (const ctaLine of ctaLines) {
+      const trimmed = ctaLine.trim();
+      if (trimmed.startsWith('✨ **') || trimmed.startsWith('🐕 **') || trimmed.startsWith('🐱 **')) {
+        title = trimmed.replace(/[✨🐕🐱]\s*\*\*/g, '').replace(/\*\*/g, '');
+      } else if (trimmed.startsWith('[**')) {
+        // Extract button text and link
+        const match = trimmed.match(/\[\*\*([^*]+)\*\*\]\(([^)]+)\)/);
+        if (match) {
+          buttonText = match[1];
+          buttonLink = match[2];
+        }
+      } else if (trimmed && !trimmed.startsWith('*') && !trimmed.startsWith('[')) {
+        description += (description ? ' ' : '') + trimmed;
+      }
+    }
+
+    return (
+      <div 
+        key={key++} 
+        className="my-12 p-8 rounded-2xl relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(197,165,114,0.15) 0%, rgba(139,58,66,0.1) 100%)',
+          border: '1px solid rgba(197,165,114,0.3)',
+          boxShadow: '0 0 60px rgba(197,165,114,0.15), inset 0 1px 0 rgba(255,255,255,0.1)',
+        }}
+      >
+        {/* Magical sparkles */}
+        <div className="absolute top-4 right-4 text-2xl opacity-60 animate-pulse">✨</div>
+        <div className="absolute bottom-4 left-4 text-xl opacity-40 animate-pulse" style={{ animationDelay: '0.5s' }}>✨</div>
+        <div className="absolute top-1/2 right-8 text-lg opacity-30 animate-pulse" style={{ animationDelay: '1s' }}>⭐</div>
+        
+        <div className="relative z-10 text-center">
+          {title && (
+            <h3 className="font-['Cormorant_Garamond',Georgia,serif] text-2xl md:text-3xl font-semibold text-[#F0EDE8] mb-4">
+              {title}
+            </h3>
+          )}
+          {description && (
+            <p className="text-[#B8B2A8] text-lg mb-6 max-w-xl mx-auto leading-relaxed">
+              {description}
+            </p>
+          )}
+          <Link 
+            href={buttonLink}
+            className="group inline-flex items-center gap-3 px-8 py-4 text-[#0A0A0A] font-semibold text-lg rounded-full transition-all duration-500 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #C5A572 0%, #D4B896 50%, #E8C984 100%)',
+              boxShadow: '0 4px 20px rgba(197,165,114,0.5), 0 0 40px rgba(197,165,114,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
+            }}
+          >
+            <span className="text-xl">👑</span>
+            {buttonText}
+            <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+    );
+  };
 
   const processListItems = () => {
     if (listItems.length > 0) {
@@ -89,6 +171,17 @@ function renderContent(content: string) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmedLine = line.trim();
+    
+    // Check for CTA placeholder
+    const ctaMatch = trimmedLine.match(/__CTA_PLACEHOLDER_(\d+)__/);
+    if (ctaMatch) {
+      processListItems();
+      const ctaBlock = ctaBlocks[parseInt(ctaMatch[1])];
+      if (ctaBlock) {
+        elements.push(renderCTA(ctaBlock.content));
+      }
+      continue;
+    }
 
     // Empty line
     if (!trimmedLine) {
