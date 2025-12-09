@@ -37,12 +37,14 @@ export default function HowItWorks() {
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
     setIsDragging(true);
     handleMove(e.touches[0].clientX);
   }, [handleMove]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isDragging) return;
+    e.preventDefault();
     handleMove(e.touches[0].clientX);
   }, [isDragging, handleMove]);
 
@@ -167,6 +169,7 @@ export default function HowItWorks() {
             className="relative w-full aspect-[4/5] sm:aspect-[3/4] max-w-lg mx-auto rounded-2xl overflow-hidden shadow-2xl cursor-ew-resize select-none"
             style={{ 
               boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(197, 165, 114, 0.15)',
+              touchAction: 'none',
             }}
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
