@@ -383,6 +383,73 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }
   }, [initialResult, initialEmail, file]);
   
+  // Check for abandoned generations that may have completed
+  useEffect(() => {
+    if (typeof window === "undefined" || initialResult || result) return;
+    
+    const checkPendingGeneration = async () => {
+      try {
+        const pendingData = localStorage.getItem("lumepet_pending_generation");
+        if (!pendingData) return;
+        
+        const pending = JSON.parse(pendingData);
+        const minutesSince = (Date.now() - pending.startedAt) / (1000 * 60);
+        
+        // Only check if generation was started 1-30 minutes ago
+        // Less than 1 minute = probably still in progress with active connection
+        // More than 30 minutes = likely too old
+        if (minutesSince < 1 || minutesSince > 30) {
+          if (minutesSince > 30) {
+            localStorage.removeItem("lumepet_pending_generation");
+            console.log("🗑️ Cleared old pending generation (>30 min)");
+          }
+          return;
+        }
+        
+        console.log(`🔍 Checking for completed generation (started ${minutesSince.toFixed(1)} min ago)...`);
+        
+        const response = await fetch(`/api/check-generation?sessionId=${encodeURIComponent(pending.sessionId)}`);
+        const data = await response.json();
+        
+        if (data.found && data.imageId && data.previewUrl) {
+          console.log("🎉 Found completed generation!", data.imageId);
+          
+          // Clear pending and set result
+          localStorage.removeItem("lumepet_pending_generation");
+          
+          setResult({
+            imageId: data.imageId,
+            previewUrl: data.previewUrl,
+          });
+          
+          // Save to last session
+          const sessionData = {
+            imageId: data.imageId,
+            previewUrl: data.previewUrl,
+            timestamp: Date.now(),
+            type: 'lumepet',
+          };
+          localStorage.setItem('lumepet_last_session', JSON.stringify(sessionData));
+          saveLastCreation(data.imageId, data.previewUrl);
+          
+          setExpirationTime(Date.now() + 15 * 60 * 1000);
+          setStage("result");
+          
+          captureEvent("abandoned_generation_recovered", {
+            minutes_since_start: minutesSince.toFixed(1),
+            session_id: pending.sessionId,
+          });
+        } else {
+          console.log("⏳ No completed generation found yet");
+        }
+      } catch (err) {
+        console.warn("Failed to check pending generation:", err);
+      }
+    };
+    
+    checkPendingGeneration();
+  }, [initialResult, result]);
+  
   // Track when tab was hidden for duration calculation
   const tabHiddenTimeRef = useRef<number | null>(null);
   
@@ -798,6 +865,18 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
         formData.append("gender", gender);
       }
       
+      // Generate a unique session ID for this generation
+      // This allows us to recover the result if the user leaves and comes back
+      const generationSessionId = `gen_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      formData.append("generationSessionId", generationSessionId);
+      
+      // Save pending generation to localStorage so we can check for it later
+      localStorage.setItem("lumepet_pending_generation", JSON.stringify({
+        sessionId: generationSessionId,
+        startedAt: Date.now(),
+      }));
+      console.log("📝 Saved pending generation session:", generationSessionId);
+      
       // Check if user has pack credits (watermarked generation from $5 pack)
       const limits = getLimits();
       if (limits.packCredits > 0) {
@@ -863,6 +942,10 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       if (data.imageId && data.previewUrl) {
         saveLastCreation(data.imageId, data.previewUrl);
       }
+      
+      // Clear pending generation since we received the result
+      localStorage.removeItem("lumepet_pending_generation");
+      console.log("✅ Cleared pending generation - result received");
       
       // Handle pack credit usage or increment generation count
       const currentLimits = getLimits();

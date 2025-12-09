@@ -2337,6 +2337,7 @@ export async function POST(request: NextRequest) {
     const useSecretCredit = formData.get("useSecretCredit") === "true";
     const style = formData.get("style") as string | null; // "rainbow-bridge" for memorial portraits
     const petName = formData.get("petName") as string | null; // Pet's name for rainbow bridge portraits
+    const generationSessionId = formData.get("generationSessionId") as string | null; // For recovering abandoned generations
     
     // Studio mode - unlimited generations with custom prompts (already checked above as isStudioMode)
     const studioMode = isStudioMode;
@@ -5118,6 +5119,7 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
         pet_description: finalDescription,
       hd_url: hdUrl,
       preview_url: previewUrl,
+        generation_session_id: generationSessionId || null, // For recovering abandoned generations
         // Note: style, pet_name, and quote fields not in portraits table schema yet
         // Rainbow Bridge metadata: style="rainbow-bridge", pet_name, quote (stored in pet_description for now)
         // Note: pack_generation not tracked in DB - pack credits just give watermarked generations
