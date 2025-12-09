@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 
 export default function HowItWorks() {
@@ -8,18 +8,17 @@ export default function HowItWorks() {
   const containerRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
   const beforeRef = useRef<HTMLDivElement>(null);
-  const positionRef = useRef(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const hasInteractedRef = useRef(false);
 
-  // Direct DOM update for smooth performance (no React re-render)
+  // Direct DOM update for smooth performance
   const updateSliderPosition = useCallback((percentage: number) => {
-    positionRef.current = percentage;
     if (sliderRef.current) {
-      sliderRef.current.style.left = `${percentage}%`;
+      sliderRef.current.style.transform = `translateX(${percentage}%)`;
     }
     if (beforeRef.current) {
-      beforeRef.current.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+      beforeRef.current.style.width = `${percentage}%`;
     }
   }, []);
 
@@ -31,51 +30,77 @@ export default function HowItWorks() {
     const x = clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
     updateSliderPosition(percentage);
-    setHasInteracted(true);
+    hasInteractedRef.current = true;
   }, [updateSliderPosition]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-    handleMove(e.clientX);
-  }, [handleMove]);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
-    handleMove(e.clientX);
-  }, [isDragging, handleMove]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-    handleMove(e.touches[0].clientX);
-  }, [handleMove]);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    handleMove(e.touches[0].clientX);
-  }, [isDragging, handleMove]);
-
-  const handleTouchEnd = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  // Global mouse event listeners
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+  const handleStart = useCallback((clientX: number) => {
+    isDraggingRef.current = true;
+    if (handleRef.current) {
+      handleRef.current.style.transform = 'translate(-50%, -50%) scale(1.1)';
     }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+    handleMove(clientX);
+  }, [handleMove]);
+
+  const handleEnd = useCallback(() => {
+    isDraggingRef.current = false;
+    if (handleRef.current) {
+      handleRef.current.style.transform = 'translate(-50%, -50%) scale(1)';
+    }
+  }, []);
+
+  // Set up event listeners
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onMouseDown = (e: MouseEvent) => {
+      e.preventDefault();
+      handleStart(e.clientX);
     };
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      handleMove(e.clientX);
+    };
+
+    const onMouseUp = () => {
+      handleEnd();
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      handleStart(e.touches[0].clientX);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDraggingRef.current) return;
+      e.preventDefault();
+      handleMove(e.touches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+      handleEnd();
+    };
+
+    // Container events
+    container.addEventListener('mousedown', onMouseDown);
+    container.addEventListener('touchstart', onTouchStart, { passive: false });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
+
+    // Window events for mouse
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      container.removeEventListener('mousedown', onMouseDown);
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [handleStart, handleMove, handleEnd]);
 
   // Intersection observer for reveal animation
   useEffect(() => {
@@ -98,34 +123,35 @@ export default function HowItWorks() {
 
   // Auto-animate slider on first view
   useEffect(() => {
-    if (hasInteracted) return;
-    
+    const container = containerRef.current;
+    if (!container) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasInteracted) {
+          if (entry.isIntersecting && !hasInteractedRef.current) {
             const animate = async () => {
               await new Promise(r => setTimeout(r, 500));
-              if (hasInteracted) return;
+              if (hasInteractedRef.current) return;
               
               let pos = 50;
               const animateTo = (target: number, duration: number) => {
                 return new Promise<void>((resolve) => {
                   const start = pos;
-                  const startTime = Date.now();
-                  const tick = () => {
-                    const elapsed = Date.now() - startTime;
+                  const startTime = performance.now();
+                  const tick = (now: number) => {
+                    const elapsed = now - startTime;
                     const progress = Math.min(elapsed / duration, 1);
                     const eased = 1 - Math.pow(1 - progress, 3);
                     pos = start + (target - start) * eased;
                     updateSliderPosition(pos);
-                    if (progress < 1 && !hasInteracted) {
+                    if (progress < 1 && !hasInteractedRef.current) {
                       requestAnimationFrame(tick);
                     } else {
                       resolve();
                     }
                   };
-                  tick();
+                  requestAnimationFrame(tick);
                 });
               };
               
@@ -143,12 +169,9 @@ export default function HowItWorks() {
       { threshold: 0.5 }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
+    observer.observe(container);
     return () => observer.disconnect();
-  }, [hasInteracted, updateSliderPosition]);
+  }, [updateSliderPosition]);
 
   return (
     <section ref={sectionRef} className="py-12 sm:py-20 px-6" id="how-it-works">
@@ -181,10 +204,6 @@ export default function HowItWorks() {
               boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(197, 165, 114, 0.15)',
               touchAction: 'none',
             }}
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
             {/* After Image (Full width, underneath) */}
             <div className="absolute inset-0">
@@ -210,28 +229,32 @@ export default function HowItWorks() {
               </div>
             </div>
 
-            {/* Before Image (Clipped) */}
+            {/* Before Image Container - uses width instead of clip-path */}
             <div 
               ref={beforeRef}
-              className="absolute inset-0 overflow-hidden"
+              className="absolute top-0 left-0 bottom-0 overflow-hidden"
               style={{ 
-                clipPath: 'inset(0 50% 0 0)',
-                willChange: 'clip-path',
+                width: '50%',
+                willChange: 'width',
               }}
             >
-              <Image
-                src="/samples/before.png"
-                alt="Original pet photo"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 800px"
-                unoptimized
-                priority
-                draggable={false}
-              />
+              {/* Before Image - fixed to container width */}
+              <div className="absolute inset-0" style={{ width: containerRef.current?.offsetWidth || '100vw' }}>
+                <Image
+                  src="/samples/before.png"
+                  alt="Original pet photo"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  unoptimized
+                  priority
+                  draggable={false}
+                  style={{ maxWidth: 'none', width: '100%' }}
+                />
+              </div>
               {/* Before Label */}
               <div 
-                className="absolute bottom-4 left-4 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider backdrop-blur-sm"
+                className="absolute bottom-4 left-4 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider backdrop-blur-sm z-10"
                 style={{ 
                   backgroundColor: 'rgba(240, 237, 232, 0.9)',
                   color: '#1A1815',
@@ -241,24 +264,28 @@ export default function HowItWorks() {
               </div>
             </div>
 
-            {/* Slider Handle */}
+            {/* Slider Handle - uses transform instead of left */}
             <div 
               ref={sliderRef}
-              className="absolute top-0 bottom-0 w-1 -translate-x-1/2 z-10"
+              className="absolute top-0 bottom-0 w-1 z-10 pointer-events-none"
               style={{ 
-                left: '50%',
+                left: 0,
+                transform: 'translateX(50%)',
+                transformOrigin: 'left',
                 backgroundColor: '#C5A572',
                 boxShadow: '0 0 20px rgba(197, 165, 114, 0.5)',
-                willChange: 'left',
+                willChange: 'transform',
               }}
             >
               {/* Handle Circle */}
               <div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-150"
+                ref={handleRef}
+                className="absolute top-1/2 left-1/2 w-12 h-12 rounded-full flex items-center justify-center"
                 style={{ 
                   backgroundColor: '#C5A572',
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-                  transform: `translate(-50%, -50%) scale(${isDragging ? 1.1 : 1})`,
+                  transform: 'translate(-50%, -50%) scale(1)',
+                  transition: 'transform 0.15s ease-out',
                 }}
               >
                 {/* Arrows */}
