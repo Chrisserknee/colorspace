@@ -275,26 +275,6 @@ export default function Gallery() {
             )}
           </button>
 
-          {/* Image info - positioned at top */}
-          {!isZoomed && (
-            <div 
-              className="absolute top-4 sm:top-8 left-1/2 transform -translate-x-1/2 text-center z-10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 
-                className="text-2xl sm:text-3xl mb-1"
-                style={{ 
-                  fontFamily: "'Cormorant Garamond', Georgia, serif", 
-                  color: '#F0EDE8',
-                  textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)'
-                }}
-              >
-                {selectedImage.title}
-              </h3>
-              <p className="text-sm" style={{ color: '#C5A572', textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)' }}>{selectedImage.pet}</p>
-            </div>
-          )}
-
           {/* Image container with glow */}
           <div 
             className={`relative transition-all duration-300 ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
@@ -338,13 +318,24 @@ export default function Gallery() {
             </div>
           </div>
 
-          {/* Help text at bottom */}
+          {/* Image info - positioned at bottom */}
           {!isZoomed && (
             <div 
-              className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 text-center"
+              className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="text-xs" style={{ color: '#7A756D' }}>
+              <h3 
+                className="text-2xl sm:text-3xl mb-1"
+                style={{ 
+                  fontFamily: "'Cormorant Garamond', Georgia, serif", 
+                  color: '#F0EDE8',
+                  textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)'
+                }}
+              >
+                {selectedImage.title}
+              </h3>
+              <p className="text-sm" style={{ color: '#C5A572' }}>{selectedImage.pet}</p>
+              <p className="text-xs mt-2" style={{ color: '#7A756D' }}>
                 Click image to zoom • Press ESC to close
               </p>
             </div>
