@@ -820,7 +820,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       
       try {
         // Cancel URL returns user to their portrait via session restore
-        const cancelUrl = `/rainbow-bridge?email=${encodeURIComponent(email)}`;
+        const cancelUrl = `/rainbow-bridge?fromCheckout=true&email=${encodeURIComponent(email)}`;
         
         const response = await fetch("/api/checkout", {
           method: "POST",
@@ -923,7 +923,7 @@ export default function RainbowBridgeFlow({ file, onReset, initialEmail }: Rainb
       }
       
       // Cancel URL returns user to their portrait via session restore
-      const cancelUrl = `/rainbow-bridge?email=${encodeURIComponent(email)}`;
+      const cancelUrl = `/rainbow-bridge?fromCheckout=true&email=${encodeURIComponent(email)}`;
       
       console.log("Creating checkout session:", {
         imageId: isPackPurchase ? null : result.imageId,

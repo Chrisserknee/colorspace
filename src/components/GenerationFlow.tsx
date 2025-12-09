@@ -1061,8 +1061,9 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     }, 1000);
     
     try {
-      // Cancel URL returns user to result page
-      const cancelUrl = `/`;
+      // Cancel URL returns user to homepage where session will auto-restore from localStorage
+      // Adding ?fromCheckout=true helps ensure the session restoration is triggered
+      const cancelUrl = `/?fromCheckout=true`;
       
       const apiStartTime = Date.now();
       const response = await fetch("/api/checkout", {
@@ -1191,7 +1192,7 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
 
     try {
       // Cancel URL returns user to their portrait via session restore
-      const cancelUrl = `/?email=${encodeURIComponent(email)}`;
+      const cancelUrl = `/?fromCheckout=true&email=${encodeURIComponent(email)}`;
       
       const requestBody = { 
         imageId: isPackPurchase ? null : result.imageId, 
