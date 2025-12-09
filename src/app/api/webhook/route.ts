@@ -234,12 +234,12 @@ export async function POST(request: NextRequest) {
           try {
             await trackServerCompletePayment({
               email: customerEmail || undefined,
-              value: 0.50,
+              value: 4.99,
               content_id: "unlimited-session",
               content_name: "Royal Unlimited Session",
               order_id: session.id,
             });
-            console.log(`📱 TikTok server event sent: CompletePayment $0.50 (Royal Unlimited Session)`);
+            console.log(`📱 TikTok server event sent: CompletePayment $4.99 (Royal Unlimited Session)`);
           } catch (tiktokError) {
             console.warn("⚠️ TikTok server tracking failed:", tiktokError);
           }

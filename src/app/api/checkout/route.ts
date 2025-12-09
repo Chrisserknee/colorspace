@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       console.log(`Creating unlimited session checkout: price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
     } else if (isPackPurchase) {
       // Legacy pack purchase support
-      priceAmount = 50; // Default to $0.50 (same as unlimited - testing price)
+      priceAmount = 499; // Default to $4.99 (same as unlimited)
       productName = "LumePet Royal Unlimited Session";
       productDescription = "Unlimited generations for 2 hours";
       console.log(`Legacy pack purchase redirected to unlimited session: ${priceAmount} cents`);

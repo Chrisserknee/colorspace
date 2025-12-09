@@ -5,8 +5,8 @@ export const CONFIG = {
   PRICE_AMOUNT: 1999, // $19.99 in cents
   
   // Royal Unlimited Session - 2 hours of unlimited generations
-  UNLIMITED_SESSION_PRICE_DISPLAY: "$0.50",
-  UNLIMITED_SESSION_PRICE_AMOUNT: 50, // $0.50 in cents (testing price)
+  UNLIMITED_SESSION_PRICE_DISPLAY: "$4.99",
+  UNLIMITED_SESSION_PRICE_AMOUNT: 499, // $4.99 in cents
   UNLIMITED_SESSION_DURATION_HOURS: 2,
   UNLIMITED_SESSION_NAME: "Royal Unlimited Session",
   UNLIMITED_SESSION_DESCRIPTION: "Unlimited generations for 2 hours - create as many portraits as you want!",

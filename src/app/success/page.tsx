@@ -312,7 +312,7 @@ function SuccessContent() {
     let contentName = "Pet Portrait";
     
     if (type === "unlimited-session" || type === "pack") {
-      purchaseValue = 0.50;
+      purchaseValue = 4.99;
       contentName = "Royal Unlimited Session";
     } else if (type === "canvas") {
       // Canvas purchase - get value from URL or use defaults

@@ -78,7 +78,7 @@ function UnlimitedCheckoutContent() {
             className="text-4xl sm:text-5xl font-bold"
             style={{ color: '#C5A572' }}
           >
-            $0.50
+            $4.99
           </span>
         </div>
 
@@ -143,7 +143,7 @@ function UnlimitedCheckoutContent() {
             boxShadow: '0 4px 20px rgba(197, 165, 114, 0.4)',
           }}
         >
-          {loading ? "Processing..." : "Start Unlimited Session — $0.50"}
+          {loading ? "Processing..." : "Start Unlimited Session — $4.99"}
         </button>
 
         {/* Back link */}
