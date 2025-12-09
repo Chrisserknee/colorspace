@@ -641,12 +641,17 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("restored") === "true") {
-        // Show success message
-        setShowPackPurchaseSuccess(true);
+        // Only show success message if they actually have an unlimited session
+        // (prevents showing success message when user cancels checkout)
+        const unlimitedSession = getUnlimitedSession();
+        if (unlimitedSession) {
+          // Show success message only if they actually purchased
+          setShowPackPurchaseSuccess(true);
+          // Hide success message after 5 seconds
+          setTimeout(() => setShowPackPurchaseSuccess(false), 5000);
+        }
         // Clean up URL
         window.history.replaceState({}, "", window.location.pathname);
-        // Hide success message after 5 seconds
-        setTimeout(() => setShowPackPurchaseSuccess(false), 5000);
         // Refresh limits to show new credits
         const limits = getLimits();
         setGenerationLimits(limits);
