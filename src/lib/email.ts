@@ -559,5 +559,4 @@ function getCanvasShippedHTML(params: {
 </html>
 `;
 }
-}
 
