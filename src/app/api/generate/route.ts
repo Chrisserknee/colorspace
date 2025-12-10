@@ -2419,7 +2419,7 @@ async function createBeforeAfterImage(
   imageId: string
 ): Promise<void> {
   try {
-    console.log(`🖼️ Creating side-by-side before/after image (FULL RESOLUTION) for ${imageId}...`);
+    console.log(`🖼️ Creating multiple before/after image variations (FULL RESOLUTION) for ${imageId}...`);
     
     // Get metadata for both images (full resolution)
     const originalMeta = await sharp(originalBuffer).metadata();
@@ -2428,53 +2428,245 @@ async function createBeforeAfterImage(
     console.log(`📐 Original image: ${originalMeta.width}x${originalMeta.height}`);
     console.log(`📐 Generated image: ${generatedMeta.width}x${generatedMeta.height}`);
     
-    // Use FULL RESOLUTION - no resizing
-    // Determine target height (use the larger height to accommodate both images)
-    const targetHeight = Math.max(originalMeta.height || 1024, generatedMeta.height || 1024);
-    
-    // Align both images to the same height by centering vertically
-    // Original image (left side) - full resolution, centered vertically
     const originalWidth = originalMeta.width || 1024;
     const originalHeight = originalMeta.height || 1024;
-    const originalTop = Math.floor((targetHeight - originalHeight) / 2);
-    
-    // Generated image (right side) - full resolution, centered vertically
     const generatedWidth = generatedMeta.width || 1024;
     const generatedHeight = generatedMeta.height || 1024;
-    const generatedTop = Math.floor((targetHeight - generatedHeight) / 2);
     
-    const combinedWidth = originalWidth + generatedWidth;
+    // 1. HORIZONTAL SIDE-BY-SIDE (original format)
+    try {
+      const targetHeight = Math.max(originalHeight, generatedHeight);
+      const originalTop = Math.floor((targetHeight - originalHeight) / 2);
+      const generatedTop = Math.floor((targetHeight - generatedHeight) / 2);
+      const combinedWidth = originalWidth + generatedWidth;
+      
+      const horizontalBuffer = await sharp({
+        create: {
+          width: combinedWidth,
+          height: targetHeight,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        }
+      })
+        .composite([
+          { input: originalBuffer, left: 0, top: originalTop },
+          { input: generatedBuffer, left: originalWidth, top: generatedTop }
+        ])
+        .png()
+        .toBuffer();
+      
+      await uploadBeforeAfterImage(
+        horizontalBuffer,
+        `${imageId}-before-after-horizontal.png`,
+        "image/png"
+      );
+      console.log(`✅ Horizontal before/after uploaded: ${imageId}-before-after-horizontal.png`);
+    } catch (error) {
+      console.error(`⚠️ Failed to create horizontal before/after:`, error);
+    }
     
-    // Create side-by-side composite using FULL RESOLUTION images
-    const beforeAfterBuffer = await sharp({
-      create: {
-        width: combinedWidth,
-        height: targetHeight,
-        channels: 4,
-        background: { r: 255, g: 255, b: 255, alpha: 1 }
-      }
-    })
-      .composite([
-        { input: originalBuffer, left: 0, top: originalTop }, // Full resolution original
-        { input: generatedBuffer, left: originalWidth, top: generatedTop } // Full resolution generated
-      ])
-      .png()
-      .toBuffer();
+    // 2. PORTRAIT STACKED (vertical)
+    try {
+      const targetWidth = Math.max(originalWidth, generatedWidth);
+      const originalLeft = Math.floor((targetWidth - originalWidth) / 2);
+      const generatedLeft = Math.floor((targetWidth - generatedWidth) / 2);
+      const combinedHeight = originalHeight + generatedHeight;
+      
+      const portraitBuffer = await sharp({
+        create: {
+          width: targetWidth,
+          height: combinedHeight,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        }
+      })
+        .composite([
+          { input: originalBuffer, left: originalLeft, top: 0 },
+          { input: generatedBuffer, left: generatedLeft, top: originalHeight }
+        ])
+        .png()
+        .toBuffer();
+      
+      await uploadBeforeAfterImage(
+        portraitBuffer,
+        `${imageId}-before-after-portrait.png`,
+        "image/png"
+      );
+      console.log(`✅ Portrait before/after uploaded: ${imageId}-before-after-portrait.png`);
+    } catch (error) {
+      console.error(`⚠️ Failed to create portrait before/after:`, error);
+    }
     
-    const finalMeta = await sharp(beforeAfterBuffer).metadata();
-    console.log(`📐 Final before/after image: ${finalMeta.width}x${finalMeta.height} (FULL RESOLUTION)`);
+    // 3. SQUARE FORMAT (1:1) - Instagram post style
+    try {
+      const squareSize = Math.max(
+        Math.max(originalWidth, generatedWidth),
+        Math.max(originalHeight, generatedHeight)
+      );
+      
+      // Resize both images to fit square, maintaining aspect ratio
+      const originalSquare = await sharp(originalBuffer)
+        .resize(squareSize / 2, squareSize / 2, { fit: 'inside', withoutEnlargement: false })
+        .png()
+        .toBuffer();
+      
+      const generatedSquare = await sharp(generatedBuffer)
+        .resize(squareSize / 2, squareSize / 2, { fit: 'inside', withoutEnlargement: false })
+        .png()
+        .toBuffer();
+      
+      const originalSquareMeta = await sharp(originalSquare).metadata();
+      const generatedSquareMeta = await sharp(generatedSquare).metadata();
+      
+      const originalSquareWidth = originalSquareMeta.width || squareSize / 2;
+      const originalSquareHeight = originalSquareMeta.height || squareSize / 2;
+      const generatedSquareWidth = generatedSquareMeta.width || squareSize / 2;
+      const generatedSquareHeight = generatedSquareMeta.height || squareSize / 2;
+      
+      const originalSquareTop = Math.floor((squareSize / 2 - originalSquareHeight) / 2);
+      const generatedSquareTop = Math.floor((squareSize / 2 - generatedSquareHeight) / 2);
+      const originalSquareLeft = Math.floor((squareSize / 2 - originalSquareWidth) / 2);
+      const generatedSquareLeft = Math.floor((squareSize / 2 - generatedSquareWidth) / 2);
+      
+      const squareBuffer = await sharp({
+        create: {
+          width: squareSize,
+          height: squareSize,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        }
+      })
+        .composite([
+          { input: originalSquare, left: originalSquareLeft, top: originalSquareTop },
+          { input: generatedSquare, left: Math.floor(squareSize / 2) + generatedSquareLeft, top: generatedSquareTop }
+        ])
+        .png()
+        .toBuffer();
+      
+      await uploadBeforeAfterImage(
+        squareBuffer,
+        `${imageId}-before-after-square.png`,
+        "image/png"
+      );
+      console.log(`✅ Square before/after uploaded: ${imageId}-before-after-square.png`);
+    } catch (error) {
+      console.error(`⚠️ Failed to create square before/after:`, error);
+    }
     
-    // Upload to Before_After bucket
-    await uploadBeforeAfterImage(
-      beforeAfterBuffer,
-      `${imageId}-before-after.png`,
-      "image/png"
-    );
+    // 4. INSTAGRAM STORY FORMAT (9:16 vertical)
+    try {
+      const storyWidth = 1080;
+      const storyHeight = 1920;
+      const halfHeight = Math.floor(storyHeight / 2);
+      
+      // Resize images to fit story format
+      const originalStory = await sharp(originalBuffer)
+        .resize(storyWidth, halfHeight, { fit: 'inside', withoutEnlargement: false })
+        .png()
+        .toBuffer();
+      
+      const generatedStory = await sharp(generatedBuffer)
+        .resize(storyWidth, halfHeight, { fit: 'inside', withoutEnlargement: false })
+        .png()
+        .toBuffer();
+      
+      const originalStoryMeta = await sharp(originalStory).metadata();
+      const generatedStoryMeta = await sharp(generatedStory).metadata();
+      
+      const originalStoryWidth = originalStoryMeta.width || storyWidth;
+      const originalStoryHeight = originalStoryMeta.height || halfHeight;
+      const generatedStoryWidth = generatedStoryMeta.width || storyWidth;
+      const generatedStoryHeight = generatedStoryMeta.height || halfHeight;
+      
+      const originalStoryLeft = Math.floor((storyWidth - originalStoryWidth) / 2);
+      const generatedStoryLeft = Math.floor((storyWidth - generatedStoryWidth) / 2);
+      const originalStoryTop = Math.floor((halfHeight - originalStoryHeight) / 2);
+      const generatedStoryTop = halfHeight + Math.floor((halfHeight - generatedStoryHeight) / 2);
+      
+      const storyBuffer = await sharp({
+        create: {
+          width: storyWidth,
+          height: storyHeight,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        }
+      })
+        .composite([
+          { input: originalStory, left: originalStoryLeft, top: originalStoryTop },
+          { input: generatedStory, left: generatedStoryLeft, top: generatedStoryTop }
+        ])
+        .png()
+        .toBuffer();
+      
+      await uploadBeforeAfterImage(
+        storyBuffer,
+        `${imageId}-before-after-story.png`,
+        "image/png"
+      );
+      console.log(`✅ Story format before/after uploaded: ${imageId}-before-after-story.png`);
+    } catch (error) {
+      console.error(`⚠️ Failed to create story format before/after:`, error);
+    }
     
-    console.log(`✅ Side-by-side before/after image uploaded (FULL RESOLUTION): ${imageId}-before-after.png`);
+    // 5. FACEBOOK AD FORMAT (1.91:1 horizontal)
+    try {
+      const fbWidth = 1200;
+      const fbHeight = 628;
+      const halfWidth = Math.floor(fbWidth / 2);
+      
+      // Resize images to fit Facebook ad format
+      const originalFb = await sharp(originalBuffer)
+        .resize(halfWidth, fbHeight, { fit: 'inside', withoutEnlargement: false })
+        .png()
+        .toBuffer();
+      
+      const generatedFb = await sharp(generatedBuffer)
+        .resize(halfWidth, fbHeight, { fit: 'inside', withoutEnlargement: false })
+        .png()
+        .toBuffer();
+      
+      const originalFbMeta = await sharp(originalFb).metadata();
+      const generatedFbMeta = await sharp(generatedFb).metadata();
+      
+      const originalFbWidth = originalFbMeta.width || halfWidth;
+      const originalFbHeight = originalFbMeta.height || fbHeight;
+      const generatedFbWidth = generatedFbMeta.width || halfWidth;
+      const generatedFbHeight = generatedFbMeta.height || fbHeight;
+      
+      const originalFbLeft = Math.floor((halfWidth - originalFbWidth) / 2);
+      const generatedFbLeft = halfWidth + Math.floor((halfWidth - generatedFbWidth) / 2);
+      const originalFbTop = Math.floor((fbHeight - originalFbHeight) / 2);
+      const generatedFbTop = Math.floor((fbHeight - generatedFbHeight) / 2);
+      
+      const fbBuffer = await sharp({
+        create: {
+          width: fbWidth,
+          height: fbHeight,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        }
+      })
+        .composite([
+          { input: originalFb, left: originalFbLeft, top: originalFbTop },
+          { input: generatedFb, left: generatedFbLeft, top: generatedFbTop }
+        ])
+        .png()
+        .toBuffer();
+      
+      await uploadBeforeAfterImage(
+        fbBuffer,
+        `${imageId}-before-after-facebook.png`,
+        "image/png"
+      );
+      console.log(`✅ Facebook ad format before/after uploaded: ${imageId}-before-after-facebook.png`);
+    } catch (error) {
+      console.error(`⚠️ Failed to create Facebook ad format before/after:`, error);
+    }
+    
+    console.log(`✅ All before/after image variations created for ${imageId}`);
   } catch (error) {
     // Don't fail the generation if before/after upload fails
-    console.error(`⚠️ Failed to create before/after image:`, error);
+    console.error(`⚠️ Failed to create before/after images:`, error);
   }
 }
 
