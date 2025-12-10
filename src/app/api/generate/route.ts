@@ -2819,178 +2819,12 @@ async function createBeforeAfterImage(
         `${imageId}-before-after-portrait.png`,
         "image/png"
       );
-      console.log(`✅ Portrait before/after uploaded: ${imageId}-before-after-portrait.png`);
+      console.log(`✅ Portrait (vertical) before/after uploaded: ${imageId}-before-after-portrait.png`);
     } catch (error) {
       console.error(`⚠️ Failed to create portrait before/after:`, error);
     }
     
-    // 3. SQUARE FORMAT (1:1) - Instagram post style
-    try {
-      const squareSize = Math.max(
-        Math.max(originalWidth, generatedWidth),
-        Math.max(originalHeight, generatedHeight)
-      );
-      
-      // Resize both images to fit square, maintaining aspect ratio
-      const originalSquare = await sharp(originalBuffer)
-        .resize(squareSize / 2, squareSize / 2, { fit: 'inside', withoutEnlargement: false })
-        .png()
-        .toBuffer();
-      
-      const generatedSquare = await sharp(generatedBuffer)
-        .resize(squareSize / 2, squareSize / 2, { fit: 'inside', withoutEnlargement: false })
-        .png()
-        .toBuffer();
-      
-      const originalSquareMeta = await sharp(originalSquare).metadata();
-      const generatedSquareMeta = await sharp(generatedSquare).metadata();
-      
-      const originalSquareWidth = originalSquareMeta.width || squareSize / 2;
-      const originalSquareHeight = originalSquareMeta.height || squareSize / 2;
-      const generatedSquareWidth = generatedSquareMeta.width || squareSize / 2;
-      const generatedSquareHeight = generatedSquareMeta.height || squareSize / 2;
-      
-      const originalSquareTop = Math.floor((squareSize / 2 - originalSquareHeight) / 2);
-      const generatedSquareTop = Math.floor((squareSize / 2 - generatedSquareHeight) / 2);
-      const originalSquareLeft = Math.floor((squareSize / 2 - originalSquareWidth) / 2);
-      const generatedSquareLeft = Math.floor((squareSize / 2 - generatedSquareWidth) / 2);
-      
-      const squareBuffer = await sharp({
-        create: {
-          width: squareSize,
-          height: squareSize,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .composite([
-          { input: originalSquare, left: originalSquareLeft, top: originalSquareTop },
-          { input: generatedSquare, left: Math.floor(squareSize / 2) + generatedSquareLeft, top: generatedSquareTop }
-        ])
-        .png()
-        .toBuffer();
-      
-      await uploadBeforeAfterImage(
-        squareBuffer,
-        `${imageId}-before-after-square.png`,
-        "image/png"
-      );
-      console.log(`✅ Square before/after uploaded: ${imageId}-before-after-square.png`);
-    } catch (error) {
-      console.error(`⚠️ Failed to create square before/after:`, error);
-    }
-    
-    // 4. INSTAGRAM STORY FORMAT (9:16 vertical)
-    try {
-      const storyWidth = 1080;
-      const storyHeight = 1920;
-      const halfHeight = Math.floor(storyHeight / 2);
-      
-      // Resize images to fit story format
-      const originalStory = await sharp(originalBuffer)
-        .resize(storyWidth, halfHeight, { fit: 'inside', withoutEnlargement: false })
-        .png()
-        .toBuffer();
-      
-      const generatedStory = await sharp(generatedBuffer)
-        .resize(storyWidth, halfHeight, { fit: 'inside', withoutEnlargement: false })
-        .png()
-        .toBuffer();
-      
-      const originalStoryMeta = await sharp(originalStory).metadata();
-      const generatedStoryMeta = await sharp(generatedStory).metadata();
-      
-      const originalStoryWidth = originalStoryMeta.width || storyWidth;
-      const originalStoryHeight = originalStoryMeta.height || halfHeight;
-      const generatedStoryWidth = generatedStoryMeta.width || storyWidth;
-      const generatedStoryHeight = generatedStoryMeta.height || halfHeight;
-      
-      const originalStoryLeft = Math.floor((storyWidth - originalStoryWidth) / 2);
-      const generatedStoryLeft = Math.floor((storyWidth - generatedStoryWidth) / 2);
-      const originalStoryTop = Math.floor((halfHeight - originalStoryHeight) / 2);
-      const generatedStoryTop = halfHeight + Math.floor((halfHeight - generatedStoryHeight) / 2);
-      
-      const storyBuffer = await sharp({
-        create: {
-          width: storyWidth,
-          height: storyHeight,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .composite([
-          { input: originalStory, left: originalStoryLeft, top: originalStoryTop },
-          { input: generatedStory, left: generatedStoryLeft, top: generatedStoryTop }
-        ])
-        .png()
-        .toBuffer();
-      
-      await uploadBeforeAfterImage(
-        storyBuffer,
-        `${imageId}-before-after-story.png`,
-        "image/png"
-      );
-      console.log(`✅ Story format before/after uploaded: ${imageId}-before-after-story.png`);
-    } catch (error) {
-      console.error(`⚠️ Failed to create story format before/after:`, error);
-    }
-    
-    // 5. FACEBOOK AD FORMAT (1.91:1 horizontal)
-    try {
-      const fbWidth = 1200;
-      const fbHeight = 628;
-      const halfWidth = Math.floor(fbWidth / 2);
-      
-      // Resize images to fit Facebook ad format
-      const originalFb = await sharp(originalBuffer)
-        .resize(halfWidth, fbHeight, { fit: 'inside', withoutEnlargement: false })
-        .png()
-        .toBuffer();
-      
-      const generatedFb = await sharp(generatedBuffer)
-        .resize(halfWidth, fbHeight, { fit: 'inside', withoutEnlargement: false })
-        .png()
-        .toBuffer();
-      
-      const originalFbMeta = await sharp(originalFb).metadata();
-      const generatedFbMeta = await sharp(generatedFb).metadata();
-      
-      const originalFbWidth = originalFbMeta.width || halfWidth;
-      const originalFbHeight = originalFbMeta.height || fbHeight;
-      const generatedFbWidth = generatedFbMeta.width || halfWidth;
-      const generatedFbHeight = generatedFbMeta.height || fbHeight;
-      
-      const originalFbLeft = Math.floor((halfWidth - originalFbWidth) / 2);
-      const generatedFbLeft = halfWidth + Math.floor((halfWidth - generatedFbWidth) / 2);
-      const originalFbTop = Math.floor((fbHeight - originalFbHeight) / 2);
-      const generatedFbTop = Math.floor((fbHeight - generatedFbHeight) / 2);
-      
-      const fbBuffer = await sharp({
-        create: {
-          width: fbWidth,
-          height: fbHeight,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .composite([
-          { input: originalFb, left: originalFbLeft, top: originalFbTop },
-          { input: generatedFb, left: generatedFbLeft, top: generatedFbTop }
-        ])
-        .png()
-        .toBuffer();
-      
-      await uploadBeforeAfterImage(
-        fbBuffer,
-        `${imageId}-before-after-facebook.png`,
-        "image/png"
-      );
-      console.log(`✅ Facebook ad format before/after uploaded: ${imageId}-before-after-facebook.png`);
-    } catch (error) {
-      console.error(`⚠️ Failed to create Facebook ad format before/after:`, error);
-    }
-    
-    console.log(`✅ All Studio mode before/after image variations created for ${imageId}`);
+    console.log(`✅ Studio mode before/after images created (horizontal + vertical) for ${imageId}`);
   } catch (error) {
     // Don't fail the generation if before/after upload fails
     console.error(`⚠️ Failed to create before/after images:`, error);
@@ -4362,27 +4196,29 @@ STYLE – ANTIQUE OIL MASTERPIECE
 
 - Looks like a 200–300 year old painting found in a grand estate, not new.
 
-HEAVY PAINTERLY FACIAL TREATMENT (CREATES STRONG ARTISTIC ILLUSION):
+EXTREMELY HEAVY PAINTERLY FACIAL TREATMENT (CRITICAL - MUST OBSCURE FACE):
 
-- Apply HEAVY painterly texture and BOLD brushstrokes specifically to the face and head area - MORE than the rest of the image.
+- Apply EXTREMELY HEAVY painterly texture and VERY BOLD, THICK brushstrokes to the ENTIRE face and head area - SIGNIFICANTLY MORE than the rest of the image.
 
-- SIGNIFICANTLY SOFTEN facial details with visible, loose brushstrokes - use IMPRESSIONISTIC, flowing brushwork that blends and obscures features.
+- HEAVILY OBSCURE all facial details with thick, visible brushstrokes - the face should look like an IMPRESSIONIST PAINTING, not a photograph. Think MONET, RENOIR, or VAN GOGH close-up.
 
-- OBSCURE facial details with artistic texture - let THICK brushstrokes create soft, blurred transitions between features. Minor details should be lost in the paint texture.
+- Use VERY LOOSE, EXPRESSIVE brushwork that BREAKS UP and FRAGMENTS facial features - individual brush strokes should be clearly visible and create texture that hides precise details.
 
-- Create a STRONG ARTISTIC ILLUSION through painterly rendering - the heavy artistic texture helps viewers see their pet's essence rather than any imperfections.
+- BLUR and SOFTEN all facial transitions - no sharp edges on eyes, nose, mouth, or facial markings. Everything blends together with soft, painterly strokes.
 
-- Use VERY IMPRESSIONISTIC brushwork on the face - visible, CHUNKY strokes that SUGGEST features rather than rendering them sharply. Like Monet or Renoir.
+- Apply EXTREMELY THICK impasto texture - CHUNKY raised paint on nose, around eyes, on cheeks, muzzle, and forehead. The paint should look physically THICK and TEXTURED.
 
-- Apply VERY THICK impasto paint texture on facial highlights - HEAVY impasto on nose, eyes, and fur highlights creates depth and softness.
+- Create a STRONG ARTISTIC ABSTRACTION - the face should feel like looking at an impressionist masterpiece up close where you see PAINT STROKES first, subject second.
 
-- VERY SOFT, BLURRED EDGES on all facial features - let brushstrokes heavily blend edges, creating a DREAMY, heavily artistic quality.
+- EVERY DETAIL should be SOFTENED and OBSCURED by visible brushwork - this is NOT a photograph, it's an ARTISTIC INTERPRETATION rendered in thick oil paint.
 
-- The face should feel HEAVILY PAINTED and ARTISTIC, almost abstract - NOT photographic. This painterly quality enhances perception of likeness.
+- Let brushstrokes CREATE THE FACE rather than trace it - the texture and color of the strokes suggest features without rendering them precisely.
 
-- Maintain ONLY the essential recognizable features (overall shape, coloring) while heavily obscuring fine details with artistic texture.
+- HEAVILY TEXTURED fur with visible directional brushstrokes that blend into the facial features, obscuring where one feature ends and another begins.
 
-- The brushwork should be VISIBLE and PROMINENT - like looking at a real oil painting up close where you can see every brush stroke.
+- The face should feel ALMOST ABSTRACT - you recognize it's the pet through overall shape, color, and essence, NOT through precise photographic detail.
+
+- MAXIMUM PAINTERLY EFFECT on the face - if it looks too photographic or too clear, ADD MORE BRUSHSTROKES AND TEXTURE.
 
 IDENTITY & LIKENESS (MOST IMPORTANT)
 
@@ -5108,8 +4944,8 @@ Increase overall ornateness and incorporate stronger Victorian-royal influence t
 PAINTING TECHNIQUE – EXTREMELY THICK, SCULPTURAL OIL
 Use VERY THICK, HEAVILY TEXTURED oil paint with dramatic impasto buildup. Brush strokes must be BOLD, RAISED, and SCULPTURAL—visible ridges, thick paint peaks, heavy bristle marks, and palette-knife textures. The paint should look like it could be touched—physical, 3D, and deeply layered. Every stroke must be visibly hand-painted with thick, rich pigment.
 
-HEAVY PAINTERLY FACIAL TREATMENT (CREATES STRONG ARTISTIC ILLUSION):
-Apply HEAVY painterly texture and BOLD brushstrokes specifically to the face and head area - MORE than the rest of the image. SIGNIFICANTLY SOFTEN facial details with visible, loose brushstrokes - use IMPRESSIONISTIC, flowing brushwork that blends and obscures features. OBSCURE facial details with artistic texture - let THICK brushstrokes create soft, blurred transitions between features. Create a STRONG ARTISTIC ILLUSION through painterly rendering - the heavy artistic texture helps viewers see their pet's essence. Use VERY IMPRESSIONISTIC brushwork on the face - visible, CHUNKY strokes that SUGGEST features rather than rendering sharply. Like Monet or Renoir. Apply VERY THICK impasto paint texture on facial highlights - HEAVY impasto on nose, eyes, fur highlights. VERY SOFT, BLURRED EDGES on all facial features - let brushstrokes heavily blend edges, creating a DREAMY, heavily artistic quality. The face should feel HEAVILY PAINTED and ARTISTIC, almost abstract - NOT photographic. Maintain ONLY essential recognizable features (overall shape, coloring) while heavily obscuring fine details.
+EXTREMELY HEAVY PAINTERLY FACIAL TREATMENT (CRITICAL - MUST OBSCURE FACE):
+Apply EXTREMELY HEAVY painterly texture and VERY BOLD, THICK brushstrokes to the ENTIRE face and head - SIGNIFICANTLY MORE than the rest of the image. HEAVILY OBSCURE all facial details with thick visible brushstrokes - the face should look like an IMPRESSIONIST PAINTING (MONET, RENOIR, VAN GOGH close-up), not a photograph. Use VERY LOOSE, EXPRESSIVE brushwork that BREAKS UP and FRAGMENTS facial features. BLUR and SOFTEN all facial transitions - no sharp edges. Apply EXTREMELY THICK impasto texture - CHUNKY raised paint on nose, eyes, cheeks, muzzle. Create a STRONG ARTISTIC ABSTRACTION - see PAINT STROKES first, subject second. EVERY DETAIL SOFTENED and OBSCURED by visible brushwork. Let brushstrokes CREATE THE FACE rather than trace it. HEAVILY TEXTURED fur with directional brushstrokes blending into facial features. The face should feel ALMOST ABSTRACT - recognizable through overall shape and color essence, NOT precise photographic detail. MAXIMUM PAINTERLY EFFECT - if it looks too photographic, ADD MORE BRUSHSTROKES AND TEXTURE.
 
 ANTIQUE AGING
 Soft craquelure, warm aged varnish glow, and light edge wear. Maintain elegance.
