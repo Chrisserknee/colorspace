@@ -4350,7 +4350,7 @@ ${facialStructureSection}
 ${petDescription}${genderInfo}${feminineAesthetic}${masculineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
 
 === CRITICAL: EXACT MATCHING - THIS IS THE MOST IMPORTANT REQUIREMENT ===
-The generated pet MUST match the description EXACTLY - this is NON-NEGOTIABLE. The owner must recognize THIS EXACT pet, not a similar one.
+THE OWNER MUST RECOGNIZE THIS AS THEIR EXACT PET - NOT A SIMILAR ONE. If the description mentions ANY unique feature, marking, asymmetry, or distinguishing characteristic, it MUST be visible in the generated image. Generic breed features are NOT acceptable - only THIS pet's specific features.
 
 EVERY UNIQUE FEATURE MUST BE CAPTURED:
 - Same colors EXACTLY - if described as 'midnight black', use midnight black, not charcoal gray or dark gray
