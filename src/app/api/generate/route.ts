@@ -4615,15 +4615,13 @@ A dual royal Victorian antique oil portrait featuring ${petCountWord} pets, rend
     
     const modelName = useLeonardo ? "🎨 Leonardo AI (Kino XL) - DEV TESTING"
       : useOpenAIImg2Img ? "OpenAI img2img (images.edit)"
-      : useStableDiffusion ? `⚠️ Stable Diffusion (${sdModel}) - LOCAL TESTING ONLY`
       : useComposite ? "Composite (segment + scene + blend)"
       : useStyleTransfer ? "Style Transfer + GPT Refinement" 
       : useIPAdapter ? "IP-Adapter SDXL (identity preservation)" 
       : "GPT-Image-1 (OpenAI)";
     console.log("Model selected:", modelName);
     console.log("Selection reason:", useLeonardo ? "USE_LEONARDO=true (⚠️ DEV TESTING ONLY)"
-      : useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true (default)"
-      : useStableDiffusion ? `USE_STABLE_DIFFUSION=true, SD_MODEL=${sdModel} (⚠️ LOCAL TESTING ONLY - DO NOT DEPLOY)`
+      : useOpenAIImg2Img ? "USE_OPENAI_IMG2IMG=true (default - MAIN GENERATOR)"
       : useComposite ? "USE_COMPOSITE=true"
       : useStyleTransfer ? "USE_STYLE_TRANSFER=true"
       : useIPAdapter ? "USE_IP_ADAPTER=true"
@@ -4634,8 +4632,11 @@ A dual royal Victorian antique oil portrait featuring ${petCountWord} pets, rend
     console.log("Detected species:", species);
     console.log("Species enforcement:", notSpecies);
     
-    // ⚠️ STABLE DIFFUSION PATH - LOCAL TESTING ONLY ⚠️
+    // ⚠️ STABLE DIFFUSION PATH - DISABLED FOR NOW ⚠️
     if (useStableDiffusion) {
+      // This block will never execute since useStableDiffusion is always false
+      // Keeping for future reference when SD is re-enabled
+      const sdModel = process.env.SD_MODEL || "sdxl-ip-adapter-plus";
       console.log("⚠️⚠️⚠️ STABLE DIFFUSION MODE - LOCAL TESTING ONLY ⚠️⚠️⚠️");
       console.log(`📌 Using SD model: ${sdModel}`);
       console.log("📌 Available models: flux, flux-img2img, sd3, sdxl-img2img, sdxl-controlnet, ip-adapter-faceid");
