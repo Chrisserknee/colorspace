@@ -3622,6 +3622,12 @@ Respond with ONLY the species name.`,
     const breedMatch = petDescription.match(/BREED:\s*([^.(\n]+)/i);
     const detectedBreed = breedMatch ? breedMatch[1].trim() : "";
     console.log("Detected breed:", detectedBreed || "Unknown");
+    
+    // Get random pose and palette early - needed for prompt generation
+    const selectedPose = getRandomNaturalPose();
+    const selectedPalette = getRandomPalette();
+    console.log(`🎨 Selected pose: ${selectedPose.name}`);
+    console.log(`🎨 Selected palette: ${selectedPalette.name} (${selectedPalette.mood})`);
 
     // Step 1.5: Perform detailed facial structure analysis (ENABLED by default for identity accuracy)
     // Disable with DISABLE_FACIAL_ANALYSIS=true if speed is more important than accuracy
@@ -4246,11 +4252,7 @@ THIS IS A LARGE DOG BREED. You MUST zoom out and show a WIDE SHOT.
 
 ` : "";
 
-    // Get random pose and palette for this generation - ensures uniqueness
-    const selectedPose = getRandomNaturalPose();
-    const selectedPalette = getRandomPalette();
-    console.log(`🎨 Selected pose: ${selectedPose.name}`);
-    console.log(`🎨 Selected palette: ${selectedPalette.name} (${selectedPalette.mood})`);
+    // Note: selectedPose and selectedPalette are already initialized earlier (around line 3626)
     
     const generationPrompt = `${largeDogFramingPrefix}
 
