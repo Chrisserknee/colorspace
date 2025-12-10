@@ -2259,40 +2259,40 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
     ])
     .png()
     .toBuffer();
-}// Create side-by-side before/after image
+}// Create side-by-side before/after image using FULL RESOLUTION images
 async function createBeforeAfterImage(
   originalBuffer: Buffer,
   generatedBuffer: Buffer,
   imageId: string
 ): Promise<void> {
   try {
-    console.log(`🖼️ Creating side-by-side before/after image for ${imageId}...`);
+    console.log(`🖼️ Creating side-by-side before/after image (FULL RESOLUTION) for ${imageId}...`);
     
-    // Get metadata for both images
+    // Get metadata for both images (full resolution)
     const originalMeta = await sharp(originalBuffer).metadata();
     const generatedMeta = await sharp(generatedBuffer).metadata();
     
-    // Determine target height (use the smaller height to maintain aspect ratio)
-    const targetHeight = Math.min(originalMeta.height || 1024, generatedMeta.height || 1024);
+    console.log(`📐 Original image: ${originalMeta.width}x${originalMeta.height}`);
+    console.log(`📐 Generated image: ${generatedMeta.width}x${generatedMeta.height}`);
     
-    // Resize both images to the same height, maintaining aspect ratio
-    const originalResized = await sharp(originalBuffer)
-      .resize(null, targetHeight, { fit: 'inside', withoutEnlargement: true })
-      .toBuffer();
+    // Use FULL RESOLUTION - no resizing
+    // Determine target height (use the larger height to accommodate both images)
+    const targetHeight = Math.max(originalMeta.height || 1024, generatedMeta.height || 1024);
     
-    const generatedResized = await sharp(generatedBuffer)
-      .resize(null, targetHeight, { fit: 'inside', withoutEnlargement: true })
-      .toBuffer();
+    // Align both images to the same height by centering vertically
+    // Original image (left side) - full resolution, centered vertically
+    const originalWidth = originalMeta.width || 1024;
+    const originalHeight = originalMeta.height || 1024;
+    const originalTop = Math.floor((targetHeight - originalHeight) / 2);
     
-    // Get dimensions of resized images
-    const originalResizedMeta = await sharp(originalResized).metadata();
-    const generatedResizedMeta = await sharp(generatedResized).metadata();
+    // Generated image (right side) - full resolution, centered vertically
+    const generatedWidth = generatedMeta.width || 1024;
+    const generatedHeight = generatedMeta.height || 1024;
+    const generatedTop = Math.floor((targetHeight - generatedHeight) / 2);
     
-    const originalWidth = originalResizedMeta.width || 1024;
-    const generatedWidth = generatedResizedMeta.width || 1024;
     const combinedWidth = originalWidth + generatedWidth;
     
-    // Create side-by-side composite
+    // Create side-by-side composite using FULL RESOLUTION images
     const beforeAfterBuffer = await sharp({
       create: {
         width: combinedWidth,
@@ -2302,11 +2302,14 @@ async function createBeforeAfterImage(
       }
     })
       .composite([
-        { input: originalResized, left: 0, top: 0 },
-        { input: generatedResized, left: originalWidth, top: 0 }
+        { input: originalBuffer, left: 0, top: originalTop }, // Full resolution original
+        { input: generatedBuffer, left: originalWidth, top: generatedTop } // Full resolution generated
       ])
       .png()
       .toBuffer();
+    
+    const finalMeta = await sharp(beforeAfterBuffer).metadata();
+    console.log(`📐 Final before/after image: ${finalMeta.width}x${finalMeta.height} (FULL RESOLUTION)`);
     
     // Upload to Before_After bucket
     await uploadBeforeAfterImage(
@@ -2315,7 +2318,7 @@ async function createBeforeAfterImage(
       "image/png"
     );
     
-    console.log(`✅ Side-by-side before/after image uploaded: ${imageId}-before-after.png`);
+    console.log(`✅ Side-by-side before/after image uploaded (FULL RESOLUTION): ${imageId}-before-after.png`);
   } catch (error) {
     // Don't fail the generation if before/after upload fails
     console.error(`⚠️ Failed to create before/after image:`, error);
