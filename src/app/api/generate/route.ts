@@ -721,6 +721,7 @@ async function generateWithOpenAIImg2Img(
   }
 }
 
+
 // Retry helper for Replicate API calls with exponential backoff for rate limits
 async function retryReplicateCall<T>(
   callFn: () => Promise<T>,
@@ -2677,246 +2678,6 @@ async function createBeforeAfterImage(
   }
 }
 
-// Create 4K before/after video with transition effects
-async function createBeforeAfterVideo(
-  originalBuffer: Buffer,
-  generatedBuffer: Buffer,
-  imageId: string
-): Promise<void> {
-  try {
-    console.log(`🎬 Creating 4K before/after video for ${imageId}...`);
-    
-    // Get metadata
-    const originalMeta = await sharp(originalBuffer).metadata();
-    const generatedMeta = await sharp(generatedBuffer).metadata();
-    
-    // For 4K video: target resolution is 3840x2160 (4K UHD)
-    // But we'll scale based on the images while maintaining aspect ratio
-    const targetVideoWidth = 3840;
-    const targetVideoHeight = 2160;
-    
-    // Calculate dimensions maintaining aspect ratio of side-by-side layout
-    const originalAspect = (originalMeta.width || 1024) / (originalMeta.height || 1024);
-    const generatedAspect = (generatedMeta.width || 1024) / (generatedMeta.height || 1024);
-    
-    // Scale images to fit within 4K while maintaining quality
-    // Each side will be approximately 1920px wide (half of 3840)
-    const maxSideWidth = 1920;
-    const maxSideHeight = 2160;
-    
-    // Resize images to fit 4K video dimensions
-    let originalProcessed = originalBuffer;
-    let generatedProcessed = generatedBuffer;
-    
-    if ((originalMeta.width || 0) > maxSideWidth || (originalMeta.height || 0) > maxSideHeight) {
-      originalProcessed = await sharp(originalBuffer)
-        .resize(maxSideWidth, maxSideHeight, { fit: 'inside', withoutEnlargement: true })
-        .png()
-        .toBuffer();
-    }
-    
-    if ((generatedMeta.width || 0) > maxSideWidth || (generatedMeta.height || 0) > maxSideHeight) {
-      generatedProcessed = await sharp(generatedBuffer)
-        .resize(maxSideWidth, maxSideHeight, { fit: 'inside', withoutEnlargement: true })
-        .png()
-        .toBuffer();
-    }
-    
-    // Get processed dimensions
-    const originalProcessedMeta = await sharp(originalProcessed).metadata();
-    const generatedProcessedMeta = await sharp(generatedProcessed).metadata();
-    
-    const originalWidth = originalProcessedMeta.width || 1920;
-    const originalHeight = originalProcessedMeta.height || 2160;
-    const generatedWidth = generatedProcessedMeta.width || 1920;
-    const generatedHeight = generatedProcessedMeta.height || 2160;
-    
-    // Video dimensions - use actual 4K
-    const videoHeight = targetVideoHeight;
-    const videoWidth = targetVideoWidth;
-    
-    const originalTop = Math.floor((videoHeight - originalHeight) / 2);
-    const generatedTop = Math.floor((videoHeight - generatedHeight) / 2);
-    const originalLeft = Math.floor((videoWidth / 2 - originalWidth) / 2);
-    const generatedLeft = Math.floor(videoWidth / 2 + (videoWidth / 2 - generatedWidth) / 2);
-    
-    // Create frames for video animation
-    const numFrames = 30; // 30 frames for smooth video (~1 second at 30fps)
-    const frameBuffers: Buffer[] = [];
-    
-    // Create frames showing transition
-    for (let i = 0; i < numFrames; i++) {
-      const progress = i / (numFrames - 1);
-      
-      // Create transition frame
-      let frameBuffer: Buffer;
-      
-      if (progress < 0.3) {
-        // First 30%: Show original on both sides
-        frameBuffer = await sharp({
-          create: {
-            width: videoWidth,
-            height: videoHeight,
-            channels: 4,
-            background: { r: 255, g: 255, b: 255, alpha: 1 }
-          }
-        })
-          .composite([
-            { input: originalProcessed, left: originalLeft, top: originalTop },
-            { input: originalProcessed, left: generatedLeft, top: originalTop }
-          ])
-          .png()
-          .toBuffer();
-      } else if (progress < 0.7) {
-        // Middle 40%: Transition from original to generated on right side
-        const fadeProgress = (progress - 0.3) / 0.4; // 0 to 1
-        const generatedWithOpacity = await sharp(generatedProcessed)
-          .composite([{
-            input: {
-              create: {
-                width: generatedWidth,
-                height: generatedHeight,
-                channels: 4,
-                background: { r: 255, g: 255, b: 255, alpha: Math.floor(255 * fadeProgress) }
-              }
-            },
-            blend: 'dest-in'
-          }])
-          .toBuffer();
-        
-        frameBuffer = await sharp({
-          create: {
-            width: videoWidth,
-            height: videoHeight,
-            channels: 4,
-            background: { r: 255, g: 255, b: 255, alpha: 1 }
-          }
-        })
-          .composite([
-            { input: originalProcessed, left: originalLeft, top: originalTop },
-            { input: generatedWithOpacity, left: generatedLeft, top: generatedTop, blend: 'over' }
-          ])
-          .png()
-          .toBuffer();
-      } else {
-        // Last 30%: Show before/after side-by-side
-        frameBuffer = await sharp({
-          create: {
-            width: videoWidth,
-            height: videoHeight,
-            channels: 4,
-            background: { r: 255, g: 255, b: 255, alpha: 1 }
-          }
-        })
-          .composite([
-            { input: originalProcessed, left: originalLeft, top: originalTop },
-            { input: generatedProcessed, left: generatedLeft, top: generatedTop }
-          ])
-          .png()
-          .toBuffer();
-      }
-      
-      frameBuffers.push(frameBuffer);
-    }
-    
-    // Use FFmpeg WebAssembly to create video
-    const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-    const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
-    
-    const ffmpeg = new FFmpeg();
-    
-    // Load FFmpeg core (required for Node.js)
-    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-    });
-    
-    console.log(`📹 FFmpeg loaded, creating ${numFrames} frames for video...`);
-    
-    // Write frames to FFmpeg's virtual file system
-    for (let i = 0; i < frameBuffers.length; i++) {
-      // Convert Buffer to Uint8Array for FFmpeg (works in Node.js)
-      const frameData = new Uint8Array(frameBuffers[i]);
-      await ffmpeg.writeFile(`frame${i.toString().padStart(4, '0')}.png`, frameData);
-    }
-    
-    console.log(`📹 Frames written, encoding video...`);
-    
-    // Create video from frames using FFmpeg
-    await ffmpeg.exec([
-      '-framerate', '30',
-      '-i', 'frame%04d.png',
-      '-c:v', 'libx264',
-      '-pix_fmt', 'yuv420p',
-      '-preset', 'medium',
-      '-crf', '23',
-      '-vf', `scale=${videoWidth}:${videoHeight}:flags=lanczos`,
-      '-y', // Overwrite output file
-      'output.mp4'
-    ]);
-    
-    console.log(`📹 Video encoded, reading output...`);
-    
-    // Read the output video
-    const videoData = await ffmpeg.readFile('output.mp4');
-    let videoBuffer: Buffer;
-    
-    if (videoData instanceof Uint8Array) {
-      videoBuffer = Buffer.from(videoData);
-    } else if (typeof videoData === 'object' && videoData !== null && 'arrayBuffer' in videoData) {
-      // Handle Blob-like objects
-      const blob = videoData as { arrayBuffer(): Promise<ArrayBuffer> };
-      videoBuffer = Buffer.from(await blob.arrayBuffer());
-    } else {
-      // If it's a string or other type, try to convert
-      videoBuffer = Buffer.from(videoData as unknown as ArrayBuffer);
-    }
-    
-    // Upload 4K video to Before_After bucket
-    await uploadBeforeAfterImage(
-      videoBuffer,
-      `${imageId}-before-after.mp4`,
-      "video/mp4"
-    );
-    
-    console.log(`✅ 4K before/after video uploaded: ${imageId}-before-after.mp4`);
-  } catch (error) {
-    console.error(`⚠️ Failed to create 4K video:`, error);
-    // If video creation fails, create a simple static comparison
-    try {
-      const originalMeta = await sharp(originalBuffer).metadata();
-      const generatedMeta = await sharp(generatedBuffer).metadata();
-      const targetHeight = Math.max(originalMeta.height || 2160, generatedMeta.height || 2160);
-      const combinedWidth = (originalMeta.width || 1920) + (generatedMeta.width || 1920);
-      
-      const staticComparison = await sharp({
-        create: {
-          width: combinedWidth,
-          height: targetHeight,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .composite([
-          { input: originalBuffer, left: 0, top: Math.floor((targetHeight - (originalMeta.height || 2160)) / 2) },
-          { input: generatedBuffer, left: originalMeta.width || 1920, top: Math.floor((targetHeight - (generatedMeta.height || 2160)) / 2) }
-        ])
-        .png()
-        .toBuffer();
-      
-      await uploadBeforeAfterImage(
-        staticComparison,
-        `${imageId}-before-after-static.png`,
-        "image/png"
-      );
-      console.log(`✅ Static comparison uploaded as fallback: ${imageId}-before-after-static.png`);
-    } catch (fallbackError) {
-      console.error(`⚠️ Fallback also failed:`, fallbackError);
-    }
-  }
-}
-
 export async function POST(request: NextRequest) {
   const userAgent = request.headers.get("user-agent") || "unknown";
   const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent);
@@ -4172,400 +3933,138 @@ THIS IS A LARGE DOG BREED. You MUST zoom out and show a WIDE SHOT.
     console.log(`🎨 Selected palette: ${selectedPalette.name} (${selectedPalette.mood})`);
     
     const generationPrompt = `${largeDogFramingPrefix}
-*******************************************************************
-*** MANDATORY POSE & COMPOSITION - READ FIRST - FOLLOW EXACTLY ***
-*******************************************************************
 
-POSE REQUIREMENT: "${selectedPose.name}"
-The pet MUST be in this pose: ${selectedPose.description}
-- Body: ${selectedPose.bodyPosition}
-- Head: ${selectedPose.headPosition}
-- Paws: ${selectedPose.pawPosition}
-- Expression: ${selectedPose.expression}
+POSE & COMPOSITION (MANDATORY)
 
-COMPOSITION REQUIREMENT: ZOOMED OUT - FULL BODY VISIBLE
-- Frame the pet from a DISTANCE - show the ENTIRE BODY including ALL FOUR LEGS
-- Pet should occupy only 50-60% of the frame height - NOT a close-up
-- WIDE SHOT showing pet lying/lounging on an ornate cushion
-- Full legs and paws clearly visible - do not crop the body
-- Generous space around the pet on all sides
-- Camera PULLED BACK - as if viewing from across a room
+- Pose: "${selectedPose.name}" – ${selectedPose.description}
 
-CLOTHING REQUIREMENT: ORNATE CLOAK + ONE EXTRAVAGANT VIBRANT NECKLACE
-- ONE ORNATE velvet CLOAK draped elegantly over the pet's back/shoulders with ELABORATE decorative details
-- CLOAK COLOR FOR THIS PORTRAIT: ${selectedPalette.cloakColor}
-- Cloak secured by an ORNATE SILVER CLASP at the chest - ELABORATE and DECORATIVE with INTRICATE details
-- ONE EXTRAVAGANT VIBRANT NECKLACE around the pet's neck - this is MANDATORY, NOT optional
-- The necklace MUST be EXTREMELY ORNATE, BRILLIANT, and VIBRANT - EXTRA LARGE gems, MULTIPLE LAYERS, ELABORATE filigree
-- Jewelry should POP with VIBRANT SATURATED colors - FIERY rubies, EMERALD greens, BRILLIANT sapphires, ROYAL purples
-- Gems should SHIMMER, SPARKLE, and CATCH LIGHT - EXTREMELY VISIBLE and EYE-CATCHING
-- NO heavy robes, NO multiple layers, NO elaborate costumes
-- The pet's BODY should be mostly visible UNDER the cloak
-- Think: ORNATE elegant draping with ONE EXTRAVAGANT STATEMENT NECKLACE that COMMANDS ATTENTION
-- The cloak should look like it could slip off naturally
+- Body: ${selectedPose.bodyPosition}, head: ${selectedPose.headPosition}, paws: ${selectedPose.pawPosition}, expression: ${selectedPose.expression}
 
-COLOR PALETTE FOR THIS PORTRAIT: "${selectedPalette.name}"
-- BACKGROUND: ${selectedPalette.background}
-- MOOD: ${selectedPalette.mood}
-- CUSHION: ${selectedPalette.cushionColor}
-- LIGHTING: ${selectedPalette.lighting}
-- Use SOFT, MUTED tones - not overly saturated or harsh
-- Colors should feel harmonious and refined
+- Wide shot, full body visible on an ornate cushion. Show ALL four legs and paws.
 
-❌ DO NOT: Sitting upright like a statue
-❌ DO NOT: Close-up head shot
-❌ DO NOT: Cropped body - must show full body
-❌ DO NOT: Heavy elaborate clothing covering the body
-❌ DO NOT: Multiple necklaces - ONE elegant necklace only
-❌ DO NOT: Stiff formal pose
-❌ DO NOT: Harsh oversaturated colors
+- Pet fills about 50–60% of frame height with space around it; camera pulled back like viewing from across a room. No close-ups, no cropped body.
 
-✓ MUST DO: ${selectedPose.name} pose as described above
-✓ MUST DO: Full body visible, zoomed out wide shot
-✓ MUST DO: ORNATE cloak with ELABORATE decorative silver clasp
-✓ MUST DO: ONE EXTRAVAGANT VIBRANT NECKLACE around the pet's neck - EXTREMELY ORNATE with BRILLIANT VIBRANT gems that POP and SHIMMER
-✓ MUST DO: Natural relaxed position on cushion
-✓ MUST DO: Use the "${selectedPalette.name}" color palette specified above
-✓ MUST DO: Soft, refined, harmonious coloring (EXCEPT jewelry which should be VIBRANT and BRILLIANT)
+CLOTHING & JEWELRY
 
-*******************************************************************
+- Single ornate velvet cloak over shoulders/back, body mostly visible beneath.
 
-CRITICAL SPECIES REQUIREMENT: THIS IS A ${species}. YOU MUST GENERATE A ${species}. ${notSpecies} REPEAT: THIS IS A ${species} - GENERATE ONLY A ${species}. DO NOT GENERATE THE WRONG SPECIES.
+- Cloak color: ${selectedPalette.cloakColor}, draped naturally, could slip off.
 
-THIS IS A ${species}. Generate a ${species}. ${notSpecies}
+- Cloak held by one elegant SILVER clasp at the chest.
 
-=== MASTER STYLE GUIDE (CRITICAL - FOLLOW EXACTLY) ===
-A refined 18th-century European aristocratic oil-portrait style featuring SOFT, MUTED, HARMONIOUS colors and smooth old-master brushwork. The pet wears ONLY a simple velvet cloak draped loosely, secured by a THIN ELEGANT SILVER CLASP - no heavy costumes or excessive clothing. The pet's natural body should be mostly visible.
+- ONE statement necklace only: extremely ornate, vibrant gems (rubies, emeralds, sapphires, purples) that shimmer and catch light. No other clothing, no extra necklaces.
 
-THIS PORTRAIT USES THE "${selectedPalette.name}" PALETTE:
+COLOR PALETTE "${selectedPalette.name}"
+
 - Background: ${selectedPalette.background}
-- Cloak: ${selectedPalette.cloakColor}
-- Cushion: ${selectedPalette.cushionColor}
-- Lighting: ${selectedPalette.lighting}
-- Overall mood: ${selectedPalette.mood}
 
-Colors should be SOFT and REFINED - muted tones, gentle harmonies, NOT harsh or oversaturated. Think soft watercolor elegance rather than bright poster colors. The overall mood is noble, elegant, and historically authentic with a gentle, refined quality.
-
-=== SOFT COLOR APPROACH (This Portrait: "${selectedPalette.name}") ===
-USE THESE SPECIFIC COLORS FOR THIS PORTRAIT:
-- Background: ${selectedPalette.background}
-- Cloak: ${selectedPalette.cloakColor}  
 - Cushion: ${selectedPalette.cushionColor}
 
-COLOR QUALITIES:
-- SOFT and MUTED - not harsh or oversaturated
-- HARMONIOUS - colors should blend and complement each other
-- REFINED - elegant, subtle tonal variations
-- GENTLE - avoid jarring contrasts or neon-bright colors
-- The palette should feel cohesive and intentional
-- Colors should enhance the pet, not compete with it
+- Lighting & mood: ${selectedPalette.lighting}, ${selectedPalette.mood}
 
-=== IDENTITY PRESERVATION - MOST CRITICAL - READ CAREFULLY ===
-This portrait MUST be instantly recognizable as THIS SPECIFIC ${species}. The owner should look at the portrait and immediately feel "That's MY pet!" NOT "that's A pet that looks similar."
+- Overall colors: soft, muted, harmonious and refined. Jewelry gems may be highly vibrant; everything else is gentle, not harsh or neon.
 
-*** FACIAL GEOMETRY - THE #1 PRIORITY - MATCH EXACTLY, NO APPROXIMATIONS ***
-The FACE is what makes a pet recognizable. You MUST match these EXACTLY - every millimeter matters. The owner must see THEIR pet's face, not a generic version.
+BRIGHTNESS & LUMINOSITY (CRITICAL):
 
-HEAD SHAPE - MATCH PRECISELY:
-- If the description says "round head" - make it PERFECTLY ROUND, not oval, not slightly round, not triangular
-- If "square jaw" - make it SQUARE with sharp angles, not rounded or soft
-- If "wide face" - make it WIDE, not narrow or average width
-- If "narrow face" - make it NARROW, not wide or medium
-- The head-to-body proportion must match EXACTLY - if head is large relative to body, show that
-- Head width-to-length ratio must match: if described as "wider than it is long", make it wider than long
+- Make the overall image BRIGHT and LUMINOUS - well-lit throughout, not dark or shadowy
 
-SNOUT/MUZZLE - CRITICAL FOR RECOGNITION:
-- SHORT snout = generate SHORT snout (not medium, not slightly short, but SHORT)
-- FLAT face = generate FLAT face (like a Persian, not a Siamese, not slightly flat)
-- LONG muzzle = generate LONG muzzle (like a Greyhound, not a Bulldog, not medium-long)
-- The snout length relative to head size is CRITICAL - measure it exactly as described
-- Snout width must match: if "narrow snout", make it narrow; if "wide snout", make it wide
-- Snout shape details: if "pointed", make it pointed; if "blunt", make it blunt; if "button-like", make it button-like
+- Increase overall brightness - the image should feel bright and airy, like viewing in a well-lit gallery
 
-EYES - EXTREMELY IMPORTANT - THESE MUST BE EXACT:
-- ROUND eyes = generate perfectly ROUND eyes (not slightly round, not oval-round, but ROUND)
-- ALMOND eyes = generate almond-shaped eyes (not round-almond, but clearly ALMOND)
-- WIDE-SET eyes = space them WIDE apart - measure the distance, don't approximate
-- CLOSE-SET eyes = space them CLOSE together - if they're close, make them CLOSE
-- The exact EYE COLOR must match EXACTLY (golden-yellow, amber, emerald green, blue, copper) - not "similar" but EXACT
-- Eye SIZE relative to face must be accurate - if "large eyes", make them LARGE; if "small eyes", make them SMALL
-- Eye shape details: if "hooded", show hooded; if "prominent", show prominent; if "deep-set", show deep-set
-- Eye tilt: if "upward slant", show upward slant; if "straight", show straight
+- Enhance luminosity - colors should glow and radiate light, especially highlights on fur, jewelry, and fabric
 
-EARS - CRITICAL FOR CATS - SIZE AND POSITION MUST BE EXACT:
-- LARGE ears = make them LARGE - do not shrink them, do not make them medium-large
-- SMALL ears = make them SMALL - do not enlarge them, do not make them medium-small
-- TALL ears = make them TALL (especially Maine Coons - their ears are VERY tall, not average-tall)
-- WIDE-SET ears = position them FAR apart - measure the distance
-- CLOSE-SET ears = position them CLOSE together
-- HIGH-SET ears = position them HIGH on the head - not medium-high, but HIGH
-- LOW-SET ears = position them LOW on the head
-- Ear SHAPE (pointed, rounded, folded) must match EXACTLY - if "pointed", make them pointed, not rounded-pointed
-- LYNX TIPS (ear tufts) = if described, these are ESSENTIAL - show hair tufts at ear tips, don't omit them
-- Ear FURNISHINGS = if described, show long hair inside ears - this is a distinguishing feature
-- For cats: ear size relative to head is CRITICAL - if ears are "disproportionately large", show that
-- Maine Coons, Norwegian Forest Cats have DRAMATICALLY TALL ears - do not make them average size
-- Ear angle: if "tilted forward", show forward tilt; if "upright", show upright; if "folded", show fold
+- Brighten shadows - shadows should be lighter and more visible, not deep dark areas
 
-CHEEKS & JAWLINE - MATCH THE EXACT SHAPE:
-- FULL cheeks = show full, rounded cheeks - not slightly full, but FULL
-- HOLLOW cheeks = show hollow, sunken cheeks - not slightly hollow
-- ANGULAR face = show defined bone structure - sharp angles, not soft
-- SOFT features = show gentle, rounded features - no sharp edges
-- Prominent cheekbones = make them prominent; subtle cheekbones = make them subtle
+- Increase exposure - the image should feel like it's bathed in bright, warm light
 
-BODY SIZE & STATURE PRESERVATION:
-- Match the pet's EXACT body type: if stocky, show stocky; if slender, show slender
-- Preserve the pet's SIZE accurately: a tiny Chihuahua should look tiny, a massive Great Dane should look imposing
-- Maintain correct proportions: long-bodied pets stay long, short-legged pets have short legs
-- If the pet is chunky/fluffy, show that roundness; if lean/athletic, show that musculature
-- Barrel-chested pets should have broad chests; narrow pets should appear streamlined
-- The body silhouette from any angle should be recognizable as THIS specific pet
+- Luminous atmosphere - everything should feel bright and radiant, with soft glowing highlights throughout
 
-THE RECOGNITION TEST:
-Ask yourself: If 10 pets of this breed were lined up, would the owner be able to pick out THEIR pet from this portrait? If not, the facial features aren't accurate enough.
+- Avoid dark or dim areas - ensure even lighting across the entire composition
 
-*** CRITICAL: DO NOT GENERATE A GENERIC BREED FACE - THIS IS THIS SPECIFIC PET ***
-- Do NOT generate a "typical" or "ideal" example of the breed - generate THIS EXACT pet
-- Do NOT default to the most common facial features for this breed - use THIS pet's features
-- Generate THIS SPECIFIC pet's unique facial structure - every pet is different
-- Every pet has individual variations - capture THOSE variations EXACTLY
-- If the description says "flat, wide face" - make it FLAT and WIDE, not medium-flat or slightly wide
-- If the description says "almond eyes" - make them ALMOND, not round, not round-almond, but ALMOND
-- If the description says "wide-set eyes" - space them WIDE, not average, not slightly wide, but WIDE
-- If the description mentions ANY unique feature (asymmetrical markings, one ear different, distinctive scar, etc.) - it MUST be visible
-- The face should look like THIS pet, not like a breed standard photo - owners know their pet's exact face
-- Individual quirks matter: if one eye is slightly larger, if the nose is slightly off-center, if there's a unique wrinkle pattern - capture it
+- Bright, cheerful, luminous overall feel - the portrait should feel like it's in bright daylight or well-lit studio
 
-=== CRITICAL: FULLY ANIMAL - NO HUMAN FEATURES ===
-- The ${species} must be 100% ANIMAL - NOT a human-animal hybrid
-- NO human body, NO human posture, NO bipedal stance
-- NO human hands, arms, or humanoid body shape
-- Natural animal anatomy and proportions
-- The pet is a REAL ${species}, not an anthropomorphic character
+DO NOT:
+
+- No upright human-like pose, no stiff statue pose.
+
+- No close-up head shot, no cropped ears or body.
+
+- No heavy layered costumes, no multiple necklaces.
+
+- No harsh, oversaturated or muddy green/brown color casts.
+
+SPECIES (CRITICAL)
+
+THIS IS A ${species}. Generate ONLY a ${species}. ${notSpecies}
+
+STYLE – ANTIQUE OIL MASTERPIECE
+
+- 18th-century European aristocratic oil portrait.
+
+- Loose visible brushwork, rich oil texture, not smooth or digital.
+
+- Thick impasto highlights, visible bristle marks, painterly not photographic.
+
+- Strong aged look: craquelure (crack network), warm amber/yellowed varnish, subtle wear on edges, canvas texture slightly visible.
+
+- Looks like a 200–300 year old painting found in a grand estate, not new.
+
+IDENTITY & LIKENESS (MOST IMPORTANT)
+
+This must look like THIS specific ${species}, instantly recognizable to the owner.
+
+- Match head and face proportions, muzzle length/shape, eye shape/size/spacing/color, ear size/shape/position, cheeks and jawline, body build (stocky vs slender, large vs tiny).
+
+- Preserve ALL distinctive markings, patterns and asymmetries from the description: ${petDescription}
+
+- Any unique feature mentioned (spots, patches, scars, tufts, ear tilt, color breaks, etc.) MUST be clearly visible in the correct location.
+
+- Do NOT generate a generic breed face; capture this pet's individual quirks exactly.
+
+FULLY ANIMAL ONLY
+
+- 100% natural ${species} anatomy and posture.
+
+- No human body, no bipedal stance, no human hands or hybrid features.
+
 ${compositionInstructions}
+
 ${poseInstructions}
+
 ${facialStructureSection}
-=== THE ${species} - DETAILED DESCRIPTION ===
-${petDescription}${genderInfo}${feminineAesthetic}${masculineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
 
-=== CRITICAL: EXACT MATCHING - THIS IS THE MOST IMPORTANT REQUIREMENT ===
-THE OWNER MUST RECOGNIZE THIS AS THEIR EXACT PET - NOT A SIMILAR ONE. If the description mentions ANY unique feature, marking, asymmetry, or distinguishing characteristic, it MUST be visible in the generated image. Generic breed features are NOT acceptable - only THIS pet's specific features.
+Additional traits and special handling:
 
-EVERY UNIQUE FEATURE MUST BE CAPTURED:
-- Same colors EXACTLY - if described as 'midnight black', use midnight black, not charcoal gray or dark gray
-- Same markings in EXACT same locations - if description says 'white patch on left cheek', generate a white patch on the LEFT CHEEK (viewer's left)
-- Same face proportions EXACTLY - if described as 'round face', generate a round face, not oval or slightly round
-- Preserve color gradients EXACTLY - if darker on back, lighter on belly, maintain this EXACT gradient pattern
-- Every marking, spot, patch, stripe, or pattern described MUST appear in the generated image in the EXACT same location and size
-- If asymmetrical markings are described, they MUST be asymmetrical in the generated image - do NOT make them symmetrical
-- Eye spacing, nose size, muzzle length, ear position must match the description PRECISELY - no approximations
-- Capture unique identifiers: if description mentions "small white spot above right eye", "crooked tail", "one ear slightly droopy", "distinctive scar", etc. - these MUST be visible
-- Individual variations matter: if this pet has slightly wider-set eyes than typical for the breed, capture that. If the snout is slightly longer/shorter than breed standard, match THIS pet's proportions
-- Facial asymmetry: if one side of the face differs from the other, preserve that asymmetry - pets are not perfectly symmetrical
-- Unique fur patterns: if there's a specific swirl, cowlick, or unusual fur direction, capture it exactly
-- Distinguishing marks: any birthmarks, scars, or unique features mentioned MUST be present
+${genderInfo}${feminineAesthetic}${masculineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
 
-BODY SIZE & BUILD - MATCH EXACTLY:
-- If described as 'stocky' or 'compact', generate a stocky/compact body - NOT slender
-- If described as 'slender' or 'athletic', generate a lean body - NOT chunky
-- If described as 'large' or 'giant', the pet should appear imposingly large
-- If described as 'tiny' or 'petite', the pet should appear delicately small
-- Long-bodied pets (like Dachshunds, Corgis) must have elongated bodies
-- Short-legged breeds must have visibly short legs relative to body
-- Barrel-chested pets must show broad, deep chests
-- If described as 'fluffy' or 'round', show that fullness in the silhouette
+FINAL FRAMING
 
-This ${species} portrait must look like THIS EXACT ${species}. ${notSpecies}
+Full-body portrait of the ${species} naturally sitting or resting on ${cushion}, in a relaxed pose, with ${robe} draped over its back and a bright polished silver cloak clasp plus ${jewelryItem}. ${background}. ${lighting}. Entire head and ear tips fully visible with background above; never cropped.
 
-=== STYLE: AUTHENTIC ANTIQUE OIL PAINTING - MUSEUM MASTERPIECE ===
-This MUST look like a GENUINE 200+ YEAR OLD ANTIQUE OIL PAINTING - discovered in a grand estate:
-- LOOSE FLOWING BRUSHWORK: Long, sweeping, elegant strokes that FLOW across the canvas with graceful energy
-- ROUGH TACTILE TEXTURE: The surface should look ROUGH, WEATHERED, and TEXTURED - not smooth or digital
-- AUTHENTIC OIL PAINTING TECHNIQUE: THICK IMPASTO with visible paint ridges, layered wet-on-wet glazing, scumbling effects
-- GENUINE BRUSH TEXTURE: Individual bristle marks clearly visible, directional strokes following form, varying pressure creating THICK and THIN areas
-- FEATHERY STROKES: Like Gainsborough's famous feathery brushwork - light, airy, flowing, alive with movement
-- LATE 18TH-CENTURY MASTERS: Thomas Gainsborough's loose feathery luminosity, Joshua Reynolds' rich glazes, Élisabeth Vigée Le Brun's pearlescent elegance (1770-1830)
-- PAINT SURFACE TEXTURE: Raised impasto peaks in highlights, rough canvas weave visible through thin areas, tactile weathered quality
-- NATURAL PAINT BEHAVIOR: Paint pooling in crevices, dry brush scratches, uneven loading, age-related settling
+RENDERING SUMMARY
 
-ANTIQUE AGING EFFECTS (EXTREMELY CRITICAL - PUSH THIS HARD):
-- HEAVY CRAQUELURE: PROMINENT network of cracks throughout entire paint surface - like a 300-year-old masterpiece
-- DEEP CRACKS in thick impasto areas, fine spider-web cracks in thin glazed areas
-- AGED VARNISH: HEAVY warm amber/golden/brown patina - noticeably yellowed and aged
-- SIGNIFICANT SURFACE WEAR: Visible paint loss on edges, worn impasto peaks, rubbed areas
-- WEATHERED EDGES: Paint worn away at corners and edges, canvas showing through in spots
-- CANVAS AGING: Prominently visible aged linen texture, warping, uneven tension
-- COLOR MELLOWING: Colors noticeably softened and warmed by centuries - rich amber cast throughout
-- DUST AND GRIME: Visible accumulation in paint crevices and texture - the patina of centuries
-- FOXING AND AGE SPOTS: Subtle discoloration spots from age
-- VARNISH UNEVENNESS: Pooling, drips, and uneven application of aged varnish layers
-- PATINA OF TIME: STRONG warm, golden-brown quality throughout - unmistakably antique
-- LOOKS 300 YEARS OLD: Not just old - ANCIENT, like discovered in a forgotten castle
+Authentic, heavily aged oil painting: loose flowing brushstrokes, strong surface texture, impasto, craquelure, warm amber varnish, soft weathered edges, atmospheric depth, plush velvet cloak, gleaming gold accents, sparkling vibrant gems, museum-quality antique look.
 
-WEATHERED EDGE TREATMENT (CRITICAL):
-- WORN CORNERS: Paint visibly thinned or missing at corners
-- EDGE RUBBING: Soft, worn areas along all edges where handling has occurred
-- FRAME SHADOW LINES: Subtle darkening suggesting centuries under a frame
-- EXPOSED GROUND: Hints of reddish-brown ground layer showing through worn areas
-- SOFT PERIMETER: Edges should feel soft, worn, weathered - NOT crisp or clean
+BRIGHTNESS & LUMINOSITY REQUIREMENTS:
 
-- EXTREMELY ROUGH TEXTURE: Broken, tactile, weathered surface throughout
-- DEPTH FROM LAYERING: Underpainting showing through worn areas, colored grounds visible
-- LUSTROUS BUT AGED VARNISH: Rich patina with amber warmth, some areas more worn than others
-- ABSOLUTELY NOT: digital, smooth, clean, new-looking, fresh, perfect, crisp edges, or pristine
+- BRIGHT overall composition - the image must be well-lit throughout, bright and luminous
 
-=== COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
-BACKGROUND (RANDOMIZE EACH GENERATION):
-- Pick ONE at random: charcoal black, pure white, silver grey, powder blue, navy, soft pink, dusty rose, lavender, cream, peach, coral, lilac, periwinkle, rose gold, soft mauve, pale yellow
-- MAXIMIZE VARIETY - each portrait should look unique with different colors
-- GLOWING atmospheric gradients with sfumato depth - colors seem to RADIATE from within
-- CREATE STRONG CONTRAST with pet's fur - background should make pet POP
-- BRIGHT and LUMINOUS - interesting color choices
-- NEVER green, tan, brown, beige, teal, emerald, sage, or muddy earth tones
-- COLOR BALANCE: Reduce overall green tint/color cast - avoid green grunge or green color grading throughout the image
+- Increase overall brightness - make the entire image brighter, like viewing in bright daylight or a well-lit gallery
 
-FABRICS & DRAPES:
-- SATURATED JEWEL TONES with BRILLIANT sheen: vivid ruby red, deep sapphire blue, rich emerald green, royal purple, warm amber gold
-- LUSTROUS silk and velvet that CATCHES LIGHT - visible sheen and reflection
-- BRIGHT cream/ivory with warm undertones that GLOW
-- BRILLIANT antique gold embroidery that SHIMMERS with metallic quality
-- Colors should be RICH and RADIANT - like stained glass lit from behind
+- Enhanced luminosity - colors should glow and radiate light, especially highlights on fur, jewelry, and fabric
 
-JEWELRY - EXTREMELY ORNATE AND VIBRANT (CRITICAL):
-- EXTRAVAGANT ORNATE GLEAMING gold with WARM REFLECTIVE highlights - looks like REAL POLISHED METAL that SHIMMERS
-- EXTREMELY BRILLIANT VIBRANT gems that SPARKLE INTENSELY: FIERY deep ruby, EMERALD vivid green, BRILLIANT rich sapphire, WARM sunny topaz, GLOWING royal amethyst
-- Gems MUST have INTENSE INTERNAL FIRE - BRILLIANT light REFRACTING WITHIN creating RAINBOW effects
-- EXTRA LARGE gems that POP and COMMAND ATTENTION - NOT small or subtle
-- MULTIPLE LAYERS of gems creating DEPTH and OPULENCE
-- ELABORATE INTRICATE filigree work with BAROQUE scrollwork and ORNATE patterns
-- LUSTROUS pearls with IRIDESCENT overtones showing RAINBOW SHIMMER - pink, blue, green, gold shimmer
-- Metallic surfaces CATCH and REFLECT light REALISTICALLY creating BRILLIANT highlights
-- CROWN JEWEL quality - EXTREMELY ORNATE, MUSEUM-WORTHY detail
-- VIBRANT SATURATED colors that SING - gems should be the MOST VIBRANT element in the portrait
+- Brighten all areas - avoid dark or shadowy sections, ensure even bright lighting across the composition
 
-FUR TONES:
-- RICH naturalistic colors with LUMINOUS depth - fur should seem to GLOW with health
-- Warm reflected light bouncing into shadows - no dead flat areas
-- BRILLIANT WHITE highlights on fur tips that POP with brightness
-- Multiple tones within single colors - warm and cool variations creating LIFE
-- Preserve exact pet coloring with ENHANCED vibrancy
-- Deep blacks should be VELVETY and RICH - with subtle blue or brown undertones
+- Luminous atmosphere - everything should feel bright, radiant, and cheerful
 
-=== RENDERING STYLE (Critical - AUTHENTIC OIL PAINTING) ===
-BRUSHWORK - EXTREMELY VISIBLE, BOLD, EXPRESSIVE (CRITICAL - PUSH THIS HARD):
-- DRAMATICALLY VISIBLE BRUSHSTROKES: Every single stroke should be CLEARLY VISIBLE and distinct - NOT blended smooth
-- BOLD CONFIDENT STROKES: Each brushstroke is a statement - thick, decisive, unmistakable
-- LONG SWEEPING STROKES: Elegant flowing brush movements 6-12 inches long, graceful curves following form
-- GESTURAL FLUIDITY: Brushwork should feel ALIVE and DYNAMIC - the energy of the artist's hand visible in EVERY stroke
-- FEATHERY EDGES: Soft, wispy brush endings that trail off naturally - NOT hard stops
-- VARIED STROKE WIDTH: Thick confident strokes transitioning to thin delicate trails within single movements
-- VISIBLE BRISTLE TRACKS: Individual brush hair marks CLEARLY visible, showing direction and speed of stroke - COUNT THE BRISTLE LINES
-- DIRECTIONAL FLOW: All strokes follow the natural form - fur growth direction, fabric drape, facial contours
-- IMPASTO RIDGES: Thick raised paint creating 3D texture on highlights - you could feel it with your fingers
-- SCUMBLED ROUGHNESS: Broken color, dry brush dragging, unblended areas for textural interest
-- STROKE-BY-STROKE VISIBLE: You should be able to trace individual brushstrokes across the entire painting
-- NO SMOOTH BLENDING: Avoid airbrushed or digitally smooth areas - EVERY surface shows brush texture
-- PAINTERLY NOT PHOTOGRAPHIC: This should look PAINTED, not like a smooth photograph with a filter
+- Light, airy feel - the portrait should feel like it's bathed in bright, warm light
 
-PAINT TEXTURE - EXTREME SCULPTURAL IMPASTO (CRITICAL FOR WOW FACTOR):
-- MOUNTAINOUS IMPASTO PEAKS: Paint so thick it creates 3-5mm RAISED RIDGES that cast their own shadows
-- SCULPTURAL RELIEF: Paint standing up from canvas like miniature mountain ranges - FULLY 3D DEPTH
-- VAN GOGH SWIRLING THICKNESS: Bold visible swirling brushstrokes with dramatic texture - UNMISSABLE
-- BUTTER-THICK PAINT: Applied straight from tube, unmixed, with palette knife - CHUNKY and DRAMATIC
-- THICK AND THIN CONTRAST: Towering impasto peaks in lights, thin scraped glazes in shadows
-- PROMINENT CANVAS WEAVE: Coarse linen texture CLEARLY visible throughout - especially in thin areas
-- NATURAL IMPERFECTIONS: Paint pooling, drips, uneven loading, brush running dry, palette scrapings
-- EXTREMELY ROUGH TACTILE SURFACE: Should look like you could feel every bump and ridge with your fingertips
-- BROKEN JAGGED EDGES: Rough, uneven, weathered transitions - like an ancient artifact
-- DRY BRUSH SCRATCHES: Heavy scratchy, textured strokes throughout - VISIBLE DRAG MARKS
-- PALETTE KNIFE GOUGES: Thick angular paint, scraped areas, knife marks visible - AGGRESSIVE TEXTURE
-- LAYERED DEPTH: Multiple visible layers of paint built up over time - you can see the history of strokes
-- LOADED BRUSH MARKS: Where the brush was heavily loaded with paint, leaving thick deposits
-- TEXTURE IN SHADOWS TOO: Even dark areas should show visible brushwork, not smooth darkness
-- SARGENT-STYLE BRAVURA: Bold, confident, economical strokes that capture form with minimal blending
-- GRANULAR TEXTURE: Paint surface should have GRIT and TOOTH - not smooth anywhere
-- CRACKS AND FISSURES: Age cracks throughout adding to textural complexity
-- WORN PEAKS: Impasto highlights worn smooth from centuries of handling
-- ACCUMULATED TEXTURE: Layers upon layers of paint, varnish, dirt, history
+- Bright highlights - enhance highlights on fur, jewelry, and fabric to make them pop with brightness
 
-LUMINOSITY & DRAMATIC LIGHTING (INSTANT WOW FACTOR):
-- REMBRANDT LIGHTING: Strong single golden light source from upper-left creating dramatic chiaroscuro
-- GLOWING FROM WITHIN: Colors appear to radiate light, not just reflect it - LUMINOUS quality
-- BRILLIANT HIGHLIGHTS: Pure white and warm highlights that seem to EMIT light - almost glowing
-- FUR THAT RADIATES: Each strand of fur catches light, creating a halo-like luminous effect
-- RICH SATURATED DARKS: Shadows full of color, not grey or muddy - VELVET DEEP
-- OPTICAL MIXING: Layered transparent colors create depth and vibrancy
-- WARM LIGHT BOUNCING: Reflected warm tones in shadow areas
-- MUSEUM SPOTLIGHT EFFECT: As if lit by a single warm spotlight in a grand gallery
+- Lighter shadows - shadows should be lighter and more visible, not deep dark areas
 
-CAPTIVATING EYES (THE WOW MOMENT - CRITICAL):
-- SOULFUL EXPRESSIVE EYES: Deep, intelligent, captivating gaze that draws you in emotionally
-- WET GLOSSY EYES: Realistic moisture and depth - eyes that look ALIVE
-- BRILLIANT CATCHLIGHTS: Bright white reflections in eyes that bring them to life
-- EYES THAT FOLLOW YOU: The gaze should feel like it connects with the viewer
-- DEPTH AND SOUL: Eyes should have visible depth, not flat - multiple layers of color and reflection
-- EMOTIONAL CONNECTION: The eyes should make you feel something - wonder, love, connection
+- Overall bright, cheerful, luminous feel - the image should feel bright and inviting, not dark or moody
 
-FINISH QUALITY - HEAVILY AGED AND WEATHERED:
-- THICK AMBER VARNISH PATINA: HEAVY warm amber/brown/golden varnish - noticeably aged and yellowed
-- PROMINENT CRAQUELURE: CLEARLY VISIBLE network of cracks throughout - like cracked dried earth
-- HEAVY SURFACE WEATHERING: Obvious wear on raised impasto, worn edges, rubbed areas, paint loss
-- MULTIPLE VARNISH LAYERS: Uneven, pooled, dripped varnish accumulation over centuries
-- DEPTH AND DIMENSION: Many visible paint and varnish layers creating complex depth
-- EXTREMELY ROUGH TACTILE SURFACE: HEAVILY textured, weathered, rough - ancient artifact quality
-- GRIME AND PATINA: Visible accumulation of dust, dirt, age in every crevice
-- CANVAS AGING: Prominently visible aged coarse linen texture, warping, buckling
-- FOXING AND SPOTS: Age spots, discoloration, the marks of time
-- VISIBLE HAND OF ARTIST: Every stroke shows human creation - spontaneous, expressive, alive
-- HEAVILY WORN EDGES: Corners and edges worn, paint thinned, canvas peeking through
-- SOFT WEATHERED PERIMETER: All edges soft and worn from centuries of handling
-- COLOR MELLOWING: Rich warm tones with STRONG amber cast from aged varnish
-- DISCOVERED IN A CASTLE: Looks like found in an attic after 300 years - not cleaned or restored
-- ABSOLUTELY NOT: smooth, clean, pristine, new-looking, digitally perfect, fresh, or crisp
-
-=== KEY QUALITIES (VIVID, LUMINOUS, AUTHENTIC) ===
-- ATMOSPHERIC DEPTH: Background recedes with sfumato, grand chamber feeling, air between elements
-- SATURATED JEWEL-TONED fabrics: Rich ruby, deep sapphire, emerald green - colors that SING with vibrancy
-- LUSTROUS VELVET TEXTURE: Visible pile direction, light catching raised nap, rich color depth in folds
-- BRILLIANT WARM LIGHTING: Strong key light making subject GLOW, warm golden radiance
-- LUMINOUS ATMOSPHERE: Everything seems to emit soft inner light - not just reflect
-- GLEAMING GOLD accents: Metallic embroidery that catches light, warm reflective quality
-- EXTRAVAGANT VIBRANT SPARKLING GEMS: EXTREMELY ORNATE jewelry with INTENSE internal fire, BRILLIANT light refracting within stones, EXTRA LARGE faceted highlights that SHIMMER and POP, VIBRANT SATURATED colors (FIERY rubies, EMERALD greens, BRILLIANT sapphires, ROYAL purples), MULTIPLE LAYERS of gems, ELABORATE filigree work, CROWN JEWEL quality that COMMANDS ATTENTION
-- PURE BRILLIANT WHITE highlights: Crisp bright whites that POP against rich colors
-- NATURAL ANIMAL BODY: Four legs, normal pet anatomy - never anthropomorphic
-- VELVETY DEEP BLACKS: Rich saturated darks with subtle undertones - never flat or grey
-- RICH CONTRAST: Bright lights against deep shadows creating dramatic depth
-- AUTHENTIC BRUSHWORK: Visible paint texture, bristle marks, natural imperfections of hand-painting
-- MUSEUM QUALITY: Looks like a genuine antique masterpiece worth millions
-
-=== COLOR MATCHING REQUIREMENTS ===
-- Match colors EXACTLY as described - if described as 'midnight black', use rich deep midnight black, not charcoal gray
-- PRESERVE DEEP BLACKS: Any black fur or features must remain rich, deep, and saturated - never lighten black areas
-- If described as 'snow white', use pure bright white, not off-white
-- If described as 'honey gold', use that exact vibrant golden honey color
-- Preserve color gradients exactly - if darker on back, lighter on belly, maintain this gradient
-- Do not change or approximate colors - use the exact colors described
-- Brighten lighter colors while keeping deep blacks intact and rich
-
-=== MARKINGS AND PATTERNS ===
-- Every marking, spot, patch, or stripe described MUST appear in the generated image in the EXACT same location
-- If description mentions 'left cheek', place marking on LEFT cheek (viewer's perspective)
-- If description mentions 'right shoulder', place marking on RIGHT shoulder
-- If asymmetrical markings are described, they MUST be asymmetrical in the generated image
-- Do not add markings that are not described
-- Do not remove or relocate markings that are described
-
-=== FACE PROPORTIONS ===
-- Match face proportions EXACTLY - if described as 'round face', generate a round face, not oval
-- If described as 'long/narrow face', generate a long narrow face
-- Eye spacing must match the description precisely - if eyes are 'close together', they must be close together
-- Nose size relative to face must match - if described as 'small nose', generate a small nose
-- Muzzle length must match - if described as 'short muzzle', generate a short muzzle
-
-FULL BODY PORTRAIT - ${isVeryLargeAnimal(detectedBreed, petDescription) ? "MAXIMUM ZOOM OUT" : isLargeBreed(detectedBreed, petDescription) ? "ZOOMED OUT FOR LARGE BREED" : "STANDARD"} FRAMING: The ${species} is SITTING or RESTING NATURALLY on ${cushion} - like a real ${species} would sit or lie down. NEVER standing upright like a human. ${isVeryLargeAnimal(detectedBreed, petDescription) ? "*** CRITICAL LARGE ANIMAL FRAMING ***: This is a VERY LARGE animal. ZOOM WAY OUT - subject should fill only 60% of frame height. Position subject in LOWER THIRD of frame. Leave MINIMUM 20% headroom above ear tips. ABSOLUTELY DO NOT CROP ANY PART OF HEAD OR EARS. Full ear tips MUST be visible with clear background above them." : isLargeBreed(detectedBreed, petDescription) ? "*** CRITICAL LARGE DOG FRAMING ***: This is a LARGE DOG breed. ZOOM OUT significantly - subject should fill only 70% of frame height. Position subject LOWER in frame. Leave MINIMUM 15% headroom above ear tips. ABSOLUTELY DO NOT crop the top of head or ears. The COMPLETE ears including tips MUST be fully visible with background space above them." : ""} Show MORE OF THE BODY - zoom out to show from head to paws with space around the pet. Wide framing, NOT a close-up. *** MANDATORY: ENTIRE HEAD including FULL EAR TIPS must be completely visible with background above - NEVER crop ears ***. With ${robe} draped over its back (NOT clothing, just draped fabric), secured by a BRIGHT POLISHED SILVER CLOAK CLASP at upper chest HOLDING THE CLOAK CLOSED (two GLEAMING SHINY silver plates connected by BRIGHT silver chain, HIGHLY REFLECTIVE polished silver that catches the light), with ${jewelryItem} around its neck. ${background}. ${lighting}. NO human clothing - ONLY a draped cloak with decorative clasp. NATURAL ANIMAL POSTURE - sitting, lying, or resting like a real pet would. 
-
-RENDERING: AUTHENTIC 300-YEAR-OLD ANTIQUE OIL PAINTING with LOOSE FLOWING BRUSHWORK - long sweeping strokes that feel ALIVE. EXTREMELY ROUGH WEATHERED TEXTURE throughout - HEAVILY textured like ancient artifact. THICK SCULPTURAL IMPASTO, VISIBLE BRISTLE TRACKS, FEATHERY TRAILING EDGES. PROMINENT CRAQUELURE - visible crack network throughout like cracked earth. HEAVY AMBER VARNISH PATINA - noticeably yellowed and aged. COARSE CANVAS WEAVE clearly visible, DRY BRUSH SCRATCHES, BROKEN JAGGED EDGES. SIGNIFICANT SURFACE WEAR - worn impasto peaks, rubbed areas. WEATHERED SOFT EDGES - corners worn, paint thinned at perimeter. Colors with STRONG AMBER CAST from aged varnish. Gainsborough's LOOSE FEATHERY strokes/Reynolds' glazes/Vigée Le Brun's elegance. NOT digital, NOT smooth, NOT clean, NOT new. Pet in NATURAL RELAXED POSE - comfortable, at ease. ATMOSPHERIC DEPTH. PLUSH VELVET cloak, GLEAMING gold, SPARKLING gems. Pet MUST match original - fur with FLOWING brushstrokes. HEAVILY AGED ANTIQUE - looks DISCOVERED IN A FORGOTTEN CASTLE after 300 years, covered in dust and patina.`;
+`;
 
     // Determine which model to use for generation
     // Priority: Stable Diffusion (LOCAL TESTING ONLY) > OpenAI img2img > Composite > Style Transfer > IP-Adapter > GPT-Image-1
@@ -5768,17 +5267,6 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
           console.log(`🎨 Studio mode - multiple before/after variations created for ${imageId}`);
         } else {
           console.log(`✅ Single before/after image created for ${imageId}`);
-        }
-        
-        // Also create before/after video with effects
-        try {
-          await createBeforeAfterVideo(buffer, generatedBuffer, imageId);
-          if (studioMode) {
-            console.log(`🎨 Studio mode - before/after video created for ${imageId}`);
-          }
-        } catch (videoError) {
-          // Don't fail if video creation fails
-          console.error("⚠️ Before/after video creation failed (non-critical):", videoError);
         }
       } else {
         console.warn("⚠️ Cannot create before/after image: missing buffer(s)");
