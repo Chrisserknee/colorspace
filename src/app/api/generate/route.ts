@@ -2637,7 +2637,9 @@ async function createBeforeAfterVideo(
     
     // Write frames to FFmpeg's virtual file system
     for (let i = 0; i < frameBuffers.length; i++) {
-      const frameData = await fetchFile(frameBuffers[i]);
+      // Convert Buffer to Blob for fetchFile
+      const frameBlob = new Blob([frameBuffers[i]], { type: 'image/png' });
+      const frameData = await fetchFile(frameBlob);
       await ffmpeg.writeFile(`frame${i.toString().padStart(4, '0')}.png`, frameData);
     }
     
