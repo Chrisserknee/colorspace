@@ -48,9 +48,15 @@ export async function GET(request: NextRequest) {
     // This prevents unauthorized access to the full-resolution image
     
     // Generate text overlay URLs by modifying the base URLs
-    // Text versions are stored as {imageId}-hd-text.png and {imageId}-preview-text.png
+    // Text versions are stored as {imageId}-hd-text.png
     const hdTextUrl = metadata.hd_url ? metadata.hd_url.replace("-hd.png", "-hd-text.png") : null;
-    const previewTextUrl = metadata.preview_url ? metadata.preview_url.replace("-preview.png", "-preview-text.png") : null;
+    
+    // Preview URL may be relative (/api/preview?imageId=xxx) or absolute (HD URL for unwatermarked)
+    // For text overlay preview, construct from imageId if preview is a relative URL
+    const isRelativePreview = metadata.preview_url?.startsWith('/api/preview');
+    const previewTextUrl = isRelativePreview 
+      ? `/api/preview?imageId=${metadata.id}&text=true`  // Use text param for preview endpoint
+      : (metadata.preview_url ? metadata.preview_url.replace("-preview.png", "-preview-text.png") : null);
     
     return NextResponse.json({
       imageId: metadata.id,

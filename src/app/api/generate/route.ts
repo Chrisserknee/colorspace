@@ -10,6 +10,7 @@ import { CONFIG } from "@/lib/config";
 import { uploadImage, saveMetadata, incrementPortraitCount, uploadBeforeAfterImage, getSiteWideGuidance } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
+import { createWatermarkedImage } from "@/lib/watermark";
 
 // Analyze image to detect if pet is black/dark-colored
 async function analyzeImageDarkness(imageBuffer: Buffer): Promise<{ isDark: boolean; averageBrightness: number }> {
@@ -2555,189 +2556,12 @@ async function upscaleImage(inputBuffer: Buffer, scale: number = 2, maxRetries: 
   }
 }
 
-// Create watermarked version of image with LumePet logo
-async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
-  const image = sharp(inputBuffer);
-  const metadata = await image.metadata();
-  const width = metadata.width || 1024;
-  const height = metadata.height || 1024;
-
-  // Load LumePet logo from public folder
-  const fs = await import("fs");
-  const path = await import("path");
-  const logoPath = path.join(process.cwd(), "public", "samples", "LumePet2.png");
-  
-  let logoBuffer: Buffer;
-  try {
-    logoBuffer = fs.readFileSync(logoPath);
-  } catch (error) {
-    console.error("Failed to load logo, using text watermark:", error);
-    // Fallback to text watermark if logo not found
-  const watermarkSvg = `
-    <svg width="${width}" height="${height}">
-      <defs>
-        <pattern id="watermark" width="400" height="200" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)">
-          <text x="0" y="100" 
-                font-family="Georgia, serif" 
-                font-size="28" 
-                font-weight="bold"
-                  fill="rgba(255,255,255,0.5)"
-                text-anchor="start">
-              LUMEPET – PREVIEW ONLY
-          </text>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#watermark)"/>
-      </svg>
-    `;
-    return await sharp(inputBuffer)
-      .composite([
-        {
-          input: Buffer.from(watermarkSvg),
-          top: 0,
-          left: 0,
-        },
-      ])
-      .png()
-      .toBuffer();
-  }
-
-  // Get logo dimensions
-  const logoImage = sharp(logoBuffer);
-  const logoMetadata = await logoImage.metadata();
-  const logoWidth = logoMetadata.width || 200;
-  const logoHeight = logoMetadata.height || 200;
-  
-  // Watermarks - about 18% of image size for denser coverage
-  const watermarkSize = Math.max(width, height) * 0.18;
-  const watermarkAspectRatio = logoWidth / logoHeight;
-  const watermarkWidth = watermarkSize;
-  const watermarkHeight = watermarkSize / watermarkAspectRatio;
-
-  // Convert logo to base64 for SVG embedding
-  const logoBase64 = logoBuffer.toString("base64");
-  const logoMimeType = logoMetadata.format === "png" ? "image/png" : "image/jpeg";
-
-  // Create dense grid of watermarks covering entire image
-  // 4 rows with alternating 3 and 4 watermarks for full coverage
-  const watermarkImages: string[] = [];
-  const opacity = "0.45"; // Brighter opacity
-  
-  // Row 1 (top): 3 watermarks
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.15 - watermarkWidth / 2)}" y="${Math.round(height * 0.12 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.12 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.85 - watermarkWidth / 2)}" y="${Math.round(height * 0.12 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  
-  // Row 2: 4 watermarks offset
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.05 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.35 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.65 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.95 - watermarkWidth / 2)}" y="${Math.round(height * 0.35 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  
-  // Row 3 (middle): 3 watermarks
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.20 - watermarkWidth / 2)}" y="${Math.round(height * 0.55 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.55 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.80 - watermarkWidth / 2)}" y="${Math.round(height * 0.55 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  
-  // Row 4: 4 watermarks offset
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.05 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.35 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.65 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.95 - watermarkWidth / 2)}" y="${Math.round(height * 0.75 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  
-  // Row 5 (bottom): 3 watermarks
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.15 - watermarkWidth / 2)}" y="${Math.round(height * 0.92 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.50 - watermarkWidth / 2)}" y="${Math.round(height * 0.92 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-  watermarkImages.push(`
-      <image x="${Math.round(width * 0.85 - watermarkWidth / 2)}" y="${Math.round(height * 0.92 - watermarkHeight / 2)}" 
-        width="${Math.round(watermarkWidth)}" height="${Math.round(watermarkHeight)}" 
-        href="data:${logoMimeType};base64,${logoBase64}" opacity="${opacity}" filter="url(#whiteBright)"/>`);
-
-  // Create SVG with dense watermark coverage
-  // Watermarks are WHITE with high visibility
-  const watermarkSvg = `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- White filter to make logo appear white -->
-        <filter id="whiteBright" x="-50%" y="-50%" width="200%" height="200%">
-          <feColorMatrix type="matrix" values="
-            0 0 0 0 1
-            0 0 0 0 1
-            0 0 0 0 1
-            0 0 0 1 0"/>
-        </filter>
-      </defs>
-      
-      <!-- 17 watermarks with dense coverage -->
-      ${watermarkImages.join('')}
-    </svg>
-  `;
-
-  return await sharp(inputBuffer)
-    .composite([
-      {
-        input: Buffer.from(watermarkSvg),
-        top: 0,
-        left: 0,
-        blend: "over",
-      },
-    ])
-    .png()
-    .toBuffer();
-}// Create side-by-side before/after image using FULL RESOLUTION images
+// Create side-by-side before/after image using FULL RESOLUTION images
+// Only creates a single horizontal before-after image for all users
 async function createBeforeAfterImage(
   originalBuffer: Buffer,
   generatedBuffer: Buffer,
-  imageId: string,
-  studioMode: boolean = false
+  imageId: string
 ): Promise<void> {
   try {
     // Get metadata for both images (full resolution)
@@ -2752,82 +2576,36 @@ async function createBeforeAfterImage(
     const generatedWidth = generatedMeta.width || 1024;
     const generatedHeight = generatedMeta.height || 1024;
     
-    // Always create horizontal side-by-side (for all users)
-    try {
-      const targetHeight = Math.max(originalHeight, generatedHeight);
-      const originalTop = Math.floor((targetHeight - originalHeight) / 2);
-      const generatedTop = Math.floor((targetHeight - generatedHeight) / 2);
-      const combinedWidth = originalWidth + generatedWidth;
-      
-      const horizontalBuffer = await sharp({
-        create: {
-          width: combinedWidth,
-          height: targetHeight,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .composite([
-          { input: originalBuffer, left: 0, top: originalTop },
-          { input: generatedBuffer, left: originalWidth, top: generatedTop }
-        ])
-        .png()
-        .toBuffer();
-      
-      await uploadBeforeAfterImage(
-        horizontalBuffer,
-        `${imageId}-before-after.png`,
-        "image/png"
-      );
-      console.log(`✅ Horizontal before/after uploaded: ${imageId}-before-after.png`);
-    } catch (error) {
-      console.error(`⚠️ Failed to create horizontal before/after:`, error);
-    }
+    // Create horizontal side-by-side
+    const targetHeight = Math.max(originalHeight, generatedHeight);
+    const originalTop = Math.floor((targetHeight - originalHeight) / 2);
+    const generatedTop = Math.floor((targetHeight - generatedHeight) / 2);
+    const combinedWidth = originalWidth + generatedWidth;
     
-    // Only create additional variations for Studio mode
-    if (!studioMode) {
-      console.log(`✅ Single before/after image created for regular user: ${imageId}`);
-      return;
-    }
+    const horizontalBuffer = await sharp({
+      create: {
+        width: combinedWidth,
+        height: targetHeight,
+        channels: 4,
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
+      }
+    })
+      .composite([
+        { input: originalBuffer, left: 0, top: originalTop },
+        { input: generatedBuffer, left: originalWidth, top: generatedTop }
+      ])
+      .png()
+      .toBuffer();
     
-    console.log(`🖼️ Creating multiple before/after image variations (Studio mode) for ${imageId}...`);
-    
-    // 2. PORTRAIT STACKED (vertical)
-    try {
-      const targetWidth = Math.max(originalWidth, generatedWidth);
-      const originalLeft = Math.floor((targetWidth - originalWidth) / 2);
-      const generatedLeft = Math.floor((targetWidth - generatedWidth) / 2);
-      const combinedHeight = originalHeight + generatedHeight;
-      
-      const portraitBuffer = await sharp({
-        create: {
-          width: targetWidth,
-          height: combinedHeight,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .composite([
-          { input: originalBuffer, left: originalLeft, top: 0 },
-          { input: generatedBuffer, left: generatedLeft, top: originalHeight }
-        ])
-        .png()
-        .toBuffer();
-      
-      await uploadBeforeAfterImage(
-        portraitBuffer,
-        `${imageId}-before-after-portrait.png`,
-        "image/png"
-      );
-      console.log(`✅ Portrait (vertical) before/after uploaded: ${imageId}-before-after-portrait.png`);
-    } catch (error) {
-      console.error(`⚠️ Failed to create portrait before/after:`, error);
-    }
-    
-    console.log(`✅ Studio mode before/after images created (horizontal + vertical) for ${imageId}`);
+    await uploadBeforeAfterImage(
+      horizontalBuffer,
+      `${imageId}-before-after.png`,
+      "image/png"
+    );
+    console.log(`✅ Before/after image uploaded: ${imageId}-before-after.png`);
   } catch (error) {
     // Don't fail the generation if before/after upload fails
-    console.error(`⚠️ Failed to create before/after images:`, error);
+    console.error(`⚠️ Failed to create before/after image:`, error);
   }
 }
 
@@ -5137,32 +4915,6 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       console.log(`   Pet name: "${petName}" (text overlay will be rendered by client and uploaded)`);
     }
 
-    // Create preview (watermarked for free and pack credits, un-watermarked for secret credit or studio mode)
-    // NOTE: The generation model used above is IDENTICAL for all types (free, pack credit, secret credit).
-    // The $5 pack gives watermarked generations - only secret credit is un-watermarked (for testing).
-    let previewBuffer: Buffer;
-    if (useSecretCredit) {
-      // Un-watermarked preview ONLY for secret credit (testing)
-      previewBuffer = generatedBuffer;
-      console.log("Using secret credit - generating un-watermarked image for testing");
-    } else if (studioMode && !enableWatermark) {
-      // Studio mode with watermarks disabled
-      previewBuffer = generatedBuffer;
-      console.log("🎨 Studio mode - generating un-watermarked image");
-    } else if (studioMode && enableWatermark) {
-      // Studio mode with watermarks enabled
-      previewBuffer = await createWatermarkedImage(generatedBuffer);
-      console.log("🎨 Studio mode - generating watermarked image");
-    } else {
-      // Watermarked preview for free generations AND pack credits ($5 pack = watermarked)
-      previewBuffer = await createWatermarkedImage(generatedBuffer);
-      if (usePackCredit) {
-        console.log("Using pack credit ($5 pack) - creating watermarked preview");
-      } else {
-        console.log("Free generation - creating watermarked preview");
-      }
-    }
-
     // Upload HD image to Supabase Storage (always un-watermarked, without text)
     // Note: For Rainbow Bridge, the client will upload the text-overlay version separately
     console.log(`📤 Uploading HD image to pet-portraits bucket: ${imageId}-hd.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
@@ -5179,40 +4931,25 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       throw new Error(`Failed to upload HD image: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
     }
 
-    // Upload preview to Supabase Storage (without text)
-    console.log(`📤 Uploading preview image to pet-portraits bucket: ${imageId}-preview.png${isRainbowBridge ? ' (Rainbow Bridge)' : ''}`);
-    let previewUrl: string;
-    try {
-      previewUrl = await uploadImage(
-        previewBuffer,
-        `${imageId}-preview.png`,
-        "image/png"
-      );
-      console.log(`✅ Preview image uploaded successfully: ${previewUrl.substring(0, 80)}...`);
-    } catch (uploadError) {
-      console.error("❌ Failed to upload preview image:", uploadError);
-      throw new Error(`Failed to upload preview image: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
-    }
+    // Preview URL uses on-demand watermarking endpoint (no separate upload needed)
+    // For secret credit or studio mode without watermark, use HD directly
+    const useUnwatermarked = useSecretCredit || (studioMode && !enableWatermark);
+    const previewUrl = useUnwatermarked 
+      ? hdUrl 
+      : `/api/preview?imageId=${imageId}`;
+    console.log(`📸 Preview URL: ${useUnwatermarked ? 'Using HD (no watermark)' : 'Using on-demand watermark endpoint'}`);
 
-    // Create and upload side-by-side before/after image
-    // Works for both regular and Studio mode generations
+    // Create and upload single before/after image
     try {
       if (buffer && generatedBuffer) {
-        await createBeforeAfterImage(buffer, generatedBuffer, imageId, studioMode);
-        if (studioMode) {
-          console.log(`🎨 Studio mode - multiple before/after variations created for ${imageId}`);
-        } else {
-          console.log(`✅ Single before/after image created for ${imageId}`);
-        }
+        await createBeforeAfterImage(buffer, generatedBuffer, imageId);
+        console.log(`✅ Before/after image created for ${imageId}`);
       } else {
         console.warn("⚠️ Cannot create before/after image: missing buffer(s)");
       }
     } catch (beforeAfterError) {
       // Don't fail the generation if before/after creation fails
       console.error("⚠️ Before/after image creation failed (non-critical):", beforeAfterError);
-      if (studioMode) {
-        console.error(`🎨 Studio mode - before/after failed for ${imageId}:`, beforeAfterError);
-      }
     }
 
     // Validate URLs before saving
@@ -5221,7 +4958,10 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
       console.log("🔍 HD URL:", hdUrl.substring(0, 100));
       console.log("🔍 Preview URL:", previewUrl.substring(0, 100));
       new URL(hdUrl);
-      new URL(previewUrl);
+      // Preview URL can be relative (/api/preview?imageId=xxx) or absolute (HD URL for unwatermarked)
+      if (!previewUrl.startsWith('/api/preview')) {
+        new URL(previewUrl);
+      }
       console.log("✅ URLs are valid");
     } catch (urlError) {
       console.error("❌ Invalid URL format:");
