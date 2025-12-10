@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CONFIG } from "@/lib/config";
 import { trackTikTokCompletePayment, identifyTikTokUser } from "@/lib/tiktok";
+import { trackMetaPurchase } from "@/lib/meta-pixel";
 
 // Rainbow Bridge text overlay data from localStorage
 interface RainbowBridgeData {
@@ -299,13 +300,13 @@ function SuccessContent() {
     }
   }, []);
   
-  // Track ref to prevent duplicate TikTok events
-  const tiktokTrackedRef = useRef(false);
+  // Track ref to prevent duplicate conversion events
+  const conversionTrackedRef = useRef(false);
   
-  // TikTok Pixel: Track CompletePayment conversion
+  // TikTok & Meta Pixel: Track Purchase conversion
   useEffect(() => {
     // Only track once per page load
-    if (tiktokTrackedRef.current) return;
+    if (conversionTrackedRef.current) return;
     
     // Determine purchase value based on type
     let purchaseValue = 0;
@@ -325,14 +326,25 @@ function SuccessContent() {
     }
     
     if (purchaseValue > 0) {
+      // TikTok Pixel: Track CompletePayment
       trackTikTokCompletePayment({
         content_id: imageId || "unlimited-session",
         content_name: contentName,
         value: purchaseValue,
         quantity: 1,
       });
-      tiktokTrackedRef.current = true;
+      
+      // Meta Pixel: Track Purchase
+      trackMetaPurchase({
+        content_ids: imageId ? [imageId] : ["unlimited-session"],
+        content_name: contentName,
+        value: purchaseValue,
+        num_items: 1,
+      });
+      
+      conversionTrackedRef.current = true;
       console.log(`📱 TikTok Pixel: CompletePayment tracked - $${purchaseValue} for ${contentName}`);
+      console.log(`📘 Meta Pixel: Purchase tracked - $${purchaseValue} for ${contentName}`);
     }
   }, [type, imageId]);
 

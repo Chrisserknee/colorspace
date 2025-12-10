@@ -25,6 +25,13 @@ import {
   trackTikTokViewContent,
   identifyTikTokUser 
 } from "@/lib/tiktok";
+import {
+  trackMetaAddToCart,
+  trackMetaInitiateCheckout,
+  trackMetaViewContent,
+  trackMetaLead,
+  initMetaUserData,
+} from "@/lib/meta-pixel";
 
 type Stage = "preview" | "email-capture" | "generating" | "result" | "checkout" | "email" | "expired" | "restoring";
 type Gender = "male" | "female" | null;
@@ -823,6 +830,14 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       // Identify user in PostHog for tracking
       identifyUser(email, { email });
       
+      // Initialize Meta Pixel with user email for Advanced Matching
+      initMetaUserData(email);
+      
+      // Track Lead event for Meta Pixel (email captured)
+      trackMetaLead({
+        content_name: "Pet Portrait Generation",
+      });
+      
       captureEvent("email_captured_pre_generate", {
         gender: gender || "not_selected",
       });
@@ -972,6 +987,12 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       // TikTok Pixel: Track ViewContent when portrait is generated
       trackTikTokViewContent({
         content_id: data.imageId,
+        content_name: "Generated Pet Portrait",
+      });
+      
+      // Meta Pixel: Track ViewContent when portrait is generated
+      trackMetaViewContent({
+        content_ids: [data.imageId],
         content_name: "Generated Pet Portrait",
       });
       
@@ -1188,6 +1209,13 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
       value: CONFIG.PRICE_AMOUNT / 100, // Convert cents to dollars
     });
     
+    // Meta Pixel: Track AddToCart event
+    trackMetaAddToCart({
+      content_ids: result?.imageId ? [result.imageId] : undefined,
+      content_name: "Pet Portrait Download",
+      value: CONFIG.PRICE_AMOUNT / 100, // Convert cents to dollars
+    });
+    
     if (!result) {
       setError("Something went wrong. Please try again.");
       return;
@@ -1196,6 +1224,13 @@ export default function GenerationFlow({ file, onReset, initialEmail, initialRes
     // TikTok Pixel: Track InitiateCheckout
     trackTikTokInitiateCheckout({
       content_id: result.imageId,
+      value: CONFIG.PRICE_AMOUNT / 100,
+    });
+    
+    // Meta Pixel: Track InitiateCheckout
+    trackMetaInitiateCheckout({
+      content_ids: [result.imageId],
+      content_name: "Pet Portrait Download",
       value: CONFIG.PRICE_AMOUNT / 100,
     });
     

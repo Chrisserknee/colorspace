@@ -1,8 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
+import { trackTikTokCompletePayment } from "@/lib/tiktok";
+import { trackMetaPurchase } from "@/lib/meta-pixel";
+import { CONFIG } from "@/lib/config";
 
 function CanvasSuccessContent() {
   const searchParams = useSearchParams();
@@ -11,6 +14,41 @@ function CanvasSuccessContent() {
   const size = searchParams.get("size");
 
   const sizeDisplay = size === "16x16" ? '16" × 16"' : '12" × 12"';
+  
+  // Track ref to prevent duplicate conversion events
+  const conversionTrackedRef = useRef(false);
+  
+  // Track Canvas Purchase conversion for TikTok & Meta Pixel
+  useEffect(() => {
+    // Only track once per page load
+    if (conversionTrackedRef.current) return;
+    
+    // Determine canvas purchase value
+    const purchaseValue = size === "16x16" 
+      ? CONFIG.CANVAS_16X16_PRICE_AMOUNT / 100 
+      : CONFIG.CANVAS_12X12_PRICE_AMOUNT / 100;
+    const contentName = `Canvas Print ${sizeDisplay}`;
+    
+    // TikTok Pixel: Track CompletePayment
+    trackTikTokCompletePayment({
+      content_id: imageId || "canvas",
+      content_name: contentName,
+      value: purchaseValue,
+      quantity: 1,
+    });
+    
+    // Meta Pixel: Track Purchase
+    trackMetaPurchase({
+      content_ids: imageId ? [imageId] : ["canvas"],
+      content_name: contentName,
+      value: purchaseValue,
+      num_items: 1,
+    });
+    
+    conversionTrackedRef.current = true;
+    console.log(`📱 TikTok Pixel: CompletePayment tracked - $${purchaseValue} for ${contentName}`);
+    console.log(`📘 Meta Pixel: Purchase tracked - $${purchaseValue} for ${contentName}`);
+  }, [imageId, size, sizeDisplay]);
 
   return (
     <div className="min-h-screen bg-renaissance py-12 px-6">
