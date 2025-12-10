@@ -49,7 +49,7 @@ const PORTRAIT_PALETTES = [
     background: "soft muted peach with gentle warm undertones",
     mood: "warm, gentle, serene",
     cloakColor: "dusty rose velvet with subtle gold thread",
-    cushionColor: "warm cream with soft gold embroidery",
+    cushionColor: "soft pastel pink with delicate gold embroidery",
     lighting: "soft diffused morning light, gentle and warm"
   },
   {
@@ -57,15 +57,15 @@ const PORTRAIT_PALETTES = [
     background: "soft hazy lavender grey, dreamy and ethereal",
     mood: "peaceful, dreamy, romantic",
     cloakColor: "pale lilac velvet with silver accents",
-    cushionColor: "soft grey-lavender with pearl details",
+    cushionColor: "soft pastel lavender with pearl details",
     lighting: "soft filtered light, gentle purple undertones"
   },
   {
-    name: "GENTLE SAGE",
-    background: "muted sage green with soft grey undertones",
-    mood: "calm, natural, tranquil",
-    cloakColor: "soft moss green velvet with gold trim",
-    cushionColor: "warm cream with sage embroidery",
+    name: "SOFT MINT",
+    background: "soft pale mint with gentle blue undertones",
+    mood: "calm, fresh, tranquil",
+    cloakColor: "pale mint velvet with silver trim",
+    cushionColor: "soft pastel pink with silver embroidery",
     lighting: "soft natural light, gentle and soothing"
   },
   {
@@ -73,7 +73,7 @@ const PORTRAIT_PALETTES = [
     background: "soft powder blue fading to pale grey",
     mood: "serene, airy, calm",
     cloakColor: "pale sky blue velvet with silver clasp",
-    cushionColor: "soft cream with blue accents",
+    cushionColor: "soft pastel blue with lavender accents",
     lighting: "cool soft daylight, gentle and clear"
   },
   {
@@ -81,16 +81,16 @@ const PORTRAIT_PALETTES = [
     background: "soft warm cream with golden undertones",
     mood: "classic, timeless, elegant",
     cloakColor: "rich burgundy velvet with gold details",
-    cushionColor: "ivory velvet with gold tassels",
+    cushionColor: "soft pastel cream with gold tassels",
     lighting: "warm golden afternoon light"
   },
   // MEDIUM TONES
   {
-    name: "DUSTY TEAL",
-    background: "muted teal blue-green, sophisticated",
+    name: "PASTEL BLUE",
+    background: "soft pastel blue with gentle grey undertones",
     mood: "refined, sophisticated, calm",
-    cloakColor: "deep teal velvet with gold embroidery",
-    cushionColor: "warm gold velvet with teal accents",
+    cloakColor: "pale blue velvet with silver embroidery",
+    cushionColor: "soft pastel lavender with silver accents",
     lighting: "balanced warm-cool light"
   },
   {
@@ -98,7 +98,7 @@ const PORTRAIT_PALETTES = [
     background: "muted dusty rose with grey undertones",
     mood: "vintage, romantic, soft",
     cloakColor: "soft mauve velvet with pearl details",
-    cushionColor: "dusty pink with gold thread",
+    cushionColor: "soft pastel pink with gold thread",
     lighting: "soft romantic candlelight glow"
   },
   {
@@ -106,7 +106,7 @@ const PORTRAIT_PALETTES = [
     background: "gentle blue-grey slate, neutral and elegant",
     mood: "modern, clean, refined",
     cloakColor: "charcoal velvet with silver clasp",
-    cushionColor: "soft grey with silver embroidery",
+    cushionColor: "soft pastel lavender with silver embroidery",
     lighting: "soft diffused studio light"
   },
   // DARK & DRAMATIC palettes
@@ -115,7 +115,7 @@ const PORTRAIT_PALETTES = [
     background: "rich deep charcoal black with subtle warmth",
     mood: "dramatic, mysterious, regal",
     cloakColor: "deep burgundy velvet with gold trim",
-    cushionColor: "dark wine velvet with gold tassels",
+    cushionColor: "soft pastel rose with gold tassels",
     lighting: "dramatic candlelight, warm highlights on dark"
   },
   {
@@ -123,31 +123,31 @@ const PORTRAIT_PALETTES = [
     background: "deep midnight navy blue, rich and dark",
     mood: "noble, dramatic, sophisticated",
     cloakColor: "royal blue velvet with silver details",
-    cushionColor: "navy velvet with silver embroidery",
+    cushionColor: "soft pastel blue with silver embroidery",
     lighting: "moonlight effect, cool silver highlights"
   },
   {
-    name: "FOREST SHADOW",
-    background: "deep forest green with dark shadows",
-    mood: "rich, earthy, dramatic",
-    cloakColor: "deep emerald velvet with gold clasp",
-    cushionColor: "dark green velvet with gold accents",
-    lighting: "warm candlelight against dark green"
+    name: "ROSE DUSK",
+    background: "soft rose pink fading to pale lavender",
+    mood: "rich, romantic, dramatic",
+    cloakColor: "dusty rose velvet with gold clasp",
+    cushionColor: "soft pastel pink with gold accents",
+    lighting: "warm candlelight against soft rose"
   },
   {
     name: "PLUM DUSK",
     background: "deep plum purple fading to dark",
     mood: "luxurious, dramatic, royal",
     cloakColor: "deep purple velvet with gold trim",
-    cushionColor: "dark plum velvet with gold tassels",
+    cushionColor: "soft pastel lavender with gold tassels",
     lighting: "warm golden light against rich purple"
   },
   {
-    name: "WARM CHARCOAL",
-    background: "warm charcoal grey with subtle brown undertones",
+    name: "SOFT CHARCOAL",
+    background: "soft charcoal grey with subtle blue undertones",
     mood: "classic, timeless, distinguished",
     cloakColor: "deep grey velvet with silver clasp",
-    cushionColor: "charcoal velvet with silver details",
+    cushionColor: "soft pastel lavender with silver details",
     lighting: "soft dramatic light, classic portrait style"
   }
 ];
@@ -4417,12 +4417,12 @@ WEATHERED EDGE TREATMENT (CRITICAL):
 
 === COLOR PALETTE (HIGHLY VARIED - Different Every Time) ===
 BACKGROUND (RANDOMIZE EACH GENERATION):
-- Pick ONE at random: charcoal black, pure white, silver grey, powder blue, navy, teal, soft pink, dusty rose, emerald, sage, lavender, cream, peach, coral, lilac, periwinkle
+- Pick ONE at random: charcoal black, pure white, silver grey, powder blue, navy, soft pink, dusty rose, lavender, cream, peach, coral, lilac, periwinkle, rose gold, soft mauve, pale yellow
 - MAXIMIZE VARIETY - each portrait should look unique with different colors
 - GLOWING atmospheric gradients with sfumato depth - colors seem to RADIATE from within
 - CREATE STRONG CONTRAST with pet's fur - background should make pet POP
 - BRIGHT and LUMINOUS - interesting color choices
-- NEVER brown, tan, beige, or muddy earth tones
+- NEVER green, tan, brown, beige, teal, emerald, sage, or muddy earth tones
 - COLOR BALANCE: Reduce overall green tint/color cast - avoid green grunge or green color grading throughout the image
 
 FABRICS & DRAPES:
