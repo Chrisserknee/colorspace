@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
-import { uploadImage, saveMetadata, incrementPortraitCount } from "@/lib/supabase";
+import { uploadImage, saveMetadata, incrementPortraitCount, uploadBeforeAfterImage } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
 
@@ -2259,6 +2259,67 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
     ])
     .png()
     .toBuffer();
+}// Create side-by-side before/after image
+async function createBeforeAfterImage(
+  originalBuffer: Buffer,
+  generatedBuffer: Buffer,
+  imageId: string
+): Promise<void> {
+  try {
+    console.log(`🖼️ Creating side-by-side before/after image for ${imageId}...`);
+    
+    // Get metadata for both images
+    const originalMeta = await sharp(originalBuffer).metadata();
+    const generatedMeta = await sharp(generatedBuffer).metadata();
+    
+    // Determine target height (use the smaller height to maintain aspect ratio)
+    const targetHeight = Math.min(originalMeta.height || 1024, generatedMeta.height || 1024);
+    
+    // Resize both images to the same height, maintaining aspect ratio
+    const originalResized = await sharp(originalBuffer)
+      .resize(null, targetHeight, { fit: 'inside', withoutEnlargement: true })
+      .toBuffer();
+    
+    const generatedResized = await sharp(generatedBuffer)
+      .resize(null, targetHeight, { fit: 'inside', withoutEnlargement: true })
+      .toBuffer();
+    
+    // Get dimensions of resized images
+    const originalResizedMeta = await sharp(originalResized).metadata();
+    const generatedResizedMeta = await sharp(generatedResized).metadata();
+    
+    const originalWidth = originalResizedMeta.width || 1024;
+    const generatedWidth = generatedResizedMeta.width || 1024;
+    const combinedWidth = originalWidth + generatedWidth;
+    
+    // Create side-by-side composite
+    const beforeAfterBuffer = await sharp({
+      create: {
+        width: combinedWidth,
+        height: targetHeight,
+        channels: 4,
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
+      }
+    })
+      .composite([
+        { input: originalResized, left: 0, top: 0 },
+        { input: generatedResized, left: originalWidth, top: 0 }
+      ])
+      .png()
+      .toBuffer();
+    
+    // Upload to Before_After bucket
+    await uploadBeforeAfterImage(
+      beforeAfterBuffer,
+      `${imageId}-before-after.png`,
+      "image/png"
+    );
+    
+    console.log(`✅ Side-by-side before/after image uploaded: ${imageId}-before-after.png`);
+  } catch (error) {
+    // Don't fail the generation if before/after upload fails
+    console.error(`⚠️ Failed to create before/after image:`, error);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -5063,6 +5124,14 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     } catch (uploadError) {
       console.error("❌ Failed to upload preview image:", uploadError);
       throw new Error(`Failed to upload preview image: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
+    }
+
+    // Create and upload side-by-side before/after image
+    try {
+      await createBeforeAfterImage(buffer, generatedBuffer, imageId);
+    } catch (beforeAfterError) {
+      // Don't fail the generation if before/after creation fails
+      console.error("⚠️ Before/after image creation failed (non-critical):", beforeAfterError);
     }
 
     // Validate URLs before saving

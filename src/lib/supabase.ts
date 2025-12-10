@@ -10,6 +10,7 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 // Storage bucket names
 export const STORAGE_BUCKET = "pet-portraits";
 export const UPLOADS_BUCKET = "pet-uploads";
+export const BEFORE_AFTER_BUCKET = "Before_After";
 
 // Helper to upload image to Supabase Storage
 export async function uploadImage(
@@ -67,6 +68,35 @@ export async function uploadPetPhoto(
     .getPublicUrl(fileName);
 
   console.log(`✅ Successfully uploaded pet photo to ${UPLOADS_BUCKET} bucket: ${fileName}`);
+  return urlData.publicUrl;
+}
+
+// Helper to upload image to Before_After bucket
+export async function uploadBeforeAfterImage(
+  buffer: Buffer,
+  fileName: string,
+  contentType: string = "image/png"
+): Promise<string> {
+  console.log(`📦 Uploading to Supabase Storage bucket "${BEFORE_AFTER_BUCKET}": ${fileName} (${(buffer.length / 1024).toFixed(2)} KB)`);
+  
+  const { data, error } = await supabase.storage
+    .from(BEFORE_AFTER_BUCKET)
+    .upload(fileName, buffer, {
+      contentType,
+      upsert: true,
+    });
+
+  if (error) {
+    console.error(`❌ Upload failed for ${fileName}:`, error);
+    throw new Error(`Failed to upload before/after image: ${error.message}`);
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from(BEFORE_AFTER_BUCKET)
+    .getPublicUrl(fileName);
+
+  console.log(`✅ Successfully uploaded to ${BEFORE_AFTER_BUCKET} bucket: ${fileName}`);
   return urlData.publicUrl;
 }
 
