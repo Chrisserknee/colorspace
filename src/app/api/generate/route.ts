@@ -4334,6 +4334,26 @@ STYLE – ANTIQUE OIL MASTERPIECE
 
 - Looks like a 200–300 year old painting found in a grand estate, not new.
 
+PAINTERLY FACIAL TREATMENT (CREATES GENTLE ILLUSION):
+
+- Apply MORE painterly texture and brushstrokes specifically to the face and head area.
+
+- SOFTEN facial details subtly with visible brushstrokes - use loose, flowing brushwork that gently blends features.
+
+- Slightly OBSCURE minor facial details with artistic texture - let brushstrokes create soft transitions between features.
+
+- Create a GENTLE ILLUSION through painterly rendering - the artistic texture helps viewers see their pet's essence rather than focusing on minor imperfections.
+
+- Use IMPRESSIONISTIC brushwork on the face - visible strokes that suggest features rather than rendering every detail sharply.
+
+- Apply THICKER paint texture on facial highlights - impasto on nose, eyes, and fur highlights creates depth and softness.
+
+- SOFT EDGES on facial features - let brushstrokes blend edges subtly, creating a dreamy, artistic quality.
+
+- The face should feel PAINTED and ARTISTIC, not photographic - this painterly quality enhances the perception of likeness.
+
+- Maintain recognizable features while adding artistic texture - the pet should still be clearly identifiable, just rendered more artistically.
+
 IDENTITY & LIKENESS (MOST IMPORTANT)
 
 This must look like THIS specific ${species}, instantly recognizable to the owner.
@@ -5054,6 +5074,9 @@ Increase overall ornateness and incorporate stronger Victorian-royal influence t
 
 PAINTING TECHNIQUE – EXTREMELY THICK, SCULPTURAL OIL
 Use VERY THICK, HEAVILY TEXTURED oil paint with dramatic impasto buildup. Brush strokes must be BOLD, RAISED, and SCULPTURAL—visible ridges, thick paint peaks, heavy bristle marks, and palette-knife textures. The paint should look like it could be touched—physical, 3D, and deeply layered. Every stroke must be visibly hand-painted with thick, rich pigment.
+
+PAINTERLY FACIAL TREATMENT (CREATES GENTLE ILLUSION):
+Apply MORE painterly texture and brushstrokes specifically to the face and head area. SOFTEN facial details subtly with visible brushstrokes - use loose, flowing brushwork that gently blends features. Slightly OBSCURE minor facial details with artistic texture - let brushstrokes create soft transitions between features. Create a GENTLE ILLUSION through painterly rendering - the artistic texture helps viewers see their pet's essence rather than focusing on minor imperfections. Use IMPRESSIONISTIC brushwork on the face - visible strokes that suggest features rather than rendering every detail sharply. Apply THICKER paint texture on facial highlights - impasto on nose, eyes, and fur highlights creates depth and softness. SOFT EDGES on facial features - let brushstrokes blend edges subtly, creating a dreamy, artistic quality. The face should feel PAINTED and ARTISTIC, not photographic - this painterly quality enhances the perception of likeness. Maintain recognizable features while adding artistic texture - the pet should still be clearly identifiable, just rendered more artistically.
 
 ANTIQUE AGING
 Soft craquelure, warm aged varnish glow, and light edge wear. Maintain elegance.
