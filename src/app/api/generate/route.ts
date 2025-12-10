@@ -4286,6 +4286,32 @@ COLOR PALETTE "${selectedPalette.name}"
 
 - Overall colors: soft, muted, harmonious and refined. Jewelry gems may be highly vibrant; everything else is gentle, not harsh or neon.
 
+BEAUTIFUL COMPOSITION (CRITICAL FOR STUNNING RESULT):
+
+- CLASSICAL COMPOSITION: Apply golden ratio and rule of thirds principles. Pet positioned at a visually pleasing focal point.
+
+- DRAMATIC LIGHTING: Use Rembrandt-style chiaroscuro lighting with beautiful interplay of light and shadow. Strong rim lighting on fur edges creating a luminous halo effect.
+
+- DEPTH AND DIMENSION: Create atmospheric perspective - soft focus on background elements, sharp focus on pet. Multiple planes of depth (foreground cushion, mid-ground pet, background).
+
+- COLOR HARMONY: Use sophisticated color relationships - complementary accents, analogous base colors, split-complementary highlights. Colors should sing together in harmony.
+
+- ELEGANT NEGATIVE SPACE: Thoughtful use of empty space around the subject to create breathing room and draw focus to the pet.
+
+- VISUAL FLOW: Guide the viewer's eye through the composition using diagonal lines of the cloak, curves of the cushion, and placement of jewelry.
+
+- RICH TEXTURAL CONTRAST: Juxtapose textures beautifully - soft plush fur against smooth velvet, matte fabric against gleaming metallic jewelry, rough canvas texture against soft painted areas.
+
+- PROFESSIONAL STUDIO LIGHTING: Main key light from upper left (classic portrait lighting), fill light from right to soften shadows, rim light from behind to separate subject from background.
+
+- MUSEUM-QUALITY AESTHETIC: The composition should look like it belongs in the Louvre or National Gallery - refined, balanced, sophisticated, and timeless.
+
+- ROMANTIC ATMOSPHERE: Soft, dreamy quality with gentle bokeh effect in background, warm golden tones, and an overall sense of elegance and beauty.
+
+- ARTISTIC BALANCE: Perfect visual weight distribution - if the pet leans one direction, balance with jewelry, cloak drape, or cushion folds on the opposite side.
+
+- PAINTERLY BEAUTY: Every element should contribute to an overall sense of sublime beauty - this is fine art, not just a pet photo.
+
 BRIGHTNESS & LUMINOSITY (CRITICAL):
 
 - Make the overall image BRIGHT and LUMINOUS - well-lit throughout, not dark or shadowy
@@ -4388,11 +4414,11 @@ ${genderInfo}${feminineAesthetic}${masculineAesthetic}${whiteCatTreatment}${grey
 
 FINAL FRAMING
 
-Full-body portrait of the ${species} naturally sitting or resting on ${cushion}, in a relaxed pose, with ${robe} draped over its back and a bright polished silver cloak clasp plus ${jewelryItem}. ${background}. ${lighting}. Entire head and ear tips fully visible with background above; never cropped.
+BREATHTAKINGLY BEAUTIFUL full-body portrait of the ${species} naturally sitting or resting on ${cushion}, in a relaxed, elegant pose, with ${robe} draped gracefully over its back and a bright polished silver cloak clasp plus ${jewelryItem}. ${background}. ${lighting} with GORGEOUS Rembrandt-style dramatic lighting, soft rim lighting creating luminous fur edges, beautiful interplay of light and shadow. Entire head and ear tips fully visible with atmospheric background above; never cropped. STUNNING museum-quality composition with perfect visual balance and classical artistic principles.
 
 RENDERING SUMMARY
 
-Authentic, heavily aged oil painting: loose flowing brushstrokes, strong surface texture, impasto, craquelure, warm amber varnish, soft weathered edges, atmospheric depth, plush velvet cloak, gleaming gold accents, sparkling vibrant gems, BRIGHT LUMINOUS COLORS, HIGH SATURATION, museum-quality antique look. Image must be BRIGHT and COLORFUL throughout - vibrant, saturated colors with high brightness.
+STUNNINGLY BEAUTIFUL authentic antique oil painting masterpiece: GORGEOUS composition with classical golden ratio placement, ROMANTIC Rembrandt-style dramatic lighting, SUBLIME color harmony, EXQUISITE textural contrasts. Loose flowing brushstrokes, rich impasto, elegant craquelure, warm amber varnish glow. BREATHTAKINGLY BEAUTIFUL atmosphere with soft luminous highlights, professional studio lighting quality, museum-worthy elegance. Plush velvet cloak with luxurious drape, gleaming gold accents catching light beautifully, DAZZLING vibrant gems with inner fire. BRIGHT LUMINOUS COLORS, HIGH SATURATION, sophisticated visual balance. The portrait should be SO BEAUTIFUL it takes the viewer's breath away - fine art gallery masterpiece quality.
 
 BRIGHTNESS & COLOR REQUIREMENTS (CRITICAL):
 
@@ -5069,12 +5095,15 @@ This is a LARGE DOG breed. You MUST create a WIDE SHOT showing the dog from a di
 CRITICAL SPECIES LOCK
 This is a ${species}. Generate ONLY a real ${species}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. Do NOT generate: ${notSpecies}.
 
+STUNNINGLY BEAUTIFUL COMPOSITION (CRITICAL FOR GORGEOUS RESULT)
+Apply classical golden ratio and rule of thirds for visually pleasing placement. Use GORGEOUS Rembrandt-style chiaroscuro lighting with beautiful interplay of light and shadow. Strong luminous rim lighting on fur edges creating a halo effect. Create atmospheric depth with soft background and sharp subject focus. Sophisticated color harmony with complementary accents. Elegant negative space drawing focus to the pet. Rich textural contrasts - soft fur against smooth velvet, matte fabric against gleaming jewelry. Professional studio lighting quality. MUSEUM-QUALITY aesthetic that belongs in the Louvre or National Gallery. ROMANTIC atmosphere with dreamy quality and warm golden tones. Perfect visual balance throughout. Every element contributes to SUBLIME BEAUTY.
+
 BRIGHTNESS & VICTORIAN ELEGANCE
 The overall image must be BRIGHTER and more luminous than typical portraits. Increase light on the subject significantly. The aesthetic must be distinctly VICTORIAN—refined, romantic, elegant, with intricate details, delicate ornamentation, and graceful sophistication throughout.
 
 MASTER STYLE
-18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a softer, elegant background (muted navy, sage green, dusty rose, soft burgundy, warm taupe). Maintain a regal, elegant, historically authentic Victorian atmosphere with refined composition and classical staging.
-Increase overall ornateness and incorporate stronger Victorian-royal influence throughout—the environment, fabrics, patterns, textures, and decorative elements should feel more lavish, detailed, and aristocratic.
+BREATHTAKINGLY BEAUTIFUL 18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a softer, elegant background. Maintain a regal, elegant, historically authentic Victorian atmosphere with GORGEOUS refined composition and classical staging.
+Increase overall ornateness and incorporate stronger Victorian-royal influence throughout—the environment, fabrics, patterns, textures, and decorative elements should feel more lavish, detailed, and aristocratic. The composition should be SO BEAUTIFUL it takes the viewer's breath away.
 
 PAINTING TECHNIQUE – EXTREMELY THICK, SCULPTURAL OIL
 Use VERY THICK, HEAVILY TEXTURED oil paint with dramatic impasto buildup. Brush strokes must be BOLD, RAISED, and SCULPTURAL—visible ridges, thick paint peaks, heavy bristle marks, and palette-knife textures. The paint should look like it could be touched—physical, 3D, and deeply layered. Every stroke must be visibly hand-painted with thick, rich pigment.
