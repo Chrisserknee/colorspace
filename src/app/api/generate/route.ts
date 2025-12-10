@@ -7,7 +7,6 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
 import { uploadImage, saveMetadata, incrementPortraitCount, uploadBeforeAfterImage } from "@/lib/supabase";
-import Replicate from "replicate";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
 
