@@ -5127,11 +5127,22 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     }
 
     // Create and upload side-by-side before/after image
+    // Works for both regular and Studio mode generations
     try {
-      await createBeforeAfterImage(buffer, generatedBuffer, imageId);
+      if (buffer && generatedBuffer) {
+        await createBeforeAfterImage(buffer, generatedBuffer, imageId);
+        if (studioMode) {
+          console.log(`🎨 Studio mode - before/after image created for ${imageId}`);
+        }
+      } else {
+        console.warn("⚠️ Cannot create before/after image: missing buffer(s)");
+      }
     } catch (beforeAfterError) {
       // Don't fail the generation if before/after creation fails
       console.error("⚠️ Before/after image creation failed (non-critical):", beforeAfterError);
+      if (studioMode) {
+        console.error(`🎨 Studio mode - before/after failed for ${imageId}:`, beforeAfterError);
+      }
     }
 
     // Validate URLs before saving
