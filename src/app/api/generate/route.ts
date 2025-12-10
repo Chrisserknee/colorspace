@@ -2661,9 +2661,16 @@ async function createBeforeAfterVideo(
     
     // Read the output video
     const videoData = await ffmpeg.readFile('output.mp4');
-    const videoBuffer = videoData instanceof Uint8Array 
-      ? Buffer.from(videoData)
-      : Buffer.from(await (videoData as Blob).arrayBuffer());
+    let videoBuffer: Buffer;
+    
+    if (videoData instanceof Uint8Array) {
+      videoBuffer = Buffer.from(videoData);
+    } else if (videoData instanceof Blob) {
+      videoBuffer = Buffer.from(await videoData.arrayBuffer());
+    } else {
+      // If it's a string or other type, try to convert
+      videoBuffer = Buffer.from(videoData as unknown as ArrayBuffer);
+    }
     
     // Upload 4K video to Before_After bucket
     await uploadBeforeAfterImage(
