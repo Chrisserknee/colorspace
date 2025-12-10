@@ -42,113 +42,104 @@ async function analyzeImageDarkness(imageBuffer: Buffer): Promise<{ isDark: bool
 }
 
 // Portrait style palettes - each creates a unique mood
+// ALL BACKGROUNDS ARE WHITE/LIGHT WHITE - NO GREEN, NO MUDDY COLORS
 const PORTRAIT_PALETTES = [
-  // SOFT & LIGHT palettes
+  // WHITE & LIGHT WHITE VARIATIONS
   {
-    name: "SOFT DAWN",
-    background: "soft muted peach with gentle warm undertones",
-    mood: "warm, gentle, serene",
+    name: "PURE WHITE",
+    background: "pure bright white, clean and luminous",
+    mood: "clean, bright, elegant",
     cloakColor: "dusty rose velvet with subtle gold thread",
     cushionColor: "soft pastel pink with delicate gold embroidery",
-    lighting: "soft diffused morning light, gentle and warm"
+    lighting: "bright diffused natural light, clean and luminous"
   },
   {
-    name: "MISTY LAVENDER",
-    background: "soft hazy lavender grey, dreamy and ethereal",
-    mood: "peaceful, dreamy, romantic",
+    name: "WARM WHITE",
+    background: "warm white with subtle cream undertones, bright and airy",
+    mood: "warm, gentle, serene",
     cloakColor: "pale lilac velvet with silver accents",
     cushionColor: "soft pastel lavender with pearl details",
-    lighting: "soft filtered light, gentle purple undertones"
+    lighting: "warm bright daylight, gentle and inviting"
   },
   {
-    name: "SOFT SKY",
-    background: "soft pale sky blue with gentle lavender undertones",
+    name: "COOL WHITE",
+    background: "cool white with subtle blue-grey undertones, crisp and clean",
     mood: "calm, fresh, tranquil",
     cloakColor: "pale blue velvet with silver trim",
     cushionColor: "soft pastel pink with silver embroidery",
-    lighting: "soft natural light, gentle and soothing"
+    lighting: "cool bright natural light, crisp and clear"
   },
   {
-    name: "POWDER BLUE SERENITY",
-    background: "soft powder blue fading to pale grey",
+    name: "IVORY WHITE",
+    background: "ivory white with gentle warm undertones, soft and elegant",
     mood: "serene, airy, calm",
     cloakColor: "pale sky blue velvet with silver clasp",
     cushionColor: "soft pastel blue with lavender accents",
-    lighting: "cool soft daylight, gentle and clear"
+    lighting: "soft bright daylight, gentle and clear"
   },
   {
-    name: "WARM CREAM",
-    background: "soft warm cream with golden undertones",
+    name: "PEARL WHITE",
+    background: "pearl white with subtle pink-grey undertones, luminous",
     mood: "classic, timeless, elegant",
     cloakColor: "rich burgundy velvet with gold details",
     cushionColor: "soft pastel cream with gold tassels",
-    lighting: "warm golden afternoon light"
+    lighting: "bright golden afternoon light"
   },
-  // MEDIUM TONES
   {
-    name: "PASTEL BLUE",
-    background: "soft pastel blue with gentle grey undertones",
+    name: "SNOW WHITE",
+    background: "snow white, pure and bright, no undertones",
     mood: "refined, sophisticated, calm",
     cloakColor: "pale blue velvet with silver embroidery",
     cushionColor: "soft pastel lavender with silver accents",
-    lighting: "balanced warm-cool light"
+    lighting: "balanced bright light"
   },
   {
-    name: "ANTIQUE ROSE",
-    background: "muted dusty rose with grey undertones",
+    name: "CREAM WHITE",
+    background: "cream white with subtle warm undertones, soft and inviting",
     mood: "vintage, romantic, soft",
     cloakColor: "soft mauve velvet with pearl details",
     cushionColor: "soft pastel pink with gold thread",
-    lighting: "soft romantic candlelight glow"
+    lighting: "warm bright candlelight glow"
   },
   {
-    name: "SOFT SLATE",
-    background: "gentle blue-grey slate, neutral and elegant",
+    name: "LIGHT GREY WHITE",
+    background: "very light grey-white, neutral and elegant",
     mood: "modern, clean, refined",
     cloakColor: "charcoal velvet with silver clasp",
     cushionColor: "soft pastel lavender with silver embroidery",
-    lighting: "soft diffused studio light"
-  },
-  // DARK & DRAMATIC palettes
-  {
-    name: "DEEP NIGHT",
-    background: "rich deep charcoal black with subtle warmth",
-    mood: "dramatic, mysterious, regal",
-    cloakColor: "deep burgundy velvet with gold trim",
-    cushionColor: "soft pastel rose with gold tassels",
-    lighting: "dramatic candlelight, warm highlights on dark"
+    lighting: "bright diffused studio light"
   },
   {
-    name: "MIDNIGHT BLUE",
-    background: "deep midnight navy blue, rich and dark",
-    mood: "noble, dramatic, sophisticated",
-    cloakColor: "royal blue velvet with silver details",
-    cushionColor: "soft pastel blue with silver embroidery",
-    lighting: "moonlight effect, cool silver highlights"
-  },
-  {
-    name: "ROSE DUSK",
-    background: "soft rose pink fading to pale lavender",
-    mood: "rich, romantic, dramatic",
+    name: "OFF WHITE",
+    background: "off-white with subtle warm undertones, bright and clean",
+    mood: "warm, gentle, inviting",
     cloakColor: "dusty rose velvet with gold clasp",
     cushionColor: "soft pastel pink with gold accents",
-    lighting: "warm candlelight against soft rose"
+    lighting: "warm bright light"
   },
   {
-    name: "PLUM DUSK",
-    background: "deep plum purple fading to dark",
-    mood: "luxurious, dramatic, royal",
+    name: "BRIGHT WHITE",
+    background: "bright white, pure and luminous, maximum brightness",
+    mood: "clean, bright, cheerful",
+    cloakColor: "pale blue velvet with silver details",
+    cushionColor: "soft pastel blue with silver embroidery",
+    lighting: "very bright natural light, maximum luminosity"
+  },
+  {
+    name: "SOFT WHITE",
+    background: "soft white with minimal warm undertones, gentle and bright",
+    mood: "soft, gentle, peaceful",
     cloakColor: "deep purple velvet with gold trim",
     cushionColor: "soft pastel lavender with gold tassels",
-    lighting: "warm golden light against rich purple"
+    lighting: "soft bright light"
   },
   {
-    name: "SOFT CHARCOAL",
-    background: "soft charcoal grey with subtle blue undertones",
+    name: "PRISTINE WHITE",
+    background: "pristine white, absolutely pure and clean, no color cast",
     mood: "classic, timeless, distinguished",
     cloakColor: "deep grey velvet with silver clasp",
     cushionColor: "soft pastel lavender with silver details",
-    lighting: "soft dramatic light, classic portrait style"
+    lighting: "bright clean light, classic portrait style"
   }
 ];
 
@@ -3864,7 +3855,8 @@ Respond with ONLY the species name.`,
     let cushion = cushions[Math.floor(Math.random() * cushions.length)];
     let robe = robes[Math.floor(Math.random() * robes.length)];
     let jewelryItem = jewelry[Math.floor(Math.random() * jewelry.length)];
-    let background = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    // Use white background from selected palette instead of random backgrounds array
+    let background = selectedPalette.background;
     const lighting = lightingDirections[Math.floor(Math.random() * lightingDirections.length)];
 
     // Adjust for FEMALE pets - feminine aesthetic
@@ -4318,9 +4310,11 @@ DO NOT:
 
 - No heavy layered costumes, no multiple necklaces.
 
-- NO GREEN OR TAN BACKGROUNDS - backgrounds must be light pastels (pink, blue, lavender, cream), rich jewel tones (navy, plum, charcoal), or pure white/light grey. NEVER green, tan, brown, or earth tones.
+- BACKGROUND MUST BE WHITE - pure white, bright white, ivory white, or very light white variations ONLY. NO colors, NO green, NO tan, NO brown.
 
-- NO GREEN COLOR CASTS - avoid any green tinting or green color grading throughout the image.
+- NO GREEN COLOR CASTS - absolutely avoid any green tinting or green color grading throughout the image.
+
+- NO MUDDY COLORS - avoid any muddy, brown, tan, or earth-tone colors anywhere in the image.
 
 - Increase color saturation and brightness throughout - make colors vibrant and luminous.
 
@@ -4400,11 +4394,15 @@ BRIGHTNESS & COLOR REQUIREMENTS (CRITICAL):
 
 - Overall bright, cheerful, luminous feel - the image should feel bright and inviting, not dark or moody
 
-- NO GREEN BACKGROUNDS - never use green, olive, sage, or any green-tinted backgrounds
+- BACKGROUND MUST BE WHITE - pure white, bright white, ivory white, or very light white variations ONLY
 
-- NO TAN/BROWN BACKGROUNDS - never use tan, beige, brown, or earth-tone backgrounds
+- NO GREEN BACKGROUNDS - absolutely never use green, olive, sage, or any green-tinted backgrounds
 
-- Backgrounds must be: light pastels (pink, blue, lavender, cream), rich jewel tones (navy, plum, charcoal), or pure white/light grey - NO GREEN OR TAN
+- NO TAN/BROWN BACKGROUNDS - absolutely never use tan, beige, brown, or earth-tone backgrounds
+
+- NO COLORED BACKGROUNDS - backgrounds must be white or very light white only, no colors
+
+- Background must be: pure white, bright white, ivory white, warm white, cool white, or very light grey-white - WHITE ONLY
 
 `;
 
