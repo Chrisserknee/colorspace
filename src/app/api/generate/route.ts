@@ -227,6 +227,158 @@ const NATURAL_PET_POSES = [
     headPosition: "held up with natural dignity, not stiff",
     pawPosition: "front legs together extended forward, back legs visible to side",
     expression: "dignified, serene, peacefully noble"
+  },
+  {
+    name: "ELEGANT REACH",
+    description: "Pet lying down with one front paw extended forward elegantly, body slightly turned, showing graceful extension. Like reaching for something with refined poise.",
+    bodyPosition: "lying down with body slightly angled, FULL BODY visible",
+    headPosition: "turned toward extended paw or viewer, elegant angle",
+    pawPosition: "one front paw extended forward gracefully, other front paw relaxed, back legs visible",
+    expression: "curious, elegant, poised"
+  },
+  {
+    name: "NOBLE PROFILE",
+    description: "Pet lying on side in profile view, head turned to show elegant profile line, body curved gracefully. Classic portrait angle showing regal silhouette.",
+    bodyPosition: "lying on side in profile, FULL BODY visible in elegant curve",
+    headPosition: "turned to show profile, elegant neck line visible",
+    pawPosition: "all four legs visible in profile, arranged gracefully",
+    expression: "noble, contemplative, serene"
+  },
+  {
+    name: "PLAYFUL PAW TUCK",
+    description: "Pet lying down with front paws tucked under chest, head resting on paws, back legs relaxed. Cozy, comfortable, inviting pose.",
+    bodyPosition: "lying down comfortably, FULL BODY visible",
+    headPosition: "resting on tucked front paws, looking at viewer",
+    pawPosition: "front paws tucked under chest, back legs relaxed and visible",
+    expression: "cozy, content, inviting"
+  },
+  {
+    name: "DRAMATIC STRETCH",
+    description: "Pet in full body stretch, front legs reaching far forward, back legs extended behind, body elongated. Maximum length and grace visible.",
+    bodyPosition: "fully stretched out, MAXIMUM BODY LENGTH visible",
+    headPosition: "low, between or on front paws",
+    pawPosition: "front paws reaching FAR forward, back legs stretched FAR behind",
+    expression: "blissful, relaxed, satisfied"
+  },
+  {
+    name: "ROYAL RECLINE",
+    description: "Pet reclining back against cushion at elegant angle, front legs extended forward, back legs relaxed. Like a royal lounging on a throne.",
+    bodyPosition: "reclined back elegantly, FULL BODY visible at angle",
+    headPosition: "held up regally, looking at viewer with dignity",
+    pawPosition: "front legs extended forward elegantly, back legs relaxed to side",
+    expression: "regal, confident, majestic"
+  },
+  {
+    name: "CONTEMPLATIVE CURL",
+    description: "Pet curled in tight ball, head resting on side, all paws tucked in. Viewed from angle to show full rounded form. Peaceful, introspective.",
+    bodyPosition: "curled in tight ball, FULL ROUNDED BODY visible",
+    headPosition: "resting on side, turned toward viewer",
+    pawPosition: "all paws tucked in, creating rounded shape",
+    expression: "contemplative, peaceful, introspective"
+  },
+  {
+    name: "GRACEFUL EXTENSION",
+    description: "Pet lying down with body extended, one front leg stretched forward, other relaxed, back legs visible. Showing elegant length and grace.",
+    bodyPosition: "extended elegantly, FULL BODY LENGTH visible",
+    headPosition: "held up gracefully, looking forward or at viewer",
+    pawPosition: "one front leg extended forward, other relaxed, back legs visible",
+    expression: "graceful, elegant, refined"
+  },
+  {
+    name: "SUNBATHING LOUNGE",
+    description: "Pet lying flat on back or side, completely relaxed, all four legs visible and relaxed. Like basking in warm sunlight, utterly at ease.",
+    bodyPosition: "lying flat, FULL BODY visible and relaxed",
+    headPosition: "resting comfortably, may be tilted back or to side",
+    pawPosition: "all four legs relaxed and visible in natural positions",
+    expression: "blissful, sun-warmed, completely relaxed"
+  },
+  {
+    name: "ALERT REST",
+    description: "Pet lying down but alert, head up and attentive, body relaxed but ready. Showing both comfort and awareness.",
+    bodyPosition: "lying down comfortably, FULL BODY visible",
+    headPosition: "held up alertly, ears perked, looking at viewer",
+    pawPosition: "front paws positioned ready, back legs relaxed",
+    expression: "alert, attentive, but comfortable"
+  },
+  {
+    name: "ELEGANT TWIST",
+    description: "Pet lying down with body twisted slightly, showing elegant turn of the torso, head turned toward viewer. Dynamic but graceful pose.",
+    bodyPosition: "lying down with elegant body twist, FULL BODY visible",
+    headPosition: "turned toward viewer over shoulder",
+    pawPosition: "front paws positioned naturally, back legs visible",
+    expression: "elegant, dynamic, graceful"
+  },
+  {
+    name: "PEACEFUL SETTLE",
+    description: "Pet settling into cushion, body weight shifting down, all muscles relaxing. Captured moment of complete comfort and peace.",
+    bodyPosition: "settling into cushion, FULL BODY visible sinking down",
+    headPosition: "lowering comfortably, eyes soft",
+    pawPosition: "all paws relaxing into natural positions",
+    expression: "peaceful, settling, content"
+  },
+  {
+    name: "REGAL SIDE VIEW",
+    description: "Pet lying on side viewed from three-quarter angle, showing elegant body curve, head turned toward viewer. Classic portrait elegance.",
+    bodyPosition: "lying on side at three-quarter angle, FULL BODY visible",
+    headPosition: "turned toward viewer, elegant neck curve",
+    pawPosition: "all four legs visible, arranged gracefully",
+    expression: "regal, elegant, serene"
+  },
+  {
+    name: "COMFORTABLE SPREAD",
+    description: "Pet lying down with legs spread comfortably, taking up space, completely relaxed. Showing confidence and comfort in their space.",
+    bodyPosition: "lying down spread out, FULL BODY visible taking space",
+    headPosition: "resting comfortably, may be on side or lifted",
+    pawPosition: "legs spread comfortably, all four visible",
+    expression: "confident, comfortable, at home"
+  },
+  {
+    name: "GRACEFUL ARCH",
+    description: "Pet lying down with elegant arch to the back, head held high, showing graceful curve of spine. Like a dancer's elegant line.",
+    bodyPosition: "lying down with elegant arch, FULL BODY showing graceful curve",
+    headPosition: "held high with grace, elegant neck line",
+    pawPosition: "front paws extended forward, back legs relaxed",
+    expression: "graceful, elegant, refined"
+  },
+  {
+    name: "COZY NEST",
+    description: "Pet curled tightly into cushion, making themselves small and cozy, all paws tucked, tail wrapped. Maximum coziness and comfort.",
+    bodyPosition: "curled tightly, FULL BODY in compact cozy shape",
+    headPosition: "tucked into body or resting on paws",
+    pawPosition: "all paws tucked in tightly, creating nest-like shape",
+    expression: "cozy, nested, completely comfortable"
+  },
+  {
+    name: "NOBLE EXTENSION",
+    description: "Pet lying down with regal extension, front legs stretched forward elegantly, head held high. Showing both relaxation and dignity.",
+    bodyPosition: "lying down with regal extension, FULL BODY visible",
+    headPosition: "held high with nobility, looking forward",
+    pawPosition: "front legs extended forward elegantly, back legs visible",
+    expression: "noble, dignified, regal"
+  },
+  {
+    name: "RELAXED SPRAWL",
+    description: "Pet sprawled out completely relaxed, taking up maximum space, all limbs extended. Utterly comfortable and at ease.",
+    bodyPosition: "sprawled out completely, MAXIMUM BODY SPREAD visible",
+    headPosition: "resting comfortably, may be on side or back",
+    pawPosition: "all limbs extended and relaxed, maximum sprawl",
+    expression: "completely relaxed, blissful, carefree"
+  },
+  {
+    name: "ELEGANT FOLD",
+    description: "Pet lying down with elegant fold of body, front legs crossed or folded, back legs relaxed. Showing refined, composed posture.",
+    bodyPosition: "lying down with elegant body fold, FULL BODY visible",
+    headPosition: "held up elegantly, composed",
+    pawPosition: "front legs elegantly folded or crossed, back legs relaxed",
+    expression: "elegant, composed, refined"
+  },
+  {
+    name: "PEACEFUL REPOSE",
+    description: "Pet in complete repose, all tension released, body completely relaxed, eyes soft. The ultimate state of peace and comfort.",
+    bodyPosition: "in complete repose, FULL BODY relaxed and visible",
+    headPosition: "resting peacefully, soft and relaxed",
+    pawPosition: "all paws in natural relaxed positions",
+    expression: "peaceful, serene, in complete repose"
   }
 ];
 
@@ -3215,44 +3367,50 @@ Respond with ONLY the species name.`,
     ];
     
     const jewelry = [
-      // Original classic multi-gem options
-      "dainty antique multi-chain gold necklace with multiple gem clusters (ruby, emerald, amethyst, topaz), gold filigree details, small pearls interspersed, NOT modern jewelry",
-      "delicate antique gold necklace with gem clusters (ruby red, emerald green, amethyst purple), intricate gold filigree, tiny pearls, multiple fine chains, classical styling",
-      "ornate antique gold multi-chain necklace with small gem clusters (topaz, ruby, emerald), delicate gold filigree work, tiny pearl accents, dainty and refined",
-      "elegant antique gold necklace with multiple gem clusters (amethyst, ruby, topaz, emerald), gold filigree details, small pearls, layered fine chains, NOT simple beads",
-      "dainty gold filigree necklace with gem clusters (ruby, emerald, amethyst), multiple delicate chains, tiny pearl accents, antique classical styling",
-      "refined antique gold multi-chain necklace with small gem clusters (topaz yellow, ruby red, emerald green, amethyst purple), intricate filigree, tiny pearls",
-      "delicate antique gold necklace with ornate gem clusters (ruby, amethyst, emerald, topaz), gold filigree work, small pearls, multiple fine chains, dainty and elegant",
-      "ornate antique gold necklace with multiple gem clusters (emerald, ruby, topaz, amethyst), delicate gold filigree, tiny pearl accents, NOT modern, classical jewelry",
-      // Single statement gems
-      "magnificent antique gold pendant necklace with LARGE central SAPPHIRE surrounded by diamond accents, royal blue brilliance, fine gold chain, statement piece",
-      "elegant antique gold necklace with LARGE teardrop EMERALD pendant, surrounded by tiny pearls, deep green brilliance, refined single-gem elegance",
-      "stunning antique gold necklace with LARGE oval RUBY pendant framed in gold filigree, passionate red brilliance, classical dramatic beauty",
-      "regal antique gold necklace with LARGE cushion-cut AMETHYST pendant, royal purple depth, surrounded by seed pearls, Victorian grandeur",
-      // Pearl-focused
-      "classic triple-strand PEARL necklace with gold clasp featuring small ruby accent, timeless elegance, creamy white lustrous pearls, understated luxury",
-      "elegant graduated PEARL necklace with ornate gold and emerald clasp, single strand of increasing pearl sizes, classic sophistication",
-      "baroque PEARL choker with gold Art Nouveau setting, irregular lustrous pearls, unique organic shapes, artistic refinement",
-      "delicate antique gold necklace with large central PEARL surrounded by tiny sapphires, moonlit elegance, romantic styling",
-      // Silver/platinum variations
-      "delicate antique SILVER filigree necklace with MOONSTONE pendant, ethereal opalescent shimmer, mystical elegance, silvery chain",
-      "elegant antique SILVER necklace with cluster of AQUAMARINES and diamonds, icy blue beauty, winter elegance, platinum styling",
-      "refined SILVER choker with OPAL pendant showing rainbow fire, iridescent mystery, Art Nouveau inspired, unique character",
-      // Unique gems and combinations
-      "antique gold necklace with TURQUOISE and coral cabochons, Southwestern inspired elegance, warm earthy tones, distinctive styling",
-      "elegant gold necklace with GARNET cluster surrounded by seed pearls, deep wine-red warmth, Victorian romance, January birthstone",
-      "delicate gold necklace with PERIDOT and diamond pendant, fresh lime green sparkle, spring elegance, August brightness",
-      "ornate gold necklace with CITRINE sunburst pendant, warm golden amber, summer sunshine captured in stone, November radiance",
-      // Layered and complex
-      "elaborate antique gold BIB NECKLACE with cascading gems and pearls, statement piece, multiple layers of jeweled elegance, museum quality",
-      "intricate antique gold COLLAR necklace with alternating rubies and diamonds, regal commanding presence, crown jewel elegance",
-      "delicate THREE-TIER gold necklace with pearls on first tier, small gems on second, larger gems on third, layered luxury",
-      // Cameo and vintage
-      "elegant antique gold necklace with CAMEO pendant featuring classical profile, carved shell artistry, Victorian antiquity, timeless charm",
-      "refined antique gold locket necklace with diamond and pearl accent, ornate engraving, sentimental elegance, heirloom quality",
-      // Bold and dramatic
-      "magnificent gold necklace with LARGE MEDALLION pendant featuring lion motif surrounded by rubies, royal heraldry, commanding presence",
-      "dramatic antique gold necklace with BLACK ONYX and diamond pendant, striking contrast, mysterious elegance, bold sophistication"
+      // EXTRAVAGANT MULTI-GEM STATEMENT PIECES - VIBRANT AND ORNATE
+      "MAGNIFICENT EXTRAVAGANT antique gold multi-chain necklace with BRILLIANT VIBRANT gem clusters (FIRE-RED ruby, EMERALD-GREEN emerald, ROYAL-PURPLE amethyst, SUNNY-YELLOW topaz), INTRICATE ornate gold filigree with SCROLLWORK, LUSTROUS pearls interspersed, MULTIPLE LAYERS of chains, CROWN JEWEL opulence, MUSEUM-WORTHY ornate detail",
+      "STUNNING ORNATE antique gold necklace with VIBRANT SATURATED gem clusters (RICH ruby red, BRILLIANT emerald green, DEEP amethyst purple, WARM topaz gold), ELABORATE intricate gold filigree patterns, TINY SPARKLING pearls, MULTIPLE fine chains creating LAYERED LUXURY, EXTREMELY ORNATE classical styling",
+      "EXTRAVAGANT ORNATE antique gold multi-chain necklace with BRILLIANT gem clusters (VIVID topaz, FIERY ruby, EMERALD emerald), ELABORATE delicate gold filigree with BAROQUE scrollwork, LUSTROUS pearl accents, MULTIPLE LAYERS creating DEPTH, EXTREMELY REFINED ornate detail",
+      "MAGNIFICENT ELABORATE antique gold necklace with MULTIPLE VIBRANT gem clusters (DEEP amethyst, FIERY ruby, WARM topaz, EMERALD emerald), ORNATE gold filigree with INTRICATE patterns, SPARKLING pearls, LAYERED fine chains creating RICH TEXTURE, EXTREMELY ORNATE NOT simple",
+      "STUNNING ORNATE gold filigree necklace with BRILLIANT VIBRANT gem clusters (RICH ruby, EMERALD emerald, ROYAL amethyst), MULTIPLE delicate chains creating LAYERS, LUSTROUS pearl accents, EXTREMELY ORNATE antique classical styling with BAROQUE details",
+      "EXTRAVAGANT REFINED antique gold multi-chain necklace with VIBRANT SATURATED gem clusters (SUNNY topaz yellow, FIERY ruby red, EMERALD green, ROYAL amethyst purple), ELABORATE intricate filigree with SCROLLWORK, LUSTROUS pearls, MULTIPLE LAYERS of ornate detail",
+      "MAGNIFICENT DELICATE antique gold necklace with ORNATE VIBRANT gem clusters (RICH ruby, DEEP amethyst, EMERALD emerald, WARM topaz), ELABORATE gold filigree with BAROQUE patterns, SPARKLING pearls, MULTIPLE fine chains, EXTREMELY DAINTY yet ORNATE elegance",
+      "STUNNING ORNATE antique gold necklace with MULTIPLE BRILLIANT gem clusters (EMERALD, FIERY ruby, WARM topaz, ROYAL amethyst), ELABORATE delicate gold filigree with INTRICATE scrollwork, LUSTROUS tiny pearl accents, EXTREMELY ORNATE classical jewelry NOT modern",
+      // SINGLE STATEMENT GEMS - EXTRA LARGE AND VIBRANT
+      "MAGNIFICENT EXTRAVAGANT antique gold pendant necklace with EXTRA LARGE central BRILLIANT SAPPHIRE surrounded by SPARKLING diamond accents, ROYAL BLUE VIBRANT brilliance that CATCHES LIGHT, ornate gold chain, EXTREMELY ORNATE statement piece, CROWN JEWEL quality",
+      "STUNNING ELEGANT antique gold necklace with EXTRA LARGE teardrop BRILLIANT EMERALD pendant, surrounded by LUSTROUS tiny pearls, DEEP GREEN VIBRANT brilliance that GLOWS, EXTREMELY REFINED single-gem elegance with ORNATE gold setting",
+      "MAGNIFICENT STUNNING antique gold necklace with EXTRA LARGE oval FIERY RUBY pendant framed in ELABORATE gold filigree, PASSIONATE RED VIBRANT brilliance that SHIMMERS, EXTREMELY ORNATE classical dramatic beauty",
+      "REGAL MAGNIFICENT antique gold necklace with EXTRA LARGE cushion-cut ROYAL AMETHYST pendant, DEEP PURPLE VIBRANT brilliance, surrounded by LUSTROUS seed pearls, EXTREMELY ORNATE Victorian grandeur",
+      // PEARL-FOCUSED - MORE LUSTROUS AND ORNATE
+      "CLASSIC EXTRAVAGANT triple-strand LUSTROUS PEARL necklace with ORNATE gold clasp featuring BRILLIANT ruby accent, TIMELESS elegance, CREAMY WHITE IRIDESCENT pearls that SHIMMER, EXTREMELY ORNATE understated luxury",
+      "ELEGANT MAGNIFICENT graduated LUSTROUS PEARL necklace with ELABORATE ornate gold and EMERALD clasp, single strand of INCREASING pearl sizes, CLASSIC sophistication with EXTREME ORNATE detail",
+      "BAROQUE EXTRAVAGANT LUSTROUS PEARL choker with ORNATE gold Art Nouveau setting, IRREGULAR IRIDESCENT pearls showing RAINBOW SHIMMER, UNIQUE organic shapes, EXTREMELY ARTISTIC ornate refinement",
+      "DELICATE MAGNIFICENT antique gold necklace with LARGE central LUSTROUS PEARL surrounded by TINY SPARKLING sapphires, MOONLIT IRIDESCENT elegance, EXTREMELY ROMANTIC ornate styling",
+      // SILVER/PLATINUM VARIATIONS - MORE VIBRANT
+      "DELICATE EXTRAVAGANT antique SILVER filigree necklace with BRILLIANT MOONSTONE pendant, ETHEREAL OPALESCENT SHIMMER with RAINBOW FIRE, MYSTICAL elegance, ORNATE silvery chain with INTRICATE patterns",
+      "ELEGANT MAGNIFICENT antique SILVER necklace with CLUSTER of BRILLIANT AQUAMARINES and SPARKLING diamonds, ICY BLUE VIBRANT beauty, WINTER elegance, EXTREMELY ORNATE platinum styling",
+      "REFINED EXTRAVAGANT SILVER choker with BRILLIANT OPAL pendant showing RAINBOW FIRE and IRIDESCENT MYSTERY, ETHEREAL SHIMMER, EXTREMELY ORNATE Art Nouveau inspired, UNIQUE ornate character",
+      // UNIQUE GEMS AND COMBINATIONS - MORE VIBRANT
+      "ANTIQUE EXTRAVAGANT gold necklace with VIBRANT TURQUOISE and CORAL cabochons, SOUTHWESTERN inspired elegance, WARM EARTHY VIBRANT tones, EXTREMELY DISTINCTIVE ornate styling",
+      "ELEGANT MAGNIFICENT gold necklace with VIBRANT GARNET cluster surrounded by LUSTROUS seed pearls, DEEP WINE-RED VIBRANT warmth, EXTREMELY ORNATE Victorian romance, January birthstone brilliance",
+      "DELICATE EXTRAVAGANT gold necklace with BRILLIANT PERIDOT and SPARKLING diamond pendant, FRESH LIME-GREEN VIBRANT sparkle, SPRING elegance, EXTREMELY ORNATE August brightness",
+      "ORNATE MAGNIFICENT gold necklace with BRILLIANT CITRINE sunburst pendant, WARM GOLDEN AMBER VIBRANT glow, SUMMER SUNSHINE captured in stone, EXTREMELY ORNATE November radiance",
+      // LAYERED AND COMPLEX - MORE ORNATE
+      "ELABORATE EXTRAVAGANT antique gold BIB NECKLACE with CASCADING BRILLIANT gems and LUSTROUS pearls, EXTREMELY ORNATE statement piece, MULTIPLE LAYERS of JEWELED ELEGANCE, MUSEUM-QUALITY ornate detail, CROWN JEWEL opulence",
+      "INTRICATE MAGNIFICENT antique gold COLLAR necklace with ALTERNATING FIERY rubies and SPARKLING diamonds, EXTREMELY REGAL commanding presence, CROWN JEWEL elegance, EXTREMELY ORNATE ornate detail",
+      "DELICATE EXTRAVAGANT THREE-TIER gold necklace with LUSTROUS pearls on first tier, BRILLIANT small gems on second, EXTRA LARGE gems on third, EXTREMELY LAYERED ornate luxury",
+      // CAMEO AND VINTAGE - MORE ORNATE
+      "ELEGANT EXTRAVAGANT antique gold necklace with ORNATE CAMEO pendant featuring CLASSICAL profile, CARVED SHELL artistry with INTRICATE detail, EXTREMELY ORNATE Victorian antiquity, TIMELESS ornate charm",
+      "REFINED MAGNIFICENT antique gold locket necklace with SPARKLING diamond and LUSTROUS pearl accent, ELABORATE ornate engraving, EXTREMELY SENTIMENTAL elegance, HEIRLOOM-QUALITY ornate detail",
+      // BOLD AND DRAMATIC - MORE VIBRANT
+      "MAGNIFICENT EXTRAVAGANT gold necklace with EXTRA LARGE MEDALLION pendant featuring LION motif surrounded by FIERY rubies, EXTREMELY ORNATE royal heraldry, COMMANDING presence, CROWN JEWEL quality",
+      "DRAMATIC MAGNIFICENT antique gold necklace with BRILLIANT BLACK ONYX and SPARKLING diamond pendant, STRIKING contrast, MYSTERIOUS elegance, EXTREMELY BOLD ornate sophistication",
+      // NEW EXTRAVAGANT ADDITIONS
+      "EXTRAVAGANT ORNATE antique gold necklace with MULTI-COLORED BRILLIANT gem cascade (RUBY, EMERALD, SAPPHIRE, AMETHYST, TOPAZ), ELABORATE baroque gold filigree, LUSTROUS pearls throughout, EXTREMELY ORNATE waterfall effect, MUSEUM-WORTHY detail",
+      "MAGNIFICENT STUNNING gold necklace with LARGE BRILLIANT DIAMOND centerpiece surrounded by COLORFUL gem halo (RUBY, EMERALD, SAPPHIRE), EXTREMELY ORNATE platinum and gold setting, SPARKLING brilliance, CROWN JEWEL extravagance",
+      "EXTRAVAGANT ELABORATE antique gold necklace with CLUSTER of BRILLIANT STAR SAPPHIRES showing ASTERISM, SURROUNDED by SPARKLING diamonds, EXTREMELY ORNATE celestial theme, MYSTICAL VIBRANT beauty",
+      "MAGNIFICENT ORNATE gold necklace with LARGE BRILLIANT ALEXANDRITE pendant that CHANGES COLOR (green to red), SURROUNDED by SPARKLING diamonds, EXTREMELY RARE VIBRANT gem, EXTREMELY ORNATE unique beauty",
+      "STUNNING EXTRAVAGANT antique gold necklace with MULTIPLE LAYERS of BRILLIANT gems (RUBY, EMERALD, SAPPHIRE) ALTERNATING with LUSTROUS pearls, ELABORATE baroque goldwork, EXTREMELY ORNATE cascading design, REGAL opulence"
     ];
     
     const backgrounds = [
@@ -3770,15 +3928,17 @@ COMPOSITION REQUIREMENT: ZOOMED OUT - FULL BODY VISIBLE
 - Generous space around the pet on all sides
 - Camera PULLED BACK - as if viewing from across a room
 
-CLOTHING REQUIREMENT: SIMPLE CLOAK + ONE ELEGANT NECKLACE
-- ONE simple velvet CLOAK draped loosely over the pet's back/shoulders
+CLOTHING REQUIREMENT: ORNATE CLOAK + ONE EXTRAVAGANT VIBRANT NECKLACE
+- ONE ORNATE velvet CLOAK draped elegantly over the pet's back/shoulders with ELABORATE decorative details
 - CLOAK COLOR FOR THIS PORTRAIT: ${selectedPalette.cloakColor}
-- Cloak secured by a THIN SILVER CLASP at the chest - small and elegant, not bulky
-- ONE ELEGANT NECKLACE around the pet's neck - this is MANDATORY, NOT optional
-- The necklace should be clearly visible and beautiful - pearls, gems, or gold
+- Cloak secured by an ORNATE SILVER CLASP at the chest - ELABORATE and DECORATIVE with INTRICATE details
+- ONE EXTRAVAGANT VIBRANT NECKLACE around the pet's neck - this is MANDATORY, NOT optional
+- The necklace MUST be EXTREMELY ORNATE, BRILLIANT, and VIBRANT - EXTRA LARGE gems, MULTIPLE LAYERS, ELABORATE filigree
+- Jewelry should POP with VIBRANT SATURATED colors - FIERY rubies, EMERALD greens, BRILLIANT sapphires, ROYAL purples
+- Gems should SHIMMER, SPARKLE, and CATCH LIGHT - EXTREMELY VISIBLE and EYE-CATCHING
 - NO heavy robes, NO multiple layers, NO elaborate costumes
 - The pet's BODY should be mostly visible UNDER the cloak
-- Think: light elegant draping with one statement necklace
+- Think: ORNATE elegant draping with ONE EXTRAVAGANT STATEMENT NECKLACE that COMMANDS ATTENTION
 - The cloak should look like it could slip off naturally
 
 COLOR PALETTE FOR THIS PORTRAIT: "${selectedPalette.name}"
@@ -3799,11 +3959,11 @@ COLOR PALETTE FOR THIS PORTRAIT: "${selectedPalette.name}"
 
 ✓ MUST DO: ${selectedPose.name} pose as described above
 ✓ MUST DO: Full body visible, zoomed out wide shot
-✓ MUST DO: Simple cloak with thin silver clasp
-✓ MUST DO: ONE ELEGANT NECKLACE around the pet's neck - pearls, gems, or gold
+✓ MUST DO: ORNATE cloak with ELABORATE decorative silver clasp
+✓ MUST DO: ONE EXTRAVAGANT VIBRANT NECKLACE around the pet's neck - EXTREMELY ORNATE with BRILLIANT VIBRANT gems that POP and SHIMMER
 ✓ MUST DO: Natural relaxed position on cushion
 ✓ MUST DO: Use the "${selectedPalette.name}" color palette specified above
-✓ MUST DO: Soft, refined, harmonious coloring
+✓ MUST DO: Soft, refined, harmonious coloring (EXCEPT jewelry which should be VIBRANT and BRILLIANT)
 
 *******************************************************************
 
@@ -3989,12 +4149,17 @@ FABRICS & DRAPES:
 - BRILLIANT antique gold embroidery that SHIMMERS with metallic quality
 - Colors should be RICH and RADIANT - like stained glass lit from behind
 
-JEWELRY:
-- GLEAMING gold with warm reflective highlights - looks like real polished metal
-- BRILLIANT gems that SPARKLE: deep ruby, vivid emerald, rich sapphire, warm topaz, glowing amethyst
-- Gems should have INTERNAL FIRE - light refracting within
-- LUSTROUS pearls with iridescent overtones - pink, blue, green shimmer
-- Metallic surfaces CATCH and REFLECT light realistically
+JEWELRY - EXTREMELY ORNATE AND VIBRANT (CRITICAL):
+- EXTRAVAGANT ORNATE GLEAMING gold with WARM REFLECTIVE highlights - looks like REAL POLISHED METAL that SHIMMERS
+- EXTREMELY BRILLIANT VIBRANT gems that SPARKLE INTENSELY: FIERY deep ruby, EMERALD vivid green, BRILLIANT rich sapphire, WARM sunny topaz, GLOWING royal amethyst
+- Gems MUST have INTENSE INTERNAL FIRE - BRILLIANT light REFRACTING WITHIN creating RAINBOW effects
+- EXTRA LARGE gems that POP and COMMAND ATTENTION - NOT small or subtle
+- MULTIPLE LAYERS of gems creating DEPTH and OPULENCE
+- ELABORATE INTRICATE filigree work with BAROQUE scrollwork and ORNATE patterns
+- LUSTROUS pearls with IRIDESCENT overtones showing RAINBOW SHIMMER - pink, blue, green, gold shimmer
+- Metallic surfaces CATCH and REFLECT light REALISTICALLY creating BRILLIANT highlights
+- CROWN JEWEL quality - EXTREMELY ORNATE, MUSEUM-WORTHY detail
+- VIBRANT SATURATED colors that SING - gems should be the MOST VIBRANT element in the portrait
 
 FUR TONES:
 - RICH naturalistic colors with LUMINOUS depth - fur should seem to GLOW with health
@@ -4083,7 +4248,7 @@ FINISH QUALITY - HEAVILY AGED AND WEATHERED:
 - BRILLIANT WARM LIGHTING: Strong key light making subject GLOW, warm golden radiance
 - LUMINOUS ATMOSPHERE: Everything seems to emit soft inner light - not just reflect
 - GLEAMING GOLD accents: Metallic embroidery that catches light, warm reflective quality
-- SPARKLING GEMS: Jewelry with internal fire, light refracting within stones, brilliant faceted highlights
+- EXTRAVAGANT VIBRANT SPARKLING GEMS: EXTREMELY ORNATE jewelry with INTENSE internal fire, BRILLIANT light refracting within stones, EXTRA LARGE faceted highlights that SHIMMER and POP, VIBRANT SATURATED colors (FIERY rubies, EMERALD greens, BRILLIANT sapphires, ROYAL purples), MULTIPLE LAYERS of gems, ELABORATE filigree work, CROWN JEWEL quality that COMMANDS ATTENTION
 - PURE BRILLIANT WHITE highlights: Crisp bright whites that POP against rich colors
 - NATURAL ANIMAL BODY: Four legs, normal pet anatomy - never anthropomorphic
 - VELVETY DEEP BLACKS: Rich saturated darks with subtle undertones - never flat or grey
