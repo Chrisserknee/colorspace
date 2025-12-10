@@ -106,12 +106,62 @@ export default function StudioPage() {
   const [customPrompt, setCustomPrompt] = useState("");
   const [selectedGender, setSelectedGender] = useState<"male" | "female" | null>(null);
   
+  // Site-wide guidance (applies to ALL generations site-wide)
+  const [siteWideGuidance, setSiteWideGuidance] = useState("");
+  const [siteWideGuidanceLoading, setSiteWideGuidanceLoading] = useState(false);
+  const [siteWideGuidanceSaved, setSiteWideGuidanceSaved] = useState(false);
+  
   // Results
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
   const [error, setError] = useState("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch site-wide guidance when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetch("/api/admin/site-guidance")
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setSiteWideGuidance(data.guidance || "");
+          }
+        })
+        .catch(err => console.error("Failed to fetch site guidance:", err));
+    }
+  }, [isAuthenticated]);
+
+  // Save site-wide guidance
+  const saveSiteWideGuidance = async () => {
+    setSiteWideGuidanceLoading(true);
+    setSiteWideGuidanceSaved(false);
+    
+    try {
+      const response = await fetch("/api/admin/site-guidance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${STUDIO_PASSWORD}`,
+        },
+        body: JSON.stringify({ guidance: siteWideGuidance }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setSiteWideGuidanceSaved(true);
+        setTimeout(() => setSiteWideGuidanceSaved(false), 3000);
+      } else {
+        setError(data.error || "Failed to save site guidance");
+      }
+    } catch (err) {
+      console.error("Error saving site guidance:", err);
+      setError("Failed to save site guidance");
+    } finally {
+      setSiteWideGuidanceLoading(false);
+    }
+  };
 
   // Handle password submission
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -625,6 +675,55 @@ export default function StudioPage() {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Site-Wide Guidance */}
+            <div 
+              className="rounded-xl p-6"
+              style={{ backgroundColor: '#1A1A1A', border: '2px solid #C5A572' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xl">🌐</span>
+                <h2 className="text-lg font-medium" style={{ color: '#C5A572' }}>
+                  Site-Wide Generation Guidance
+                </h2>
+              </div>
+              <p className="text-sm mb-3" style={{ color: '#7A756D' }}>
+                This guidance applies to <strong style={{ color: '#C5A572' }}>ALL generations site-wide</strong> (not just Studio). 
+                Use this for global adjustments like &quot;bright white background&quot; or &quot;more vibrant colors&quot;.
+              </p>
+              
+              <textarea
+                value={siteWideGuidance}
+                onChange={(e) => setSiteWideGuidance(e.target.value)}
+                placeholder="e.g., 'bright white background', 'more vibrant jewelry', 'softer lighting'..."
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg bg-[#0A0A0A] border border-[#C5A572] text-[#F0EDE8] placeholder-[#666] focus:outline-none focus:border-[#C5A572] resize-none mb-3"
+              />
+              
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={saveSiteWideGuidance}
+                  disabled={siteWideGuidanceLoading}
+                  className="px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #C5A572 0%, #A68B5B 100%)',
+                    color: '#0A0A0A'
+                  }}
+                >
+                  {siteWideGuidanceLoading ? "Saving..." : "💾 Save Site-Wide"}
+                </button>
+                
+                {siteWideGuidanceSaved && (
+                  <span className="text-sm" style={{ color: '#4CAF50' }}>
+                    ✓ Saved! Now applies to all generations.
+                  </span>
+                )}
+              </div>
+              
+              <p className="text-xs mt-3" style={{ color: '#666' }}>
+                ⚠️ Changes take effect immediately for all new generations across the entire site.
+              </p>
             </div>
 
             {/* Generate Button */}

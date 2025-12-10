@@ -7,7 +7,7 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 // Note: Video creation will use frame-based approach with FFmpeg
 import { CONFIG } from "@/lib/config";
-import { uploadImage, saveMetadata, incrementPortraitCount, uploadBeforeAfterImage } from "@/lib/supabase";
+import { uploadImage, saveMetadata, incrementPortraitCount, uploadBeforeAfterImage, getSiteWideGuidance } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
 
@@ -2913,6 +2913,17 @@ export async function POST(request: NextRequest) {
     const customPrompt = formData.get("customPrompt") as string | null;
     const enableWatermark = formData.get("enableWatermark") !== "false"; // Default true unless explicitly false
     
+    // Fetch site-wide guidance (applies to ALL generations)
+    let siteWideGuidance: string | null = null;
+    try {
+      siteWideGuidance = await getSiteWideGuidance();
+      if (siteWideGuidance) {
+        console.log(`🌐 Site-wide guidance active: "${siteWideGuidance.substring(0, 50)}${siteWideGuidance.length > 50 ? '...' : ''}"`);
+      }
+    } catch (err) {
+      console.warn("⚠️ Failed to fetch site-wide guidance:", err);
+    }
+    
     const isRainbowBridge = style === "rainbow-bridge";
     
     // Log Rainbow Bridge parameters
@@ -5098,12 +5109,18 @@ OVERALL GOAL
 A luminous, regal antique oil portrait with extremely thick, dimensional paint; darker backgrounds; ornate Victorian styling; extremely detailed jewelry and cloaks modeled after the reference; vibrant ornate pillows; a rich composition showing more of the figure; and a serene Renaissance-inspired natural pose.
 The portrait must remain instantly recognizable as this specific pet.`;
 
-      // Add custom prompt for studio mode
-      const finalOpenAIPrompt = customPrompt 
-        ? `${openAIImg2ImgPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`
-        : openAIImg2ImgPrompt;
+      // Add site-wide guidance and custom prompt
+      let finalOpenAIPrompt = openAIImg2ImgPrompt;
       
+      // Site-wide guidance applies to ALL generations
+      if (siteWideGuidance) {
+        finalOpenAIPrompt = `${finalOpenAIPrompt}\n\n=== SITE-WIDE GUIDANCE (IMPORTANT) ===\n${siteWideGuidance}`;
+        console.log("🌐 Site-wide guidance applied to prompt");
+      }
+      
+      // Custom prompt for studio mode (in addition to site-wide)
       if (customPrompt) {
+        finalOpenAIPrompt = `${finalOpenAIPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`;
         console.log("🎨 Custom prompt added:", customPrompt);
       }
       
@@ -5254,12 +5271,18 @@ The ${species} should match the reference image exactly - same face, markings, c
       // Use GPT-Image-1 (original approach)
       console.log("🎨 Using GPT-Image-1 for generation...");
       
-      // Add custom prompt for studio mode
-      const finalGptPrompt = customPrompt 
-        ? `${generationPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`
-        : generationPrompt;
+      // Add site-wide guidance and custom prompt
+      let finalGptPrompt = generationPrompt;
       
+      // Site-wide guidance applies to ALL generations
+      if (siteWideGuidance) {
+        finalGptPrompt = `${finalGptPrompt}\n\n=== SITE-WIDE GUIDANCE (IMPORTANT) ===\n${siteWideGuidance}`;
+        console.log("🌐 Site-wide guidance applied to prompt");
+      }
+      
+      // Custom prompt for studio mode (in addition to site-wide)
       if (customPrompt) {
+        finalGptPrompt = `${finalGptPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`;
         console.log("🎨 Custom prompt added:", customPrompt);
       }
       

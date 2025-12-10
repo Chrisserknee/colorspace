@@ -1030,3 +1030,78 @@ export async function isCustomer(email: string): Promise<boolean> {
   return customer !== null;
 }
 
+// ============================================
+// SITE-WIDE SETTINGS (for Studio admin controls)
+// Uses a simple key-value store in site_settings table
+// ============================================
+
+/**
+ * Get a site-wide setting by key
+ */
+export async function getSiteSetting(key: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", key)
+      .maybeSingle();
+    
+    if (error) {
+      // Table might not exist yet - return null
+      if (error.code === '42P01' || error.message.includes('does not exist')) {
+        console.warn(`Site settings table doesn't exist yet. Key: ${key}`);
+        return null;
+      }
+      console.error(`Error getting site setting ${key}:`, error);
+      return null;
+    }
+    
+    return data?.value || null;
+  } catch (err) {
+    console.error(`getSiteSetting error for ${key}:`, err);
+    return null;
+  }
+}
+
+/**
+ * Set a site-wide setting
+ */
+export async function setSiteSetting(key: string, value: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({
+        key,
+        value,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: "key",
+      });
+    
+    if (error) {
+      console.error(`Error setting site setting ${key}:`, error);
+      return false;
+    }
+    
+    console.log(`✅ Site setting updated: ${key}`);
+    return true;
+  } catch (err) {
+    console.error(`setSiteSetting error for ${key}:`, err);
+    return false;
+  }
+}
+
+/**
+ * Get the site-wide generation guidance
+ */
+export async function getSiteWideGuidance(): Promise<string | null> {
+  return getSiteSetting("generation_guidance");
+}
+
+/**
+ * Set the site-wide generation guidance
+ */
+export async function setSiteWideGuidance(guidance: string): Promise<boolean> {
+  return setSiteSetting("generation_guidance", guidance);
+}
+
