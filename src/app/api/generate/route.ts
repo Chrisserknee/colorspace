@@ -2416,11 +2416,10 @@ async function createWatermarkedImage(inputBuffer: Buffer): Promise<Buffer> {
 async function createBeforeAfterImage(
   originalBuffer: Buffer,
   generatedBuffer: Buffer,
-  imageId: string
+  imageId: string,
+  studioMode: boolean = false
 ): Promise<void> {
   try {
-    console.log(`🖼️ Creating multiple before/after image variations (FULL RESOLUTION) for ${imageId}...`);
-    
     // Get metadata for both images (full resolution)
     const originalMeta = await sharp(originalBuffer).metadata();
     const generatedMeta = await sharp(generatedBuffer).metadata();
@@ -2433,7 +2432,7 @@ async function createBeforeAfterImage(
     const generatedWidth = generatedMeta.width || 1024;
     const generatedHeight = generatedMeta.height || 1024;
     
-    // 1. HORIZONTAL SIDE-BY-SIDE (original format)
+    // Always create horizontal side-by-side (for all users)
     try {
       const targetHeight = Math.max(originalHeight, generatedHeight);
       const originalTop = Math.floor((targetHeight - originalHeight) / 2);
@@ -2457,13 +2456,21 @@ async function createBeforeAfterImage(
       
       await uploadBeforeAfterImage(
         horizontalBuffer,
-        `${imageId}-before-after-horizontal.png`,
+        `${imageId}-before-after.png`,
         "image/png"
       );
-      console.log(`✅ Horizontal before/after uploaded: ${imageId}-before-after-horizontal.png`);
+      console.log(`✅ Horizontal before/after uploaded: ${imageId}-before-after.png`);
     } catch (error) {
       console.error(`⚠️ Failed to create horizontal before/after:`, error);
     }
+    
+    // Only create additional variations for Studio mode
+    if (!studioMode) {
+      console.log(`✅ Single before/after image created for regular user: ${imageId}`);
+      return;
+    }
+    
+    console.log(`🖼️ Creating multiple before/after image variations (Studio mode) for ${imageId}...`);
     
     // 2. PORTRAIT STACKED (vertical)
     try {
@@ -2663,7 +2670,7 @@ async function createBeforeAfterImage(
       console.error(`⚠️ Failed to create Facebook ad format before/after:`, error);
     }
     
-    console.log(`✅ All before/after image variations created for ${imageId}`);
+    console.log(`✅ All Studio mode before/after image variations created for ${imageId}`);
   } catch (error) {
     // Don't fail the generation if before/after upload fails
     console.error(`⚠️ Failed to create before/after images:`, error);
@@ -5731,9 +5738,11 @@ Generate a refined portrait that addresses ALL corrections and matches the origi
     // Works for both regular and Studio mode generations
     try {
       if (buffer && generatedBuffer) {
-        await createBeforeAfterImage(buffer, generatedBuffer, imageId);
+        await createBeforeAfterImage(buffer, generatedBuffer, imageId, studioMode);
         if (studioMode) {
-          console.log(`🎨 Studio mode - before/after image created for ${imageId}`);
+          console.log(`🎨 Studio mode - multiple before/after variations created for ${imageId}`);
+        } else {
+          console.log(`✅ Single before/after image created for ${imageId}`);
         }
         
         // Also create before/after video with effects
