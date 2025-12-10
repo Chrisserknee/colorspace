@@ -5109,19 +5109,19 @@ OVERALL GOAL
 A luminous, regal antique oil portrait with extremely thick, dimensional paint; darker backgrounds; ornate Victorian styling; extremely detailed jewelry and cloaks modeled after the reference; vibrant ornate pillows; a rich composition showing more of the figure; and a serene Renaissance-inspired natural pose.
 The portrait must remain instantly recognizable as this specific pet.`;
 
-      // Add site-wide guidance and custom prompt
+      // Add site-wide guidance and custom prompt - AT BEGINNING for priority
       let finalOpenAIPrompt = openAIImg2ImgPrompt;
       
-      // Site-wide guidance applies to ALL generations
+      // Site-wide guidance applies to ALL generations - ADD AT BEGINNING for maximum attention
       if (siteWideGuidance) {
-        finalOpenAIPrompt = `${finalOpenAIPrompt}\n\n=== SITE-WIDE GUIDANCE (IMPORTANT) ===\n${siteWideGuidance}`;
-        console.log("🌐 Site-wide guidance applied to prompt");
+        finalOpenAIPrompt = `=== CRITICAL REQUIREMENTS (MUST FOLLOW) ===\n${siteWideGuidance}\n\n${finalOpenAIPrompt}`;
+        console.log("🌐 Site-wide guidance applied at BEGINNING of prompt");
       }
       
-      // Custom prompt for studio mode (in addition to site-wide)
+      // Custom prompt for studio mode - also at beginning for priority
       if (customPrompt) {
-        finalOpenAIPrompt = `${finalOpenAIPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`;
-        console.log("🎨 Custom prompt added:", customPrompt);
+        finalOpenAIPrompt = `=== ADDITIONAL REQUIREMENTS ===\n${customPrompt}\n\n${finalOpenAIPrompt}`;
+        console.log("🎨 Custom prompt added at beginning:", customPrompt);
       }
       
       // Process the original image buffer for OpenAI
@@ -5271,19 +5271,19 @@ The ${species} should match the reference image exactly - same face, markings, c
       // Use GPT-Image-1 (original approach)
       console.log("🎨 Using GPT-Image-1 for generation...");
       
-      // Add site-wide guidance and custom prompt
+      // Add site-wide guidance and custom prompt - AT BEGINNING for priority
       let finalGptPrompt = generationPrompt;
       
-      // Site-wide guidance applies to ALL generations
+      // Site-wide guidance applies to ALL generations - ADD AT BEGINNING for maximum attention
       if (siteWideGuidance) {
-        finalGptPrompt = `${finalGptPrompt}\n\n=== SITE-WIDE GUIDANCE (IMPORTANT) ===\n${siteWideGuidance}`;
-        console.log("🌐 Site-wide guidance applied to prompt");
+        finalGptPrompt = `=== CRITICAL REQUIREMENTS (MUST FOLLOW) ===\n${siteWideGuidance}\n\n${finalGptPrompt}`;
+        console.log("🌐 Site-wide guidance applied at BEGINNING of prompt");
       }
       
-      // Custom prompt for studio mode (in addition to site-wide)
+      // Custom prompt for studio mode - also at beginning for priority
       if (customPrompt) {
-        finalGptPrompt = `${finalGptPrompt}\n\n=== ADDITIONAL CUSTOM GUIDANCE ===\n${customPrompt}`;
-        console.log("🎨 Custom prompt added:", customPrompt);
+        finalGptPrompt = `=== ADDITIONAL REQUIREMENTS ===\n${customPrompt}\n\n${finalGptPrompt}`;
+        console.log("🎨 Custom prompt added at beginning:", customPrompt);
       }
       
       const imageResponse = await openai.images.generate({
