@@ -4196,29 +4196,27 @@ STYLE – ANTIQUE OIL MASTERPIECE
 
 - Looks like a 200–300 year old painting found in a grand estate, not new.
 
-EXTREMELY HEAVY PAINTERLY FACIAL TREATMENT (CRITICAL - MUST OBSCURE FACE):
+PAINTERLY FACIAL TREATMENT (BALANCED - ARTISTIC YET RECOGNIZABLE):
 
-- Apply EXTREMELY HEAVY painterly texture and VERY BOLD, THICK brushstrokes to the ENTIRE face and head area - SIGNIFICANTLY MORE than the rest of the image.
+- Apply visible painterly texture and brushstrokes to the face and head area, creating an oil painting look.
 
-- HEAVILY OBSCURE all facial details with thick, visible brushstrokes - the face should look like an IMPRESSIONIST PAINTING, not a photograph. Think MONET, RENOIR, or VAN GOGH close-up.
+- KEEP EYES CLEAR AND DEFINED - the eyes are essential for pet recognition. Eyes should be the sharpest, most detailed part of the face with clear highlights and depth.
 
-- Use VERY LOOSE, EXPRESSIVE brushwork that BREAKS UP and FRAGMENTS facial features - individual brush strokes should be clearly visible and create texture that hides precise details.
+- Add visible brushwork to FUR TEXTURE - loose, flowing strokes that create soft, painterly fur without obscuring the underlying features.
 
-- BLUR and SOFTEN all facial transitions - no sharp edges on eyes, nose, mouth, or facial markings. Everything blends together with soft, painterly strokes.
+- SOFTEN facial transitions gently - soft edges where fur meets features, but NOT blurred or lost.
 
-- Apply EXTREMELY THICK impasto texture - CHUNKY raised paint on nose, around eyes, on cheeks, muzzle, and forehead. The paint should look physically THICK and TEXTURED.
+- Apply impasto texture to highlights - raised paint on nose tip, fur highlights, and whisker areas, but NOT covering or obscuring the eyes.
 
-- Create a STRONG ARTISTIC ABSTRACTION - the face should feel like looking at an impressionist masterpiece up close where you see PAINT STROKES first, subject second.
+- Create an ARTISTIC rendering - it should look like a skilled oil portrait, NOT a photograph, but the pet must be clearly recognizable.
 
-- EVERY DETAIL should be SOFTENED and OBSCURED by visible brushwork - this is NOT a photograph, it's an ARTISTIC INTERPRETATION rendered in thick oil paint.
+- Brushstrokes should ENHANCE the face, not hide it - visible strokes add artistic texture while preserving the pet's identity.
 
-- Let brushstrokes CREATE THE FACE rather than trace it - the texture and color of the strokes suggest features without rendering them precisely.
+- GENTLE softening around muzzle and cheeks - painterly blending that looks natural, not smeared or blurred.
 
-- HEAVILY TEXTURED fur with visible directional brushstrokes that blend into the facial features, obscuring where one feature ends and another begins.
+- The face should feel PAINTED and ARTISTIC - like a classical portrait with visible brushwork - but the pet's expression and features remain clear.
 
-- The face should feel ALMOST ABSTRACT - you recognize it's the pet through overall shape, color, and essence, NOT through precise photographic detail.
-
-- MAXIMUM PAINTERLY EFFECT on the face - if it looks too photographic or too clear, ADD MORE BRUSHSTROKES AND TEXTURE.
+- Balance between ART and RECOGNITION - the painterly effect adds beauty and texture while the pet remains unmistakably identifiable.
 
 IDENTITY & LIKENESS (MOST IMPORTANT)
 
@@ -4944,8 +4942,8 @@ Increase overall ornateness and incorporate stronger Victorian-royal influence t
 PAINTING TECHNIQUE – EXTREMELY THICK, SCULPTURAL OIL
 Use VERY THICK, HEAVILY TEXTURED oil paint with dramatic impasto buildup. Brush strokes must be BOLD, RAISED, and SCULPTURAL—visible ridges, thick paint peaks, heavy bristle marks, and palette-knife textures. The paint should look like it could be touched—physical, 3D, and deeply layered. Every stroke must be visibly hand-painted with thick, rich pigment.
 
-EXTREMELY HEAVY PAINTERLY FACIAL TREATMENT (CRITICAL - MUST OBSCURE FACE):
-Apply EXTREMELY HEAVY painterly texture and VERY BOLD, THICK brushstrokes to the ENTIRE face and head - SIGNIFICANTLY MORE than the rest of the image. HEAVILY OBSCURE all facial details with thick visible brushstrokes - the face should look like an IMPRESSIONIST PAINTING (MONET, RENOIR, VAN GOGH close-up), not a photograph. Use VERY LOOSE, EXPRESSIVE brushwork that BREAKS UP and FRAGMENTS facial features. BLUR and SOFTEN all facial transitions - no sharp edges. Apply EXTREMELY THICK impasto texture - CHUNKY raised paint on nose, eyes, cheeks, muzzle. Create a STRONG ARTISTIC ABSTRACTION - see PAINT STROKES first, subject second. EVERY DETAIL SOFTENED and OBSCURED by visible brushwork. Let brushstrokes CREATE THE FACE rather than trace it. HEAVILY TEXTURED fur with directional brushstrokes blending into facial features. The face should feel ALMOST ABSTRACT - recognizable through overall shape and color essence, NOT precise photographic detail. MAXIMUM PAINTERLY EFFECT - if it looks too photographic, ADD MORE BRUSHSTROKES AND TEXTURE.
+PAINTERLY FACIAL TREATMENT (BALANCED - ARTISTIC YET RECOGNIZABLE):
+Apply visible painterly texture and brushstrokes to create an oil painting look. KEEP EYES CLEAR AND DEFINED - eyes are essential for pet recognition, should be the sharpest part with clear highlights. Add visible brushwork to FUR TEXTURE - loose flowing strokes creating soft painterly fur. SOFTEN facial transitions gently - soft edges where fur meets features, but NOT blurred. Apply impasto texture to highlights on nose tip and fur, but NOT covering eyes. Create an ARTISTIC rendering that looks like skilled oil portrait, NOT photograph, but pet must be clearly recognizable. Brushstrokes should ENHANCE the face, not hide it. GENTLE softening around muzzle and cheeks - painterly blending that looks natural. The face should feel PAINTED and ARTISTIC with visible brushwork, but pet's expression and features remain clear. Balance ART and RECOGNITION - painterly effect adds beauty while pet remains unmistakably identifiable.
 
 ANTIQUE AGING
 Soft craquelure, warm aged varnish glow, and light edge wear. Maintain elegance.
