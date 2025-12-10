@@ -3241,9 +3241,14 @@ Provide an EXTREMELY DETAILED description focusing on what makes THIS SPECIFIC p
    - MARKINGS: Specific locations of any markings, patches, or patterns
    - TEXTURE: Short, medium, long, fluffy, sleek, wiry, double-coat?
 
-8. UNIQUE IDENTIFIERS: 3-5 specific features that would let you identify THIS pet in a crowd of similar pets
+8. UNIQUE IDENTIFIERS (CRITICAL - be extremely detailed):
+   - List 5-7 specific features that would let you identify THIS pet in a crowd of similar pets
+   - Include: asymmetrical markings, unique fur patterns, distinctive scars or marks, unusual proportions, one-of-a-kind features
+   - Be specific about locations: "small white spot above right eye", "crooked tail tip", "one ear slightly droopy", "distinctive swirl pattern on chest"
+   - Note any facial asymmetry: "left eye slightly larger", "nose slightly off-center", "one cheek fuller than the other"
+   - Capture individual quirks: "distinctive wrinkle pattern", "unique cowlick", "unusual fur direction", "one paw slightly different color"
 
-Format your response as a detailed paragraph that could be used to recreate this exact pet's appearance.`,
+Format your response as a detailed paragraph that could be used to recreate this EXACT pet's appearance. Focus on what makes THIS pet unique and distinguishable from others of the same breed.`,
             },
             {
               type: "image_url",
@@ -4258,45 +4263,56 @@ COLOR QUALITIES:
 === IDENTITY PRESERVATION - MOST CRITICAL - READ CAREFULLY ===
 This portrait MUST be instantly recognizable as THIS SPECIFIC ${species}. The owner should look at the portrait and immediately feel "That's MY pet!" NOT "that's A pet that looks similar."
 
-*** FACIAL GEOMETRY - THE #1 PRIORITY ***
-The FACE is what makes a pet recognizable. You MUST match these EXACTLY:
+*** FACIAL GEOMETRY - THE #1 PRIORITY - MATCH EXACTLY, NO APPROXIMATIONS ***
+The FACE is what makes a pet recognizable. You MUST match these EXACTLY - every millimeter matters. The owner must see THEIR pet's face, not a generic version.
 
-HEAD SHAPE:
-- If the description says "round head" - make it ROUND, not oval or triangular
-- If "square jaw" - make it SQUARE, not rounded
-- If "wide face" - make it WIDE, not narrow
-- The head-to-body proportion must match exactly
+HEAD SHAPE - MATCH PRECISELY:
+- If the description says "round head" - make it PERFECTLY ROUND, not oval, not slightly round, not triangular
+- If "square jaw" - make it SQUARE with sharp angles, not rounded or soft
+- If "wide face" - make it WIDE, not narrow or average width
+- If "narrow face" - make it NARROW, not wide or medium
+- The head-to-body proportion must match EXACTLY - if head is large relative to body, show that
+- Head width-to-length ratio must match: if described as "wider than it is long", make it wider than long
 
-SNOUT/MUZZLE:
-- SHORT snout = generate SHORT snout (not medium or long)
-- FLAT face = generate FLAT face (like a Persian, not a Siamese)
-- LONG muzzle = generate LONG muzzle (like a Greyhound, not a Bulldog)
-- The snout length relative to head size is CRITICAL for recognition
+SNOUT/MUZZLE - CRITICAL FOR RECOGNITION:
+- SHORT snout = generate SHORT snout (not medium, not slightly short, but SHORT)
+- FLAT face = generate FLAT face (like a Persian, not a Siamese, not slightly flat)
+- LONG muzzle = generate LONG muzzle (like a Greyhound, not a Bulldog, not medium-long)
+- The snout length relative to head size is CRITICAL - measure it exactly as described
+- Snout width must match: if "narrow snout", make it narrow; if "wide snout", make it wide
+- Snout shape details: if "pointed", make it pointed; if "blunt", make it blunt; if "button-like", make it button-like
 
-EYES - EXTREMELY IMPORTANT:
-- ROUND eyes = generate perfectly ROUND eyes
-- ALMOND eyes = generate almond-shaped eyes
-- WIDE-SET eyes = space them WIDE apart
-- CLOSE-SET eyes = space them CLOSE together
-- The exact EYE COLOR must match (golden-yellow, amber, green, blue, copper)
-- Eye SIZE relative to face must be accurate
+EYES - EXTREMELY IMPORTANT - THESE MUST BE EXACT:
+- ROUND eyes = generate perfectly ROUND eyes (not slightly round, not oval-round, but ROUND)
+- ALMOND eyes = generate almond-shaped eyes (not round-almond, but clearly ALMOND)
+- WIDE-SET eyes = space them WIDE apart - measure the distance, don't approximate
+- CLOSE-SET eyes = space them CLOSE together - if they're close, make them CLOSE
+- The exact EYE COLOR must match EXACTLY (golden-yellow, amber, emerald green, blue, copper) - not "similar" but EXACT
+- Eye SIZE relative to face must be accurate - if "large eyes", make them LARGE; if "small eyes", make them SMALL
+- Eye shape details: if "hooded", show hooded; if "prominent", show prominent; if "deep-set", show deep-set
+- Eye tilt: if "upward slant", show upward slant; if "straight", show straight
 
-EARS - CRITICAL FOR CATS:
-- LARGE ears = make them LARGE - do not shrink them
-- SMALL ears = make them SMALL  
-- TALL ears = make them TALL (especially Maine Coons - their ears are VERY tall)
-- WIDE-SET ears = position them FAR apart
-- HIGH-SET ears = position them HIGH on the head
-- Ear SHAPE (pointed, rounded, folded) must match exactly
-- LYNX TIPS (ear tufts) = if described, these are ESSENTIAL - show hair tufts at ear tips
-- Ear FURNISHINGS = if described, show long hair inside ears
-- For cats: ear size relative to head is CRITICAL for breed recognition
+EARS - CRITICAL FOR CATS - SIZE AND POSITION MUST BE EXACT:
+- LARGE ears = make them LARGE - do not shrink them, do not make them medium-large
+- SMALL ears = make them SMALL - do not enlarge them, do not make them medium-small
+- TALL ears = make them TALL (especially Maine Coons - their ears are VERY tall, not average-tall)
+- WIDE-SET ears = position them FAR apart - measure the distance
+- CLOSE-SET ears = position them CLOSE together
+- HIGH-SET ears = position them HIGH on the head - not medium-high, but HIGH
+- LOW-SET ears = position them LOW on the head
+- Ear SHAPE (pointed, rounded, folded) must match EXACTLY - if "pointed", make them pointed, not rounded-pointed
+- LYNX TIPS (ear tufts) = if described, these are ESSENTIAL - show hair tufts at ear tips, don't omit them
+- Ear FURNISHINGS = if described, show long hair inside ears - this is a distinguishing feature
+- For cats: ear size relative to head is CRITICAL - if ears are "disproportionately large", show that
 - Maine Coons, Norwegian Forest Cats have DRAMATICALLY TALL ears - do not make them average size
+- Ear angle: if "tilted forward", show forward tilt; if "upright", show upright; if "folded", show fold
 
-CHEEKS & JAWLINE:
-- FULL cheeks = show full, rounded cheeks
-- ANGULAR face = show defined bone structure
-- SOFT features = show gentle, rounded features
+CHEEKS & JAWLINE - MATCH THE EXACT SHAPE:
+- FULL cheeks = show full, rounded cheeks - not slightly full, but FULL
+- HOLLOW cheeks = show hollow, sunken cheeks - not slightly hollow
+- ANGULAR face = show defined bone structure - sharp angles, not soft
+- SOFT features = show gentle, rounded features - no sharp edges
+- Prominent cheekbones = make them prominent; subtle cheekbones = make them subtle
 
 BODY SIZE & STATURE PRESERVATION:
 - Match the pet's EXACT body type: if stocky, show stocky; if slender, show slender
@@ -4309,15 +4325,17 @@ BODY SIZE & STATURE PRESERVATION:
 THE RECOGNITION TEST:
 Ask yourself: If 10 pets of this breed were lined up, would the owner be able to pick out THEIR pet from this portrait? If not, the facial features aren't accurate enough.
 
-*** CRITICAL: DO NOT GENERATE A GENERIC BREED FACE ***
-- Do NOT generate a "typical" or "ideal" example of the breed
-- Do NOT default to the most common facial features for this breed
-- Generate THIS SPECIFIC pet's unique facial structure
-- Every pet has individual variations - capture THOSE variations
-- If the description says "flat, wide face" - make it FLAT and WIDE, not medium
-- If the description says "almond eyes" - make them ALMOND, not round
-- If the description says "wide-set eyes" - space them WIDE, not average
-- The face should look like THIS pet, not like a breed standard photo
+*** CRITICAL: DO NOT GENERATE A GENERIC BREED FACE - THIS IS THIS SPECIFIC PET ***
+- Do NOT generate a "typical" or "ideal" example of the breed - generate THIS EXACT pet
+- Do NOT default to the most common facial features for this breed - use THIS pet's features
+- Generate THIS SPECIFIC pet's unique facial structure - every pet is different
+- Every pet has individual variations - capture THOSE variations EXACTLY
+- If the description says "flat, wide face" - make it FLAT and WIDE, not medium-flat or slightly wide
+- If the description says "almond eyes" - make them ALMOND, not round, not round-almond, but ALMOND
+- If the description says "wide-set eyes" - space them WIDE, not average, not slightly wide, but WIDE
+- If the description mentions ANY unique feature (asymmetrical markings, one ear different, distinctive scar, etc.) - it MUST be visible
+- The face should look like THIS pet, not like a breed standard photo - owners know their pet's exact face
+- Individual quirks matter: if one eye is slightly larger, if the nose is slightly off-center, if there's a unique wrinkle pattern - capture it
 
 === CRITICAL: FULLY ANIMAL - NO HUMAN FEATURES ===
 - The ${species} must be 100% ANIMAL - NOT a human-animal hybrid
@@ -4331,15 +4349,22 @@ ${facialStructureSection}
 === THE ${species} - DETAILED DESCRIPTION ===
 ${petDescription}${genderInfo}${feminineAesthetic}${masculineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
 
-=== CRITICAL: EXACT MATCHING ===
-The generated pet MUST match the description EXACTLY:
-- Same colors - if described as 'midnight black', use midnight black, not charcoal gray
-- Same markings in same locations - if description says 'white patch on left cheek', generate a white patch on the LEFT CHEEK
-- Same face proportions - if described as 'round face', generate a round face, not oval
-- Preserve color gradients exactly - if darker on back, lighter on belly, maintain this gradient
-- Every marking, spot, patch, or stripe described MUST appear in the generated image in the EXACT same location
-- If asymmetrical markings are described, they MUST be asymmetrical in the generated image
-- Eye spacing, nose size, muzzle length must match the description precisely
+=== CRITICAL: EXACT MATCHING - THIS IS THE MOST IMPORTANT REQUIREMENT ===
+The generated pet MUST match the description EXACTLY - this is NON-NEGOTIABLE. The owner must recognize THIS EXACT pet, not a similar one.
+
+EVERY UNIQUE FEATURE MUST BE CAPTURED:
+- Same colors EXACTLY - if described as 'midnight black', use midnight black, not charcoal gray or dark gray
+- Same markings in EXACT same locations - if description says 'white patch on left cheek', generate a white patch on the LEFT CHEEK (viewer's left)
+- Same face proportions EXACTLY - if described as 'round face', generate a round face, not oval or slightly round
+- Preserve color gradients EXACTLY - if darker on back, lighter on belly, maintain this EXACT gradient pattern
+- Every marking, spot, patch, stripe, or pattern described MUST appear in the generated image in the EXACT same location and size
+- If asymmetrical markings are described, they MUST be asymmetrical in the generated image - do NOT make them symmetrical
+- Eye spacing, nose size, muzzle length, ear position must match the description PRECISELY - no approximations
+- Capture unique identifiers: if description mentions "small white spot above right eye", "crooked tail", "one ear slightly droopy", "distinctive scar", etc. - these MUST be visible
+- Individual variations matter: if this pet has slightly wider-set eyes than typical for the breed, capture that. If the snout is slightly longer/shorter than breed standard, match THIS pet's proportions
+- Facial asymmetry: if one side of the face differs from the other, preserve that asymmetry - pets are not perfectly symmetrical
+- Unique fur patterns: if there's a specific swirl, cowlick, or unusual fur direction, capture it exactly
+- Distinguishing marks: any birthmarks, scars, or unique features mentioned MUST be present
 
 BODY SIZE & BUILD - MATCH EXACTLY:
 - If described as 'stocky' or 'compact', generate a stocky/compact body - NOT slender
