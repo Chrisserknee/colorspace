@@ -4100,205 +4100,36 @@ THIS IS A LARGE DOG BREED. You MUST zoom out and show a WIDE SHOT.
     // Note: selectedPose and selectedPalette are already initialized earlier (around line 3626)
     
     const generationPrompt = `${largeDogFramingPrefix}
-
-POSE & COMPOSITION (MANDATORY)
-
-- Pose: "${selectedPose.name}" – ${selectedPose.description}
-
-- Body: ${selectedPose.bodyPosition}, head: ${selectedPose.headPosition}, paws: ${selectedPose.pawPosition}, expression: ${selectedPose.expression}
-
-- Wide shot, full body visible on an ornate cushion. Show ALL four legs and paws.
-
-- Pet fills about 50–60% of frame height with space around it; camera pulled back like viewing from across a room. No close-ups, no cropped body.
-
-CLOTHING & JEWELRY
-
-- Single ornate velvet cloak over shoulders/back, body mostly visible beneath.
-
-- Cloak color: ${selectedPalette.cloakColor}, draped naturally, could slip off.
-
-- Cloak held by one elegant SILVER clasp at the chest.
-
-- ONE statement necklace only: extremely ornate, vibrant gems (rubies, emeralds, sapphires, purples) that shimmer and catch light. No other clothing, no extra necklaces.
-
-COLOR PALETTE "${selectedPalette.name}"
-
-- Background: ${selectedPalette.background}
-
-- Cushion: ${selectedPalette.cushionColor}
-
-- Lighting & mood: ${selectedPalette.lighting}, ${selectedPalette.mood}
-
-- Overall colors: soft, muted, harmonious and refined. Jewelry gems may be highly vibrant; everything else is gentle, not harsh or neon.
-
-BEAUTIFUL COMPOSITION (CRITICAL FOR STUNNING RESULT):
-
-- CLASSICAL COMPOSITION: Apply golden ratio and rule of thirds principles. Pet positioned at a visually pleasing focal point.
-
-- DRAMATIC LIGHTING: Use Rembrandt-style chiaroscuro lighting with beautiful interplay of light and shadow. Strong rim lighting on fur edges creating a luminous halo effect.
-
-- DEPTH AND DIMENSION: Create atmospheric perspective - soft focus on background elements, sharp focus on pet. Multiple planes of depth (foreground cushion, mid-ground pet, background).
-
-- COLOR HARMONY: Use sophisticated color relationships - complementary accents, analogous base colors, split-complementary highlights. Colors should sing together in harmony.
-
-- ELEGANT NEGATIVE SPACE: Thoughtful use of empty space around the subject to create breathing room and draw focus to the pet.
-
-- VISUAL FLOW: Guide the viewer's eye through the composition using diagonal lines of the cloak, curves of the cushion, and placement of jewelry.
-
-- RICH TEXTURAL CONTRAST: Juxtapose textures beautifully - soft plush fur against smooth velvet, matte fabric against gleaming metallic jewelry, rough canvas texture against soft painted areas.
-
-- PROFESSIONAL STUDIO LIGHTING: Main key light from upper left (classic portrait lighting), fill light from right to soften shadows, rim light from behind to separate subject from background.
-
-- MUSEUM-QUALITY AESTHETIC: The composition should look like it belongs in the Louvre or National Gallery - refined, balanced, sophisticated, and timeless.
-
-- ROMANTIC ATMOSPHERE: Soft, dreamy quality with gentle bokeh effect in background, warm golden tones, and an overall sense of elegance and beauty.
-
-- ARTISTIC BALANCE: Perfect visual weight distribution - if the pet leans one direction, balance with jewelry, cloak drape, or cushion folds on the opposite side.
-
-- PAINTERLY BEAUTY: Every element should contribute to an overall sense of sublime beauty - this is fine art, not just a pet photo.
-
-BRIGHTNESS & LUMINOSITY (CRITICAL):
-
-- Make the overall image BRIGHT and LUMINOUS - well-lit throughout, not dark or shadowy
-
-- Increase overall brightness - the image should feel bright and airy, like viewing in a well-lit gallery
-
-- Enhance luminosity - colors should glow and radiate light, especially highlights on fur, jewelry, and fabric
-
-- Brighten shadows - shadows should be lighter and more visible, not deep dark areas
-
-- Increase exposure - the image should feel like it's bathed in bright, warm light
-
-- Luminous atmosphere - everything should feel bright and radiant, with soft glowing highlights throughout
-
-- Avoid dark or dim areas - ensure even lighting across the entire composition
-
-- Bright, cheerful, luminous overall feel - the portrait should feel like it's in bright daylight or well-lit studio
-
-DO NOT:
-
-- No upright human-like pose, no stiff statue pose.
-
-- No close-up head shot, no cropped ears or body.
-
-- No heavy layered costumes, no multiple necklaces.
-
-- BACKGROUND MUST BE WHITE - pure white, bright white, ivory white, or very light white variations ONLY. NO colors, NO green, NO tan, NO brown.
-
-- NO GREEN COLOR CASTS - absolutely avoid any green tinting or green color grading throughout the image.
-
-- NO MUDDY COLORS - avoid any muddy, brown, tan, or earth-tone colors anywhere in the image.
-
-- Increase color saturation and brightness throughout - make colors vibrant and luminous.
-
-SPECIES (CRITICAL)
-
-THIS IS A ${species}. Generate ONLY a ${species}. ${notSpecies}
-
-STYLE – ANTIQUE OIL MASTERPIECE
-
-- 18th-century European aristocratic oil portrait.
-
-- Loose visible brushwork, rich oil texture, not smooth or digital.
-
-- Thick impasto highlights, visible bristle marks, painterly not photographic.
-
-- Strong aged look: craquelure (crack network), warm amber/yellowed varnish, subtle wear on edges, canvas texture slightly visible.
-
-- Looks like a 200–300 year old painting found in a grand estate, not new.
-
-PAINTERLY FACIAL TREATMENT (BALANCED - ARTISTIC YET RECOGNIZABLE):
-
-- Apply visible painterly texture and brushstrokes to the face and head area, creating an oil painting look.
-
-- KEEP EYES CLEAR AND DEFINED - the eyes are essential for pet recognition. Eyes should be the sharpest, most detailed part of the face with clear highlights and depth.
-
-- Add visible brushwork to FUR TEXTURE - loose, flowing strokes that create soft, painterly fur without obscuring the underlying features.
-
-- SOFTEN facial transitions gently - soft edges where fur meets features, but NOT blurred or lost.
-
-- Apply impasto texture to highlights - raised paint on nose tip, fur highlights, and whisker areas, but NOT covering or obscuring the eyes.
-
-- Create an ARTISTIC rendering - it should look like a skilled oil portrait, NOT a photograph, but the pet must be clearly recognizable.
-
-- Brushstrokes should ENHANCE the face, not hide it - visible strokes add artistic texture while preserving the pet's identity.
-
-- GENTLE softening around muzzle and cheeks - painterly blending that looks natural, not smeared or blurred.
-
-- The face should feel PAINTED and ARTISTIC - like a classical portrait with visible brushwork - but the pet's expression and features remain clear.
-
-- Balance between ART and RECOGNITION - the painterly effect adds beauty and texture while the pet remains unmistakably identifiable.
-
-IDENTITY & LIKENESS (MOST IMPORTANT)
-
-This must look like THIS specific ${species}, instantly recognizable to the owner.
-
-- Match head and face proportions, muzzle length/shape, eye shape/size/spacing/color, ear size/shape/position, cheeks and jawline, body build (stocky vs slender, large vs tiny).
-
-- Preserve ALL distinctive markings, patterns and asymmetries from the description: ${petDescription}
-
-- Any unique feature mentioned (spots, patches, scars, tufts, ear tilt, color breaks, etc.) MUST be clearly visible in the correct location.
-
-- Do NOT generate a generic breed face; capture this pet's individual quirks exactly.
-
-FULLY ANIMAL ONLY
-
-- 100% natural ${species} anatomy and posture.
-
-- No human body, no bipedal stance, no human hands or hybrid features.
-
-${compositionInstructions}
-
-${poseInstructions}
-
-${facialStructureSection}
-
-Additional traits and special handling:
-
-${genderInfo}${feminineAesthetic}${masculineAesthetic}${whiteCatTreatment}${greyCatTreatment}${blackCatTreatment}${maineCoonTreatment}${agePreservationInstructions}
-
-FINAL FRAMING
-
-BREATHTAKINGLY BEAUTIFUL full-body portrait of the ${species} naturally sitting or resting on ${cushion}, in a relaxed, elegant pose, with ${robe} draped gracefully over its back and a bright polished silver cloak clasp plus ${jewelryItem}. ${background}. ${lighting} with GORGEOUS Rembrandt-style dramatic lighting, soft rim lighting creating luminous fur edges, beautiful interplay of light and shadow. Entire head and ear tips fully visible with atmospheric background above; never cropped. STUNNING museum-quality composition with perfect visual balance and classical artistic principles.
-
-RENDERING SUMMARY
-
-STUNNINGLY BEAUTIFUL authentic antique oil painting masterpiece: GORGEOUS composition with classical golden ratio placement, ROMANTIC Rembrandt-style dramatic lighting, SUBLIME color harmony, EXQUISITE textural contrasts. Loose flowing brushstrokes, rich impasto, elegant craquelure, warm amber varnish glow. BREATHTAKINGLY BEAUTIFUL atmosphere with soft luminous highlights, professional studio lighting quality, museum-worthy elegance. Plush velvet cloak with luxurious drape, gleaming gold accents catching light beautifully, DAZZLING vibrant gems with inner fire. BRIGHT LUMINOUS COLORS, HIGH SATURATION, sophisticated visual balance. The portrait should be SO BEAUTIFUL it takes the viewer's breath away - fine art gallery masterpiece quality.
-
-BRIGHTNESS & COLOR REQUIREMENTS (CRITICAL):
-
-- BRIGHT overall composition - the image must be well-lit throughout, bright and luminous
-
-- INCREASE COLOR SATURATION - make colors more vibrant, rich, and saturated throughout
-
-- INCREASE BRIGHTNESS - make the entire image significantly brighter, like viewing in bright daylight or a well-lit gallery
-
-- Enhanced luminosity - colors should glow and radiate light, especially highlights on fur, jewelry, and fabric
-
-- VIBRANT COLORS - make all colors more intense and vivid (cloaks, cushions, jewelry, backgrounds)
-
-- Brighten all areas - avoid dark or shadowy sections, ensure even bright lighting across the composition
-
-- Luminous atmosphere - everything should feel bright, radiant, and cheerful
-
-- Light, airy feel - the portrait should feel like it's bathed in bright, warm light
-
-- Bright highlights - enhance highlights on fur, jewelry, and fabric to make them pop with brightness
-
-- Lighter shadows - shadows should be lighter and more visible, not deep dark areas
-
-- Overall bright, cheerful, luminous feel - the image should feel bright and inviting, not dark or moody
-
-- BACKGROUND MUST BE WHITE - pure white, bright white, ivory white, or very light white variations ONLY
-
-- NO GREEN BACKGROUNDS - absolutely never use green, olive, sage, or any green-tinted backgrounds
-
-- NO TAN/BROWN BACKGROUNDS - absolutely never use tan, beige, brown, or earth-tone backgrounds
-
-- NO COLORED BACKGROUNDS - backgrounds must be white or very light white only, no colors
-
-- Background must be: pure white, bright white, ivory white, warm white, cool white, or very light grey-white - WHITE ONLY
-
+VERY BRIGHT, LIGHT, AIRY royal oil portrait of a ${species}.
+
+BRIGHTNESS (MOST IMPORTANT):
+- EXTREMELY BRIGHT and LIGHT composition - like outdoor daylight
+- WHITE background only - pure white, bright white
+- NO dark areas, NO shadows, NO moody lighting
+- Light, airy, cheerful, luminous feel throughout
+- High key lighting - everything bright and well-lit
+
+COMPOSITION:
+- Full body ${species} on ${cushion}
+- ${selectedPose.name}: ${selectedPose.description}
+- Elegant ${robe} draped over shoulders with silver clasp
+- ONE ornate necklace with bright gems
+- Pet fills 50-60% of frame, wide shot, full body visible
+
+STYLE:
+- 18th-century oil portrait with visible brushstrokes
+- Painterly texture, impasto highlights
+- Soft craquelure aging effect
+- Eyes clear and detailed, fur softly textured
+
+IDENTITY:
+- Must look exactly like THIS ${species}: ${petDescription}
+- Preserve all markings, colors, face shape, eye color
+- Natural animal pose, no human features
+
+${genderInfo}${agePreservationInstructions}
+
+OUTPUT: Bright, light, airy antique oil portrait. White background. Vibrant colors. Beautiful composition.
 `;
 
     // Determine which model to use for generation
@@ -4937,177 +4768,36 @@ This is a LARGE DOG breed. You MUST create a WIDE SHOT showing the dog from a di
 ` : "";
       
       const openAIImg2ImgPrompt = isRainbowBridge ? rainbowBridgePrompt! : `${largeDogImg2ImgPrefix}
-CRITICAL SPECIES LOCK
-This is a ${species}. Generate ONLY a real ${species}. No human features, no hybrids, no upright poses, no anthropomorphism. Natural animal anatomy only. Do NOT generate: ${notSpecies}.
-
-STUNNINGLY BEAUTIFUL COMPOSITION (CRITICAL FOR GORGEOUS RESULT)
-Apply classical golden ratio and rule of thirds for visually pleasing placement. Use GORGEOUS Rembrandt-style chiaroscuro lighting with beautiful interplay of light and shadow. Strong luminous rim lighting on fur edges creating a halo effect. Create atmospheric depth with soft background and sharp subject focus. Sophisticated color harmony with complementary accents. Elegant negative space drawing focus to the pet. Rich textural contrasts - soft fur against smooth velvet, matte fabric against gleaming jewelry. Professional studio lighting quality. MUSEUM-QUALITY aesthetic that belongs in the Louvre or National Gallery. ROMANTIC atmosphere with dreamy quality and warm golden tones. Perfect visual balance throughout. Every element contributes to SUBLIME BEAUTY.
-
-BRIGHTNESS & VICTORIAN ELEGANCE
-The overall image must be BRIGHTER and more luminous than typical portraits. Increase light on the subject significantly. The aesthetic must be distinctly VICTORIAN—refined, romantic, elegant, with intricate details, delicate ornamentation, and graceful sophistication throughout.
-
-MASTER STYLE
-BREATHTAKINGLY BEAUTIFUL 18th-century European aristocratic oil portrait with bright, luminous lighting on the subject and a softer, elegant background. Maintain a regal, elegant, historically authentic Victorian atmosphere with GORGEOUS refined composition and classical staging.
-Increase overall ornateness and incorporate stronger Victorian-royal influence throughout—the environment, fabrics, patterns, textures, and decorative elements should feel more lavish, detailed, and aristocratic. The composition should be SO BEAUTIFUL it takes the viewer's breath away.
-
-PAINTING TECHNIQUE – EXTREMELY THICK, SCULPTURAL OIL
-Use VERY THICK, HEAVILY TEXTURED oil paint with dramatic impasto buildup. Brush strokes must be BOLD, RAISED, and SCULPTURAL—visible ridges, thick paint peaks, heavy bristle marks, and palette-knife textures. The paint should look like it could be touched—physical, 3D, and deeply layered. Every stroke must be visibly hand-painted with thick, rich pigment.
-
-PAINTERLY FACIAL TREATMENT (BALANCED - ARTISTIC YET RECOGNIZABLE):
-Apply visible painterly texture and brushstrokes to create an oil painting look. KEEP EYES CLEAR AND DEFINED - eyes are essential for pet recognition, should be the sharpest part with clear highlights. Add visible brushwork to FUR TEXTURE - loose flowing strokes creating soft painterly fur. SOFTEN facial transitions gently - soft edges where fur meets features, but NOT blurred. Apply impasto texture to highlights on nose tip and fur, but NOT covering eyes. Create an ARTISTIC rendering that looks like skilled oil portrait, NOT photograph, but pet must be clearly recognizable. Brushstrokes should ENHANCE the face, not hide it. GENTLE softening around muzzle and cheeks - painterly blending that looks natural. The face should feel PAINTED and ARTISTIC with visible brushwork, but pet's expression and features remain clear. Balance ART and RECOGNITION - painterly effect adds beauty while pet remains unmistakably identifiable.
-
-ANTIQUE AGING
-Soft craquelure, warm aged varnish glow, and light edge wear. Maintain elegance.
-
-COLOR PALETTE
-A unique palette each generation. Backgrounds remain darker. Cloaks and royal garments should use refined, luminous tones. Colors must enhance the pet and those garments.
-
-IDENTITY PRESERVATION
-The portrait must be unmistakably THIS exact pet. Preserve all facial structure, markings, eye shape, proportion, coloring, gradients, asymmetry, snout shape, and ear position. Do not alter markings or colors.
-
-ENHANCED ROYAL ENVIRONMENT & PILLOW REQUIREMENTS:
-
-Pillows must frequently appear in different colors, not repeating the same tones each generation.
-
-Use brighter, richer, more vibrant colors for pillows (ruby, sapphire, emerald, amethyst, gold, teal, rose, turquoise).
-
-Pillows should feature ornate Victorian royal patterns such as brocade, damask, embroidered gold thread, floral scrollwork, or regal geometric motifs.
-
-Textures may include velvet, silk, embroidered linen, or other noble materials.
-
-Pillow patterns and colors must elevate the royal atmosphere and amplify the Victorian opulence of the portrait.
-
-ROYAL WARDROBE – CLOAK, GARMENTS, AND CLASP
-The pet rests naturally on ${cushion}. A ${robe} is draped over its back as a true cloak.
-
-ELEGANCE REQUIREMENT:
-Clothing must be exceptionally elegant, royal, and luxurious, reflecting the highest aristocratic fashion of the 18th century.
-The cloak and garments must feel crafted for nobility, using only rich, refined, elevated materials.
-Increase overall Victorian-royal refinement: more ornate trims, subtle baroque motifs, elevated textile complexity when appropriate.
-
-CLOAK REQUIREMENTS:
-
-Cloak must be lighter-colored, luminous, elegant, and visually stunning
-
-Colors may include: cream, ivory, pale gold, champagne, silver-blue, sky blue, soft rose, light lavender
-
-Silky or satin-like with flowing, graceful folds and natural sheen
-
-Embroidery, woven patterns, or subtle embellishments encouraged when appropriate
-
-Cloak must elevate the portrait to a royal, high-status appearance
-
-CLOAK FASTENING – THIN SILVER CHAIN:
-
-The cloak MUST ALWAYS be held in place by a VERY THIN, DELICATE SILVER CHAIN
-
-This chain must be fine, elegant, and beautiful—like Victorian jewelry chain
-
-The chain connects across the upper chest, securing the cloak gracefully
-
-Use polished 925 sterling silver with a bright, gleaming finish
-
-The chain should be almost thread-like, never thick or heavy
-
-Optional: a small ornate clasp or decorative element where the chain meets
-
-JEWELRY REQUIREMENTS – DAINTY VICTORIAN ELEGANCE:
-
-CRITICAL: Chains must be VERY THIN, FINE, and DELICATE—like real Victorian jewelry
-NEVER use thick chains, chunky links, or heavy rope chains
-Chains should be almost thread-like, elegant, barely-there fine metalwork
-
-Beautiful gemstones: sapphires, rubies, emeralds, amethysts, pearls, and diamonds
-
-Designs inspired by Victorian-era jewelry: cameos, lockets, delicate pendants, intricate metalwork
-
-Use polished gold or 925 sterling silver with fine, graceful craftsmanship
-
-JEWELRY BEAUTY & SHINE:
-Jewelry must be exceptionally beautiful with a refined, feminine elegance
-
-VERY FINE, THIN chains (like delicate thread) with brilliant gemstones
-
-Intricate Victorian filigree, scrollwork, or floral metalwork patterns
-
-Gemstones must sparkle with high brilliance and clarity
-
-The overall feel should be precious, graceful, and romantically Victorian
-
-JEWELRY STYLE:
-The pet wears delicate Victorian-style jewelry:
-
-ULTRA-FINE chain necklaces—thin, elegant, graceful (NEVER thick or chunky)
-
-A beautiful pendant with gemstones in ornate Victorian settings
-
-Optional: delicate pearl strands, cameo brooches, or filigree pieces
-
-Jewelry rests naturally on the chest, complementing the cloak
-
-Overall design feels refined, precious, and aristocratically handcrafted
-
-CLOAK CLASP REQUIREMENT (MATCH REFERENCE):
-The cloak clasp must closely match the style shown:
-
-A round, ornate, polished metal clasp (gold or 925 silver)
-
-Embossed/engraved aristocratic detailing
-
-High-shine finish with strong reflections
-
-Sits at the chest in the same placement/scale as in the reference
-
-Must look luxurious, heavy, ceremonial, and regal
-
-CLOAK STYLE REQUIREMENT (MATCH REFERENCE):
-The cloak must follow the same construction style and silhouette as the reference while changing colors each generation:
-
-Rich, noble fabric with deep folds, heavy drape, and elegant weight
-
-Detailed gold filigree or baroque patterns similar to the example
-
-Ermine-style fur trim with black spots, thick texture, and natural variation
-
-Cloak must feel ceremonial, royal, Victorian/18th-century, and powerfully ornate
-
-Cloak color should change frequently (deep blue, crimson, emerald, purple, gold, etc.)
-
-Maintain a consistent luxury level matching the reference image
-
-COMPOSITION – SUBJECT OFTEN FARTHER AWAY
-The pet must not always be close-up. Frequently show:
-
-The subject farther away
-
-More body visible
-
-More cloak, garments, clasp, ornate pillows, and decorative environment
-
-Classical portrait composition with richer, elaborate staging
-
-POSE REQUIREMENT – RELAXED, NATURAL, RENAISSANCE-LIKE
-The pet should often appear in a serene, natural pose:
-
-Relaxed posture
-
-Calm, candid presence
-
-Graceful, Renaissance-inspired positioning
-Avoid stiff or rigid posing.
-
-Use provided variables:
-${compositionInstructions}
-${poseInstructions}
-${facialStructureSection}
-
-PET DESCRIPTION
-Follow all provided details exactly:
-${petDescription}${genderInfo}${feminineAestheticForOpenAI}${masculineAestheticForOpenAI}${whiteCatTreatmentForOpenAI}${greyCatTreatmentForOpenAI}${blackCatTreatmentForOpenAI}${agePreservationInstructions}
-
-OVERALL GOAL
-A luminous, regal antique oil portrait with extremely thick, dimensional paint; darker backgrounds; ornate Victorian styling; extremely detailed jewelry and cloaks modeled after the reference; vibrant ornate pillows; a rich composition showing more of the figure; and a serene Renaissance-inspired natural pose.
-The portrait must remain instantly recognizable as this specific pet.`;
+VERY BRIGHT, LIGHT, AIRY royal oil portrait transformation.
+
+BRIGHTNESS (MOST IMPORTANT):
+- EXTREMELY BRIGHT and LIGHT - like outdoor daylight or high key studio lighting
+- WHITE or very light background only
+- NO dark areas, NO heavy shadows, NO moody lighting
+- Light, airy, cheerful, luminous feel
+- Everything well-lit and bright
+
+TRANSFORM THIS ${species} INTO:
+- 18th-century aristocratic oil portrait style
+- On elegant ${cushion}
+- Wearing ${robe} draped over shoulders with silver clasp
+- ONE ornate necklace with bright gems
+- Visible brushstrokes, painterly texture
+- Soft craquelure aging effect
+
+COMPOSITION:
+- Full body visible, wide shot (50-60% of frame)
+- Natural relaxed pose
+- Eyes clear and detailed
+- Fur softly textured with brushstrokes
+
+IDENTITY (CRITICAL):
+- Must look exactly like THIS ${species}
+- Preserve all markings, colors, face shape
+- ${petDescription}
+${genderInfo}${agePreservationInstructions}
+
+OUTPUT: Very bright, light, airy antique oil portrait. White background. Natural animal pose.`;
 
       // Add site-wide guidance and custom prompt - AT BEGINNING for priority
       let finalOpenAIPrompt = openAIImg2ImgPrompt;
