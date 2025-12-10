@@ -5,6 +5,8 @@ import sharp from "sharp";
 import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+// @ts-ignore - gif.js doesn't have TypeScript types
+const GIF = require("gif.js");
 import { CONFIG } from "@/lib/config";
 import { uploadImage, saveMetadata, incrementPortraitCount, uploadBeforeAfterImage } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
@@ -2477,37 +2479,36 @@ async function createBeforeAfterImage(
   }
 }
 
-// Create short animated before/after GIF with transition effects (FREE - using Sharp)
+// Create animated before/after GIF with transition effects (FREE - using gif.js)
 async function createBeforeAfterVideo(
   originalBuffer: Buffer,
   generatedBuffer: Buffer,
   imageId: string
 ): Promise<void> {
   try {
-    console.log(`🎬 Creating animated before/after GIF (FREE) for ${imageId}...`);
+    console.log(`🎬 Creating animated before/after GIF for ${imageId}...`);
     
     // Get metadata
     const originalMeta = await sharp(originalBuffer).metadata();
     const generatedMeta = await sharp(generatedBuffer).metadata();
     
-    // Use full resolution but limit max dimensions for GIF file size
-    // GIFs can get large, so we'll cap at reasonable size while maintaining quality
-    const maxDimension = 1200; // Good balance between quality and file size
+    // Resize to reasonable size for GIF (max 800px width to keep file size manageable)
+    const maxWidth = 800;
     
     let originalProcessed = originalBuffer;
     let generatedProcessed = generatedBuffer;
     
     // Resize if needed (maintain aspect ratio)
-    if ((originalMeta.width || 0) > maxDimension || (originalMeta.height || 0) > maxDimension) {
+    if ((originalMeta.width || 0) > maxWidth) {
       originalProcessed = await sharp(originalBuffer)
-        .resize(maxDimension, maxDimension, { fit: 'inside', withoutEnlargement: true })
+        .resize(maxWidth, null, { fit: 'inside', withoutEnlargement: true })
         .png()
         .toBuffer();
     }
     
-    if ((generatedMeta.width || 0) > maxDimension || (generatedMeta.height || 0) > maxDimension) {
+    if ((generatedMeta.width || 0) > maxWidth) {
       generatedProcessed = await sharp(generatedBuffer)
-        .resize(maxDimension, maxDimension, { fit: 'inside', withoutEnlargement: true })
+        .resize(maxWidth, null, { fit: 'inside', withoutEnlargement: true })
         .png()
         .toBuffer();
     }
@@ -2516,10 +2517,10 @@ async function createBeforeAfterVideo(
     const originalProcessedMeta = await sharp(originalProcessed).metadata();
     const generatedProcessedMeta = await sharp(generatedProcessed).metadata();
     
-    const originalWidth = originalProcessedMeta.width || 1200;
-    const originalHeight = originalProcessedMeta.height || 1200;
-    const generatedWidth = generatedProcessedMeta.width || 1200;
-    const generatedHeight = generatedProcessedMeta.height || 1200;
+    const originalWidth = originalProcessedMeta.width || 800;
+    const originalHeight = originalProcessedMeta.height || 800;
+    const generatedWidth = generatedProcessedMeta.width || 800;
+    const generatedHeight = generatedProcessedMeta.height || 800;
     
     // Canvas dimensions for side-by-side
     const targetHeight = Math.max(originalHeight, generatedHeight);
@@ -2528,109 +2529,143 @@ async function createBeforeAfterVideo(
     const originalTop = Math.floor((targetHeight - originalHeight) / 2);
     const generatedTop = Math.floor((targetHeight - generatedHeight) / 2);
     
-    // Create polished before/after comparison with visual effects
-    // Add subtle border and divider line for professional look
-    const borderWidth = 4;
-    const dividerWidth = 3;
-    const padding = 20;
+    // Create frames for animation
+    const numFrames = 8; // 8 frames for smooth animation
+    const frames: Buffer[] = [];
     
-    const finalWidth = combinedWidth + (padding * 2) + (borderWidth * 2);
-    const finalHeight = targetHeight + (padding * 2) + (borderWidth * 2);
-    
-    // Create the composite with padding and borders
-    const polishedComparison = await sharp({
+    // Frame 1: Show only original (before) - both sides show original
+    const frame1 = await sharp({
       create: {
-        width: finalWidth,
-        height: finalHeight,
+        width: combinedWidth,
+        height: targetHeight,
         channels: 4,
-        background: { r: 245, g: 245, b: 245, alpha: 1 } // Light gray background
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
       }
     })
       .composite([
-        // White background for images
-        {
-          input: {
-            create: {
-              width: combinedWidth + (padding * 2),
-              height: targetHeight + (padding * 2),
-              channels: 4,
-              background: { r: 255, g: 255, b: 255, alpha: 1 }
-            }
-          },
-          left: borderWidth,
-          top: borderWidth
-        },
-        // Original image
-        {
-          input: originalProcessed,
-          left: borderWidth + padding,
-          top: borderWidth + padding + originalTop
-        },
-        // Divider line
-        {
-          input: {
-            create: {
-              width: dividerWidth,
-              height: targetHeight,
-              channels: 4,
-              background: { r: 200, g: 200, b: 200, alpha: 1 }
-            }
-          },
-          left: borderWidth + padding + originalWidth,
-          top: borderWidth + padding
-        },
-        // Generated image
-        {
-          input: generatedProcessed,
-          left: borderWidth + padding + originalWidth + dividerWidth,
-          top: borderWidth + padding + generatedTop
-        },
-        // "BEFORE" label (simple text effect using a colored rectangle)
-        {
-          input: {
-            create: {
-              width: 100,
-              height: 30,
-              channels: 4,
-              background: { r: 0, g: 0, b: 0, alpha: 0.7 }
-            }
-          },
-          left: borderWidth + padding + 10,
-          top: borderWidth + padding + 10
-        },
-        // "AFTER" label
-        {
-          input: {
-            create: {
-              width: 100,
-              height: 30,
-              channels: 4,
-              background: { r: 0, g: 0, b: 0, alpha: 0.7 }
-            }
-          },
-          left: borderWidth + padding + originalWidth + dividerWidth + 10,
-          top: borderWidth + padding + 10
-        }
+        { input: originalProcessed, left: 0, top: originalTop },
+        { input: originalProcessed, left: originalWidth, top: originalTop } // Duplicate original on right
       ])
-      .png()
+      .raw()
       .toBuffer();
+    frames.push(frame1);
     
-    // Upload polished comparison to Before_After bucket
+    // Frames 2-7: Transition from original to generated
+    for (let i = 1; i < numFrames - 1; i++) {
+      const progress = i / (numFrames - 1);
+      
+      // Create transition frame with crossfade
+      const generatedWithOpacity = await sharp(generatedProcessed)
+        .composite([{
+          input: {
+            create: {
+              width: generatedWidth,
+              height: generatedHeight,
+              channels: 4,
+              background: { r: 255, g: 255, b: 255, alpha: Math.floor(255 * progress) }
+            }
+          },
+          blend: 'dest-in'
+        }])
+        .toBuffer();
+      
+      const transitionFrame = await sharp({
+        create: {
+          width: combinedWidth,
+          height: targetHeight,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        }
+      })
+        .composite([
+          { input: originalProcessed, left: 0, top: originalTop },
+          { input: generatedWithOpacity, left: originalWidth, top: generatedTop, blend: 'over' }
+        ])
+        .raw()
+        .toBuffer();
+      
+      frames.push(transitionFrame);
+    }
+    
+    // Final frame: Show before/after side-by-side
+    const finalFrame = await sharp({
+      create: {
+        width: combinedWidth,
+        height: targetHeight,
+        channels: 4,
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
+      }
+    })
+      .composite([
+        { input: originalProcessed, left: 0, top: originalTop },
+        { input: generatedProcessed, left: originalWidth, top: generatedTop }
+      ])
+      .raw()
+      .toBuffer();
+    frames.push(finalFrame);
+    
+    // Create animated GIF using gif.js
+    const gif = new GIF({
+      workers: 2,
+      quality: 10, // Lower quality = smaller file size (1-30, lower is better quality)
+      width: combinedWidth,
+      height: targetHeight,
+      repeat: 0 // Loop forever
+    });
+    
+    // Convert each frame buffer to ImageData format for gif.js
+    // Sharp raw() gives RGBA data, which is what gif.js needs
+    for (let i = 0; i < frames.length; i++) {
+      const frameBuffer = frames[i];
+      // Sharp raw() returns RGBA data as Buffer, convert to Uint8ClampedArray
+      const frameData = new Uint8ClampedArray(frameBuffer);
+      
+      // Create ImageData-like object (gif.js expects {data, width, height})
+      const imageData = {
+        data: frameData,
+        width: combinedWidth,
+        height: targetHeight
+      };
+      
+      gif.addFrame(imageData, { delay: 200 }); // 200ms delay between frames
+    }
+    
+    // Render GIF
+    const gifBuffer = await new Promise<Buffer>((resolve, reject) => {
+      gif.on('finished', (blob: Blob) => {
+        blob.arrayBuffer().then(buffer => {
+          resolve(Buffer.from(buffer));
+        }).catch(reject);
+      });
+      
+      gif.on('progress', (p: number) => {
+        console.log(`GIF progress: ${Math.round(p * 100)}%`);
+      });
+      
+      gif.on('error', (err: Error) => {
+        console.error('GIF encoding error:', err);
+        reject(err);
+      });
+      
+      gif.render();
+    });
+    
+    // Upload animated GIF to Before_After bucket
     await uploadBeforeAfterImage(
-      polishedComparison,
-      `${imageId}-before-after-polished.png`,
-      "image/png"
+      gifBuffer,
+      `${imageId}-before-after.gif`,
+      "image/gif"
     );
     
-    console.log(`✅ Polished before/after comparison uploaded (FREE): ${imageId}-before-after-polished.png`);
+    console.log(`✅ Animated before/after GIF uploaded: ${imageId}-before-after.gif`);
   } catch (error) {
     console.error(`⚠️ Failed to create animated GIF:`, error);
-    // If GIF creation fails, try creating a simple static comparison
+    // If GIF creation fails, create a simple static comparison
     try {
       const originalMeta = await sharp(originalBuffer).metadata();
       const generatedMeta = await sharp(generatedBuffer).metadata();
-      const targetHeight = Math.max(originalMeta.height || 1200, generatedMeta.height || 1200);
-      const combinedWidth = (originalMeta.width || 1200) + (generatedMeta.width || 1200);
+      const targetHeight = Math.max(originalMeta.height || 800, generatedMeta.height || 800);
+      const combinedWidth = (originalMeta.width || 800) + (generatedMeta.width || 800);
       
       const staticComparison = await sharp({
         create: {
@@ -2641,8 +2676,8 @@ async function createBeforeAfterVideo(
         }
       })
         .composite([
-          { input: originalBuffer, left: 0, top: Math.floor((targetHeight - (originalMeta.height || 1200)) / 2) },
-          { input: generatedBuffer, left: originalMeta.width || 1200, top: Math.floor((targetHeight - (generatedMeta.height || 1200)) / 2) }
+          { input: originalBuffer, left: 0, top: Math.floor((targetHeight - (originalMeta.height || 800)) / 2) },
+          { input: generatedBuffer, left: originalMeta.width || 800, top: Math.floor((targetHeight - (generatedMeta.height || 800)) / 2) }
         ])
         .png()
         .toBuffer();
