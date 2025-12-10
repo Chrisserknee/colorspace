@@ -2665,8 +2665,10 @@ async function createBeforeAfterVideo(
     
     if (videoData instanceof Uint8Array) {
       videoBuffer = Buffer.from(videoData);
-    } else if (videoData instanceof Blob) {
-      videoBuffer = Buffer.from(await videoData.arrayBuffer());
+    } else if (typeof videoData === 'object' && videoData !== null && 'arrayBuffer' in videoData) {
+      // Handle Blob-like objects
+      const blob = videoData as { arrayBuffer(): Promise<ArrayBuffer> };
+      videoBuffer = Buffer.from(await blob.arrayBuffer());
     } else {
       // If it's a string or other type, try to convert
       videoBuffer = Buffer.from(videoData as unknown as ArrayBuffer);
