@@ -3716,47 +3716,47 @@ Respond with ONLY the species name.`,
     ];
     
     const jewelry = [
-      // EXTRAVAGANT MULTI-GEM STATEMENT PIECES - VIBRANT AND ORNATE
-      "MAGNIFICENT EXTRAVAGANT antique gold multi-chain necklace with BRILLIANT VIBRANT gem clusters (FIRE-RED ruby, EMERALD-GREEN emerald, ROYAL-PURPLE amethyst, SUNNY-YELLOW topaz), INTRICATE ornate gold filigree with SCROLLWORK, LUSTROUS pearls interspersed, MULTIPLE LAYERS of chains, CROWN JEWEL opulence, MUSEUM-WORTHY ornate detail",
-      "STUNNING ORNATE antique gold necklace with VIBRANT SATURATED gem clusters (RICH ruby red, BRILLIANT emerald green, DEEP amethyst purple, WARM topaz gold), ELABORATE intricate gold filigree patterns, TINY SPARKLING pearls, MULTIPLE fine chains creating LAYERED LUXURY, EXTREMELY ORNATE classical styling",
-      "EXTRAVAGANT ORNATE antique gold multi-chain necklace with BRILLIANT gem clusters (VIVID topaz, FIERY ruby, EMERALD emerald), ELABORATE delicate gold filigree with BAROQUE scrollwork, LUSTROUS pearl accents, MULTIPLE LAYERS creating DEPTH, EXTREMELY REFINED ornate detail",
-      "MAGNIFICENT ELABORATE antique gold necklace with MULTIPLE VIBRANT gem clusters (DEEP amethyst, FIERY ruby, WARM topaz, EMERALD emerald), ORNATE gold filigree with INTRICATE patterns, SPARKLING pearls, LAYERED fine chains creating RICH TEXTURE, EXTREMELY ORNATE NOT simple",
-      "STUNNING ORNATE gold filigree necklace with BRILLIANT VIBRANT gem clusters (RICH ruby, EMERALD emerald, ROYAL amethyst), MULTIPLE delicate chains creating LAYERS, LUSTROUS pearl accents, EXTREMELY ORNATE antique classical styling with BAROQUE details",
-      "EXTRAVAGANT REFINED antique gold multi-chain necklace with VIBRANT SATURATED gem clusters (SUNNY topaz yellow, FIERY ruby red, EMERALD green, ROYAL amethyst purple), ELABORATE intricate filigree with SCROLLWORK, LUSTROUS pearls, MULTIPLE LAYERS of ornate detail",
-      "MAGNIFICENT DELICATE antique gold necklace with ORNATE VIBRANT gem clusters (RICH ruby, DEEP amethyst, EMERALD emerald, WARM topaz), ELABORATE gold filigree with BAROQUE patterns, SPARKLING pearls, MULTIPLE fine chains, EXTREMELY DAINTY yet ORNATE elegance",
-      "STUNNING ORNATE antique gold necklace with MULTIPLE BRILLIANT gem clusters (EMERALD, FIERY ruby, WARM topaz, ROYAL amethyst), ELABORATE delicate gold filigree with INTRICATE scrollwork, LUSTROUS tiny pearl accents, EXTREMELY ORNATE classical jewelry NOT modern",
-      // SINGLE STATEMENT GEMS - EXTRA LARGE AND VIBRANT
-      "MAGNIFICENT EXTRAVAGANT antique gold pendant necklace with EXTRA LARGE central BRILLIANT SAPPHIRE surrounded by SPARKLING diamond accents, ROYAL BLUE VIBRANT brilliance that CATCHES LIGHT, ornate gold chain, EXTREMELY ORNATE statement piece, CROWN JEWEL quality",
-      "STUNNING ELEGANT antique gold necklace with EXTRA LARGE teardrop BRILLIANT EMERALD pendant, surrounded by LUSTROUS tiny pearls, DEEP GREEN VIBRANT brilliance that GLOWS, EXTREMELY REFINED single-gem elegance with ORNATE gold setting",
-      "MAGNIFICENT STUNNING antique gold necklace with EXTRA LARGE oval FIERY RUBY pendant framed in ELABORATE gold filigree, PASSIONATE RED VIBRANT brilliance that SHIMMERS, EXTREMELY ORNATE classical dramatic beauty",
-      "REGAL MAGNIFICENT antique gold necklace with EXTRA LARGE cushion-cut ROYAL AMETHYST pendant, DEEP PURPLE VIBRANT brilliance, surrounded by LUSTROUS seed pearls, EXTREMELY ORNATE Victorian grandeur",
-      // PEARL-FOCUSED - MORE LUSTROUS AND ORNATE
-      "CLASSIC EXTRAVAGANT triple-strand LUSTROUS PEARL necklace with ORNATE gold clasp featuring BRILLIANT ruby accent, TIMELESS elegance, CREAMY WHITE IRIDESCENT pearls that SHIMMER, EXTREMELY ORNATE understated luxury",
-      "ELEGANT MAGNIFICENT graduated LUSTROUS PEARL necklace with ELABORATE ornate gold and EMERALD clasp, single strand of INCREASING pearl sizes, CLASSIC sophistication with EXTREME ORNATE detail",
-      "BAROQUE EXTRAVAGANT LUSTROUS PEARL choker with ORNATE gold Art Nouveau setting, IRREGULAR IRIDESCENT pearls showing RAINBOW SHIMMER, UNIQUE organic shapes, EXTREMELY ARTISTIC ornate refinement",
-      "DELICATE MAGNIFICENT antique gold necklace with LARGE central LUSTROUS PEARL surrounded by TINY SPARKLING sapphires, MOONLIT IRIDESCENT elegance, EXTREMELY ROMANTIC ornate styling",
-      // SILVER/PLATINUM VARIATIONS - MORE VIBRANT
-      "DELICATE EXTRAVAGANT antique SILVER filigree necklace with BRILLIANT MOONSTONE pendant, ETHEREAL OPALESCENT SHIMMER with RAINBOW FIRE, MYSTICAL elegance, ORNATE silvery chain with INTRICATE patterns",
-      "ELEGANT MAGNIFICENT antique SILVER necklace with CLUSTER of BRILLIANT AQUAMARINES and SPARKLING diamonds, ICY BLUE VIBRANT beauty, WINTER elegance, EXTREMELY ORNATE platinum styling",
-      "REFINED EXTRAVAGANT SILVER choker with BRILLIANT OPAL pendant showing RAINBOW FIRE and IRIDESCENT MYSTERY, ETHEREAL SHIMMER, EXTREMELY ORNATE Art Nouveau inspired, UNIQUE ornate character",
-      // UNIQUE GEMS AND COMBINATIONS - MORE VIBRANT
-      "ANTIQUE EXTRAVAGANT gold necklace with VIBRANT TURQUOISE and CORAL cabochons, SOUTHWESTERN inspired elegance, WARM EARTHY VIBRANT tones, EXTREMELY DISTINCTIVE ornate styling",
-      "ELEGANT MAGNIFICENT gold necklace with VIBRANT GARNET cluster surrounded by LUSTROUS seed pearls, DEEP WINE-RED VIBRANT warmth, EXTREMELY ORNATE Victorian romance, January birthstone brilliance",
-      "DELICATE EXTRAVAGANT gold necklace with BRILLIANT PERIDOT and SPARKLING diamond pendant, FRESH LIME-GREEN VIBRANT sparkle, SPRING elegance, EXTREMELY ORNATE August brightness",
-      "ORNATE MAGNIFICENT gold necklace with BRILLIANT CITRINE sunburst pendant, WARM GOLDEN AMBER VIBRANT glow, SUMMER SUNSHINE captured in stone, EXTREMELY ORNATE November radiance",
-      // LAYERED AND COMPLEX - MORE ORNATE
-      "ELABORATE EXTRAVAGANT antique gold BIB NECKLACE with CASCADING BRILLIANT gems and LUSTROUS pearls, EXTREMELY ORNATE statement piece, MULTIPLE LAYERS of JEWELED ELEGANCE, MUSEUM-QUALITY ornate detail, CROWN JEWEL opulence",
-      "INTRICATE MAGNIFICENT antique gold COLLAR necklace with ALTERNATING FIERY rubies and SPARKLING diamonds, EXTREMELY REGAL commanding presence, CROWN JEWEL elegance, EXTREMELY ORNATE ornate detail",
-      "DELICATE EXTRAVAGANT THREE-TIER gold necklace with LUSTROUS pearls on first tier, BRILLIANT small gems on second, EXTRA LARGE gems on third, EXTREMELY LAYERED ornate luxury",
-      // CAMEO AND VINTAGE - MORE ORNATE
-      "ELEGANT EXTRAVAGANT antique gold necklace with ORNATE CAMEO pendant featuring CLASSICAL profile, CARVED SHELL artistry with INTRICATE detail, EXTREMELY ORNATE Victorian antiquity, TIMELESS ornate charm",
-      "REFINED MAGNIFICENT antique gold locket necklace with SPARKLING diamond and LUSTROUS pearl accent, ELABORATE ornate engraving, EXTREMELY SENTIMENTAL elegance, HEIRLOOM-QUALITY ornate detail",
-      // BOLD AND DRAMATIC - MORE VIBRANT
-      "MAGNIFICENT EXTRAVAGANT gold necklace with EXTRA LARGE MEDALLION pendant featuring LION motif surrounded by FIERY rubies, EXTREMELY ORNATE royal heraldry, COMMANDING presence, CROWN JEWEL quality",
-      "DRAMATIC MAGNIFICENT antique gold necklace with BRILLIANT BLACK ONYX and SPARKLING diamond pendant, STRIKING contrast, MYSTERIOUS elegance, EXTREMELY BOLD ornate sophistication",
-      // NEW EXTRAVAGANT ADDITIONS
-      "EXTRAVAGANT ORNATE antique gold necklace with MULTI-COLORED BRILLIANT gem cascade (RUBY, EMERALD, SAPPHIRE, AMETHYST, TOPAZ), ELABORATE baroque gold filigree, LUSTROUS pearls throughout, EXTREMELY ORNATE waterfall effect, MUSEUM-WORTHY detail",
-      "MAGNIFICENT STUNNING gold necklace with LARGE BRILLIANT DIAMOND centerpiece surrounded by COLORFUL gem halo (RUBY, EMERALD, SAPPHIRE), EXTREMELY ORNATE platinum and gold setting, SPARKLING brilliance, CROWN JEWEL extravagance",
+      // ULTRA-BRIGHT MULTI-GEM STATEMENT PIECES - MAXIMUM VIBRANCY AND SPARKLE
+      "DAZZLING ULTRA-BRIGHT antique gold multi-chain necklace with BLAZING BRILLIANT gem clusters (NEON-BRIGHT ruby, ELECTRIC-GREEN emerald, GLOWING amethyst, SUNBURST topaz), GLEAMING gold filigree CATCHING LIGHT, RADIANT pearls, CROWN JEWEL brilliance, BLINDING sparkle",
+      "LUMINOUS SPECTACULAR antique gold necklace with ULTRA-SATURATED GLOWING gems (LASER-BRIGHT ruby red, NEON emerald green, ELECTRIC amethyst purple, BLAZING topaz gold), MIRROR-FINISH gold filigree, RADIANT SPARKLING pearls, BLINDING BRIGHTNESS",
+      "RADIANT ULTRA-BRIGHT antique gold necklace with BLAZING gem clusters (FIRE-BRIGHT topaz, NEON ruby, ELECTRIC emerald), GLEAMING gold filigree with LIGHT-CATCHING scrollwork, LUMINOUS pearls, MAXIMUM SPARKLE and SHINE",
+      "SPECTACULAR DAZZLING antique gold necklace with GLOWING VIBRANT gems (ELECTRIC amethyst, BLAZING ruby, NEON topaz, RADIANT emerald), BRIGHT gold filigree with LIGHT REFLECTIONS, SPARKLING pearls, ULTRA-BRIGHT BRILLIANCE",
+      "BLAZING MAGNIFICENT gold necklace with NEON-BRIGHT gems (ELECTRIC ruby, GLOWING emerald, RADIANT amethyst), MIRROR-SHINE gold chains, LUMINOUS pearl accents, ULTRA-SATURATED colors, MAXIMUM BRIGHTNESS",
+      "GLOWING SPECTACULAR antique gold necklace with ULTRA-BRIGHT SATURATED gems (LASER-RED ruby, NEON-GREEN emerald, ELECTRIC-PURPLE amethyst, BLAZING-YELLOW topaz), GLEAMING filigree, RADIANT pearls, BLINDING SPARKLE",
+      "LUMINOUS DAZZLING antique gold necklace with BRIGHT GLOWING gems (ELECTRIC ruby, NEON amethyst, BLAZING emerald, RADIANT topaz), LIGHT-CATCHING gold patterns, SPARKLING pearls, ULTRA-VIBRANT colors, MAXIMUM SHINE",
+      "SPECTACULAR ULTRA-BRIGHT gold necklace with NEON gem clusters (BLAZING EMERALD, ELECTRIC ruby, GLOWING topaz, RADIANT amethyst), GLEAMING gold filigree, LUMINOUS pearls, BLINDING BRILLIANCE",
+      // SINGLE STATEMENT GEMS - MAXIMUM GLOW AND RADIANCE
+      "BLAZING SPECTACULAR antique gold necklace with EXTRA LARGE NEON SAPPHIRE that GLOWS with inner light, surrounded by SPARKLING diamonds, ELECTRIC BLUE RADIANCE, LIGHT-CATCHING gold setting, BLINDING brilliance",
+      "LUMINOUS ULTRA-BRIGHT antique gold necklace with EXTRA LARGE GLOWING EMERALD pendant, NEON-GREEN inner fire, surrounded by RADIANT pearls, BLAZING brilliance that CATCHES ALL LIGHT",
+      "SPECTACULAR DAZZLING antique gold necklace with EXTRA LARGE NEON RUBY pendant, ELECTRIC-RED GLOW, framed in GLEAMING gold filigree, BLINDING radiance, LIGHT-CATCHING fire",
+      "RADIANT BLAZING antique gold necklace with EXTRA LARGE GLOWING AMETHYST, ELECTRIC-PURPLE inner light, surrounded by LUMINOUS pearls, NEON brilliance, MAXIMUM SPARKLE",
+      // PEARL-FOCUSED - MAXIMUM IRIDESCENCE AND GLOW
+      "LUMINOUS SPECTACULAR triple-strand GLOWING PEARL necklace with GLEAMING gold clasp, BLAZING ruby accent, RAINBOW IRIDESCENCE on every pearl, LIGHT-CATCHING shimmer, ULTRA-BRIGHT elegance",
+      "RADIANT DAZZLING graduated GLOWING PEARL necklace with BRIGHT gold and NEON EMERALD clasp, IRIDESCENT pearls with RAINBOW FIRE, MAXIMUM LUSTRE, LIGHT-CATCHING beauty",
+      "SPECTACULAR ULTRA-BRIGHT GLOWING PEARL choker with GLEAMING gold Art Nouveau setting, RAINBOW-FIRE iridescence, NEON overtones (pink, blue, green, gold), BLINDING SHIMMER",
+      "LUMINOUS BLAZING antique gold necklace with LARGE GLOWING PEARL centerpiece, RAINBOW IRIDESCENCE, surrounded by SPARKLING sapphires, ELECTRIC elegance, MAXIMUM BRIGHTNESS",
+      // SILVER/PLATINUM - MAXIMUM SPARKLE AND SHINE
+      "DAZZLING ULTRA-BRIGHT antique SILVER necklace with GLOWING MOONSTONE, BLAZING RAINBOW FIRE, ELECTRIC opalescent shimmer, NEON inner light, LIGHT-CATCHING brilliance",
+      "SPECTACULAR LUMINOUS antique SILVER necklace with NEON AQUAMARINES and BLAZING diamonds, ELECTRIC ICY-BLUE glow, MAXIMUM SPARKLE, BLINDING winter brilliance",
+      "RADIANT DAZZLING SILVER choker with GLOWING OPAL showing NEON RAINBOW FIRE, ELECTRIC mystery, BLAZING iridescence, ULTRA-BRIGHT ethereal shimmer",
+      // UNIQUE GEMS - MAXIMUM VIBRANCY
+      "LUMINOUS SPECTACULAR gold necklace with NEON TURQUOISE and GLOWING CORAL, BLAZING warm tones, ELECTRIC vibrancy, ULTRA-SATURATED colors, MAXIMUM BRIGHTNESS",
+      "DAZZLING ULTRA-BRIGHT gold necklace with GLOWING GARNET cluster, NEON WINE-RED fire, surrounded by RADIANT pearls, ELECTRIC warmth, BLINDING brilliance",
+      "SPECTACULAR LUMINOUS gold necklace with NEON PERIDOT and BLAZING diamonds, ELECTRIC LIME-GREEN glow, RADIANT sparkle, ULTRA-BRIGHT spring fire",
+      "RADIANT GLOWING gold necklace with NEON CITRINE sunburst, BLAZING GOLDEN-AMBER light, ELECTRIC warmth, MAXIMUM SUNSHINE brilliance",
+      // LAYERED - MAXIMUM OPULENCE AND SPARKLE
+      "SPECTACULAR ULTRA-BRIGHT gold BIB NECKLACE with CASCADING NEON gems, GLOWING pearls, BLAZING colors, ELECTRIC radiance, MULTIPLE LAYERS of BLINDING BRILLIANCE, CROWN JEWEL opulence",
+      "LUMINOUS DAZZLING gold COLLAR necklace with ALTERNATING NEON rubies and BLAZING diamonds, ELECTRIC fire, ULTRA-BRIGHT commanding presence, MAXIMUM SPARKLE",
+      "RADIANT SPECTACULAR THREE-TIER gold necklace with GLOWING pearls, NEON small gems, BLAZING large gems, ELECTRIC layered luxury, BLINDING brilliance",
+      // CAMEO AND VINTAGE - WITH BRIGHT ACCENTS
+      "LUMINOUS SPECTACULAR antique gold necklace with ORNATE CAMEO pendant, NEON gem accents, GLEAMING gold frame, RADIANT classical beauty, ULTRA-BRIGHT vintage charm",
+      "DAZZLING RADIANT antique gold locket with BLAZING diamond and GLOWING pearl, NEON accents, ELECTRIC elegance, MAXIMUM BRIGHTNESS",
+      // BOLD AND DRAMATIC - MAXIMUM IMPACT
+      "SPECTACULAR ULTRA-BRIGHT gold necklace with EXTRA LARGE MEDALLION, NEON rubies surrounding, BLAZING royal heraldry, ELECTRIC commanding presence, BLINDING CROWN JEWEL brilliance",
+      "LUMINOUS DAZZLING antique gold necklace with GLOWING BLACK ONYX and NEON diamonds, ELECTRIC contrast, BLAZING mystery, ULTRA-BRIGHT sophistication",
+      // NEW ULTRA-BRIGHT ADDITIONS
+      "RADIANT SPECTACULAR gold necklace with CASCADING NEON gems (BLAZING ruby, ELECTRIC emerald, GLOWING sapphire, NEON amethyst, RADIANT topaz), ULTRA-BRIGHT waterfall, BLINDING brilliance",
+      "LUMINOUS DAZZLING gold necklace with LARGE NEON DIAMOND centerpiece, GLOWING gem halo, BLAZING colors, ELECTRIC radiance, CROWN JEWEL brilliance, MAXIMUM SPARKLE",
       "EXTRAVAGANT ELABORATE antique gold necklace with CLUSTER of BRILLIANT STAR SAPPHIRES showing ASTERISM, SURROUNDED by SPARKLING diamonds, EXTREMELY ORNATE celestial theme, MYSTICAL VIBRANT beauty",
       "MAGNIFICENT ORNATE gold necklace with LARGE BRILLIANT ALEXANDRITE pendant that CHANGES COLOR (green to red), SURROUNDED by SPARKLING diamonds, EXTREMELY RARE VIBRANT gem, EXTREMELY ORNATE unique beauty",
       "STUNNING EXTRAVAGANT antique gold necklace with MULTIPLE LAYERS of BRILLIANT gems (RUBY, EMERALD, SAPPHIRE) ALTERNATING with LUSTROUS pearls, ELABORATE baroque goldwork, EXTREMELY ORNATE cascading design, REGAL opulence"
@@ -4336,25 +4336,27 @@ STYLE – ANTIQUE OIL MASTERPIECE
 
 - Looks like a 200–300 year old painting found in a grand estate, not new.
 
-PAINTERLY FACIAL TREATMENT (CREATES GENTLE ILLUSION):
+HEAVY PAINTERLY FACIAL TREATMENT (CREATES STRONG ARTISTIC ILLUSION):
 
-- Apply MORE painterly texture and brushstrokes specifically to the face and head area.
+- Apply HEAVY painterly texture and BOLD brushstrokes specifically to the face and head area - MORE than the rest of the image.
 
-- SOFTEN facial details subtly with visible brushstrokes - use loose, flowing brushwork that gently blends features.
+- SIGNIFICANTLY SOFTEN facial details with visible, loose brushstrokes - use IMPRESSIONISTIC, flowing brushwork that blends and obscures features.
 
-- Slightly OBSCURE minor facial details with artistic texture - let brushstrokes create soft transitions between features.
+- OBSCURE facial details with artistic texture - let THICK brushstrokes create soft, blurred transitions between features. Minor details should be lost in the paint texture.
 
-- Create a GENTLE ILLUSION through painterly rendering - the artistic texture helps viewers see their pet's essence rather than focusing on minor imperfections.
+- Create a STRONG ARTISTIC ILLUSION through painterly rendering - the heavy artistic texture helps viewers see their pet's essence rather than any imperfections.
 
-- Use IMPRESSIONISTIC brushwork on the face - visible strokes that suggest features rather than rendering every detail sharply.
+- Use VERY IMPRESSIONISTIC brushwork on the face - visible, CHUNKY strokes that SUGGEST features rather than rendering them sharply. Like Monet or Renoir.
 
-- Apply THICKER paint texture on facial highlights - impasto on nose, eyes, and fur highlights creates depth and softness.
+- Apply VERY THICK impasto paint texture on facial highlights - HEAVY impasto on nose, eyes, and fur highlights creates depth and softness.
 
-- SOFT EDGES on facial features - let brushstrokes blend edges subtly, creating a dreamy, artistic quality.
+- VERY SOFT, BLURRED EDGES on all facial features - let brushstrokes heavily blend edges, creating a DREAMY, heavily artistic quality.
 
-- The face should feel PAINTED and ARTISTIC, not photographic - this painterly quality enhances the perception of likeness.
+- The face should feel HEAVILY PAINTED and ARTISTIC, almost abstract - NOT photographic. This painterly quality enhances perception of likeness.
 
-- Maintain recognizable features while adding artistic texture - the pet should still be clearly identifiable, just rendered more artistically.
+- Maintain ONLY the essential recognizable features (overall shape, coloring) while heavily obscuring fine details with artistic texture.
+
+- The brushwork should be VISIBLE and PROMINENT - like looking at a real oil painting up close where you can see every brush stroke.
 
 IDENTITY & LIKENESS (MOST IMPORTANT)
 
@@ -5077,8 +5079,8 @@ Increase overall ornateness and incorporate stronger Victorian-royal influence t
 PAINTING TECHNIQUE – EXTREMELY THICK, SCULPTURAL OIL
 Use VERY THICK, HEAVILY TEXTURED oil paint with dramatic impasto buildup. Brush strokes must be BOLD, RAISED, and SCULPTURAL—visible ridges, thick paint peaks, heavy bristle marks, and palette-knife textures. The paint should look like it could be touched—physical, 3D, and deeply layered. Every stroke must be visibly hand-painted with thick, rich pigment.
 
-PAINTERLY FACIAL TREATMENT (CREATES GENTLE ILLUSION):
-Apply MORE painterly texture and brushstrokes specifically to the face and head area. SOFTEN facial details subtly with visible brushstrokes - use loose, flowing brushwork that gently blends features. Slightly OBSCURE minor facial details with artistic texture - let brushstrokes create soft transitions between features. Create a GENTLE ILLUSION through painterly rendering - the artistic texture helps viewers see their pet's essence rather than focusing on minor imperfections. Use IMPRESSIONISTIC brushwork on the face - visible strokes that suggest features rather than rendering every detail sharply. Apply THICKER paint texture on facial highlights - impasto on nose, eyes, and fur highlights creates depth and softness. SOFT EDGES on facial features - let brushstrokes blend edges subtly, creating a dreamy, artistic quality. The face should feel PAINTED and ARTISTIC, not photographic - this painterly quality enhances the perception of likeness. Maintain recognizable features while adding artistic texture - the pet should still be clearly identifiable, just rendered more artistically.
+HEAVY PAINTERLY FACIAL TREATMENT (CREATES STRONG ARTISTIC ILLUSION):
+Apply HEAVY painterly texture and BOLD brushstrokes specifically to the face and head area - MORE than the rest of the image. SIGNIFICANTLY SOFTEN facial details with visible, loose brushstrokes - use IMPRESSIONISTIC, flowing brushwork that blends and obscures features. OBSCURE facial details with artistic texture - let THICK brushstrokes create soft, blurred transitions between features. Create a STRONG ARTISTIC ILLUSION through painterly rendering - the heavy artistic texture helps viewers see their pet's essence. Use VERY IMPRESSIONISTIC brushwork on the face - visible, CHUNKY strokes that SUGGEST features rather than rendering sharply. Like Monet or Renoir. Apply VERY THICK impasto paint texture on facial highlights - HEAVY impasto on nose, eyes, fur highlights. VERY SOFT, BLURRED EDGES on all facial features - let brushstrokes heavily blend edges, creating a DREAMY, heavily artistic quality. The face should feel HEAVILY PAINTED and ARTISTIC, almost abstract - NOT photographic. Maintain ONLY essential recognizable features (overall shape, coloring) while heavily obscuring fine details.
 
 ANTIQUE AGING
 Soft craquelure, warm aged varnish glow, and light edge wear. Maintain elegance.

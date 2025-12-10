@@ -104,6 +104,7 @@ export default function StudioPage() {
   // Generation settings
   const [enableWatermark, setEnableWatermark] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
+  const [selectedGender, setSelectedGender] = useState<"male" | "female" | null>(null);
   
   // Results
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
@@ -206,6 +207,9 @@ export default function StudioPage() {
       formData.append("style", "royal");
       formData.append("studioMode", "true");
       formData.append("enableWatermark", enableWatermark.toString());
+      if (selectedGender) {
+        formData.append("gender", selectedGender);
+      }
       if (customPrompt.trim()) {
         formData.append("customPrompt", customPrompt.trim());
       }
@@ -582,6 +586,44 @@ export default function StudioPage() {
                   />
                   <span style={{ color: '#B8B2A8' }}>Add watermark to generated images</span>
                 </label>
+                
+                {/* Gender Selection */}
+                <div>
+                  <label className="block text-sm mb-2" style={{ color: '#B8B2A8' }}>
+                    Pet Gender (optional - affects styling)
+                  </label>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setSelectedGender(selectedGender === "male" ? null : "male")}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all text-sm flex-1 ${
+                        selectedGender === "male" ? "scale-105" : "opacity-70 hover:opacity-100"
+                      }`}
+                      style={{
+                        backgroundColor: selectedGender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
+                        color: selectedGender === "male" ? '#0A0A0A' : '#C5A572',
+                        border: `2px solid ${selectedGender === "male" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
+                      }}
+                    >
+                      ♂ Male
+                    </button>
+                    <button
+                      onClick={() => setSelectedGender(selectedGender === "female" ? null : "female")}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all text-sm flex-1 ${
+                        selectedGender === "female" ? "scale-105" : "opacity-70 hover:opacity-100"
+                      }`}
+                      style={{
+                        backgroundColor: selectedGender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.2)',
+                        color: selectedGender === "female" ? '#0A0A0A' : '#C5A572',
+                        border: `2px solid ${selectedGender === "female" ? '#C5A572' : 'rgba(197, 165, 114, 0.3)'}`,
+                      }}
+                    >
+                      ♀ Female
+                    </button>
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: '#666' }}>
+                    Male: refined masculine styling • Female: softer, more delicate jewelry
+                  </p>
+                </div>
               </div>
             </div>
 
