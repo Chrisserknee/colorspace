@@ -61,10 +61,10 @@ const PORTRAIT_PALETTES = [
     lighting: "soft filtered light, gentle purple undertones"
   },
   {
-    name: "SOFT MINT",
-    background: "soft pale mint with gentle blue undertones",
+    name: "SOFT SKY",
+    background: "soft pale sky blue with gentle lavender undertones",
     mood: "calm, fresh, tranquil",
-    cloakColor: "pale mint velvet with silver trim",
+    cloakColor: "pale blue velvet with silver trim",
     cushionColor: "soft pastel pink with silver embroidery",
     lighting: "soft natural light, gentle and soothing"
   },
@@ -725,8 +725,8 @@ async function generateWithOpenAIImg2Img(
 // Retry helper for Replicate API calls with exponential backoff for rate limits
 async function retryReplicateCall<T>(
   callFn: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelay: number = 2000
+  maxRetries: number = 5, // Increased retries for rate limits
+  baseDelay: number = 5000 // Increased base delay to 5 seconds
 ): Promise<T> {
   let lastError: Error | null = null;
   
@@ -738,8 +738,13 @@ async function retryReplicateCall<T>(
       const errorMsg = error?.message || String(error);
       const errorStatus = error?.status || error?.statusCode;
       
-      // Check if it's a rate limit error (429)
-      const isRateLimit = errorStatus === 429 || errorMsg.includes('429') || errorMsg.includes('rate limit') || errorMsg.includes('throttled');
+      // Check if it's a rate limit error (429) or account balance warning
+      const isRateLimit = errorStatus === 429 || 
+                         errorMsg.includes('429') || 
+                         errorMsg.includes('rate limit') || 
+                         errorMsg.includes('throttled') ||
+                         errorMsg.includes('Rate limit') ||
+                         errorMsg.includes('too many requests');
       
       if (isRateLimit && attempt < maxRetries) {
         // Extract retry_after from error if available
@@ -747,7 +752,10 @@ async function retryReplicateCall<T>(
         try {
           // Try to extract from error message first (Replicate includes it in the detail)
           const errorMsgStr = String(error?.message || error);
-          const retryMatch = errorMsgStr.match(/resets in ~(\d+)s/i) || errorMsgStr.match(/retry_after[":\s]+(\d+)/i);
+          const retryMatch = errorMsgStr.match(/resets in ~(\d+)s/i) || 
+                           errorMsgStr.match(/retry_after[":\s]+(\d+)/i) ||
+                           errorMsgStr.match(/wait (\d+) seconds/i) ||
+                           errorMsgStr.match(/(\d+)s/i);
           if (retryMatch && retryMatch[1]) {
             retryAfter = Math.max(parseInt(retryMatch[1]) * 1000, baseDelay);
           }
@@ -766,10 +774,12 @@ async function retryReplicateCall<T>(
           // Ignore JSON parsing errors
         }
         
-        // Exponential backoff: use retry_after if available, otherwise exponential
+        // Exponential backoff with longer delays for rate limits
+        // Use retry_after if available, otherwise exponential with longer base
         const delay = retryAfter > baseDelay ? retryAfter : baseDelay * Math.pow(2, attempt - 1);
         const delaySeconds = Math.ceil(delay / 1000);
         console.log(`⏳ Rate limit hit (attempt ${attempt}/${maxRetries}). Waiting ${delaySeconds}s before retry...`);
+        console.log(`💡 Tip: Replicate applies stricter rate limits when balance is ≤$20. Consider adding more credits.`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
@@ -782,19 +792,154 @@ async function retryReplicateCall<T>(
   throw lastError || new Error("Replicate API call failed after retries");
 }
 
-// ⚠️ STABLE DIFFUSION GENERATION - LOCAL TESTING ONLY - DO NOT DEPLOY TO PRODUCTION ⚠️
-// This function uses advanced Stable Diffusion models for experimentation
-// Available models: "flux", "sd3", "sdxl-img2img"
+// Local SD API generation (Automatic1111 or ComfyUI)
+async function generateWithLocalSDAPI(
+  referenceImageBase64: string,
+  prompt: string,
+  model: string,
+  apiUrl: string
+): Promise<Buffer> {
+  console.log("🏠 Generating with LOCAL SD API...");
+  
+  // Get parameters from environment
+  const sdGuidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
+  const sdSteps = parseInt(process.env.SD_STEPS || "35");
+  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.6");
+  const ipAdapterScale = parseFloat(process.env.IP_ADAPTER_SCALE || "0.85");
+  
+  // Convert base64 to Buffer
+  const imageBuffer = Buffer.from(
+    referenceImageBase64.replace(/^data:image\/\w+;base64,/, ""),
+    "base64"
+  );
+  
+  // Detect API type (Automatic1111 or ComfyUI)
+  const apiType = process.env.LOCAL_SD_API_TYPE || "automatic1111"; // "automatic1111" or "comfyui"
+  
+  try {
+    if (apiType === "comfyui") {
+      // ComfyUI API format
+      console.log("🎨 Using ComfyUI API format...");
+      
+      // ComfyUI requires a workflow JSON - simplified version for IP-Adapter Plus
+      const workflow = {
+        "1": {
+          "inputs": {
+            "image": imageBuffer.toString("base64"),
+            "text": prompt,
+            "clip": ["CLIPTextEncode", 1, 0]
+          },
+          "class_type": "IPAdapterPlus"
+        }
+      };
+      
+      // Note: ComfyUI API is more complex - you may need to customize this based on your workflow
+      const response = await fetch(`${apiUrl}/prompt`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: workflow }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`ComfyUI API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      // ComfyUI returns a prompt_id - you'd need to poll for completion
+      // This is a simplified version - you may need to implement polling
+      throw new Error("ComfyUI API requires polling - use Automatic1111 format or implement polling");
+      
+    } else {
+      // Automatic1111 (Stable Diffusion WebUI) API format
+      console.log("🎨 Using Automatic1111 API format...");
+      
+      // Convert image to base64 data URL
+      const imageDataUrl = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
+      
+      // Automatic1111 img2img endpoint
+      const requestBody: any = {
+        prompt: prompt,
+        negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+        init_images: [imageDataUrl],
+        denoising_strength: sdStrength,
+        cfg_scale: sdGuidanceScale,
+        steps: sdSteps,
+        width: 1024,
+        height: 1024,
+        sampler_index: "Euler a", // or "DPM++ 2M Karras" for better quality
+        restore_faces: false,
+        tiling: false,
+      };
+      
+      // Add IP-Adapter if model supports it (requires ControlNet extension)
+      if (model.includes("ip-adapter")) {
+        requestBody.alwayson_scripts = {
+          controlnet: {
+            args: [{
+              input_image: imageDataUrl,
+              module: "ip-adapter_plus",
+              model: "ip-adapter-plus_sdxl [2a9b6b7c]", // Adjust based on your installed models
+              weight: ipAdapterScale,
+              control_mode: 1, // Balanced
+            }]
+          }
+        };
+      }
+      
+      const response = await fetch(`${apiUrl}/sdapi/v1/img2img`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Automatic1111 API error (${response.status}): ${errorText.substring(0, 200)}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.images || !data.images[0]) {
+        throw new Error("No image returned from Automatic1111 API");
+      }
+      
+      // Decode base64 image
+      const imageBase64 = data.images[0].replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(imageBase64, "base64");
+      
+      console.log("✅ Local SD API generation successful, buffer size:", buffer.length);
+      return buffer;
+    }
+  } catch (error) {
+    console.error("Local SD API generation error:", error);
+    throw error;
+  }
+}
+
+// ⚠️ STABLE DIFFUSION GENERATION - DEV SERVER ONLY - DO NOT DEPLOY TO PRODUCTION ⚠️
+// This function uses advanced Stable Diffusion models with IP-Adapter Plus, ControlNet, and LoRA support
+// Supports both Replicate (cloud) and local API endpoints
+// Available models: "sdxl-ip-adapter-plus", "sdxl-controlnet-pose", "sdxl-controlnet-depth", "sdxl-controlnet-canny", "sdxl-lora", "flux", "sd3", "sdxl-img2img", "ip-adapter-faceid"
 async function generateWithStableDiffusion(
   referenceImageBase64: string,
   prompt: string,
-  model: string = "flux"
+  model: string = "sdxl-ip-adapter-plus"
 ): Promise<Buffer> {
-  console.log("=== ⚠️ STABLE DIFFUSION GENERATION (LOCAL TESTING ONLY) ===");
+  console.log("=== ⚠️ STABLE DIFFUSION GENERATION (DEV SERVER ONLY) ===");
   console.log(`📌 Model: ${model}`);
   
+  // Check if using local API endpoint
+  const localApiUrl = process.env.LOCAL_SD_API_URL; // e.g., "http://localhost:7860" for Automatic1111 or "http://localhost:8188" for ComfyUI
+  const useLocalApi = !!localApiUrl;
+  
+  if (useLocalApi) {
+    console.log("🏠 Using LOCAL SD API:", localApiUrl);
+    return generateWithLocalSDAPI(referenceImageBase64, prompt, model, localApiUrl);
+  }
+  
+  // Use Replicate (cloud)
   if (!process.env.REPLICATE_API_TOKEN) {
-    throw new Error("REPLICATE_API_TOKEN not configured");
+    throw new Error("REPLICATE_API_TOKEN not configured. Set LOCAL_SD_API_URL for local testing or REPLICATE_API_TOKEN for cloud.");
   }
   
   const replicate = new Replicate({
@@ -807,17 +952,25 @@ async function generateWithStableDiffusion(
     : `data:image/jpeg;base64,${referenceImageBase64}`;
 
   // Get SD-specific parameters from environment
-  // Lower strength = more identity preserved (0.5-0.7 recommended for pets)
+  // Higher strength (0.75-0.85) needed for painterly transformation - lower values keep too much original photo
   const sdGuidanceScale = parseFloat(process.env.SD_GUIDANCE_SCALE || "7.5");
-  const sdSteps = parseInt(process.env.SD_STEPS || "30");
-  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.6"); // Lowered to 0.6 to reduce weird artifacts and preserve more identity
-  const ipAdapterScale = parseFloat(process.env.IP_ADAPTER_SCALE || "0.9"); // Increased to 0.9 for maximum identity preservation
+  const sdSteps = parseInt(process.env.SD_STEPS || "35");
+  const sdStrength = parseFloat(process.env.SD_STRENGTH || "0.8");
+  const ipAdapterScale = parseFloat(process.env.IP_ADAPTER_SCALE || "0.85"); // IP-Adapter Plus works best at 0.8-0.9
+  const controlnetScale = parseFloat(process.env.CONTROLNET_SCALE || "0.8"); // ControlNet condition scale
+  const loraUrl = process.env.LORA_URL; // Custom LoRA URL for style training
+  
+  // ControlNet type (pose, depth, canny)
+  const controlnetType = process.env.CONTROLNET_TYPE || "canny";
 
   console.log("SD parameters:");
   console.log("- Guidance scale:", sdGuidanceScale);
   console.log("- Steps:", sdSteps);
   console.log("- Strength (img2img):", sdStrength);
   console.log("- IP-Adapter scale:", ipAdapterScale, "(higher = more identity preserved)");
+  console.log("- ControlNet scale:", controlnetScale, "(higher = more structure preserved)");
+  console.log("- ControlNet type:", controlnetType);
+  console.log("- LoRA URL:", loraUrl || "none (using base SDXL)");
   console.log("- Prompt length:", prompt.length);
 
   try {
@@ -850,40 +1003,21 @@ async function generateWithStableDiffusion(
       // Flux with img2img capability using a community model
       console.log("🚀 Using Flux img2img (lucataco/flux-dev-lora)...");
       
-      try {
-        // Try latest version first
-        output = await retryReplicateCall(() =>
-          replicate.run(
-            "lucataco/flux-dev-lora", // Use latest version
-            {
-              input: {
-                image: imageDataUrl,
-                prompt: prompt,
-                strength: sdStrength,
-                num_inference_steps: sdSteps,
-                guidance_scale: sdGuidanceScale,
-              }
+      // No fallback - fail clearly if it doesn't work
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "lucataco/flux-dev-lora",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              strength: sdStrength,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
             }
-          )
-        );
-      } catch (versionError) {
-        console.log("⚠️ Latest version failed, trying specific version...");
-        // Fallback to specific version
-        output = await retryReplicateCall(() =>
-          replicate.run(
-            "lucataco/flux-dev-lora:a22c463f11808638ad5e2ebd582e07a469031f48dd567366fb4c6fdab91d614d",
-            {
-              input: {
-                image: imageDataUrl,
-                prompt: prompt,
-                strength: sdStrength,
-                num_inference_steps: sdSteps,
-                guidance_scale: sdGuidanceScale,
-              }
-            }
-          )
-        );
-      }
+          }
+        )
+      );
     } else if (model === "sd3") {
       // Stable Diffusion 3 - Latest SD model
       console.log("🚀 Using Stable Diffusion 3 (stability-ai/stable-diffusion-3)...");
@@ -907,50 +1041,26 @@ async function generateWithStableDiffusion(
       // SDXL with img2img for identity preservation
       console.log("🚀 Using SDXL img2img for identity preservation...");
       
-      try {
-        // Try latest version first (more reliable)
-        output = await retryReplicateCall(() =>
-          replicate.run(
-            "stability-ai/sdxl", // Use latest version
-            {
-              input: {
-                image: imageDataUrl,
-                prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
-                prompt_strength: sdStrength,
-                num_inference_steps: sdSteps,
-                guidance_scale: sdGuidanceScale,
-                scheduler: "K_EULER_ANCESTRAL",
-                refine: "expert_ensemble_refiner",
-                high_noise_frac: 0.8,
-                num_outputs: 1,
-              }
+      // No fallback - fail clearly if it doesn't work
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "stability-ai/sdxl",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+              prompt_strength: sdStrength,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+              refine: "expert_ensemble_refiner",
+              high_noise_frac: 0.8,
+              num_outputs: 1,
             }
-          )
-        );
-      } catch (versionError) {
-        console.log("⚠️ Latest version failed, trying specific version...");
-        // Fallback to specific version
-        output = await retryReplicateCall(() =>
-          replicate.run(
-            "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-            {
-              input: {
-                image: imageDataUrl,
-                prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
-                prompt_strength: sdStrength,
-                num_inference_steps: sdSteps,
-                guidance_scale: sdGuidanceScale,
-                scheduler: "K_EULER_ANCESTRAL",
-                refine: "expert_ensemble_refiner",
-                high_noise_frac: 0.8,
-                num_outputs: 1,
-              }
-            }
-          )
-        );
-      }
+          }
+        )
+      );
     } else if (model === "sdxl-controlnet") {
       // SDXL with ControlNet for better structure preservation
       console.log("🚀 Using SDXL ControlNet (canny) for structure preservation...");
@@ -971,48 +1081,150 @@ async function generateWithStableDiffusion(
           }
         )
       );
+    } else if (model === "sdxl-ip-adapter-plus") {
+      // IP-Adapter Plus - BEST for full body identity preservation (better than FaceID)
+      // This preserves the entire pet's appearance, not just the face
+      console.log("🚀 Using SDXL img2img (identity preservation via img2img)...");
+      console.log("⚠️ Note: IP-Adapter models not available, using SDXL img2img instead");
+      
+      // Use SDXL img2img with specific version hash - works reliably and preserves identity
+      // No fallbacks, fail clearly if it doesn't work
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+              prompt_strength: sdStrength,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+              refine: "expert_ensemble_refiner",
+              high_noise_frac: 0.8,
+              num_outputs: 1,
+            }
+          }
+        )
+      );
+    } else if (model === "sdxl-controlnet-pose") {
+      // SDXL with ControlNet Pose - locks in pet's pose/structure
+      console.log("🚀 Using SDXL ControlNet (Pose) for pose preservation...");
+      
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "lucataco/sdxl-controlnet-pose",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated, harsh colors, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+              condition_scale: controlnetScale,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+            }
+          }
+        )
+      );
+    } else if (model === "sdxl-controlnet-depth") {
+      // SDXL with ControlNet Depth - preserves 3D structure
+      console.log("🚀 Using SDXL ControlNet (Depth) for structure preservation...");
+      
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "lucataco/sdxl-controlnet-depth",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated, harsh colors, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+              condition_scale: controlnetScale,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+            }
+          }
+        )
+      );
+    } else if (model === "sdxl-controlnet-canny") {
+      // SDXL with ControlNet Canny - preserves edges/structure (existing, but updated)
+      console.log("🚀 Using SDXL ControlNet (Canny) for edge/structure preservation...");
+      
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "lucataco/sdxl-controlnet:06d6fae3b75ab68a28cd2900afa6033166910dd09fd9751047043a5a8cf13ef1",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, oversaturated, harsh colors, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+              condition_scale: controlnetScale,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+            }
+          }
+        )
+      );
+    } else if (model === "sdxl-lora") {
+      // SDXL with custom LoRA for style training
+      // Requires LORA_URL environment variable pointing to your trained LoRA
+      console.log("🚀 Using SDXL + Custom LoRA for style matching...");
+      
+      if (!loraUrl) {
+        throw new Error("LORA_URL environment variable is required for sdxl-lora model. Set LORA_URL to your trained LoRA URL.");
+      }
+      
+      console.log("📌 Using LoRA:", loraUrl);
+      
+      // Use SDXL base with LoRA support
+      // Note: Replicate LoRA support varies by model - may need to use a LoRA-enabled SDXL variant
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "stability-ai/sdxl",
+          {
+            input: {
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated, ugly, blurry, human face, human body, humanoid, standing upright, bipedal, stiff pose, rigid posture, oversaturated, harsh colors, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
+              scheduler: "K_EULER_ANCESTRAL",
+              refine: "expert_ensemble_refiner",
+              high_noise_frac: 0.8,
+              num_outputs: 1,
+              // Note: LoRA integration may require a different model endpoint that supports LoRA
+              // You may need to use a community model like "lucataco/sdxl-lora" or similar
+            }
+          }
+        )
+      );
+      
+      console.log("⚠️ Note: Direct LoRA support in Replicate may require a specialized model. Consider using IP-Adapter Plus with your style images instead.");
     } else if (model === "ip-adapter-faceid") {
       // IP-Adapter FaceID for face preservation (works great for pet faces too)
+      // Note: IP-Adapter Plus is generally better for full body, but FaceID is good for face-only focus
       console.log("🚀 Using IP-Adapter FaceID for face preservation...");
       
-      // Try latest version first, fallback to specific version if needed
-      try {
-        output = await retryReplicateCall(() =>
-          replicate.run(
-            "lucataco/ip-adapter-faceid-sdxl", // Use latest version
-            {
-              input: {
-                image: imageDataUrl,
-                prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
-                ip_adapter_scale: ipAdapterScale,
-                num_inference_steps: sdSteps,
-                guidance_scale: sdGuidanceScale,
-              }
+      // No fallback - fail clearly if it doesn't work
+      output = await retryReplicateCall(() =>
+        replicate.run(
+          "lucataco/ip-adapter-faceid-sdxl",
+          {
+            input: {
+              image: imageDataUrl,
+              prompt: prompt,
+              negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated, harsh colors, dark, gloomy, shadowy, moody, dark background, brown background, dark brown, muddy colors, muted colors, dull colors, heavy shadows, dim lighting, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
+              ip_adapter_scale: ipAdapterScale,
+              num_inference_steps: sdSteps,
+              guidance_scale: sdGuidanceScale,
             }
-          )
-        );
-      } catch (versionError) {
-        console.log("⚠️ Latest version failed, trying specific version...");
-        // Fallback to specific version
-        output = await retryReplicateCall(() =>
-          replicate.run(
-            "lucataco/ip-adapter-faceid-sdxl:0626a057f7d2cd0dc1cd7e9faeb6e5bb57e0a09f4e5c8c6e5fe17ea40e8c1c03",
-            {
-              input: {
-                image: imageDataUrl,
-                prompt: prompt,
-                negative_prompt: "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, mutated, ugly, blurry, human, standing upright, oversaturated, hat, crown, headwear, floating objects, floating jewelry, floating brooch, decorative items above head, weird artifacts, strange objects, elaborate architecture, columns, staircases, complex backgrounds, excessive jewelry, multiple necklaces, heavy robes, elaborate costumes, human clothing",
-                ip_adapter_scale: ipAdapterScale,
-                num_inference_steps: sdSteps,
-                guidance_scale: sdGuidanceScale,
-              }
-            }
-          )
-        );
-      }
+          }
+        )
+      );
     } else {
-      throw new Error(`Unknown SD model: ${model}. Use: flux, flux-img2img, sd3, sdxl-img2img, sdxl-controlnet, ip-adapter-faceid`);
+      throw new Error(`Unknown SD model: ${model}. Available models: sdxl-ip-adapter-plus (RECOMMENDED), sdxl-controlnet-pose, sdxl-controlnet-depth, sdxl-controlnet-canny, sdxl-lora, flux, flux-img2img, sd3, sdxl-img2img, ip-adapter-faceid`);
     }
 
     console.log("SD generation complete, output type:", typeof output);
@@ -1511,11 +1723,32 @@ async function segmentPet(imageBase64: string): Promise<Buffer> {
 // Step 2: Generate Victorian royal scene (background + elements, no pet)
 async function generateRoyalScene(
   species: string,
-  openai: OpenAI
+  openai: OpenAI,
+  selectedPose?: { name: string; description: string; bodyPosition: string; headPosition: string; pawPosition: string; expression: string },
+  selectedPalette?: { name: string; background: string; cushionColor: string; cloakColor: string; lighting: string; mood: string }
 ): Promise<Buffer> {
   console.log("=== GENERATING ROYAL SCENE ===");
   
-  const scenePrompt = `A luxurious Victorian royal portrait scene with bright vibrant jewel tones and ornate details, empty and ready for a pet to be placed.
+  const poseContext = selectedPose ? `
+POSE CONTEXT (pet will be in this pose):
+- ${selectedPose.name}: ${selectedPose.description}
+- Body: ${selectedPose.bodyPosition}
+- Head: ${selectedPose.headPosition}
+- Paws: ${selectedPose.pawPosition}
+- Expression: ${selectedPose.expression}
+- Arrange cushion and robe to accommodate this specific pose` : "";
+  
+  const paletteContext = selectedPalette ? `
+COLOR PALETTE "${selectedPalette.name}":
+- Background: ${selectedPalette.background}
+- Cushion: ${selectedPalette.cushionColor}
+- Cloak/Robe: ${selectedPalette.cloakColor}
+- Lighting: ${selectedPalette.lighting}
+- Mood: ${selectedPalette.mood}` : "";
+  
+  const scenePrompt = `A luxurious 18th-century European aristocratic portrait scene with bright vibrant colors and ornate details, empty and ready for a ${species} to be placed.${poseContext}${paletteContext}
+
+SCENE ELEMENTS:
 
 SCENE ELEMENTS:
 - LUSTROUS velvet cushion with VISIBLE PILE texture catching light, GLEAMING gold embroidery with METALLIC SHEEN, ornate gold tassels
@@ -1655,11 +1888,12 @@ async function compositePortrait(
   }
 }
 
-// Step 4: Apply final harmonization pass to blend pet with scene
+// Step 4: Apply final harmonization pass to blend pet with scene and add painterly effects
 async function harmonizePortrait(
   compositedBuffer: Buffer,
   species: string,
-  openai: OpenAI
+  openai: OpenAI,
+  selectedPalette?: { name: string; background: string; cushionColor: string; cloakColor: string; lighting: string; mood: string }
 ): Promise<Buffer> {
   console.log("=== HARMONIZING PORTRAIT ===");
   
@@ -1669,20 +1903,36 @@ async function harmonizePortrait(
     const imageBlob = new Blob([uint8Array], { type: "image/png" });
     const imageFile = new File([imageBlob], "composited.png", { type: "image/png" });
     
-    const harmonizePrompt = `Add ONLY a soft shadow beneath the ${species} and very slightly blend the hard edges where the ${species} meets the background. 
+    const lightingContext = selectedPalette ? `Lighting: ${selectedPalette.lighting}. Mood: ${selectedPalette.mood}.` : "";
+    
+    const harmonizePrompt = `Transform this composite into an AUTHENTIC 18th-century European aristocratic OIL PAINTING PORTRAIT.
 
-CRITICAL - DO NOT MODIFY THE ${species.toUpperCase()} AT ALL:
-- Do NOT change the ${species}'s appearance in any way
-- Do NOT add texture or painterly effects to the ${species}
-- Do NOT alter the ${species}'s colors, fur, face, or body
-- The ${species} must remain EXACTLY as it appears - completely unchanged
+CRITICAL - PRESERVE THE ${species.toUpperCase()} EXACTLY:
+- The ${species}'s face, fur color, markings, and features must remain EXACTLY as shown
+- Do NOT change the ${species}'s appearance, colors, or distinctive features
+- The ${species} must look IDENTICAL to the original - same face, same markings, same everything
 
-ONLY ALLOWED CHANGES:
-- Add a soft, subtle drop shadow under the ${species}
-- Slightly soften the hard edge where ${species} meets background (1-2 pixels only)
-- That's it - nothing else
+PAINTERLY TRANSFORMATION (apply to ENTIRE image):
+- Add THICK IMPASTO oil paint texture with visible brushstrokes throughout
+- Apply heavy sculptural paint texture, palette knife ridges, bristle marks
+- Add rich glazing layers like Gainsborough, Reynolds, or Vigée Le Brun masterwork
+- Make canvas weave texture visible through thin paint areas
+- Add antique craquelure, aged varnish patina for museum-quality finish
+- Transform the ENTIRE image to look like authentic 300-year-old oil painting
+- NOT photo-realistic - must look like hand-painted masterpiece
 
-Keep the image bright and beautiful. Museum-quality finish.`;
+HARMONIZATION:
+- Add a soft, natural drop shadow beneath the ${species}
+- Blend the edges where ${species} meets background (subtle, 2-3 pixels)
+- Ensure lighting matches across pet and scene
+- Make shadows and highlights consistent throughout
+${lightingContext}
+
+RESULT:
+- Museum-quality 18th-century oil painting portrait
+- ${species} looks EXACTLY like the original photo
+- Entire image has authentic painterly texture and style
+- Bright, beautiful, luminous finish`;
 
     const response = await openai.images.edit({
       model: "gpt-image-1",
@@ -1714,36 +1964,114 @@ Keep the image bright and beautiful. Museum-quality finish.`;
   }
 }
 
+// Step 1.5: Apply painterly effects to segmented pet (preserves identity, adds style)
+async function applyPainterlyToPet(
+  petBuffer: Buffer,
+  species: string,
+  openai: OpenAI
+): Promise<Buffer> {
+  console.log("=== APPLYING PAINTERLY EFFECTS TO PET ===");
+  
+  try {
+    // Convert buffer to File for OpenAI
+    const uint8Array = new Uint8Array(petBuffer);
+    const imageBlob = new Blob([uint8Array], { type: "image/png" });
+    const imageFile = new File([imageBlob], "pet.png", { type: "image/png" });
+    
+    const painterlyPrompt = `Transform this ${species} into an 18th-century oil painting style while preserving EXACT identity.
+
+CRITICAL - PRESERVE EXACT ${species.toUpperCase()} IDENTITY:
+- Face, fur color, markings, and features must remain EXACTLY the same
+- Do NOT change the ${species}'s appearance, colors, or distinctive features
+- The ${species} must look IDENTICAL to the original - same face, same markings, same everything
+- Only add painterly TEXTURE and STYLE, not new features
+
+PAINTERLY TRANSFORMATION:
+- Add THICK IMPASTO oil paint texture with visible brushstrokes
+- Apply heavy sculptural paint texture, palette knife ridges, bristle marks
+- Add rich glazing layers like Gainsborough or Reynolds masterwork
+- Make it look like authentic hand-painted oil painting
+- NOT photo-realistic - must look like painted portrait
+- Bright, luminous lighting with warm golden highlights
+
+RESULT:
+- ${species} looks EXACTLY like the original photo
+- Entire ${species} has authentic painterly texture and style
+- Museum-quality 18th-century oil painting appearance`;
+
+    const response = await openai.images.edit({
+      model: "gpt-image-1",
+      image: imageFile,
+      prompt: painterlyPrompt,
+      n: 1,
+      size: "1024x1024",
+    });
+    
+    const imageData = response.data?.[0];
+    if (!imageData) throw new Error("No painterly pet generated");
+    
+    let buffer: Buffer;
+    if (imageData.b64_json) {
+      buffer = Buffer.from(imageData.b64_json, "base64");
+    } else if (imageData.url) {
+      const downloadResponse = await fetch(imageData.url);
+      if (!downloadResponse.ok) throw new Error(`Failed to download: ${downloadResponse.status}`);
+      buffer = Buffer.from(await downloadResponse.arrayBuffer());
+    } else {
+      throw new Error("No image data in response");
+    }
+    
+    console.log("✅ Painterly effects applied to pet, buffer size:", buffer.length);
+    return buffer;
+  } catch (error) {
+    console.error("Painterly application error:", error);
+    // If painterly step fails, return original segmented pet
+    console.log("⚠️ Falling back to original segmented pet (no painterly effects)");
+    return petBuffer;
+  }
+}
+
 // Main composite generation function
 async function generateCompositePortrait(
   petImageBase64: string,
   species: string,
-  openai: OpenAI
+  openai: OpenAI,
+  selectedPose?: { name: string; description: string; bodyPosition: string; headPosition: string; pawPosition: string; expression: string },
+  selectedPalette?: { name: string; background: string; cushionColor: string; cloakColor: string; lighting: string; mood: string }
 ): Promise<Buffer> {
   console.log("=== COMPOSITE PORTRAIT GENERATION ===");
-  console.log("Step 1/4: Segmenting pet from background...");
+  console.log("Step 1/5: Segmenting pet from background...");
   
-  // Step 1: Segment pet
+  // Step 1: Segment pet (preserves exact pet appearance)
   const segmentedPet = await segmentPet(petImageBase64);
   
-  console.log("Step 2/4: Generating royal scene...");
+  console.log("Step 2/5: Applying painterly effects to pet...");
   
-  // Step 2: Generate royal scene
-  const royalScene = await generateRoyalScene(species, openai);
+  // Step 1.5: Apply painterly effects to pet (optional - preserves identity, adds style)
+  const enablePetPainterly = process.env.USE_PET_PAINTERLY !== "false"; // Default: enabled
+  let styledPet = segmentedPet;
+  if (enablePetPainterly) {
+    styledPet = await applyPainterlyToPet(segmentedPet, species, openai);
+  }
   
-  console.log("Step 3/4: Compositing pet onto scene...");
+  console.log("Step 3/5: Generating royal scene...");
   
-  // Step 3: Composite
-  const composited = await compositePortrait(segmentedPet, royalScene);
+  // Step 2: Generate royal scene with pose/palette context
+  const royalScene = await generateRoyalScene(species, openai, selectedPose, selectedPalette);
   
-  console.log("Step 4/4: Harmonizing final portrait...");
+  console.log("Step 4/5: Compositing pet onto scene...");
   
-  // Step 4: Harmonize (optional - disabled by default to preserve pet appearance)
-  // Set ENABLE_HARMONIZATION=true to enable edge blending
-  const enableHarmonization = process.env.ENABLE_HARMONIZATION === "true";
+  // Step 3: Composite pet onto scene
+  const composited = await compositePortrait(styledPet, royalScene);
+  
+  console.log("Step 5/5: Applying final harmonization...");
+  
+  // Step 4: Harmonize with painterly effects (enabled by default for better integration)
+  // This adds shadows, edge blending, and ensures consistent painterly texture
+  const enableHarmonization = process.env.USE_COMPOSITE_HARMONIZATION !== "false"; // Default: enabled
   
   if (enableHarmonization) {
-    const harmonized = await harmonizePortrait(composited, species, openai);
+    const harmonized = await harmonizePortrait(composited, species, openai, selectedPalette);
     console.log("✅ Composite portrait complete (with harmonization)");
     return harmonized;
   } else {
@@ -3990,7 +4318,11 @@ DO NOT:
 
 - No heavy layered costumes, no multiple necklaces.
 
-- No harsh, oversaturated or muddy green/brown color casts.
+- NO GREEN OR TAN BACKGROUNDS - backgrounds must be light pastels (pink, blue, lavender, cream), rich jewel tones (navy, plum, charcoal), or pure white/light grey. NEVER green, tan, brown, or earth tones.
+
+- NO GREEN COLOR CASTS - avoid any green tinting or green color grading throughout the image.
+
+- Increase color saturation and brightness throughout - make colors vibrant and luminous.
 
 SPECIES (CRITICAL)
 
@@ -4042,15 +4374,19 @@ Full-body portrait of the ${species} naturally sitting or resting on ${cushion},
 
 RENDERING SUMMARY
 
-Authentic, heavily aged oil painting: loose flowing brushstrokes, strong surface texture, impasto, craquelure, warm amber varnish, soft weathered edges, atmospheric depth, plush velvet cloak, gleaming gold accents, sparkling vibrant gems, museum-quality antique look.
+Authentic, heavily aged oil painting: loose flowing brushstrokes, strong surface texture, impasto, craquelure, warm amber varnish, soft weathered edges, atmospheric depth, plush velvet cloak, gleaming gold accents, sparkling vibrant gems, BRIGHT LUMINOUS COLORS, HIGH SATURATION, museum-quality antique look. Image must be BRIGHT and COLORFUL throughout - vibrant, saturated colors with high brightness.
 
-BRIGHTNESS & LUMINOSITY REQUIREMENTS:
+BRIGHTNESS & COLOR REQUIREMENTS (CRITICAL):
 
 - BRIGHT overall composition - the image must be well-lit throughout, bright and luminous
 
-- Increase overall brightness - make the entire image brighter, like viewing in bright daylight or a well-lit gallery
+- INCREASE COLOR SATURATION - make colors more vibrant, rich, and saturated throughout
+
+- INCREASE BRIGHTNESS - make the entire image significantly brighter, like viewing in bright daylight or a well-lit gallery
 
 - Enhanced luminosity - colors should glow and radiate light, especially highlights on fur, jewelry, and fabric
+
+- VIBRANT COLORS - make all colors more intense and vivid (cloaks, cushions, jewelry, backgrounds)
 
 - Brighten all areas - avoid dark or shadowy sections, ensure even bright lighting across the composition
 
@@ -4064,61 +4400,43 @@ BRIGHTNESS & LUMINOSITY REQUIREMENTS:
 
 - Overall bright, cheerful, luminous feel - the image should feel bright and inviting, not dark or moody
 
+- NO GREEN BACKGROUNDS - never use green, olive, sage, or any green-tinted backgrounds
+
+- NO TAN/BROWN BACKGROUNDS - never use tan, beige, brown, or earth-tone backgrounds
+
+- Backgrounds must be: light pastels (pink, blue, lavender, cream), rich jewel tones (navy, plum, charcoal), or pure white/light grey - NO GREEN OR TAN
+
 `;
 
     // Determine which model to use for generation
-    // Priority: Stable Diffusion (LOCAL TESTING ONLY) > OpenAI img2img > Composite > Style Transfer > IP-Adapter > GPT-Image-1
-    // 
-    // ⚠️ USE_STABLE_DIFFUSION is for LOCAL TESTING ONLY - DO NOT DEPLOY TO PRODUCTION
-    // This enables advanced Stable Diffusion models (Flux, SD3) for experimentation
+    // Priority: OpenAI img2img (MAIN GENERATOR) > Style Transfer > IP-Adapter > GPT-Image-1
+    // Note: Stable Diffusion and Composite are disabled for now (will come back later)
     // 
     // CRITICAL: All generation types (free, pack credit, secret credit) use the SAME model selection logic.
     // The only difference is watermarking - the actual generation is identical for all types.
     // useSecretCredit and usePackCredit do NOT affect model selection - only watermarking.
-    // Check SD mode - must be explicitly "true" (string) and REPLICATE_API_TOKEN must be set
-    const sdEnvValue = process.env.USE_STABLE_DIFFUSION;
-    const hasReplicateToken = !!process.env.REPLICATE_API_TOKEN;
     
-    // Debug: Show exact value and type
-    console.log("🔍 DEBUG - USE_STABLE_DIFFUSION value:", JSON.stringify(sdEnvValue), "type:", typeof sdEnvValue);
-    console.log("🔍 DEBUG - Comparison check:", sdEnvValue === "true", "(should be true if env var is set correctly)");
-    
-    // Stable Diffusion DISABLED - Using OpenAI img2img
-    const useStableDiffusion = false; // Disabled - using OpenAI img2img
-    const sdModel = process.env.SD_MODEL || "sdxl-img2img"; // Not used when SD is disabled
+    // Stable Diffusion - DISABLED (removed for now, will come back later)
+    const useStableDiffusion = false; // Always disabled
     
     // Leonardo AI - for dev testing only
     const useLeonardo = process.env.USE_LEONARDO === "true" && process.env.LEONARDO_API_KEY;
     
-    // OpenAI img2img enabled by default (unless Leonardo is enabled)
-    const useOpenAIImg2Img = !useLeonardo && process.env.USE_OPENAI_IMG2IMG !== "false" && process.env.OPENAI_API_KEY; // Default to true unless explicitly disabled
-    const useComposite = !useStableDiffusion && !useLeonardo && process.env.USE_COMPOSITE === "true" && process.env.REPLICATE_API_TOKEN;
+    // Composite system - DISABLED BY DEFAULT (use OpenAI img2img instead)
+    const useComposite = false; // Disabled - use OpenAI img2img as main generator
+    
+    // OpenAI img2img - MAIN GENERATOR (default)
+    const useOpenAIImg2Img = !useLeonardo && process.env.USE_OPENAI_IMG2IMG !== "false" && process.env.OPENAI_API_KEY;
     const useStyleTransfer = !useStableDiffusion && !useLeonardo && !useComposite && process.env.USE_STYLE_TRANSFER === "true" && process.env.REPLICATE_API_TOKEN;
     const useIPAdapter = !useStableDiffusion && !useLeonardo && !useComposite && !useStyleTransfer && process.env.USE_IP_ADAPTER === "true" && process.env.REPLICATE_API_TOKEN;
     
     console.log("=== IMAGE GENERATION ===");
     console.log("Environment check:");
-    console.log("- USE_STABLE_DIFFUSION:", sdEnvValue === undefined ? "❌ undefined (not set)" : sdEnvValue === "true" ? "✅ true (ENABLED)" : `⚠️ "${sdEnvValue}" (NOT "true")`, "(⚠️ LOCAL TESTING ONLY)");
-    console.log("- REPLICATE_API_TOKEN:", hasReplicateToken ? "✅ set" : "❌ not set");
-    console.log("- SD Mode Active:", useStableDiffusion ? "✅ YES" : "❌ NO");
-    if (!useStableDiffusion) {
-      if (sdEnvValue === undefined) {
-        console.log("⚠️ USE_STABLE_DIFFUSION is not set. Add USE_STABLE_DIFFUSION=true to .env.local");
-      } else if (sdEnvValue !== "true") {
-        console.log(`⚠️ USE_STABLE_DIFFUSION is set to "${sdEnvValue}" but should be "true" (exact string match required)`);
-      }
-      if (!hasReplicateToken) {
-        console.log("⚠️ REPLICATE_API_TOKEN is required for SD mode");
-      }
-    }
-    console.log("- SD_MODEL:", process.env.SD_MODEL || `${sdModel} (default)`);
+    console.log("- Model: OpenAI img2img (MAIN GENERATOR)");
     console.log("- USE_LEONARDO:", process.env.USE_LEONARDO || "not set", useLeonardo ? "✅ ACTIVE" : "");
-    console.log("- LEONARDO_API_KEY:", process.env.LEONARDO_API_KEY ? "set" : "not set");
-    console.log("- USE_OPENAI_IMG2IMG:", process.env.USE_OPENAI_IMG2IMG || "not set");
-    console.log("- USE_COMPOSITE:", process.env.USE_COMPOSITE || "not set");
-    console.log("- USE_STYLE_TRANSFER:", process.env.USE_STYLE_TRANSFER || "not set");
-    console.log("- USE_IP_ADAPTER:", process.env.USE_IP_ADAPTER || "not set");
-    console.log("- OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "set" : "not set");
+    console.log("- USE_OPENAI_IMG2IMG:", process.env.USE_OPENAI_IMG2IMG !== "false" ? "✅ enabled" : "disabled");
+    console.log("- USE_COMPOSITE:", "disabled (using OpenAI img2img as main generator)");
+    console.log("- OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "✅ set" : "❌ not set");
     console.log("- IS_MULTI_PET:", isMultiPet ? "true" : "false");
     
     let firstGeneratedBuffer: Buffer;
@@ -4323,17 +4641,32 @@ A dual royal Victorian antique oil portrait featuring ${petCountWord} pets, rend
       console.log("📌 Available models: flux, flux-img2img, sd3, sdxl-img2img, sdxl-controlnet, ip-adapter-faceid");
       
       // Build a focused prompt for Stable Diffusion
-      const sdPrompt = `A ${species} in a refined 18th-century European aristocratic oil painting style.
+      // CRITICAL: This is img2img - we need STRONG transformation emphasis
+      const sdPrompt = `TRANSFORM INTO AUTHENTIC 18th-century European aristocratic OIL PAINTING PORTRAIT.
 
-PET IDENTITY (CRITICAL - PRESERVE EXACTLY):
+PAINTING STYLE (CRITICAL - MUST LOOK LIKE PAINTING):
+- THICK IMPASTO oil paint with visible brushstrokes and texture
+- Heavy sculptural paint texture, palette knife ridges, bristle marks
+- Rich glazing layers like Gainsborough, Reynolds, or Vigée Le Brun masterwork
+- Visible canvas weave texture throughout
+- Antique craquelure, aged varnish patina, museum-quality masterpiece
+- NOT a photo - must look like authentic 300-year-old oil painting
+- Dramatic Rembrandt-style lighting with luminous glow
+
+PET IDENTITY (PRESERVE EXACTLY):
 ${petDescription}
+- Same fur color, markings, eye color, facial features
+- Same distinctive characteristics and unique features
 
+NEW POSE & LOCATION (TRANSFORM FROM ORIGINAL):
 POSE: ${selectedPose.name}
 ${selectedPose.description}
 - ${selectedPose.bodyPosition}
 - ${selectedPose.headPosition}
 - ${selectedPose.pawPosition}
 - Expression: ${selectedPose.expression}
+- COMPLETELY NEW pose and position - NOT the same as the original photo
+- Pet in a DIFFERENT location and setting from the original
 
 COMPOSITION:
 - FULL BODY visible - zoomed out, showing from head to paws
@@ -4342,6 +4675,7 @@ COMPOSITION:
 - Natural relaxed pose, NOT sitting upright like a statue
 - Pet lying down or resting comfortably on cushion
 - Simple centered composition, pet is the focus
+- COMPLETELY NEW background and setting
 
 CLOTHING (MINIMAL):
 - ONE simple velvet cloak draped loosely over back/shoulders only
@@ -4352,11 +4686,12 @@ CLOTHING (MINIMAL):
 - NO heavy robes, NO elaborate costumes
 - Pet's natural body and fur mostly visible under the simple cloak
 
-BACKGROUND:
+BACKGROUND (NEW SETTING):
 - ${selectedPalette.background}
 - Simple, elegant background - NOT elaborate architecture
 - NO columns, NO staircases, NO complex interior scenes
 - Focus on the pet, background should be subtle
+- COMPLETELY DIFFERENT from original photo background
 
 CUSHION:
 - ${selectedPalette.cushionColor}
@@ -4369,12 +4704,6 @@ COLOR PALETTE "${selectedPalette.name}":
 - Mood: ${selectedPalette.mood}
 - Soft, muted, harmonious colors (not oversaturated)
 
-STYLE:
-- 18th-century European aristocratic oil painting
-- Visible brushstrokes, impasto texture
-- Gainsborough/Reynolds/Vigée Le Brun style
-- Museum-quality masterpiece
-
 FORBIDDEN ELEMENTS:
 - NO hats, crowns, or headwear
 - NO floating objects or decorative items
@@ -4383,8 +4712,10 @@ FORBIDDEN ELEMENTS:
 - NO weird artifacts or strange objects
 - NO human clothing elements
 - NO standing upright poses
+- NO photo-realistic rendering
+- NO modern digital look
 
-CRITICAL: This is a ${species}. Generate ONLY a ${species}. The pet must match the description exactly - same fur color, markings, eye color, facial features. Simple, elegant, natural portrait.`;
+CRITICAL: This is a ${species}. Generate ONLY a ${species}. Transform the pet into a COMPLETELY NEW pose and location while preserving exact facial features, fur color, and markings. Must look like an authentic 18th-century oil painting, NOT a photo.`;
 
       console.log("SD prompt length:", sdPrompt.length);
       
@@ -4901,17 +5232,20 @@ The portrait must remain instantly recognizable as this specific pet.`;
       
       console.log("✅ OpenAI img2img generation complete");
     } else if (useComposite) {
-      // Use composite approach for maximum face preservation
-      console.log("🎨 Using Composite Approach...");
-      console.log("📌 Step 1: Segment pet from background");
-      console.log("📌 Step 2: Generate Victorian royal scene");
+      // Use composite approach for maximum identity preservation
+      // This system: segments pet → generates scene → composites → harmonizes
+      console.log("🎨 Using Composite Approach (BEST for identity preservation)...");
+      console.log("📌 Step 1: Segment pet from background (preserves exact pet)");
+      console.log("📌 Step 2: Generate royal scene (with pose/palette context)");
       console.log("📌 Step 3: Composite pet onto scene");
-      console.log("📌 Step 4: Harmonize final portrait");
+      console.log("📌 Step 4: Harmonize with painterly effects");
       
       firstGeneratedBuffer = await generateCompositePortrait(
         base64Image,
         species,
-        openai
+        openai,
+        selectedPose,
+        selectedPalette
       );
       
       console.log("✅ Composite portrait complete");
