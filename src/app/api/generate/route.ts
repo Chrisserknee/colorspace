@@ -5,8 +5,7 @@ import sharp from "sharp";
 import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
-// @ts-ignore - gif.js doesn't have TypeScript types
-const GIF = require("gif.js");
+// Note: Video creation will use frame-based approach with FFmpeg
 import { CONFIG } from "@/lib/config";
 import { uploadImage, saveMetadata, incrementPortraitCount, uploadBeforeAfterImage } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
@@ -2479,36 +2478,47 @@ async function createBeforeAfterImage(
   }
 }
 
-// Create animated before/after GIF with transition effects (FREE - using gif.js)
+// Create 4K before/after video with transition effects
 async function createBeforeAfterVideo(
   originalBuffer: Buffer,
   generatedBuffer: Buffer,
   imageId: string
 ): Promise<void> {
   try {
-    console.log(`🎬 Creating animated before/after GIF for ${imageId}...`);
+    console.log(`🎬 Creating 4K before/after video for ${imageId}...`);
     
     // Get metadata
     const originalMeta = await sharp(originalBuffer).metadata();
     const generatedMeta = await sharp(generatedBuffer).metadata();
     
-    // Resize to reasonable size for GIF (max 800px width to keep file size manageable)
-    const maxWidth = 800;
+    // For 4K video: target resolution is 3840x2160 (4K UHD)
+    // But we'll scale based on the images while maintaining aspect ratio
+    const targetVideoWidth = 3840;
+    const targetVideoHeight = 2160;
     
+    // Calculate dimensions maintaining aspect ratio of side-by-side layout
+    const originalAspect = (originalMeta.width || 1024) / (originalMeta.height || 1024);
+    const generatedAspect = (generatedMeta.width || 1024) / (generatedMeta.height || 1024);
+    
+    // Scale images to fit within 4K while maintaining quality
+    // Each side will be approximately 1920px wide (half of 3840)
+    const maxSideWidth = 1920;
+    const maxSideHeight = 2160;
+    
+    // Resize images to fit 4K video dimensions
     let originalProcessed = originalBuffer;
     let generatedProcessed = generatedBuffer;
     
-    // Resize if needed (maintain aspect ratio)
-    if ((originalMeta.width || 0) > maxWidth) {
+    if ((originalMeta.width || 0) > maxSideWidth || (originalMeta.height || 0) > maxSideHeight) {
       originalProcessed = await sharp(originalBuffer)
-        .resize(maxWidth, null, { fit: 'inside', withoutEnlargement: true })
+        .resize(maxSideWidth, maxSideHeight, { fit: 'inside', withoutEnlargement: true })
         .png()
         .toBuffer();
     }
     
-    if ((generatedMeta.width || 0) > maxWidth) {
+    if ((generatedMeta.width || 0) > maxSideWidth || (generatedMeta.height || 0) > maxSideHeight) {
       generatedProcessed = await sharp(generatedBuffer)
-        .resize(maxWidth, null, { fit: 'inside', withoutEnlargement: true })
+        .resize(maxSideWidth, maxSideHeight, { fit: 'inside', withoutEnlargement: true })
         .png()
         .toBuffer();
     }
@@ -2517,155 +2527,159 @@ async function createBeforeAfterVideo(
     const originalProcessedMeta = await sharp(originalProcessed).metadata();
     const generatedProcessedMeta = await sharp(generatedProcessed).metadata();
     
-    const originalWidth = originalProcessedMeta.width || 800;
-    const originalHeight = originalProcessedMeta.height || 800;
-    const generatedWidth = generatedProcessedMeta.width || 800;
-    const generatedHeight = generatedProcessedMeta.height || 800;
+    const originalWidth = originalProcessedMeta.width || 1920;
+    const originalHeight = originalProcessedMeta.height || 2160;
+    const generatedWidth = generatedProcessedMeta.width || 1920;
+    const generatedHeight = generatedProcessedMeta.height || 2160;
     
-    // Canvas dimensions for side-by-side
-    const targetHeight = Math.max(originalHeight, generatedHeight);
-    const combinedWidth = originalWidth + generatedWidth;
+    // Video dimensions - use actual 4K
+    const videoHeight = targetVideoHeight;
+    const videoWidth = targetVideoWidth;
     
-    const originalTop = Math.floor((targetHeight - originalHeight) / 2);
-    const generatedTop = Math.floor((targetHeight - generatedHeight) / 2);
+    const originalTop = Math.floor((videoHeight - originalHeight) / 2);
+    const generatedTop = Math.floor((videoHeight - generatedHeight) / 2);
+    const originalLeft = Math.floor((videoWidth / 2 - originalWidth) / 2);
+    const generatedLeft = Math.floor(videoWidth / 2 + (videoWidth / 2 - generatedWidth) / 2);
     
-    // Create frames for animation
-    const numFrames = 8; // 8 frames for smooth animation
-    const frames: Buffer[] = [];
+    // Create frames for video animation
+    const numFrames = 30; // 30 frames for smooth video (~1 second at 30fps)
+    const frameBuffers: Buffer[] = [];
     
-    // Frame 1: Show only original (before) - both sides show original
-    const frame1 = await sharp({
-      create: {
-        width: combinedWidth,
-        height: targetHeight,
-        channels: 4,
-        background: { r: 255, g: 255, b: 255, alpha: 1 }
-      }
-    })
-      .composite([
-        { input: originalProcessed, left: 0, top: originalTop },
-        { input: originalProcessed, left: originalWidth, top: originalTop } // Duplicate original on right
-      ])
-      .raw()
-      .toBuffer();
-    frames.push(frame1);
-    
-    // Frames 2-7: Transition from original to generated
-    for (let i = 1; i < numFrames - 1; i++) {
+    // Create frames showing transition
+    for (let i = 0; i < numFrames; i++) {
       const progress = i / (numFrames - 1);
       
-      // Create transition frame with crossfade
-      const generatedWithOpacity = await sharp(generatedProcessed)
-        .composite([{
-          input: {
-            create: {
-              width: generatedWidth,
-              height: generatedHeight,
-              channels: 4,
-              background: { r: 255, g: 255, b: 255, alpha: Math.floor(255 * progress) }
-            }
-          },
-          blend: 'dest-in'
-        }])
-        .toBuffer();
+      // Create transition frame
+      let frameBuffer: Buffer;
       
-      const transitionFrame = await sharp({
-        create: {
-          width: combinedWidth,
-          height: targetHeight,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .composite([
-          { input: originalProcessed, left: 0, top: originalTop },
-          { input: generatedWithOpacity, left: originalWidth, top: generatedTop, blend: 'over' }
-        ])
-        .raw()
-        .toBuffer();
-      
-      frames.push(transitionFrame);
-    }
-    
-    // Final frame: Show before/after side-by-side
-    const finalFrame = await sharp({
-      create: {
-        width: combinedWidth,
-        height: targetHeight,
-        channels: 4,
-        background: { r: 255, g: 255, b: 255, alpha: 1 }
+      if (progress < 0.3) {
+        // First 30%: Show original on both sides
+        frameBuffer = await sharp({
+          create: {
+            width: videoWidth,
+            height: videoHeight,
+            channels: 4,
+            background: { r: 255, g: 255, b: 255, alpha: 1 }
+          }
+        })
+          .composite([
+            { input: originalProcessed, left: originalLeft, top: originalTop },
+            { input: originalProcessed, left: generatedLeft, top: originalTop }
+          ])
+          .png()
+          .toBuffer();
+      } else if (progress < 0.7) {
+        // Middle 40%: Transition from original to generated on right side
+        const fadeProgress = (progress - 0.3) / 0.4; // 0 to 1
+        const generatedWithOpacity = await sharp(generatedProcessed)
+          .composite([{
+            input: {
+              create: {
+                width: generatedWidth,
+                height: generatedHeight,
+                channels: 4,
+                background: { r: 255, g: 255, b: 255, alpha: Math.floor(255 * fadeProgress) }
+              }
+            },
+            blend: 'dest-in'
+          }])
+          .toBuffer();
+        
+        frameBuffer = await sharp({
+          create: {
+            width: videoWidth,
+            height: videoHeight,
+            channels: 4,
+            background: { r: 255, g: 255, b: 255, alpha: 1 }
+          }
+        })
+          .composite([
+            { input: originalProcessed, left: originalLeft, top: originalTop },
+            { input: generatedWithOpacity, left: generatedLeft, top: generatedTop, blend: 'over' }
+          ])
+          .png()
+          .toBuffer();
+      } else {
+        // Last 30%: Show before/after side-by-side
+        frameBuffer = await sharp({
+          create: {
+            width: videoWidth,
+            height: videoHeight,
+            channels: 4,
+            background: { r: 255, g: 255, b: 255, alpha: 1 }
+          }
+        })
+          .composite([
+            { input: originalProcessed, left: originalLeft, top: originalTop },
+            { input: generatedProcessed, left: generatedLeft, top: generatedTop }
+          ])
+          .png()
+          .toBuffer();
       }
-    })
-      .composite([
-        { input: originalProcessed, left: 0, top: originalTop },
-        { input: generatedProcessed, left: originalWidth, top: generatedTop }
-      ])
-      .raw()
-      .toBuffer();
-    frames.push(finalFrame);
-    
-    // Create animated GIF using gif.js
-    const gif = new GIF({
-      workers: 2,
-      quality: 10, // Lower quality = smaller file size (1-30, lower is better quality)
-      width: combinedWidth,
-      height: targetHeight,
-      repeat: 0 // Loop forever
-    });
-    
-    // Convert each frame buffer to ImageData format for gif.js
-    // Sharp raw() gives RGBA data, which is what gif.js needs
-    for (let i = 0; i < frames.length; i++) {
-      const frameBuffer = frames[i];
-      // Sharp raw() returns RGBA data as Buffer, convert to Uint8ClampedArray
-      const frameData = new Uint8ClampedArray(frameBuffer);
       
-      // Create ImageData-like object (gif.js expects {data, width, height})
-      const imageData = {
-        data: frameData,
-        width: combinedWidth,
-        height: targetHeight
-      };
-      
-      gif.addFrame(imageData, { delay: 200 }); // 200ms delay between frames
+      frameBuffers.push(frameBuffer);
     }
     
-    // Render GIF
-    const gifBuffer = await new Promise<Buffer>((resolve, reject) => {
-      gif.on('finished', (blob: Blob) => {
-        blob.arrayBuffer().then(buffer => {
-          resolve(Buffer.from(buffer));
-        }).catch(reject);
-      });
-      
-      gif.on('progress', (p: number) => {
-        console.log(`GIF progress: ${Math.round(p * 100)}%`);
-      });
-      
-      gif.on('error', (err: Error) => {
-        console.error('GIF encoding error:', err);
-        reject(err);
-      });
-      
-      gif.render();
+    // Use FFmpeg WebAssembly to create video
+    const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+    const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
+    
+    const ffmpeg = new FFmpeg();
+    
+    // Load FFmpeg core (required for Node.js)
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
     });
     
-    // Upload animated GIF to Before_After bucket
+    console.log(`📹 FFmpeg loaded, creating ${numFrames} frames for video...`);
+    
+    // Write frames to FFmpeg's virtual file system
+    for (let i = 0; i < frameBuffers.length; i++) {
+      const frameData = await fetchFile(frameBuffers[i]);
+      await ffmpeg.writeFile(`frame${i.toString().padStart(4, '0')}.png`, frameData);
+    }
+    
+    console.log(`📹 Frames written, encoding video...`);
+    
+    // Create video from frames using FFmpeg
+    await ffmpeg.exec([
+      '-framerate', '30',
+      '-i', 'frame%04d.png',
+      '-c:v', 'libx264',
+      '-pix_fmt', 'yuv420p',
+      '-preset', 'medium',
+      '-crf', '23',
+      '-vf', `scale=${videoWidth}:${videoHeight}:flags=lanczos`,
+      '-y', // Overwrite output file
+      'output.mp4'
+    ]);
+    
+    console.log(`📹 Video encoded, reading output...`);
+    
+    // Read the output video
+    const videoData = await ffmpeg.readFile('output.mp4');
+    const videoBuffer = videoData instanceof Uint8Array 
+      ? Buffer.from(videoData)
+      : Buffer.from(await (videoData as Blob).arrayBuffer());
+    
+    // Upload 4K video to Before_After bucket
     await uploadBeforeAfterImage(
-      gifBuffer,
-      `${imageId}-before-after.gif`,
-      "image/gif"
+      videoBuffer,
+      `${imageId}-before-after.mp4`,
+      "video/mp4"
     );
     
-    console.log(`✅ Animated before/after GIF uploaded: ${imageId}-before-after.gif`);
+    console.log(`✅ 4K before/after video uploaded: ${imageId}-before-after.mp4`);
   } catch (error) {
-    console.error(`⚠️ Failed to create animated GIF:`, error);
-    // If GIF creation fails, create a simple static comparison
+    console.error(`⚠️ Failed to create 4K video:`, error);
+    // If video creation fails, create a simple static comparison
     try {
       const originalMeta = await sharp(originalBuffer).metadata();
       const generatedMeta = await sharp(generatedBuffer).metadata();
-      const targetHeight = Math.max(originalMeta.height || 800, generatedMeta.height || 800);
-      const combinedWidth = (originalMeta.width || 800) + (generatedMeta.width || 800);
+      const targetHeight = Math.max(originalMeta.height || 2160, generatedMeta.height || 2160);
+      const combinedWidth = (originalMeta.width || 1920) + (generatedMeta.width || 1920);
       
       const staticComparison = await sharp({
         create: {
@@ -2676,8 +2690,8 @@ async function createBeforeAfterVideo(
         }
       })
         .composite([
-          { input: originalBuffer, left: 0, top: Math.floor((targetHeight - (originalMeta.height || 800)) / 2) },
-          { input: generatedBuffer, left: originalMeta.width || 800, top: Math.floor((targetHeight - (generatedMeta.height || 800)) / 2) }
+          { input: originalBuffer, left: 0, top: Math.floor((targetHeight - (originalMeta.height || 2160)) / 2) },
+          { input: generatedBuffer, left: originalMeta.width || 1920, top: Math.floor((targetHeight - (generatedMeta.height || 2160)) / 2) }
         ])
         .png()
         .toBuffer();
