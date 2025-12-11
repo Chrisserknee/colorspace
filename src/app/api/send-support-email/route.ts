@@ -2,14 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-initialize Resend client to avoid build errors when env var is not set
+let resendClient: Resend | null = null;
 
-// Initialize Supabase
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getResend(): Resend {
+  if (!resendClient) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendClient;
+}
+
+// Lazy-initialize Supabase client
+let supabaseClient: ReturnType<typeof createClient> | null = null;
+
+function getSupabase() {
+  if (!supabaseClient) {
+    supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return supabaseClient;
+}
 
 const FROM_EMAIL = "LumePet <noreply@lumepet.app>";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://lumepet.app";
@@ -190,7 +207,7 @@ export async function POST(request: NextRequest) {
     if (testEmail) {
       console.log(`📧 Sending test support email to: ${testEmail}`);
       
-      const { data, error } = await resend.emails.send({
+      const { data, error } = await getResend().emails.send({
         from: FROM_EMAIL,
         to: [testEmail],
         subject,
@@ -213,7 +230,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch all unique emails from lume_leads
-    const { data: leads, error: leadsError } = await supabase
+    const { data: leads, error: leadsError } = await getSupabase()
       .from("lume_leads")
       .select("email")
       .not("email", "is", null);
@@ -227,7 +244,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Also fetch from pet_emails table if it exists
-    const { data: petEmails } = await supabase
+    const { data: petEmails } = await getSupabase()
       .from("pet_emails")
       .select("email")
       .not("email", "is", null);
@@ -266,7 +283,7 @@ export async function POST(request: NextRequest) {
       const email = emailList[i];
       
       try {
-        const { error } = await resend.emails.send({
+        const { error } = await getResend().emails.send({
           from: FROM_EMAIL,
           to: [email],
           subject,
