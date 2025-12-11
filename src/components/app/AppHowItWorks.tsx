@@ -1,5 +1,6 @@
 "use client";
 
+import { JSX } from "react";
 import { AppConfig } from "@/lib/apps/types";
 
 interface AppHowItWorksProps {
