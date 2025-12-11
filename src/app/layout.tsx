@@ -6,9 +6,9 @@ import { PostHogProvider } from "@/components/PostHogProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LumePet | Turn Your Pet Into a Masterpiece",
-  description: "Transform your beloved pet into a stunning royal oil painting portrait. Upload a photo and watch the magic happen.",
-  keywords: ["pet portrait", "royal art", "pet painting", "oil painting", "pet masterpiece"],
+  title: "Color | AI-Powered Art Generation Hub",
+  description: "Create stunning AI-generated artwork from your photos. Choose from our collection of creative apps including pet portraits, child art portraits, and more.",
+  keywords: ["AI art", "portrait generator", "pet portrait", "child portrait", "AI image generation", "color"],
   manifest: "/site.webmanifest",
   icons: {
     icon: [
@@ -24,13 +24,13 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "LumePet",
+    title: "Color",
   },
   openGraph: {
-    title: "LumePet | Turn Your Pet Into a Masterpiece",
-    description: "Transform your beloved pet into a stunning royal oil painting portrait.",
+    title: "Color | AI-Powered Art Generation Hub",
+    description: "Create stunning AI-generated artwork from your photos.",
     type: "website",
-    siteName: "LumePet",
+    siteName: "Color",
   },
   other: {
     "mobile-web-app-capable": "yes",

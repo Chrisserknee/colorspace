@@ -8,9 +8,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Storage bucket names
-export const STORAGE_BUCKET = "pet-portraits";
-export const UPLOADS_BUCKET = "pet-uploads";
-export const BEFORE_AFTER_BUCKET = "Before_After";
+export const STORAGE_BUCKET = "Generations";
+export const UPLOADS_BUCKET = "uploads";
+export const BEFORE_AFTER_BUCKET = "Generations";
 
 // Helper to upload image to Supabase Storage
 export async function uploadImage(

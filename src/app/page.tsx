@@ -1,284 +1,310 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Hero from "@/components/Hero";
-import HowItWorks from "@/components/HowItWorks";
-import Gallery from "@/components/Gallery";
-import Testimonials from "@/components/Testimonials";
-import FAQ from "@/components/FAQ";
-import ContactModal from "@/components/Contact";
-import EmailCapture from "@/components/EmailCapture";
-import Footer from "@/components/Footer";
-import UploadModal from "@/components/UploadModal";
-import GenerationFlow, { getLastCreation } from "@/components/GenerationFlow";
-import ResumeButton from "@/components/ResumeButton";
-import SupportModal from "@/components/SupportModal";
-import CreationsModal, { hasCreations } from "@/components/CreationsModal";
-import { captureUTMParams } from "@/lib/utm";
+import Link from "next/link";
+import Image from "next/image";
+import { getAllApps, hubConfig, AppConfig } from "@/lib/apps";
 
-// Helper to convert data URL to File
-const dataURLtoFile = (dataurl: string, filename: string): File | null => {
-  try {
-    const arr = dataurl.split(',');
-    const mimeMatch = arr[0].match(/:(.*?);/);
-    if (!mimeMatch) return null;
-    const mime = mimeMatch[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  } catch {
-    return null;
-  }
-};
+// App Card Component
+function AppCard({ app, index }: { app: AppConfig; index: number }) {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <Link 
+      href={`/${app.slug}`}
+      className="group block"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div 
+        className="relative rounded-2xl overflow-hidden transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-2"
+        style={{
+          background: `linear-gradient(135deg, ${app.theme.gradientFrom}15 0%, ${app.theme.gradientTo}10 100%)`,
+          border: `1px solid ${app.theme.primaryColor}30`,
+          boxShadow: isHovered 
+            ? `0 25px 50px -12px ${app.theme.primaryColor}40, 0 0 60px ${app.theme.glowColor}`
+            : `0 10px 40px -15px ${app.theme.primaryColor}20`,
+          animationDelay: `${index * 100}ms`,
+        }}
+      >
+        {/* Glow effect on hover */}
+        <div 
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at center, ${app.theme.primaryColor}15 0%, transparent 70%)`,
+          }}
+        />
+        
+        {/* Card Content */}
+        <div className="relative p-6 sm:p-8">
+          {/* App Logo/Icon */}
+          <div className="mb-6 flex justify-center">
+            {app.logo ? (
+              <div 
+                className="relative w-24 h-24 sm:w-28 sm:h-28 transition-transform duration-500 group-hover:scale-110"
+                style={{
+                  filter: `drop-shadow(0 0 20px ${app.theme.primaryColor}60)`,
+                }}
+              >
+                <Image
+                  src={app.logo}
+                  alt={`${app.name} logo`}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            ) : (
+              <div 
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                style={{
+                  background: app.theme.buttonGradient,
+                  boxShadow: `0 10px 40px ${app.theme.primaryColor}40`,
+                }}
+              >
+                <span 
+                  className="text-4xl sm:text-5xl font-bold text-white"
+                  style={{ fontFamily: app.theme.fontFamily }}
+                >
+                  {app.name.charAt(0)}
+                </span>
+              </div>
+            )}
+          </div>
+          
+          {/* App Name */}
+          <h2 
+            className="text-2xl sm:text-3xl font-semibold text-center mb-2 transition-colors duration-300"
+            style={{ 
+              fontFamily: app.theme.fontFamily || "'Cormorant Garamond', Georgia, serif",
+              color: isHovered ? app.theme.primaryColor : '#F0EDE8',
+            }}
+          >
+            {app.name}
+          </h2>
+          
+          {/* Tagline */}
+          <p 
+            className="text-sm sm:text-base text-center mb-4"
+            style={{ color: app.theme.primaryColor }}
+          >
+            {app.tagline}
+          </p>
+          
+          {/* Description */}
+          <p 
+            className="text-sm text-center mb-6"
+            style={{ color: '#B8B2A8' }}
+          >
+            {app.description}
+          </p>
+          
+          {/* Sample Images (if available) */}
+          {app.heroImages.length > 0 && (
+            <div className="flex justify-center gap-3 mb-6">
+              {app.heroImages.slice(0, 2).map((img, i) => (
+                <div 
+                  key={i}
+                  className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-transform duration-300 group-hover:scale-105"
+                  style={{
+                    boxShadow: `0 8px 25px ${app.theme.primaryColor}30`,
+                    border: `2px solid ${app.theme.primaryColor}40`,
+                  }}
+                >
+                  <Image
+                    src={img}
+                    alt={`${app.name} sample`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* CTA Button */}
+          <div className="flex justify-center">
+            <div 
+              className="px-6 py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 group-hover:scale-105"
+              style={{
+                background: app.theme.buttonGradient,
+                color: 'white',
+                boxShadow: isHovered 
+                  ? `0 10px 30px ${app.theme.primaryColor}50`
+                  : `0 5px 20px ${app.theme.primaryColor}30`,
+              }}
+            >
+              {app.content.ctaText} →
+            </div>
+          </div>
+        </div>
+        
+        {/* Bottom accent line */}
+        <div 
+          className="h-1 w-full transition-all duration-500"
+          style={{
+            background: app.theme.buttonGradient,
+            opacity: isHovered ? 1 : 0.5,
+          }}
+        />
+      </div>
+    </Link>
+  );
+}
 
-// Helper to create a placeholder file for session restore
-const createPlaceholderFile = (): File => {
-  // Create a 1x1 transparent PNG as placeholder
-  const transparentPng = new Uint8Array([
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
-    0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-    0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
-    0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
-  ]);
-  return new File([transparentPng], "session-restore.png", { type: "image/png" });
-};
-
-export default function Home() {
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
-  const [isCreationsModalOpen, setIsCreationsModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [initialEmail, setInitialEmail] = useState<string | undefined>(undefined);
-  const [showFlowFromEmail, setShowFlowFromEmail] = useState(false);
-  const [lastCreation, setLastCreation] = useState<{ imageId: string; previewUrl: string } | null>(null);
-  const [viewingLastCreation, setViewingLastCreation] = useState(false);
-  const [hasAnyCreations, setHasAnyCreations] = useState(false);
-  const [justGenerated, setJustGenerated] = useState(false); // Highlight My Creations after generation
-
-  // Check for email param (session restore) or pending image from pack purchase
+export default function HubPage() {
+  const [apps, setApps] = useState<AppConfig[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // Capture UTM parameters for attribution tracking
-      captureUTMParams();
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      
-      // Check for email param for session restoration
-      const emailParam = urlParams.get("email");
-      if (emailParam) {
-        console.log("📧 Email param detected, initiating session restore:", emailParam);
-        setInitialEmail(emailParam);
-        setShowFlowFromEmail(true);
-        // Create a placeholder file to trigger the flow
-        setSelectedFile(createPlaceholderFile());
-        // Clean URL
-        window.history.replaceState({}, "", window.location.pathname);
-        return;
-      }
-      
-      // Check for restored=true from pack purchase
-      if (urlParams.get("restored") === "true") {
-        const pendingImage = localStorage.getItem("lumepet_pending_image");
-        if (pendingImage) {
-          const file = dataURLtoFile(pendingImage, "restored-pet.png");
-          if (file) {
-            setSelectedFile(file);
-          }
-          // Clear the pending image after restoring
-          localStorage.removeItem("lumepet_pending_image");
-        }
-      }
-      
-      // Check for last creation to show "View Last Creation" button
-      const savedLastCreation = getLastCreation();
-      if (savedLastCreation) {
-        setLastCreation({
-          imageId: savedLastCreation.imageId,
-          previewUrl: savedLastCreation.previewUrl,
-        });
-      }
-      
-      // Check if there are any creations for "My Creations" button
-      setHasAnyCreations(hasCreations());
-      
-      // Check for support=true param to auto-open support modal
-      if (urlParams.get("support") === "true") {
-        setIsSupportModalOpen(true);
-        // Clean URL
-        window.history.replaceState({}, "", window.location.pathname);
-      }
-    }
+    setApps(getAllApps());
+    setIsLoaded(true);
   }, []);
-
-  const handleUploadClick = () => {
-    setIsUploadModalOpen(true);
-  };
-
-  const handleFileSelected = (file: File) => {
-    setSelectedFile(file);
-    setIsUploadModalOpen(false);
-  };
-
-  const handleReset = () => {
-    // Check if user just generated something (has creations now)
-    const hasCreationsNow = hasCreations();
-    
-    setSelectedFile(null);
-    setViewingLastCreation(false);
-    setShowFlowFromEmail(false);
-    
-    // Refresh creations state
-    setHasAnyCreations(hasCreationsNow);
-    
-    // If they now have creations (either new or existing), highlight the button
-    if (hasCreationsNow) {
-      setJustGenerated(true);
-      
-      // Clear the highlight after 12 seconds
-      setTimeout(() => setJustGenerated(false), 12000);
-    }
-    
-    // Refresh last creation
-    const savedLastCreation = getLastCreation();
-    if (savedLastCreation) {
-      setLastCreation({
-        imageId: savedLastCreation.imageId,
-        previewUrl: savedLastCreation.previewUrl,
-      });
-    }
-    
-    // Also clear any pending image
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("lumepet_pending_image");
-    }
-  };
-
-  const handleViewLastCreation = () => {
-    if (lastCreation) {
-      setViewingLastCreation(true);
-    }
-  };
 
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <Hero onUploadClick={handleUploadClick} />
-
-      {/* My Creations Button - static, centered above How It Works */}
-      {!selectedFile && !showFlowFromEmail && !viewingLastCreation && hasAnyCreations && (
-        <div className="flex flex-col items-center py-6 -mt-8 gap-2">
-          {/* "Your portrait is ready!" message when just generated */}
-          {justGenerated && (
-            <div 
-              className="text-sm font-medium animate-bounce"
-              style={{ 
-                color: '#C5A572',
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-              }}
-            >
-              ✨ Your portrait is saved! ✨
-            </div>
-          )}
-          <button
-            onClick={() => {
-              setIsCreationsModalOpen(true);
-              setJustGenerated(false);
-            }}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
-              justGenerated ? 'animate-pulse scale-105' : ''
-            }`}
-            style={{
-              background: justGenerated 
-                ? 'linear-gradient(135deg, rgba(197, 165, 114, 0.35) 0%, rgba(197, 165, 114, 0.2) 100%)'
-                : 'linear-gradient(135deg, rgba(197, 165, 114, 0.15) 0%, rgba(197, 165, 114, 0.08) 100%)',
-              border: justGenerated 
-                ? '2px solid rgba(197, 165, 114, 0.6)'
-                : '1px solid rgba(197, 165, 114, 0.3)',
-              color: '#C5A572',
-              boxShadow: justGenerated
-                ? '0 4px 30px rgba(197, 165, 114, 0.4), 0 0 25px rgba(197, 165, 114, 0.3), 0 0 50px rgba(197, 165, 114, 0.15)'
-                : '0 4px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(197, 165, 114, 0.1)',
+      <section className="relative min-h-[50vh] flex flex-col items-center justify-center px-4 sm:px-6 pt-12 pb-8 overflow-hidden">
+        {/* Background decorations */}
+        <div 
+          className="absolute top-20 left-10 w-64 h-64 rounded-full blur-3xl opacity-30" 
+          style={{ background: 'linear-gradient(135deg, #C5A572 0%, #F472B6 100%)' }} 
+        />
+        <div 
+          className="absolute bottom-20 right-10 w-80 h-80 rounded-full blur-3xl opacity-20" 
+          style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #8B3A42 100%)' }} 
+        />
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-10" 
+          style={{ background: 'radial-gradient(circle, #C5A572 0%, transparent 70%)' }} 
+        />
+        
+        {/* Content */}
+        <div className={`relative z-10 text-center max-w-4xl mx-auto transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          {/* Logo */}
+          <div className="mb-6 flex justify-center">
+            {hubConfig.logo ? (
+              <div 
+                className="relative w-20 h-20 sm:w-24 sm:h-24"
+                style={{
+                  animation: 'float 3s ease-in-out infinite',
+                  filter: 'drop-shadow(0 0 20px rgba(197, 165, 114, 0.5))',
+                }}
+              >
+                <Image
+                  src={hubConfig.logo}
+                  alt="Color"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            ) : (
+              <div 
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center"
+                style={{
+                  animation: 'float 3s ease-in-out infinite',
+                  background: 'linear-gradient(135deg, #F472B6 0%, #C5A572 50%, #A78BFA 100%)',
+                  boxShadow: '0 10px 40px rgba(197, 165, 114, 0.4)',
+                }}
+              >
+                <span 
+                  className="text-4xl font-bold text-white"
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  C
+                </span>
+              </div>
+            )}
+          </div>
+          
+          {/* Title */}
+          <h1 
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light mb-4"
+            style={{ 
+              fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif",
+              color: '#F0EDE8',
+              letterSpacing: '0.02em',
+              textShadow: '0 2px 20px rgba(0, 0, 0, 0.3)',
             }}
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              strokeWidth={1.5} 
-              stroke="currentColor" 
-              className="w-5 h-5"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-            <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>My Creations</span>
-          </button>
+            {hubConfig.name}
+          </h1>
+          
+          {/* Tagline */}
+          <p 
+            className="text-lg sm:text-xl md:text-2xl mb-3"
+            style={{ 
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              color: '#C5A572',
+              letterSpacing: '0.05em',
+            }}
+          >
+            {hubConfig.tagline}
+          </p>
+          
+          {/* Description */}
+          <p 
+            className="text-base sm:text-lg max-w-2xl mx-auto"
+            style={{ color: '#B8B2A8' }}
+          >
+            {hubConfig.description}
+          </p>
         </div>
-      )}
-
-      {/* How It Works Section */}
-      <HowItWorks />
-
-      {/* Sample Gallery Section */}
-      <Gallery />
-
-      {/* Testimonials Section */}
-      <Testimonials />
-
-      {/* FAQ Section */}
-      <FAQ />
-
-      {/* Email Capture Section */}
-      <EmailCapture />
-
+      </section>
+      
+      {/* Apps Grid */}
+      <section className="px-4 sm:px-6 py-12 max-w-7xl mx-auto">
+        <div className={`text-center mb-12 transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 
+            className="text-2xl sm:text-3xl font-light mb-2"
+            style={{ 
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              color: '#F0EDE8',
+            }}
+          >
+            Choose Your Creative Experience
+          </h2>
+          <p style={{ color: '#7A756D' }}>
+            Select an app to start creating
+          </p>
+        </div>
+        
+        {/* Apps Grid */}
+        <div 
+          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto transition-all duration-1000 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
+          {apps.map((app, index) => (
+            <AppCard key={app.id} app={app} index={index} />
+          ))}
+        </div>
+      </section>
+      
+      {/* Coming Soon Section */}
+      <section className="px-4 sm:px-6 py-16 text-center">
+        <div 
+          className={`transition-all duration-1000 delay-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
+          <p 
+            className="text-sm uppercase tracking-widest mb-2"
+            style={{ color: '#7A756D' }}
+          >
+            More Apps Coming Soon
+          </p>
+          <p 
+            className="text-base"
+            style={{ color: '#B8B2A8' }}
+          >
+            We&apos;re constantly creating new AI-powered art experiences
+          </p>
+        </div>
+      </section>
+      
       {/* Footer */}
-      <Footer onContactClick={() => setIsContactModalOpen(true)} />
-
-      {/* Upload Modal */}
-      <UploadModal
-        isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
-        onFileSelected={handleFileSelected}
-      />
-
-      {/* Contact Modal */}
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-      />
-
-      {/* Support Modal */}
-      <SupportModal
-        isOpen={isSupportModalOpen}
-        onClose={() => setIsSupportModalOpen(false)}
-      />
-
-      {/* Creations Modal */}
-      <CreationsModal
-        isOpen={isCreationsModalOpen}
-        onClose={() => setIsCreationsModalOpen(false)}
-      />
-
-      {/* Generation Flow (shows after file selection, email session restore, or viewing last creation) */}
-      {(selectedFile || showFlowFromEmail || viewingLastCreation) && (
-        <GenerationFlow 
-          file={showFlowFromEmail ? null : selectedFile} 
-          onReset={handleReset} 
-          initialEmail={initialEmail}
-          initialResult={viewingLastCreation ? lastCreation : null}
-        />
-      )}
-
-      {/* Resume Button - shows when not in flow */}
-      {!selectedFile && !showFlowFromEmail && !viewingLastCreation && (
-        <ResumeButton variant="lumepet" />
-      )}
+      <footer className="border-t border-white/10 py-8 px-4 text-center">
+        <p style={{ color: '#7A756D', fontSize: '0.875rem' }}>
+          © {new Date().getFullYear()} Color. All rights reserved.
+        </p>
+      </footer>
     </main>
   );
 }
