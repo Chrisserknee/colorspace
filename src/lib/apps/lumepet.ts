@@ -9,6 +9,7 @@ export const lumepetConfig: AppConfig = {
   
   // URLs & Branding
   slug: 'lumepet',
+  externalUrl: 'https://lumepet.app', // Redirect to external LumePet site
   logo: '/samples/LumePet2.png',
   heroImages: ['/samples/hero1.png', '/samples/samuel2.png'],
   

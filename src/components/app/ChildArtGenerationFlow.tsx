@@ -65,9 +65,45 @@ export default function ChildArtGenerationFlow({ file, onReset }: ChildArtGenera
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const retryCountRef = useRef(0);
+  const proxyTriedRef = useRef(false);
+  const errorHandlingRef = useRef(false);
   
   const config = childArtPortraitConfig;
   const hasGeneratedRef = useRef(false);
+
+  // Helper to try proxy fallback
+  const tryProxyFallback = useCallback((imgElement: HTMLImageElement) => {
+    if (proxyTriedRef.current || !generatedImageUrl) {
+      errorHandlingRef.current = false;
+      return;
+    }
+    
+    proxyTriedRef.current = true;
+    console.log('All retries failed, trying proxy...');
+    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(generatedImageUrl)}`;
+    
+    fetch(proxyUrl)
+      .then(res => {
+        if (res.ok) {
+          return res.blob();
+        }
+        throw new Error(`Proxy fetch failed: ${res.status}`);
+      })
+      .then(blob => {
+        const proxyObjectUrl = URL.createObjectURL(blob);
+        imgElement.src = proxyObjectUrl;
+        console.log('✅ Loaded image via proxy');
+        errorHandlingRef.current = false;
+        setImageError(false);
+        setImageLoaded(true);
+      })
+      .catch(proxyErr => {
+        console.error('❌ Proxy also failed:', proxyErr);
+        errorHandlingRef.current = false;
+        setImageError(true);
+        setImageLoaded(false);
+      });
+  }, [generatedImageUrl]);
 
   // Countdown timer for urgency
   useEffect(() => {
@@ -132,6 +168,8 @@ export default function ChildArtGenerationFlow({ file, onReset }: ChildArtGenera
         setImageLoaded(false);
         setImageError(false);
         retryCountRef.current = 0; // Reset retry count
+        proxyTriedRef.current = false; // Reset proxy flag
+        errorHandlingRef.current = false; // Reset error handling flag
         setStage("result");
         
         // Save creation
@@ -169,6 +207,7 @@ export default function ChildArtGenerationFlow({ file, onReset }: ChildArtGenera
     captureEvent("child_art_purchase_clicked", { imageId });
     
     try {
+      console.log("Creating checkout session for child-art:", imageId);
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -180,11 +219,15 @@ export default function ChildArtGenerationFlow({ file, onReset }: ChildArtGenera
       });
       
       const data = await response.json();
+      console.log("Checkout response:", { status: response.status, hasCheckoutUrl: !!data.checkoutUrl, error: data.error });
       
       if (response.ok && data.checkoutUrl) {
+        console.log("Redirecting to Stripe checkout:", data.checkoutUrl);
         window.location.href = data.checkoutUrl;
       } else {
-        setError(data.error || "Failed to create checkout session");
+        const errorMsg = data.error || "Failed to create checkout session";
+        console.error("Checkout failed:", errorMsg);
+        setError(errorMsg);
         setIsPurchasing(false);
       }
     } catch (err) {
@@ -547,24 +590,39 @@ export default function ChildArtGenerationFlow({ file, onReset }: ChildArtGenera
                   )}
                   {imageError && (
                     <div className="absolute inset-0 flex items-center justify-center p-4">
-                      <div className="text-center">
-                        <p style={{ color: '#F5F0E6', fontFamily: "'EB Garamond', Georgia, serif" }}>Failed to load image</p>
+                      <div className="text-center max-w-sm">
+                        <p style={{ color: '#F5F0E6', fontFamily: "'EB Garamond', Georgia, serif", marginBottom: '8px' }}>
+                          Having trouble loading your portrait
+                        </p>
+                        <p style={{ color: '#C4A574', fontFamily: "'EB Garamond', Georgia, serif", fontSize: '12px', marginBottom: '16px' }}>
+                          The image may still be processing. Please try again in a moment.
+                        </p>
                         <button
                           onClick={() => {
                             setImageError(false);
                             setImageLoaded(false);
+                            retryCountRef.current = 0;
+                            proxyTriedRef.current = false;
+                            errorHandlingRef.current = false;
+                            // Force reload by updating the src
+                            if (generatedImageUrl) {
+                              const img = document.querySelector('img[alt="Your child\'s vintage portrait"]') as HTMLImageElement;
+                              if (img) {
+                                img.src = `${generatedImageUrl}?retry=${Date.now()}`;
+                              }
+                            }
                           }}
-                          className="mt-2 px-4 py-2 rounded text-sm"
+                          className="mt-2 px-4 py-2 rounded text-sm transition-all hover:scale-105"
                           style={{ backgroundColor: '#C4A574', color: '#3A3025', fontFamily: "'EB Garamond', Georgia, serif" }}
                         >
-                          Retry
+                          Retry Loading
                         </button>
                       </div>
                     </div>
                   )}
                   {generatedImageUrl && (
                     <img
-                      key={`${generatedImageUrl}-${retryCountRef.current}`}
+                      key={generatedImageUrl}
                       src={generatedImageUrl}
                       alt="Your child's vintage portrait"
                       className="w-full h-auto block"
@@ -581,50 +639,53 @@ export default function ChildArtGenerationFlow({ file, onReset }: ChildArtGenera
                       loading="eager"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
-                        const imgElement = e.target as HTMLImageElement;
-                        retryCountRef.current += 1;
+                        // Prevent concurrent error handling and infinite loops
+                        if (errorHandlingRef.current || imageError) return;
                         
-                        console.error(`Image failed to load (attempt ${retryCountRef.current}):`, generatedImageUrl);
+                        const imgElement = e.target as HTMLImageElement;
+                        const currentRetry = retryCountRef.current;
+                        
+                        // Stop if we've already exhausted all options
+                        if (currentRetry >= 3 && proxyTriedRef.current) {
+                          setImageError(true);
+                          setImageLoaded(false);
+                          return;
+                        }
+                        
+                        errorHandlingRef.current = true;
+                        console.error(`Image failed to load (attempt ${currentRetry + 1}):`, generatedImageUrl);
                         
                         // Retry up to 3 times with increasing delays
-                        if (retryCountRef.current <= 3) {
+                        if (currentRetry < 3) {
+                          retryCountRef.current += 1;
                           const delay = retryCountRef.current * 1000; // 1s, 2s, 3s
                           console.log(`Retrying image load in ${delay}ms...`);
                           
                           setTimeout(() => {
-                            // Force reload by adding timestamp to URL
-                            const retryUrl = `${generatedImageUrl}${generatedImageUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
-                            imgElement.src = retryUrl;
-                          }, delay);
-                          return;
-                        }
-                        
-                        // After retries, try proxy as fallback
-                        console.log('All retries failed, trying proxy...');
-                        const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(generatedImageUrl)}`;
-                        
-                        fetch(proxyUrl)
-                          .then(res => {
-                            if (res.ok) {
-                              return res.blob();
+                            errorHandlingRef.current = false;
+                            // Only retry if we haven't exceeded limit
+                            if (retryCountRef.current <= 3 && !imageLoaded && !imageError) {
+                              // Force reload by adding timestamp to URL
+                              const retryUrl = `${generatedImageUrl}${generatedImageUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+                              imgElement.src = retryUrl;
                             }
-                            throw new Error(`Proxy fetch failed: ${res.status}`);
-                          })
-                          .then(blob => {
-                            const proxyObjectUrl = URL.createObjectURL(blob);
-                            imgElement.src = proxyObjectUrl;
-                            console.log('✅ Loaded image via proxy');
-                            setImageError(false);
-                          })
-                          .catch(proxyErr => {
-                            console.error('❌ Proxy also failed:', proxyErr);
-                            setImageError(true);
-                            setImageLoaded(false);
-                          });
+                          }, delay);
+                        } else if (!proxyTriedRef.current) {
+                          // After 3 retries, try proxy once
+                          errorHandlingRef.current = false;
+                          tryProxyFallback(imgElement);
+                        } else {
+                          // All options exhausted - show error
+                          console.error('All retry attempts and proxy failed');
+                          errorHandlingRef.current = false;
+                          setImageError(true);
+                          setImageLoaded(false);
+                        }
                       }}
                       onLoad={(e) => {
                         console.log('Image loaded successfully:', generatedImageUrl);
                         console.log('Image dimensions:', (e.target as HTMLImageElement).naturalWidth, 'x', (e.target as HTMLImageElement).naturalHeight);
+                        errorHandlingRef.current = false;
                         setImageLoaded(true);
                         setImageError(false);
                       }}

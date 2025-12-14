@@ -8,6 +8,7 @@ export interface AppConfig {
   
   // URLs & Branding
   slug: string; // URL path e.g. "lumepet", "child-art-portrait"
+  externalUrl?: string; // External URL if app is hosted elsewhere (e.g. "https://lumepet.app")
   logo?: string; // Path to logo image
   heroImages: string[]; // Sample hero images
   

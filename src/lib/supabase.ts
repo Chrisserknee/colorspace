@@ -37,8 +37,28 @@ export async function uploadImage(
     .from(STORAGE_BUCKET)
     .getPublicUrl(fileName);
 
+  const publicUrl = urlData.publicUrl;
   console.log(`✅ Successfully uploaded to ${STORAGE_BUCKET} bucket: ${fileName}`);
-  return urlData.publicUrl;
+  console.log(`   Public URL: ${publicUrl}`);
+
+  // Verify the file is accessible by trying to download it
+  try {
+    const { data: verifyData, error: verifyError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .download(fileName);
+    
+    if (verifyError || !verifyData) {
+      console.warn(`⚠️ Warning: File uploaded but verification download failed:`, verifyError);
+      // Continue anyway - sometimes there's a brief delay before files are accessible
+    } else {
+      console.log(`✅ File verified accessible (${(verifyData.size / 1024).toFixed(2)} KB)`);
+    }
+  } catch (verifyErr) {
+    console.warn(`⚠️ Warning: Could not verify file accessibility:`, verifyErr);
+    // Continue anyway - the upload succeeded
+  }
+
+  return publicUrl;
 }
 
 // Helper to upload original pet photo to pet-uploads bucket

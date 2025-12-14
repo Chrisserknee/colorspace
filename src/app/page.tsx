@@ -9,12 +9,20 @@ import { getAllApps, hubConfig, AppConfig } from "@/lib/apps";
 function AppCard({ app, index }: { app: AppConfig; index: number }) {
   const [isHovered, setIsHovered] = useState(false);
   
+  const handleClick = (e: React.MouseEvent) => {
+    if (app.externalUrl) {
+      e.preventDefault();
+      window.location.href = app.externalUrl;
+    }
+  };
+
   return (
     <Link 
-      href={`/${app.slug}`}
+      href={app.externalUrl || `/${app.slug}`}
       className="group block"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
     >
       <div 
         className="relative rounded-2xl overflow-hidden transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-2"

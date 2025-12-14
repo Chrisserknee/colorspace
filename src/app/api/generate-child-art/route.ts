@@ -4,7 +4,7 @@ import Replicate from "replicate";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import { CONFIG } from "@/lib/config";
-import { uploadImage, saveMetadata, incrementPortraitCount } from "@/lib/supabase";
+import { uploadImage, saveMetadata, incrementPortraitCount, supabase } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { validateImageMagicBytes } from "@/lib/validation";
 import { createWatermarkedImage } from "@/lib/watermark";
@@ -552,6 +552,30 @@ IMPORTANT: The image must contain NO TEXT whatsoever - no titles, no words, no l
     if (!hdUrl || !previewUrl) {
       throw new Error("Failed to upload images to storage");
     }
+
+    console.log("✅ Images uploaded successfully:");
+    console.log("  HD URL:", hdUrl);
+    console.log("  Preview URL:", previewUrl);
+    
+    // Verify files exist and are accessible
+    try {
+      const { data: files, error: listError } = await supabase.storage
+        .from("Generations")
+        .list("", {
+          search: imageId,
+        });
+      
+      if (listError) {
+        console.warn("⚠️ Could not verify files exist:", listError);
+      } else {
+        console.log(`✅ Verified ${files?.length || 0} files with ID ${imageId}`);
+      }
+    } catch (verifyErr) {
+      console.warn("⚠️ File verification error:", verifyErr);
+    }
+    
+    // Delay to ensure Supabase storage URLs are accessible (CDN propagation)
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Save metadata (optional - don't fail if table doesn't exist)
     try {

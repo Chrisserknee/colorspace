@@ -4,6 +4,7 @@ import { CONFIG } from "@/lib/config";
 import { getMetadata, saveEmail } from "@/lib/supabase";
 import { checkRateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 import { isValidEmail, isValidUUID, sanitizeString } from "@/lib/validation";
+import { getAppById } from "@/lib/apps";
 
 export async function POST(request: NextRequest) {
   const clientIP = getClientIP(request);
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
     // Check purchase type
     const isUnlimitedSession = type === "unlimited-session";
     const isPackPurchase = type === "pack"; // Legacy support
+    const isChildArt = type === "child-art";
     
     // Validate imageId format for individual image purchases only
     if (!isUnlimitedSession && !isPackPurchase) {
@@ -81,6 +83,17 @@ export async function POST(request: NextRequest) {
       console.log(`Legacy pack purchase redirected to unlimited session: ${priceAmount} cents`);
     } else {
       // Individual image purchase
+      // Get app config if this is a child-art purchase
+      if (isChildArt) {
+        const appConfig = getAppById("child-art-portrait");
+        if (appConfig) {
+          priceAmount = appConfig.pricing.hdPrice;
+          productName = appConfig.pricing.productName;
+          productDescription = appConfig.pricing.productDescription;
+          console.log(`Child-art purchase: Using app config pricing ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
+        }
+      }
+      
       // Verify the image exists in Supabase
       metadata = await getMetadata(imageId);
       
@@ -89,6 +102,16 @@ export async function POST(request: NextRequest) {
           { error: "Portrait not found. Please generate a new one." },
           { status: 404 }
         );
+      }
+      
+      // Use preview_url from metadata for product image
+      // Child-art uses previewUrl, regular portraits use preview_url
+      const previewUrl = metadata.preview_url || metadata.previewUrl || metadata.hd_url || metadata.hdUrl;
+      if (previewUrl) {
+        productImage = [previewUrl];
+        console.log(`Using preview image: ${previewUrl.substring(0, 80)}...`);
+      } else {
+        console.warn("No preview URL found in metadata, Stripe checkout will proceed without product image");
       }
       
       // If canvas image with text overlay is provided, upload it and use for Stripe
@@ -109,11 +132,10 @@ export async function POST(request: NextRequest) {
           console.log("Canvas image uploaded for Stripe:", canvasUrl.substring(0, 80) + "...");
         } catch (uploadError) {
           console.error("Failed to upload canvas image, using original:", uploadError);
-          productImage = [metadata.preview_url];
+          // Keep using metadata preview_url
         }
-      } else {
-        productImage = [metadata.preview_url];
       }
+      
       console.log(`Creating checkout session with price: ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
     }
 

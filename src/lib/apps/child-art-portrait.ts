@@ -4,7 +4,7 @@ export const childArtPortraitConfig: AppConfig = {
   // Basic Identity
   id: 'child-art-portrait',
   name: 'Child Art Portrait',
-  tagline: 'Turn Your Child Into a Vintage Storybook Illustration',
+  tagline: 'Every Child Deserves a Story',
   description: 'Transform your child\'s photo into a magical vintage illustration, like something from a treasured storybook.',
   
   // URLs & Branding
@@ -27,112 +27,113 @@ export const childArtPortraitConfig: AppConfig = {
   generation: {
     type: 'child-portrait',
     
-    visionPrompt: `Analyze this photo of a child and provide a detailed description including:
-1. Approximate age range (toddler, young child, pre-teen)
-2. Hair color, style, and length
-3. Eye color
-4. Distinctive features (freckles, dimples, etc.)
-5. Expression and personality traits visible (happy, curious, shy, playful)
-6. What they're wearing (if relevant to the portrait style)
-7. Any notable accessories (glasses, hair accessories, etc.)
+    visionPrompt: `Describe this child photo concisely:
+1. Age range (toddler/young child/pre-teen)
+2. Hair: color, style, length, texture
+3. Eyes: color and shape
+4. Distinctive features: freckles, dimples, rosy cheeks, etc.
+5. Expression: happy/curious/shy/playful
+6. Clothing: colors, patterns, textures
+7. Accessories: glasses, hair accessories, etc.
 
-Format as a concise paragraph suitable for an image generation prompt. Focus on capturing their unique personality and charm.`,
+Format as one concise paragraph for image generation. Focus on personality and cute features.`,
     
-    basePrompt: `A beautiful vintage children's book illustration of {childDescription}.
-The child is depicted in a {styleDescription} artistic style, reminiscent of classic illustrated storybooks from the early 1900s.
-Setting: {backgroundDescription}.
-The illustration has a {moodDescription} atmosphere with aged paper texture and soft, muted colors.
-Art style: {artStyleDescription}
-The portrait has the charm of vintage botanical illustrations and classic fairy tale art.
-Warm sepia undertones, delicate linework, aged paper aesthetic, suitable for framing as fine art.`,
+    basePrompt: `Vintage children's book illustration of {childDescription}, {styleDescription} style, early 1900s storybook aesthetic.
+Setting: {backgroundDescription}. Mood: {moodDescription}. Art style: {artStyleDescription}
+Organic, asymmetrical composition with natural imperfections. Hand-drawn quality with slight roughness and irregular linework.
+Aged paper texture, subtle creases, vintage patina. Rich vibrant colors with warm sepia undertones.
+Visible brushstrokes, watercolor bleed, hand-painted feel. Not perfectly symmetrical or polished.`,
     
     stylePalettes: [
       {
         name: "VINTAGE GARDEN",
-        background: "a classic English garden with delicate roses and climbing vines, like a Beatrix Potter illustration",
+        background: "classic English garden, roses and vines, Beatrix Potter style",
         mood: "nostalgic, gentle, timeless",
-        primaryColor: "aged cream and soft sepia tones",
-        accentColor: "faded rose pink and sage green",
-        lighting: "soft diffused light with warm golden undertones, like an aged photograph"
+        primaryColor: "cream and sepia tones",
+        accentColor: "rose pink and sage green",
+        lighting: "soft diffused golden light"
       },
       {
         name: "STORYBOOK CLASSIC",
-        background: "an antique nursery setting with vintage toys and old books",
+        background: "antique nursery, vintage toys and books",
         mood: "warm, nostalgic, cozy",
-        primaryColor: "warm ivory and burnt sienna",
+        primaryColor: "ivory and burnt sienna",
         accentColor: "dusty blue and antique gold",
-        lighting: "soft candlelit warmth, like an old master painting"
+        lighting: "soft candlelit warmth"
       },
       {
         name: "FAIRY TALE VINTAGE",
-        background: "an enchanted forest from a classic Brothers Grimm illustration",
+        background: "enchanted forest, Brothers Grimm illustration style",
         mood: "magical, mysterious, enchanting",
-        primaryColor: "deep forest green and warm brown",
-        accentColor: "golden amber and soft mushroom colors",
-        lighting: "dappled sunlight through ancient trees, vintage hand-colored plate aesthetic"
+        primaryColor: "forest green and warm brown",
+        accentColor: "golden amber and mushroom tones",
+        lighting: "dappled sunlight through trees"
       },
       {
         name: "VICTORIAN PORTRAIT",
-        background: "an elegant parlor setting with rich textures and vintage decor",
+        background: "elegant parlor, vintage decor",
         mood: "refined, elegant, timeless",
-        primaryColor: "rich burgundy and aged gold",
-        accentColor: "cream and antique bronze",
-        lighting: "studio portrait lighting with soft vignette edges"
+        primaryColor: "burgundy and aged gold",
+        accentColor: "ivory and antique bronze",
+        lighting: "studio portrait with soft vignette"
       },
       {
         name: "NURSERY RHYME",
-        background: "a whimsical scene inspired by classic nursery rhyme illustrations",
+        background: "whimsical nursery rhyme scene",
         mood: "playful, innocent, charming",
-        primaryColor: "soft butter yellow and powder blue",
-        accentColor: "faded coral and mint",
-        lighting: "bright but soft, like a watercolor wash"
+        primaryColor: "butter yellow and powder blue",
+        accentColor: "coral and mint green",
+        lighting: "bright soft watercolor wash"
       },
       {
         name: "WOODLAND TALE",
-        background: "a cozy woodland setting with friendly forest creatures, like Arthur Rackham's illustrations",
+        background: "cozy woodland, forest creatures, Arthur Rackham style",
         mood: "curious, adventurous, magical",
         primaryColor: "earth brown and moss green",
         accentColor: "autumn orange and cream",
-        lighting: "warm autumn light filtering through leaves"
+        lighting: "warm autumn light through leaves"
       },
     ],
     
     poses: [
       {
         name: "JOYFUL PORTRAIT",
-        description: "A cheerful, forward-facing portrait capturing their smile",
-        bodyPosition: "looking at viewer with a natural, happy expression",
-        expression: "joyful, bright-eyed, genuine smile"
+        description: "Cheerful forward-facing portrait",
+        bodyPosition: "natural pose, slight asymmetry, looking at viewer",
+        expression: "joyful smile, bright eyes, rosy cheeks"
       },
       {
         name: "CURIOUS WONDER",
-        description: "Child looking slightly to the side with wonder in their eyes",
-        bodyPosition: "gentle three-quarter turn, eyes full of curiosity",
-        expression: "curious, wonder-filled, thoughtful"
+        description: "Child looking to the side with wonder",
+        bodyPosition: "three-quarter turn, organic pose, not perfectly centered",
+        expression: "curious, thoughtful, expressive eyes"
       },
       {
         name: "PLAYFUL SPIRIT",
-        description: "Capturing their playful personality in motion",
-        bodyPosition: "dynamic but gentle pose showing personality",
-        expression: "playful, mischievous, full of energy"
+        description: "Playful personality in motion",
+        bodyPosition: "dynamic pose, natural movement, asymmetrical",
+        expression: "playful, mischievous, energetic"
       },
       {
         name: "DREAMER",
-        description: "Soft, thoughtful portrait with a dreamy quality",
-        bodyPosition: "gentle pose, perhaps looking slightly upward",
+        description: "Soft thoughtful portrait",
+        bodyPosition: "gentle pose, looking slightly up, natural asymmetry",
         expression: "dreamy, imaginative, peaceful"
       },
     ],
     
     promptModifiers: [
-      "vintage children's book illustration style like Beatrix Potter",
-      "classic early 1900s storybook art with hand-painted quality",
-      "Arthur Rackham inspired fairy tale illustration",
-      "antique botanical illustration style with soft watercolors",
-      "golden age of illustration aesthetic with aged paper texture"
+      "vintage children's book illustration, Beatrix Potter style, hand-drawn",
+      "early 1900s storybook art, aged paper texture, organic composition",
+      "Arthur Rackham inspired, asymmetrical, vintage patina",
+      "antique botanical illustration, watercolor bleed, rough edges",
+      "golden age illustration, aged paper feel, hand-painted roughness",
+      "cute child portrait, expressive features, natural imperfections",
+      "vibrant colors, warm sepia tones, vintage charm",
+      "visible brushstrokes, irregular linework, not perfectly symmetrical"
     ],
     
-    negativePrompt: "scary, dark, horror, realistic photograph, uncanny valley, bad anatomy, distorted features, creepy, unsettling, adult themes",
+    negativePrompt: "scary, dark, horror, realistic photograph, uncanny valley, bad anatomy, distorted features, creepy, unsettling, adult themes, perfectly symmetrical, polished, digital, smooth, flawless, modern, clean",
     
     outputWidth: 1024,
     outputHeight: 1024,
@@ -155,8 +156,8 @@ Warm sepia undertones, delicate linework, aged paper aesthetic, suitable for fra
   
   // Content
   content: {
-    heroTitle: "Turn Your Child Into a Vintage Illustration",
-    heroSubtitle: "Like something from a treasured storybook — transform your little one into a timeless piece of art.",
+    heroTitle: "Turn Your Child Into a Vintage Storybook Illustration",
+    heroSubtitle: "Transform your little one into a beautiful vintage illustration, like something from a treasured storybook.",
     ctaText: "Create Their Portrait",
     
     howItWorks: [
