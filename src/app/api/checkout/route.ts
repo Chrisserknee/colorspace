@@ -85,33 +85,53 @@ export async function POST(request: NextRequest) {
       // Individual image purchase
       // Get app config if this is a child-art purchase
       if (isChildArt) {
+        console.log(`Processing child-art checkout for imageId: ${imageId}`);
         const appConfig = getAppById("child-art-portrait");
         if (appConfig) {
           priceAmount = appConfig.pricing.hdPrice;
           productName = appConfig.pricing.productName;
           productDescription = appConfig.pricing.productDescription;
           console.log(`Child-art purchase: Using app config pricing ${priceAmount} cents ($${(priceAmount / 100).toFixed(2)})`);
+        } else {
+          console.error("Child-art config not found! Falling back to default pricing.");
         }
       }
       
       // Verify the image exists in Supabase
       metadata = await getMetadata(imageId);
       
-      if (!metadata) {
+      // For child-art, if metadata doesn't exist, construct preview URL from imageId
+      if (!metadata && isChildArt) {
+        console.log("Child-art: Metadata not found, constructing preview URL from imageId");
+        const { supabase } = await import("@/lib/supabase");
+        const { STORAGE_BUCKET } = await import("@/lib/supabase");
+        
+        // Construct the preview URL directly
+        const { data: urlData } = supabase.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(`${imageId}-preview.png`);
+        
+        if (urlData?.publicUrl) {
+          productImage = [urlData.publicUrl];
+          console.log(`Child-art: Using constructed preview URL: ${urlData.publicUrl.substring(0, 80)}...`);
+        } else {
+          console.warn("Child-art: Could not construct preview URL, proceeding without product image");
+        }
+      } else if (!metadata) {
         return NextResponse.json(
           { error: "Portrait not found. Please generate a new one." },
           { status: 404 }
         );
-      }
-      
-      // Use preview_url from metadata for product image
-      // Child-art uses previewUrl, regular portraits use preview_url
-      const previewUrl = metadata.preview_url || metadata.previewUrl || metadata.hd_url || metadata.hdUrl;
-      if (previewUrl) {
-        productImage = [previewUrl];
-        console.log(`Using preview image: ${previewUrl.substring(0, 80)}...`);
       } else {
-        console.warn("No preview URL found in metadata, Stripe checkout will proceed without product image");
+        // Use preview_url from metadata for product image
+        // Child-art uses previewUrl, regular portraits use preview_url
+        const previewUrl = metadata.preview_url || metadata.previewUrl || metadata.hd_url || metadata.hdUrl;
+        if (previewUrl) {
+          productImage = [previewUrl];
+          console.log(`Using preview image from metadata: ${previewUrl.substring(0, 80)}...`);
+        } else {
+          console.warn("No preview URL found in metadata, Stripe checkout will proceed without product image");
+        }
       }
       
       // If canvas image with text overlay is provided, upload it and use for Stripe
@@ -223,6 +243,15 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe Checkout Session
     // If email not provided, Stripe will collect it during checkout
+    console.log(`Creating Stripe checkout session:`, {
+      priceAmount,
+      productName,
+      productDescription,
+      productImage: productImage.length > 0 ? productImage[0].substring(0, 50) + "..." : "none",
+      imageId,
+      isChildArt,
+    });
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       ...(sanitizedEmail ? { customer_email: sanitizedEmail } : {}),
@@ -243,12 +272,15 @@ export async function POST(request: NextRequest) {
       mode: "payment",
       success_url: (isUnlimitedSession || isPackPurchase)
         ? `${baseUrl}/success?type=unlimited-session&session_id={CHECKOUT_SESSION_ID}`
+        : isChildArt
+        ? `${baseUrl}/success?imageId=${imageId}&session_id={CHECKOUT_SESSION_ID}`
         : successUrl,
       cancel_url: cancelUrl,
       metadata: {
         ...(imageId ? { imageId } : {}),
         ...(sanitizedEmail ? { customerEmail: sanitizedEmail } : {}),
         ...((isUnlimitedSession || isPackPurchase) ? { type: "unlimited-session" } : {}),
+        ...(isChildArt ? { type: "child-art" } : {}),
         // UTM attribution data
         ...(utmData?.utm_source ? { utm_source: sanitizeString(utmData.utm_source, 50) } : {}),
         ...(utmData?.utm_medium ? { utm_medium: sanitizeString(utmData.utm_medium, 50) } : {}),
@@ -266,7 +298,7 @@ export async function POST(request: NextRequest) {
     console.error("Checkout error:", error);
 
     if (error instanceof Stripe.errors.StripeError) {
-      console.error("Stripe error details:", error.message, error.type);
+      console.error("Stripe error details:", error.message, error.type, error.code);
       return NextResponse.json(
         { error: error.message || "Payment service error. Please try again." },
         { status: 500 }
@@ -274,7 +306,8 @@ export async function POST(request: NextRequest) {
     }
 
     const errorMessage = error instanceof Error ? error.message : "Failed to create checkout session. Please try again.";
-    console.error("Error message:", errorMessage);
+    console.error("Checkout error message:", errorMessage);
+    console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }
