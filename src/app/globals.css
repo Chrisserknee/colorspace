@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 @import "tailwindcss";
 
@@ -1760,6 +1760,311 @@ select:focus-visible {
 /* Disable context menu globally on protected containers */
 .protected-image-container * {
   -webkit-touch-callout: none;
+}
+
+/* ============================================
+   VINTAGE PAPER & STORYBOOK EFFECTS
+   ============================================ */
+
+/* Vintage paper background */
+.vintage-paper-bg {
+  background: 
+    /* Aged paper texture noise */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
+    /* Warm cream paper gradient */
+    linear-gradient(180deg, 
+      #F5F0E6 0%, 
+      #EDE4D3 15%, 
+      #E8DEC8 50%, 
+      #DFD4C0 85%, 
+      #D4C9B5 100%
+    );
+  background-blend-mode: overlay, normal;
+}
+
+/* Vintage vignette overlay for aged look */
+.vintage-vignette {
+  position: relative;
+}
+
+.vintage-vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(139, 115, 85, 0.08) 70%,
+    rgba(101, 78, 55, 0.15) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Paper torn edge effect */
+.paper-edge-top {
+  position: relative;
+}
+
+.paper-edge-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, transparent 100%);
+  z-index: 2;
+}
+
+.paper-edge-bottom {
+  position: relative;
+}
+
+.paper-edge-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0%, transparent 100%);
+  z-index: 2;
+}
+
+/* Book page curl effect */
+.book-page-curl {
+  position: relative;
+  box-shadow: 
+    inset 0 0 60px rgba(0, 0, 0, 0.05),
+    0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+.book-page-curl::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25px;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(0, 0, 0, 0.08) 0%, 
+    rgba(0, 0, 0, 0.03) 30%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* Vintage decorative border */
+.vintage-border {
+  border: 2px solid #C4A574;
+  box-shadow: 
+    inset 0 0 0 4px #F5F0E6,
+    inset 0 0 0 6px #C4A574,
+    0 4px 20px rgba(139, 115, 85, 0.2);
+}
+
+/* Vintage ornament divider */
+.vintage-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #8B7355;
+}
+
+.vintage-divider::before,
+.vintage-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C4A574, transparent);
+}
+
+/* Vintage ornate corners */
+.vintage-corners {
+  position: relative;
+}
+
+.vintage-corners::before,
+.vintage-corners::after {
+  content: '❧';
+  position: absolute;
+  font-size: 24px;
+  color: #C4A574;
+  opacity: 0.7;
+}
+
+.vintage-corners::before {
+  top: -8px;
+  left: -8px;
+  transform: rotate(-90deg);
+}
+
+.vintage-corners::after {
+  bottom: -8px;
+  right: -8px;
+  transform: rotate(90deg);
+}
+
+/* Storybook frame */
+.storybook-frame {
+  background: 
+    linear-gradient(135deg, #F5F0E6 0%, #EDE4D3 100%);
+  border: 3px solid #8B7355;
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 2px 8px rgba(139, 115, 85, 0.1),
+    0 8px 32px rgba(139, 115, 85, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.storybook-frame::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid #C4A574;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.storybook-frame > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Vintage watercolor wash effect */
+.watercolor-wash {
+  background: 
+    radial-gradient(ellipse at 20% 30%, rgba(196, 165, 116, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(139, 115, 85, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(237, 228, 211, 0.8) 0%, transparent 70%);
+}
+
+/* Vintage button style */
+.vintage-btn {
+  background: linear-gradient(180deg, #8B7355 0%, #6B5645 100%);
+  color: #F5F0E6;
+  border: 2px solid #5A4535;
+  border-radius: 4px;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: 'EB Garamond', Georgia, serif;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.vintage-btn:hover {
+  background: linear-gradient(180deg, #9B8365 0%, #7B6655 100%);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Vintage section separator with fleuron */
+.vintage-separator {
+  text-align: center;
+  position: relative;
+  padding: 20px 0;
+}
+
+.vintage-separator::before {
+  content: '❦';
+  font-size: 28px;
+  color: #C4A574;
+}
+
+/* Aged paper card */
+.aged-paper-card {
+  background: 
+    linear-gradient(135deg, 
+      rgba(245, 240, 230, 0.95) 0%, 
+      rgba(237, 228, 211, 0.95) 100%
+    );
+  border: 1px solid #C4A574;
+  border-radius: 4px;
+  box-shadow: 
+    2px 2px 8px rgba(139, 115, 85, 0.15),
+    -1px -1px 4px rgba(255, 255, 255, 0.5);
+}
+
+/* Vintage typography enhancements */
+.vintage-heading {
+  font-family: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+  color: #4A3F35;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.03em;
+}
+
+.vintage-text {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #5A4F45;
+  line-height: 1.7;
+}
+
+/* Vintage drop cap for first letter */
+.vintage-dropcap::first-letter {
+  float: left;
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding-right: 8px;
+  padding-top: 4px;
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #8B7355;
+}
+
+/* Book spine effect for side */
+.book-spine-left {
+  border-left: 8px solid;
+  border-image: linear-gradient(180deg, #6B5645, #8B7355, #6B5645) 1;
+  box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Vintage page number styling */
+.vintage-page-number {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  color: #8B7355;
+  font-size: 14px;
+}
+
+/* Vintage illustration frame */
+.illustration-frame {
+  padding: 12px;
+  background: #F5F0E6;
+  border: 1px solid #C4A574;
+  box-shadow: 
+    inset 0 0 20px rgba(139, 115, 85, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.illustration-frame img {
+  border: 1px solid rgba(139, 115, 85, 0.3);
+}
+
+/* Vintage ribbon bookmark effect */
+.vintage-ribbon {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  width: 30px;
+  height: 60px;
+  background: linear-gradient(135deg, #8B3A42 0%, #722F37 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.vintage-ribbon::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  border-left: 15px solid #8B3A42;
+  border-right: 15px solid #8B3A42;
+  border-bottom: 10px solid transparent;
 }
 
 /* ============================================

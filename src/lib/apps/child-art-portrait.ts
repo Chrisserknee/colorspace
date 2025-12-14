@@ -4,23 +4,23 @@ export const childArtPortraitConfig: AppConfig = {
   // Basic Identity
   id: 'child-art-portrait',
   name: 'Child Art Portrait',
-  tagline: 'Turn Your Child Into a Storybook Character',
-  description: 'Transform your child\'s photo into a magical, whimsical artwork that captures their unique spirit.',
+  tagline: 'Turn Your Child Into a Vintage Storybook Illustration',
+  description: 'Transform your child\'s photo into a magical vintage illustration, like something from a treasured storybook.',
   
   // URLs & Branding
   slug: 'child-art-portrait',
   logo: undefined, // We'll create one
   heroImages: [], // Will add sample images later
   
-  // Colors & Theming
+  // Colors & Theming - Vintage Storybook Palette
   theme: {
-    primaryColor: '#F472B6', // Pink
-    secondaryColor: '#A78BFA', // Purple
-    gradientFrom: '#F472B6',
-    gradientTo: '#A78BFA',
-    buttonGradient: 'linear-gradient(135deg, #F472B6 0%, #A78BFA 100%)',
-    glowColor: 'rgba(244, 114, 182, 0.4)',
-    fontFamily: "'Lora', Georgia, serif",
+    primaryColor: '#8B7355', // Warm sepia brown
+    secondaryColor: '#C4A574', // Aged gold/tan
+    gradientFrom: '#A08060',
+    gradientTo: '#C4A574',
+    buttonGradient: 'linear-gradient(135deg, #8B7355 0%, #A08060 50%, #C4A574 100%)',
+    glowColor: 'rgba(139, 115, 85, 0.4)',
+    fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif",
   },
   
   // Generation Settings
@@ -38,62 +38,62 @@ export const childArtPortraitConfig: AppConfig = {
 
 Format as a concise paragraph suitable for an image generation prompt. Focus on capturing their unique personality and charm.`,
     
-    basePrompt: `A beautiful, whimsical storybook-style illustration of {childDescription}.
-The child is depicted in a {styleDescription} artistic style.
+    basePrompt: `A beautiful vintage children's book illustration of {childDescription}.
+The child is depicted in a {styleDescription} artistic style, reminiscent of classic illustrated storybooks from the early 1900s.
 Setting: {backgroundDescription}.
-The illustration has a {moodDescription} atmosphere.
+The illustration has a {moodDescription} atmosphere with aged paper texture and soft, muted colors.
 Art style: {artStyleDescription}
-The portrait captures their unique personality with warmth and charm.
-High quality, detailed illustration suitable for framing.`,
+The portrait has the charm of vintage botanical illustrations and classic fairy tale art.
+Warm sepia undertones, delicate linework, aged paper aesthetic, suitable for framing as fine art.`,
     
     stylePalettes: [
       {
-        name: "ENCHANTED GARDEN",
-        background: "a magical garden with soft-focus flowers and butterflies, dreamy pastel colors",
-        mood: "magical, whimsical, joyful",
-        primaryColor: "soft pink and lavender hues",
-        accentColor: "golden sparkles and soft mint accents",
-        lighting: "warm golden hour sunlight filtering through"
+        name: "VINTAGE GARDEN",
+        background: "a classic English garden with delicate roses and climbing vines, like a Beatrix Potter illustration",
+        mood: "nostalgic, gentle, timeless",
+        primaryColor: "aged cream and soft sepia tones",
+        accentColor: "faded rose pink and sage green",
+        lighting: "soft diffused light with warm golden undertones, like an aged photograph"
       },
       {
-        name: "STORYBOOK WONDER",
-        background: "a cozy storybook setting with soft watercolor textures",
-        mood: "warm, nostalgic, charming",
-        primaryColor: "warm cream and soft coral",
-        accentColor: "gentle sky blue and buttercup yellow",
-        lighting: "soft diffused light, like illustration art"
+        name: "STORYBOOK CLASSIC",
+        background: "an antique nursery setting with vintage toys and old books",
+        mood: "warm, nostalgic, cozy",
+        primaryColor: "warm ivory and burnt sienna",
+        accentColor: "dusty blue and antique gold",
+        lighting: "soft candlelit warmth, like an old master painting"
       },
       {
-        name: "FAIRY TALE DREAM",
-        background: "a dreamy fairy tale landscape with soft clouds and gentle stars",
-        mood: "magical, dreamy, ethereal",
-        primaryColor: "soft lavender and powder blue",
-        accentColor: "shimmering silver and soft rose",
-        lighting: "magical twilight glow with soft sparkles"
+        name: "FAIRY TALE VINTAGE",
+        background: "an enchanted forest from a classic Brothers Grimm illustration",
+        mood: "magical, mysterious, enchanting",
+        primaryColor: "deep forest green and warm brown",
+        accentColor: "golden amber and soft mushroom colors",
+        lighting: "dappled sunlight through ancient trees, vintage hand-colored plate aesthetic"
       },
       {
-        name: "ADVENTURE AWAITS",
-        background: "an imaginative adventure scene with friendly elements",
-        mood: "curious, adventurous, playful",
-        primaryColor: "warm sunshine yellow and sky blue",
-        accentColor: "bright coral and soft green",
-        lighting: "bright, cheerful daylight"
+        name: "VICTORIAN PORTRAIT",
+        background: "an elegant parlor setting with rich textures and vintage decor",
+        mood: "refined, elegant, timeless",
+        primaryColor: "rich burgundy and aged gold",
+        accentColor: "cream and antique bronze",
+        lighting: "studio portrait lighting with soft vignette edges"
       },
       {
-        name: "COZY COMFORT",
-        background: "a warm, cozy indoor scene with soft textures",
-        mood: "cozy, warm, comforting",
-        primaryColor: "warm cream and soft peach",
-        accentColor: "dusty rose and sage green",
-        lighting: "warm ambient light, like a cozy afternoon"
+        name: "NURSERY RHYME",
+        background: "a whimsical scene inspired by classic nursery rhyme illustrations",
+        mood: "playful, innocent, charming",
+        primaryColor: "soft butter yellow and powder blue",
+        accentColor: "faded coral and mint",
+        lighting: "bright but soft, like a watercolor wash"
       },
       {
-        name: "WOODLAND MAGIC",
-        background: "a friendly forest with gentle woodland creatures in the distance",
-        mood: "curious, natural, enchanting",
-        primaryColor: "forest green and warm brown",
-        accentColor: "soft mushroom caps and wildflowers",
-        lighting: "dappled sunlight through leaves"
+        name: "WOODLAND TALE",
+        background: "a cozy woodland setting with friendly forest creatures, like Arthur Rackham's illustrations",
+        mood: "curious, adventurous, magical",
+        primaryColor: "earth brown and moss green",
+        accentColor: "autumn orange and cream",
+        lighting: "warm autumn light filtering through leaves"
       },
     ],
     
@@ -125,11 +125,11 @@ High quality, detailed illustration suitable for framing.`,
     ],
     
     promptModifiers: [
-      "Pixar-inspired character design",
-      "watercolor storybook illustration style",
-      "classic children's book illustration",
-      "whimsical fairy tale art style",
-      "warm and inviting digital painting"
+      "vintage children's book illustration style like Beatrix Potter",
+      "classic early 1900s storybook art with hand-painted quality",
+      "Arthur Rackham inspired fairy tale illustration",
+      "antique botanical illustration style with soft watercolors",
+      "golden age of illustration aesthetic with aged paper texture"
     ],
     
     negativePrompt: "scary, dark, horror, realistic photograph, uncanny valley, bad anatomy, distorted features, creepy, unsettling, adult themes",
@@ -155,27 +155,27 @@ High quality, detailed illustration suitable for framing.`,
   
   // Content
   content: {
-    heroTitle: "Transform Your Child Into a Storybook Character",
-    heroSubtitle: "Upload a photo and watch as your little one becomes the star of their own magical illustration.",
+    heroTitle: "Turn Your Child Into a Vintage Illustration",
+    heroSubtitle: "Like something from a treasured storybook — transform your little one into a timeless piece of art.",
     ctaText: "Create Their Portrait",
     
     howItWorks: [
       {
         step: 1,
         title: "Upload Their Photo",
-        description: "Share a clear photo of your child. Smiling photos work great!",
+        description: "Share a cherished photo of your child. Clear, happy expressions work wonderfully!",
         icon: "camera"
       },
       {
         step: 2,
-        title: "Magic Happens",
-        description: "Our AI creates a stunning storybook-style portrait.",
+        title: "The Magic Unfolds",
+        description: "Watch as your photo transforms into a vintage storybook illustration.",
         icon: "sparkles"
       },
       {
         step: 3,
-        title: "Treasure Forever",
-        description: "Download your artwork instantly. Frame it, gift it, love it!",
+        title: "A Keepsake Forever",
+        description: "Download your artwork instantly. Perfect for framing or gifting!",
         icon: "heart"
       },
     ],
@@ -190,16 +190,16 @@ High quality, detailed illustration suitable for framing.`,
         answer: "Clear, well-lit photos where your child's face is clearly visible work best. Happy, natural expressions create the most charming results!"
       },
       {
-        question: "Is this safe for my child's photo?",
-        answer: "Absolutely! We take privacy seriously. Your photos are processed securely and not stored permanently. We never share or use your photos for anything other than creating your portrait."
+        question: "Is my child's photo 100% safe and private?",
+        answer: "Absolutely! Your child's privacy is our top priority. Photos are encrypted during upload, used ONLY to create your portrait, never shared or sold to anyone, and automatically deleted within 24 hours. We never use photos for AI training or any other purpose. Over 5,000 parents trust us with their family photos."
       },
       {
         question: "Can I choose the art style?",
-        answer: "Our AI automatically selects a beautiful style that complements your child's photo. Each portrait is unique and magical!"
+        answer: "Our AI automatically selects a beautiful vintage storybook style that complements your child's photo. Each portrait is unique and captures the charm of classic children's book illustrations."
       },
       {
         question: "Can I get it printed?",
-        answer: "Yes! We offer premium museum-quality canvas prints in 12x12 and 16x16 sizes - perfect for their bedroom or as a gift!"
+        answer: "Yes! We offer premium museum-quality canvas prints in 12x12 and 16x16 sizes - perfect for their bedroom or as a gift for grandparents!"
       },
     ],
     
