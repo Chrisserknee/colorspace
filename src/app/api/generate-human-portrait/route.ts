@@ -277,7 +277,6 @@ export async function POST(request: NextRequest) {
 
     const imageFile = formData.get("image") as File | null;
     const enableWatermark = formData.get("enableWatermark") !== "false";
-    const gender = (formData.get("gender") as string) || "person"; // "male", "female", or "person"
 
     if (!imageFile) {
       return NextResponse.json(
@@ -325,11 +324,9 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Analyze the person's photo with GPT-5.2 for detailed description
+    // Step 1: Analyze the person's photo with GPT-5.2 for detailed description + gender detection
     console.log("🎨 Analyzing person's photo with GPT-5.2...");
     const visionStartTime = Date.now();
-    
-    const genderContext = gender === "male" ? "man" : gender === "female" ? "woman" : "person";
     
     const visionResponse = await openai.chat.completions.create({
       model: "gpt-5.2" as "gpt-4o",
@@ -340,7 +337,11 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: `Analyze this ${genderContext}'s photo with EXTREME PRECISION for portrait generation. The goal is to describe THIS EXACT person so specifically that they would be INSTANTLY RECOGNIZABLE.
+              text: `Analyze this person's photo with EXTREME PRECISION for portrait generation. The goal is to describe THIS EXACT person so specifically that they would be INSTANTLY RECOGNIZABLE.
+
+FIRST, state the apparent gender on line 1: "GENDER: male" or "GENDER: female"
+
+Then provide detailed analysis:
 
 1. FACE GEOMETRY (CRITICAL):
    - FACE SHAPE: Oval, round, square, heart, long, diamond?
@@ -379,7 +380,7 @@ export async function POST(request: NextRequest) {
    - List 5-7 specific features that make THIS person unique
    - Asymmetries, distinctive features, individual quirks
 
-Format your response as a detailed paragraph focusing on what makes THIS person unique and recognizable.`,
+Format: Start with "GENDER: male" or "GENDER: female" on the first line, then a detailed paragraph focusing on what makes THIS person unique and recognizable.`,
             },
             {
               type: "image_url",
@@ -399,6 +400,16 @@ Format your response as a detailed paragraph focusing on what makes THIS person 
     console.log(`Vision analysis took ${Date.now() - visionStartTime}ms`);
     console.log("Person description:", personDescription.substring(0, 400));
     
+    // Extract detected gender from the response
+    let detectedGender: "male" | "female" = "male"; // default
+    const genderMatch = personDescription.match(/GENDER:\s*(male|female)/i);
+    if (genderMatch) {
+      detectedGender = genderMatch[1].toLowerCase() as "male" | "female";
+      // Remove the gender line from description
+      personDescription = personDescription.replace(/GENDER:\s*(male|female)\n?/i, "").trim();
+    }
+    console.log(`Detected gender: ${detectedGender}`);
+    
     // Check if the model refused to analyze
     if (personDescription.toLowerCase().includes("i'm sorry") || 
         personDescription.toLowerCase().includes("i cannot") ||
@@ -416,6 +427,7 @@ Format your response as a detailed paragraph focusing on what makes THIS person 
               {
                 type: "text",
                 text: `I'm creating a classical oil portrait. Please describe the visible physical characteristics in this reference photo:
+- Apparent gender (male or female)
 - Face shape
 - Eyes: color, shape
 - Eyebrows
@@ -443,6 +455,11 @@ Just list the observable features for the portrait artist.`,
       
       personDescription = fallbackResponse.choices[0]?.message?.content || "a distinguished person with refined features";
       console.log("Fallback description:", personDescription.substring(0, 200));
+      
+      // Try to detect gender from fallback response
+      if (personDescription.toLowerCase().includes("female") || personDescription.toLowerCase().includes("woman")) {
+        detectedGender = "female";
+      }
     }
 
     // Step 2: Select random style and location
@@ -452,8 +469,10 @@ Just list the observable features for the portrait artist.`,
     console.log(`Selected style: ${style.name}`);
     console.log(`Selected location: ${location.name}`);
 
-    // Step 3: Add gender-specific styling
-    const feminineAesthetic = gender === "female" ? `
+    // Step 3: Add gender-specific styling based on detected gender
+    const genderContext = detectedGender === "female" ? "woman" : "man";
+    
+    const feminineAesthetic = detectedGender === "female" ? `
 === FEMININE AESTHETIC ===
 - Softer, more elegant styling
 - Delicate fabrics and jewelry (pearl earrings, subtle necklace)
@@ -461,7 +480,7 @@ Just list the observable features for the portrait artist.`,
 - Graceful, poised composition
 - Elegant hairstyle appropriate to the era` : "";
 
-    const masculineAesthetic = gender === "male" ? `
+    const masculineAesthetic = detectedGender === "male" ? `
 === REFINED MASCULINE AESTHETIC ===
 - Distinguished, elegant styling
 - Rich but not harsh colors
@@ -646,7 +665,7 @@ DO NOT:
         app: "human-portrait",
         style: style.name,
         location: location.name,
-        gender,
+        gender: detectedGender,
         personDescription: personDescription.substring(0, 500),
         hdUrl,
         previewUrl,

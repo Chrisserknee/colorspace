@@ -5,8 +5,7 @@ import Image from "next/image";
 import { humanPortraitConfig } from "@/lib/apps";
 import { captureEvent } from "@/lib/posthog";
 
-type Stage = "preview" | "select-gender" | "generating" | "result";
-type Gender = "male" | "female";
+type Stage = "preview" | "generating" | "result";
 
 interface HumanPortraitGenerationFlowProps {
   file: File | null;
@@ -58,7 +57,6 @@ export default function HumanPortraitGenerationFlow({ file, onReset }: HumanPort
   const [error, setError] = useState<string | null>(null);
   const [currentPhrase, setCurrentPhrase] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
-  const [gender, setGender] = useState<Gender | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(15 * 60); // 15 minutes
@@ -135,19 +133,18 @@ export default function HumanPortraitGenerationFlow({ file, onReset }: HumanPort
   }, [stage]);
 
   // Generate the portrait
-  const generatePortrait = useCallback(async (selectedGender: Gender) => {
+  const generatePortrait = useCallback(async () => {
     if (!file || hasGeneratedRef.current) return;
     hasGeneratedRef.current = true;
     
     setStage("generating");
     setError(null);
     
-    captureEvent("human_portrait_generation_started", { app: config.id, gender: selectedGender });
+    captureEvent("human_portrait_generation_started", { app: config.id });
     
     try {
       const formData = new FormData();
       formData.append("image", file);
-      formData.append("gender", selectedGender);
       
       const response = await fetch("/api/generate-human-portrait", {
         method: "POST",
@@ -193,12 +190,6 @@ export default function HumanPortraitGenerationFlow({ file, onReset }: HumanPort
     }
   }, [file, config.id]);
 
-  // Handle gender selection
-  const handleGenderSelect = (selectedGender: Gender) => {
-    setGender(selectedGender);
-    generatePortrait(selectedGender);
-  };
-
   // Handle close with animation
   const handleClose = () => {
     setIsClosing(true);
@@ -212,7 +203,7 @@ export default function HumanPortraitGenerationFlow({ file, onReset }: HumanPort
   const handleRetry = () => {
     hasGeneratedRef.current = false;
     setError(null);
-    setStage("select-gender");
+    setStage("preview");
   };
 
   // Handle download preview (watermarked)
@@ -346,87 +337,16 @@ export default function HumanPortraitGenerationFlow({ file, onReset }: HumanPort
                 />
               </div>
 
-              {/* Continue Button */}
+              {/* Create Portrait Button */}
               <button
-                onClick={() => setStage("select-gender")}
+                onClick={() => generatePortrait()}
                 className="px-8 py-3 rounded-full text-white font-medium transition-all duration-300 hover:scale-105"
                 style={{
                   background: colors.gradient,
                   boxShadow: `0 8px 30px ${colors.primary}40`,
                 }}
               >
-                Continue
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Gender Selection Stage */}
-        {stage === "select-gender" && (
-          <div className="p-6 sm:p-8">
-            <div className="text-center mb-8">
-              <h2 
-                className="text-2xl sm:text-3xl mb-2"
-                style={{ fontFamily: config.theme.fontFamily, color: colors.text }}
-              >
-                Select Your Style
-              </h2>
-              <p style={{ color: colors.textMuted }}>
-                This helps us create the perfect aristocratic attire
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
-              {/* Male Option */}
-              <button
-                onClick={() => handleGenderSelect("male")}
-                className="w-48 h-48 rounded-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4"
-                style={{
-                  background: 'linear-gradient(180deg, rgba(155, 123, 92, 0.1) 0%, rgba(155, 123, 92, 0.02) 100%)',
-                  border: `2px solid ${colors.border}`,
-                }}
-              >
-                <div 
-                  className="w-20 h-20 rounded-full flex items-center justify-center text-4xl"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #5E4B3B 0%, #9B7B5C 100%)',
-                    boxShadow: `0 4px 20px ${colors.primary}40`,
-                  }}
-                >
-                  👨
-                </div>
-                <span 
-                  className="text-lg font-medium"
-                  style={{ color: colors.text, fontFamily: config.theme.fontFamily }}
-                >
-                  Distinguished Gentleman
-                </span>
-              </button>
-
-              {/* Female Option */}
-              <button
-                onClick={() => handleGenderSelect("female")}
-                className="w-48 h-48 rounded-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4"
-                style={{
-                  background: 'linear-gradient(180deg, rgba(155, 123, 92, 0.1) 0%, rgba(155, 123, 92, 0.02) 100%)',
-                  border: `2px solid ${colors.border}`,
-                }}
-              >
-                <div 
-                  className="w-20 h-20 rounded-full flex items-center justify-center text-4xl"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #5E4B3B 0%, #9B7B5C 100%)',
-                    boxShadow: `0 4px 20px ${colors.primary}40`,
-                  }}
-                >
-                  👩
-                </div>
-                <span 
-                  className="text-lg font-medium"
-                  style={{ color: colors.text, fontFamily: config.theme.fontFamily }}
-                >
-                  Elegant Lady
-                </span>
+                Create My Portrait
               </button>
             </div>
           </div>
