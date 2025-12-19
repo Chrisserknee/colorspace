@@ -337,49 +337,31 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: `Analyze this photo with EXTREME PRECISION for portrait generation. Describe ALL PEOPLE visible in the image so they would be INSTANTLY RECOGNIZABLE.
+              text: `Analyze this photo with EXTREME PRECISION for portrait generation. Describe ALL PEOPLE visible in the image (up to 15 people) so they would be INSTANTLY RECOGNIZABLE.
 
 FIRST LINE: State the number of people and their genders like this:
 - If 1 person: "PEOPLE: 1 (female)" or "PEOPLE: 1 (male)"
 - If 2 people: "PEOPLE: 2 (male and female)" or "PEOPLE: 2 (both male)" etc.
-- If more: "PEOPLE: 3 (2 female, 1 male)" etc.
+- For groups: "PEOPLE: 8 (5 female, 3 male)" etc.
 
-Then describe EACH PERSON in detail:
+Then describe EACH PERSON in detail (for large groups 6+, you may use briefer descriptions focusing on the most distinctive features):
 
 FOR EACH PERSON, provide:
 
-1. FACE GEOMETRY:
-   - Face shape, forehead, cheekbones, jaw, chin
+1. FACE: Shape, key features (eyes, nose, mouth)
+2. HAIR: Color, texture, style
+3. SKIN: Tone and any distinctive marks
+4. UNIQUE IDENTIFIERS: 3-5 features that make THIS person recognizable
 
-2. EYES:
-   - Color (exact shade), shape, size, spacing, expression
+For groups of 1-5, give DETAILED descriptions.
+For groups of 6-15, focus on DISTINCTIVE features that differentiate each person.
 
-3. EYEBROWS:
-   - Shape, thickness, arch, color
+Label each person clearly:
+"PERSON 1 (position - e.g., front left): [description]"
+"PERSON 2 (position - e.g., back center): [description]"
+...continue for all people...
 
-4. NOSE:
-   - Length, width, bridge shape, tip
-
-5. MOUTH & LIPS:
-   - Fullness, shape, expression
-
-6. HAIR:
-   - Color (exact shade like "warm chestnut" not just "brown")
-   - Texture (straight/wavy/curly)
-   - Length and style
-
-7. SKIN:
-   - Tone, undertone (warm/cool/neutral)
-   - Distinctive features (freckles, dimples, beauty marks)
-
-8. UNIQUE IDENTIFIERS:
-   - 5-7 features that make THIS person unique
-
-If there are 2+ people, clearly label them:
-"PERSON 1 (position in image): [detailed description]"
-"PERSON 2 (position in image): [detailed description]"
-
-Also describe their RELATIVE POSITIONS and any interaction between them (e.g., "couple standing close together", "friends side by side").
+Describe their ARRANGEMENT (e.g., "family gathered around parents", "wedding party in rows", "friends in casual group").
 
 The portrait MUST include ALL people in the image in their relative positions.`,
             },
@@ -393,13 +375,13 @@ The portrait MUST include ALL people in the image in their relative positions.`,
           ],
         },
       ],
-      max_completion_tokens: 1200,
+      max_completion_tokens: 3000, // Increased for large group descriptions (up to 15 people)
       temperature: 0.1,
     });
 
     let personDescription = visionResponse.choices[0]?.message?.content || "";
     console.log(`Vision analysis took ${Date.now() - visionStartTime}ms`);
-    console.log("Person description:", personDescription.substring(0, 600));
+    console.log("Person description (first 800 chars):", personDescription.substring(0, 800));
     
     // Extract number of people and composition info
     let numPeople = 1;
@@ -527,11 +509,55 @@ Describe all observable features for the portrait artist.`,
 - Harmonious composition showing both together
 - Both positioned as they appear in the reference photo
 - Complementary styling between both subjects`;
-    } else {
+    } else if (numPeople === 3) {
+      subjectContext = "these three people together";
+      aestheticStyling = `
+=== TRIO PORTRAIT AESTHETIC ===
+- All three subjects in elegant period-appropriate attire
+- Each person's unique features preserved perfectly
+- Classic triangular group composition
+- All three positioned as they appear in the reference photo
+- Harmonious styling that connects all three subjects`;
+    } else if (numPeople === 4) {
+      subjectContext = "these four people together";
+      aestheticStyling = `
+=== FAMILY/GROUP PORTRAIT AESTHETIC ===
+- All four subjects in elegant period-appropriate attire
+- Each person's unique features preserved perfectly
+- Classic family portrait composition
+- All four positioned as they appear in the reference photo
+- Harmonious styling across all subjects`;
+    } else if (numPeople >= 5 && numPeople <= 8) {
       subjectContext = `these ${numPeople} people together`;
       aestheticStyling = `
 === GROUP PORTRAIT AESTHETIC ===
 - All ${numPeople} subjects in elegant period-appropriate attire
+- Each person's unique features preserved perfectly
+- Classic group portrait composition (like aristocratic family portraits)
+- All people positioned as they appear in the reference photo
+- Harmonious, balanced styling across all subjects
+- Ensure no one is cropped or obscured
+- Clear visibility of each person's face`;
+    } else if (numPeople >= 9 && numPeople <= 15) {
+      subjectContext = `these ${numPeople} people together`;
+      aestheticStyling = `
+=== GRAND GROUP PORTRAIT AESTHETIC ===
+- All ${numPeople} subjects in elegant period-appropriate attire
+- Each person's distinctive features preserved
+- Grand composition style (like royal court or wedding party portraits)
+- Multiple rows/levels if needed for visibility
+- All people positioned as they appear in the reference photo
+- Harmonious styling that unifies the group
+- CRITICAL: Every single person must be visible and recognizable
+- Balanced lighting across all faces
+- Classic formal group portrait arrangement`;
+    } else {
+      // Fallback for any edge cases
+      const displayNum = Math.min(numPeople, 15);
+      subjectContext = `these ${displayNum} people together`;
+      aestheticStyling = `
+=== GROUP PORTRAIT AESTHETIC ===
+- All ${displayNum} subjects in elegant period-appropriate attire
 - Each person's unique features preserved perfectly
 - Classic group portrait composition
 - All people positioned as they appear in the reference
@@ -539,18 +565,30 @@ Describe all observable features for the portrait artist.`,
     }
 
     // Step 4: Build the generation prompt for GPT-image-1.5
-    const identityInstruction = numPeople > 1 
-      ? `- Must look EXACTLY like the people in the reference
-- Preserve EACH person's exact face shape, features, expression
-- Maintain EACH person's skin tone, hair color, eye color precisely
-- EVERYONE in the image must be INSTANTLY recognizable
-- ALL unique features preserved perfectly for EACH person
-- Keep the same relative positions as in the reference photo`
-      : `- Must look EXACTLY like this person
+    let identityInstruction: string;
+    if (numPeople === 1) {
+      identityInstruction = `- Must look EXACTLY like this person
 - Preserve exact face shape, features, expression
 - Maintain skin tone, hair color, eye color precisely
 - The person must INSTANTLY recognize themselves
 - All unique features preserved perfectly`;
+    } else if (numPeople <= 5) {
+      identityInstruction = `- Must look EXACTLY like the ${numPeople} people in the reference
+- Preserve EACH person's exact face shape, features, expression
+- Maintain EACH person's skin tone, hair color, eye color precisely
+- EVERYONE in the image must be INSTANTLY recognizable
+- ALL unique features preserved perfectly for EACH person
+- Keep the same relative positions as in the reference photo`;
+    } else {
+      // Large groups (6-15 people)
+      identityInstruction = `- Must include ALL ${numPeople} people from the reference photo
+- Preserve each person's distinctive facial features and characteristics
+- Maintain each person's skin tone, hair color, eye color
+- Each person should be recognizable by their unique features
+- Keep the same arrangement/positions as in the reference
+- Ensure every face is visible and distinguishable
+- No one should be cropped out or obscured`;
+    }
 
     const generationPrompt = `Classical aristocratic oil portrait of ${subjectContext}.
 
@@ -582,24 +620,26 @@ WARDROBE:
 - Refined, aristocratic clothing
 
 COMPOSITION:
-- ${numPeople > 1 ? 'Classic couple/group portrait composition' : 'Three-quarter or classical portrait pose'}
-- Natural, dignified expression${numPeople > 1 ? 's' : ''}
-- ${numPeople > 1 ? 'All people positioned together as in the reference' : 'Elegant hand positioning if visible'}
-- Professional portrait framing
+- ${numPeople === 1 ? 'Three-quarter or classical portrait pose' : numPeople <= 5 ? 'Classic group portrait composition' : 'Grand formal group portrait composition (like royal court paintings)'}
+- Natural, dignified expression${numPeople > 1 ? 's for all' : ''}
+- ${numPeople === 1 ? 'Elegant hand positioning if visible' : `All ${numPeople} people positioned together as in the reference`}
+- ${numPeople > 8 ? 'Multiple rows/levels to ensure everyone is visible' : 'Professional portrait framing'}
+- ${numPeople > 5 ? 'Every single face must be clearly visible and recognizable' : 'Professional portrait framing'}
 
 IDENTITY PRESERVATION (CRITICAL):
 ${identityInstruction}
 
-OUTPUT: Beautiful antique oil portrait. ${numPeople > 1 ? 'All people included together.' : 'Natural human pose.'} Stunning composition. Museum-quality masterpiece.
+OUTPUT: Beautiful antique oil portrait. ${numPeople === 1 ? 'Natural human pose.' : `All ${numPeople} people included together, each recognizable.`} Stunning composition. Museum-quality masterpiece.
 
 DO NOT: 
 - Change any facial features
 - Alter skin tone, eye color, or hair color
-- ${numPeople > 1 ? 'Omit any person from the image' : 'Add extra people'}
+- ${numPeople > 1 ? `Omit ANY of the ${numPeople} people from the image` : 'Add extra people'}
 - Add text, words, or typography
 - Create photorealistic rendering
 - Modern digital art style
-- Distort proportions`;
+- Distort proportions
+- ${numPeople > 1 ? 'Crop out or obscure any person' : 'Add extra elements'}`;
 
     console.log("Generating human portrait with GPT-Image-1.5...");
     const generationStartTime = Date.now();
