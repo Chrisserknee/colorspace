@@ -319,23 +319,21 @@ export async function POST(request: NextRequest) {
     // Skip vision analysis - just send image directly to gpt-image-1.5 (like ChatGPT does)
     console.log("🎨 Skipping vision analysis - direct image generation like ChatGPT...");
 
-    // Generate with GPT-image-1.5 (simple prompt, no analysis)
-    const generationPrompt = `Turn this photo into a beautiful classical oil painting portrait in the style of the Old Masters.`;
-
-    console.log("Generating human portrait with GPT-image-1.5...");
+    // Generate with GPT-image-1.5 using images.generate (not images.edit)
+    console.log("Generating human portrait with GPT-image-1.5 (images.generate)...");
     const generationStartTime = Date.now();
 
-    // Use original image directly for best quality
-    const uint8Array = new Uint8Array(buffer);
-    const imageBlob = new Blob([uint8Array], { type: imageFile.type });
-    const imageFileForOpenAI = new File([imageBlob], `photo.${imageFile.type.split('/')[1] || 'jpg'}`, { type: imageFile.type });
+    // Convert image to base64 for inclusion in prompt
+    const base64Image = buffer.toString("base64");
+    const imageType = imageFile.type.split('/')[1] || 'jpeg';
 
-    // Generate with gpt-image-1.5
-    const imageResponse = await openai.images.edit({
+    // Use images.generate with image reference in prompt
+    // This is different from images.edit which is designed for inpainting/masking
+    const imageResponse = await openai.images.generate({
       model: "gpt-image-1.5" as "gpt-image-1" | "dall-e-2",
-      image: imageFileForOpenAI,
-      prompt: generationPrompt,
+      prompt: `[img-${imageType}]${base64Image}[/img]\n\nTransform the person in this image into a beautiful classical oil painting portrait in the style of the Old Masters. Keep their face and features accurate.`,
       n: 1,
+      size: "1024x1024",
       quality: "high",
     });
 
