@@ -565,46 +565,66 @@ Describe all observable features for the portrait artist.`,
 - Harmonious styling across all subjects`;
     }
 
-    // Step 4: Build the generation prompt for GPT-image-1.5 (ultra simple like ChatGPT)
+    // Step 4: Use GPT-4o native image generation (like ChatGPT does)
+    // This is exactly how ChatGPT on iPhone processes "turn this into an oil painting" requests
     const generationPrompt = `Turn this photo into a beautiful classical oil painting portrait in the style of the Old Masters.`;
 
-    console.log("Generating human portrait with GPT-Image-1.5...");
+    console.log("Generating human portrait with GPT-4o native image generation (like ChatGPT)...");
     const generationStartTime = Date.now();
 
-    // Use original image directly - no re-processing like ChatGPT does
-    // Convert original buffer to File for OpenAI API (preserve original quality)
-    const uint8Array = new Uint8Array(buffer);
-    const imageBlob = new Blob([uint8Array], { type: imageFile.type });
-    const imageFileForOpenAI = new File([imageBlob], `photo.${imageFile.type.split('/')[1]}`, { type: imageFile.type });
+    // Convert original image to base64 for chat API (preserve original quality)
+    const imageType = imageFile.type.split('/')[1] || 'jpeg';
+    const originalBase64 = buffer.toString("base64");
 
-    // Generate portrait with img2img using GPT-image-1.5
-    // Don't force size - let model preserve aspect ratio like ChatGPT
-    const imageResponse = await openai.images.edit({
-      model: "gpt-image-1.5" as "gpt-image-1" | "dall-e-2",
-      image: imageFileForOpenAI,
-      prompt: generationPrompt,
-      n: 1,
-      quality: "high",
+    // Use GPT-4o chat completions with native image generation
+    // This is the same approach ChatGPT uses internally
+    // @ts-expect-error - modalities parameter for image generation
+    const chatResponse = await openai.chat.completions.create({
+      model: "gpt-4o" as "gpt-4o",
+      modalities: ["text", "image"],
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: generationPrompt,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/${imageType};base64,${originalBase64}`,
+                detail: "high",
+              },
+            },
+          ],
+        },
+      ],
+      max_completion_tokens: 4096,
     });
 
-    const imageData = imageResponse.data?.[0];
-
-    if (!imageData) {
-      throw new Error("No image generated");
-    }
-
+    // Extract image from response
+    const responseContent = chatResponse.choices[0]?.message?.content;
     let generatedBuffer: Buffer;
-    if (imageData.b64_json) {
-      generatedBuffer = Buffer.from(imageData.b64_json, "base64");
-    } else if (imageData.url) {
-      const downloadResponse = await fetch(imageData.url);
+
+    // Check if response contains image data
+    // GPT-4o native image generation returns base64 image in the response
+    // @ts-expect-error - accessing image data from response
+    const imageOutput = chatResponse.choices[0]?.message?.image;
+    
+    if (imageOutput?.b64_json) {
+      generatedBuffer = Buffer.from(imageOutput.b64_json, "base64");
+    } else if (imageOutput?.url) {
+      const downloadResponse = await fetch(imageOutput.url);
       if (!downloadResponse.ok) {
         throw new Error(`Failed to download generated image: ${downloadResponse.status}`);
       }
       const arrayBuffer = await downloadResponse.arrayBuffer();
       generatedBuffer = Buffer.from(arrayBuffer);
     } else {
-      throw new Error("No image data in response");
+      // Fallback: Check if there's a base64 image in the text content
+      console.log("Response content:", responseContent?.substring(0, 200));
+      throw new Error("No image generated in GPT-4o response. Response may not support native image generation.");
     }
 
     console.log(`Image generation took ${Date.now() - generationStartTime}ms`);
