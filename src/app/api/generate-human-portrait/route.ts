@@ -571,24 +571,19 @@ Describe all observable features for the portrait artist.`,
     console.log("Generating human portrait with GPT-Image-1.5...");
     const generationStartTime = Date.now();
 
-    // Prepare image for OpenAI img2img
-    const processedForOpenAI = await sharp(buffer)
-      .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
-      .png()
-      .toBuffer();
-
-    // Convert buffer to File for OpenAI API
-    const uint8Array = new Uint8Array(processedForOpenAI);
-    const imageBlob = new Blob([uint8Array], { type: "image/png" });
-    const imageFileForOpenAI = new File([imageBlob], "photo.png", { type: "image/png" });
+    // Use original image directly - no re-processing like ChatGPT does
+    // Convert original buffer to File for OpenAI API (preserve original quality)
+    const uint8Array = new Uint8Array(buffer);
+    const imageBlob = new Blob([uint8Array], { type: imageFile.type });
+    const imageFileForOpenAI = new File([imageBlob], `photo.${imageFile.type.split('/')[1]}`, { type: imageFile.type });
 
     // Generate portrait with img2img using GPT-image-1.5
+    // Don't force size - let model preserve aspect ratio like ChatGPT
     const imageResponse = await openai.images.edit({
       model: "gpt-image-1.5" as "gpt-image-1" | "dall-e-2",
       image: imageFileForOpenAI,
       prompt: generationPrompt,
       n: 1,
-      size: "1024x1024",
       quality: "high",
     });
 
