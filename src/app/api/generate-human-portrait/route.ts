@@ -324,8 +324,8 @@ export async function POST(request: NextRequest) {
 
     const base64Image = processedImage.toString("base64");
 
-    // Step 1: Analyze the person's photo with GPT-5.2 for detailed description + gender detection
-    console.log("🎨 Analyzing person's photo with GPT-5.2...");
+    // Step 1: Analyze the photo with GPT-5.2 for detailed description (supports multiple people)
+    console.log("🎨 Analyzing photo with GPT-5.2...");
     const visionStartTime = Date.now();
     
     const visionResponse = await openai.chat.completions.create({
@@ -337,50 +337,51 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: `Analyze this person's photo with EXTREME PRECISION for portrait generation. The goal is to describe THIS EXACT person so specifically that they would be INSTANTLY RECOGNIZABLE.
+              text: `Analyze this photo with EXTREME PRECISION for portrait generation. Describe ALL PEOPLE visible in the image so they would be INSTANTLY RECOGNIZABLE.
 
-FIRST, state the apparent gender on line 1: "GENDER: male" or "GENDER: female"
+FIRST LINE: State the number of people and their genders like this:
+- If 1 person: "PEOPLE: 1 (female)" or "PEOPLE: 1 (male)"
+- If 2 people: "PEOPLE: 2 (male and female)" or "PEOPLE: 2 (both male)" etc.
+- If more: "PEOPLE: 3 (2 female, 1 male)" etc.
 
-Then provide detailed analysis:
+Then describe EACH PERSON in detail:
 
-1. FACE GEOMETRY (CRITICAL):
-   - FACE SHAPE: Oval, round, square, heart, long, diamond?
-   - FOREHEAD: High/low, wide/narrow, flat/rounded?
-   - CHEEKBONES: High/low, prominent/subtle?
-   - JAW: Square, rounded, pointed, wide/narrow?
-   - CHIN: Prominent, recessed, pointed, cleft?
+FOR EACH PERSON, provide:
 
-2. EYES (CRITICAL):
-   - COLOR: Exact shade (light brown, deep blue, hazel with gold flecks, etc.)
-   - SHAPE: Almond, round, hooded, downturned, upturned?
-   - SIZE: Large, medium, small relative to face?
-   - SPACING: Wide-set, close-set, average?
-   - EXPRESSION: Alert, gentle, intense?
+1. FACE GEOMETRY:
+   - Face shape, forehead, cheekbones, jaw, chin
+
+2. EYES:
+   - Color (exact shade), shape, size, spacing, expression
 
 3. EYEBROWS:
-   - Shape, thickness, arch height, color
+   - Shape, thickness, arch, color
 
 4. NOSE:
-   - Length, width, bridge shape, tip shape
+   - Length, width, bridge shape, tip
 
 5. MOUTH & LIPS:
-   - Lip fullness, shape, natural expression
+   - Fullness, shape, expression
 
 6. HAIR:
-   - COLOR: Exact shade (not just "brown" - specify: warm chestnut, cool ash brown, etc.)
-   - TEXTURE: Straight, wavy, curly, coily?
-   - LENGTH & STYLE: How it frames the face
-   - HAIRLINE: Shape, any distinctive features
+   - Color (exact shade like "warm chestnut" not just "brown")
+   - Texture (straight/wavy/curly)
+   - Length and style
 
 7. SKIN:
    - Tone, undertone (warm/cool/neutral)
-   - Any distinctive features (freckles, dimples, beauty marks, etc.)
+   - Distinctive features (freckles, dimples, beauty marks)
 
 8. UNIQUE IDENTIFIERS:
-   - List 5-7 specific features that make THIS person unique
-   - Asymmetries, distinctive features, individual quirks
+   - 5-7 features that make THIS person unique
 
-Format: Start with "GENDER: male" or "GENDER: female" on the first line, then a detailed paragraph focusing on what makes THIS person unique and recognizable.`,
+If there are 2+ people, clearly label them:
+"PERSON 1 (position in image): [detailed description]"
+"PERSON 2 (position in image): [detailed description]"
+
+Also describe their RELATIVE POSITIONS and any interaction between them (e.g., "couple standing close together", "friends side by side").
+
+The portrait MUST include ALL people in the image in their relative positions.`,
             },
             {
               type: "image_url",
@@ -398,17 +399,46 @@ Format: Start with "GENDER: male" or "GENDER: female" on the first line, then a 
 
     let personDescription = visionResponse.choices[0]?.message?.content || "";
     console.log(`Vision analysis took ${Date.now() - visionStartTime}ms`);
-    console.log("Person description:", personDescription.substring(0, 400));
+    console.log("Person description:", personDescription.substring(0, 600));
     
-    // Extract detected gender from the response
-    let detectedGender: "male" | "female" = "male"; // default
-    const genderMatch = personDescription.match(/GENDER:\s*(male|female)/i);
-    if (genderMatch) {
-      detectedGender = genderMatch[1].toLowerCase() as "male" | "female";
-      // Remove the gender line from description
-      personDescription = personDescription.replace(/GENDER:\s*(male|female)\n?/i, "").trim();
+    // Extract number of people and composition info
+    let numPeople = 1;
+    let isCouple = false;
+    let hasMale = false;
+    let hasFemale = false;
+    
+    const peopleMatch = personDescription.match(/PEOPLE:\s*(\d+)\s*\(([^)]+)\)/i);
+    if (peopleMatch) {
+      numPeople = parseInt(peopleMatch[1]) || 1;
+      const genderInfo = peopleMatch[2].toLowerCase();
+      hasMale = genderInfo.includes("male") && !genderInfo.includes("female");
+      hasFemale = genderInfo.includes("female");
+      if (genderInfo.includes("male") && genderInfo.includes("female")) {
+        hasMale = true;
+        hasFemale = true;
+      }
+      if (genderInfo.includes("both male")) {
+        hasMale = true;
+        hasFemale = false;
+      }
+      if (genderInfo.includes("both female")) {
+        hasMale = false;
+        hasFemale = true;
+      }
+      isCouple = numPeople === 2;
+      // Remove the PEOPLE line from description
+      personDescription = personDescription.replace(/PEOPLE:\s*\d+\s*\([^)]+\)\n?/i, "").trim();
+    } else {
+      // Fallback: detect from content
+      if (personDescription.toLowerCase().includes("female") || personDescription.toLowerCase().includes("woman")) {
+        hasFemale = true;
+      }
+      if (personDescription.toLowerCase().includes("male") || personDescription.toLowerCase().includes("man")) {
+        hasMale = true;
+      }
     }
-    console.log(`Detected gender: ${detectedGender}`);
+    
+    console.log(`Detected: ${numPeople} people, male: ${hasMale}, female: ${hasFemale}, couple: ${isCouple}`);
     
     // Check if the model refused to analyze
     if (personDescription.toLowerCase().includes("i'm sorry") || 
@@ -426,18 +456,13 @@ Format: Start with "GENDER: male" or "GENDER: female" on the first line, then a 
             content: [
               {
                 type: "text",
-                text: `I'm creating a classical oil portrait. Please describe the visible physical characteristics in this reference photo:
-- Apparent gender (male or female)
-- Face shape
-- Eyes: color, shape
-- Eyebrows
-- Nose shape
-- Mouth/lip shape
-- Hair: color, texture, style
-- Skin tone
-- Any distinctive features (dimples, freckles, etc.)
+                text: `I'm creating a classical oil portrait. Please describe ALL people visible in this reference photo:
+- Number of people
+- For each person: gender, face shape, eyes, eyebrows, nose, mouth, hair (color, texture, style), skin tone
+- Their positions relative to each other
+- Any distinctive features
 
-Just list the observable features for the portrait artist.`,
+Describe all observable features for the portrait artist.`,
               },
               {
                 type: "image_url",
@@ -449,17 +474,12 @@ Just list the observable features for the portrait artist.`,
             ],
           },
         ],
-        max_tokens: 600,
+        max_tokens: 800,
         temperature: 0.1,
       });
       
-      personDescription = fallbackResponse.choices[0]?.message?.content || "a distinguished person with refined features";
+      personDescription = fallbackResponse.choices[0]?.message?.content || "distinguished people with refined features";
       console.log("Fallback description:", personDescription.substring(0, 200));
-      
-      // Try to detect gender from fallback response
-      if (personDescription.toLowerCase().includes("female") || personDescription.toLowerCase().includes("woman")) {
-        detectedGender = "female";
-      }
     }
 
     // Step 2: Select random style and location
@@ -469,29 +489,72 @@ Just list the observable features for the portrait artist.`,
     console.log(`Selected style: ${style.name}`);
     console.log(`Selected location: ${location.name}`);
 
-    // Step 3: Add gender-specific styling based on detected gender
-    const genderContext = detectedGender === "female" ? "woman" : "man";
+    // Step 3: Build subject context based on number of people
+    let subjectContext = "";
+    let aestheticStyling = "";
     
-    const feminineAesthetic = detectedGender === "female" ? `
+    if (numPeople === 1) {
+      subjectContext = hasFemale ? "this woman" : "this man";
+      aestheticStyling = hasFemale ? `
 === FEMININE AESTHETIC ===
 - Softer, more elegant styling
 - Delicate fabrics and jewelry (pearl earrings, subtle necklace)
 - Gentler lighting with flattering shadows
 - Graceful, poised composition
-- Elegant hairstyle appropriate to the era` : "";
-
-    const masculineAesthetic = detectedGender === "male" ? `
+- Elegant hairstyle appropriate to the era` : `
 === REFINED MASCULINE AESTHETIC ===
 - Distinguished, elegant styling
 - Rich but not harsh colors
 - Refined fabrics with soft textures
 - Sophisticated, warm lighting
-- Strong but approachable composition` : "";
+- Strong but approachable composition`;
+    } else if (isCouple && hasMale && hasFemale) {
+      subjectContext = "this couple (man and woman together)";
+      aestheticStyling = `
+=== COUPLE PORTRAIT AESTHETIC ===
+- Both subjects in elegant period-appropriate attire
+- The woman in a beautiful gown with delicate jewelry
+- The man in distinguished aristocratic clothing
+- Romantic, intimate composition showing their connection
+- Both positioned naturally together as they appear in the reference
+- Complementary colors that harmonize between both subjects`;
+    } else if (numPeople === 2) {
+      subjectContext = "these two people together";
+      aestheticStyling = `
+=== DUAL PORTRAIT AESTHETIC ===
+- Both subjects in elegant period-appropriate attire
+- Each person's unique features preserved perfectly
+- Harmonious composition showing both together
+- Both positioned as they appear in the reference photo
+- Complementary styling between both subjects`;
+    } else {
+      subjectContext = `these ${numPeople} people together`;
+      aestheticStyling = `
+=== GROUP PORTRAIT AESTHETIC ===
+- All ${numPeople} subjects in elegant period-appropriate attire
+- Each person's unique features preserved perfectly
+- Classic group portrait composition
+- All people positioned as they appear in the reference
+- Harmonious styling across all subjects`;
+    }
 
     // Step 4: Build the generation prompt for GPT-image-1.5
-    const generationPrompt = `Classical aristocratic oil portrait of this ${genderContext}.
+    const identityInstruction = numPeople > 1 
+      ? `- Must look EXACTLY like the people in the reference
+- Preserve EACH person's exact face shape, features, expression
+- Maintain EACH person's skin tone, hair color, eye color precisely
+- EVERYONE in the image must be INSTANTLY recognizable
+- ALL unique features preserved perfectly for EACH person
+- Keep the same relative positions as in the reference photo`
+      : `- Must look EXACTLY like this person
+- Preserve exact face shape, features, expression
+- Maintain skin tone, hair color, eye color precisely
+- The person must INSTANTLY recognize themselves
+- All unique features preserved perfectly`;
 
-THE SUBJECT (MUST MATCH EXACTLY):
+    const generationPrompt = `Classical aristocratic oil portrait of ${subjectContext}.
+
+THE SUBJECT(S) (MUST MATCH EXACTLY):
 ${personDescription}
 
 SETTING: ${location.name}
@@ -504,8 +567,7 @@ ${style.background}
 Colors: ${style.colors}
 ${style.lighting}
 
-${feminineAesthetic}
-${masculineAesthetic}
+${aestheticStyling}
 
 PORTRAIT STYLE:
 - 18th-century aristocratic oil portrait
@@ -514,29 +576,26 @@ PORTRAIT STYLE:
 - Museum masterpiece quality
 
 WARDROBE:
-- Elegant period-appropriate attire
+- Elegant period-appropriate attire for ${numPeople > 1 ? 'each person' : 'the subject'}
 - Rich velvet or silk fabrics in jewel tones
 - Tasteful jewelry appropriate to the era
 - Refined, aristocratic clothing
 
 COMPOSITION:
-- Three-quarter or classical portrait pose
-- Natural, dignified expression
-- Elegant hand positioning if visible
+- ${numPeople > 1 ? 'Classic couple/group portrait composition' : 'Three-quarter or classical portrait pose'}
+- Natural, dignified expression${numPeople > 1 ? 's' : ''}
+- ${numPeople > 1 ? 'All people positioned together as in the reference' : 'Elegant hand positioning if visible'}
 - Professional portrait framing
 
 IDENTITY PRESERVATION (CRITICAL):
-- Must look EXACTLY like this person
-- Preserve exact face shape, features, expression
-- Maintain skin tone, hair color, eye color precisely
-- The person must INSTANTLY recognize themselves
-- All unique features preserved perfectly
+${identityInstruction}
 
-OUTPUT: Beautiful antique oil portrait. Natural human pose. Stunning composition. Museum-quality masterpiece.
+OUTPUT: Beautiful antique oil portrait. ${numPeople > 1 ? 'All people included together.' : 'Natural human pose.'} Stunning composition. Museum-quality masterpiece.
 
 DO NOT: 
 - Change any facial features
 - Alter skin tone, eye color, or hair color
+- ${numPeople > 1 ? 'Omit any person from the image' : 'Add extra people'}
 - Add text, words, or typography
 - Create photorealistic rendering
 - Modern digital art style
@@ -665,7 +724,9 @@ DO NOT:
         app: "human-portrait",
         style: style.name,
         location: location.name,
-        gender: detectedGender,
+        numPeople,
+        hasMale,
+        hasFemale,
         personDescription: personDescription.substring(0, 500),
         hdUrl,
         previewUrl,
