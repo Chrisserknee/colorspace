@@ -333,7 +333,6 @@ export async function POST(request: NextRequest) {
     
     const visionResponse = await openai.chat.completions.create({
       model: "gpt-5.2" as "gpt-4o",
-      // @ts-expect-error - gpt-5.2 uses reasoning_effort parameter
       reasoning_effort: "none",
       messages: [
         {
