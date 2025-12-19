@@ -565,15 +565,8 @@ Describe all observable features for the portrait artist.`,
 - Harmonious styling across all subjects`;
     }
 
-    // Step 4: Build the generation prompt for GPT-image-1.5 (keeping it simple like ChatGPT)
-    const generationPrompt = `Transform this photo into a classical Renaissance oil painting portrait.
-
-${numPeople > 1 ? `Include all ${numPeople} people exactly as shown.` : ''}
-
-Style: Elegant aristocratic portrait, rich colors, painterly brushstrokes, museum quality.
-Setting: ${location.name}
-
-Keep faces accurate and recognizable. Full heads visible with space above.`;
+    // Step 4: Build the generation prompt for GPT-image-1.5 (ultra simple like ChatGPT)
+    const generationPrompt = `Turn this photo into a beautiful classical oil painting portrait in the style of the Old Masters.`;
 
     console.log("Generating human portrait with GPT-Image-1.5...");
     const generationStartTime = Date.now();
