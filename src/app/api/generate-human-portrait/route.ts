@@ -429,9 +429,10 @@ The portrait MUST include ALL people in the image in their relative positions.`,
         personDescription.length < 50) {
       console.log("⚠️ Vision model refused or gave short response, using fallback prompt...");
       
-      // Try a simpler, more direct approach
+      // Try a simpler, more direct approach with same model
       const fallbackResponse = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-5.2" as "gpt-4o",
+        reasoning_effort: "none",
         messages: [
           {
             role: "user",
@@ -456,7 +457,7 @@ Describe all observable features for the portrait artist.`,
             ],
           },
         ],
-        max_tokens: 800,
+        max_completion_tokens: 800,
         temperature: 0.1,
       });
       
