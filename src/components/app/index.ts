@@ -5,4 +5,5 @@ export { default as AppFAQ } from './AppFAQ';
 export { default as AppUploadModal } from './AppUploadModal';
 export { default as AppFooter } from './AppFooter';
 export { default as ChildArtGenerationFlow } from './ChildArtGenerationFlow';
+export { default as HumanPortraitGenerationFlow } from './HumanPortraitGenerationFlow';
 

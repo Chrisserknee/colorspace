@@ -2068,6 +2068,118 @@ select:focus-visible {
 }
 
 /* ============================================
+   PORTRAIT STUDIO - RENAISSANCE THEME
+   ============================================ */
+
+/* Portrait Studio background gradient */
+.portrait-studio-bg {
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(155, 123, 92, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(94, 75, 59, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #0D0B09 0%, #1A1612 15%, #1E1915 50%, #1A1612 85%, #0D0B09 100%);
+}
+
+/* Renaissance gold text accent */
+.portrait-gold-text {
+  color: #C4A574;
+  text-shadow: 0 0 20px rgba(196, 165, 116, 0.3);
+}
+
+/* Classical portrait frame effect */
+.portrait-frame {
+  border: 4px solid rgba(155, 123, 92, 0.4);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4), 
+    0 0 60px rgba(155, 123, 92, 0.2),
+    inset 0 0 30px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+/* Portrait Studio button style */
+.portrait-btn {
+  background: linear-gradient(135deg, #5E4B3B 0%, #9B7B5C 50%, #C4A574 100%);
+  color: #F0EDE8;
+  font-family: 'Playfair Display', 'EB Garamond', Georgia, serif;
+  font-weight: 500;
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(196, 165, 116, 0.3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(155, 123, 92, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  letter-spacing: 0.05em;
+}
+
+.portrait-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(155, 123, 92, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.portrait-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Renaissance card style */
+.portrait-card {
+  background: linear-gradient(180deg, rgba(155, 123, 92, 0.08) 0%, rgba(155, 123, 92, 0.02) 100%);
+  border: 1px solid rgba(155, 123, 92, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.portrait-card:hover {
+  border-color: rgba(155, 123, 92, 0.4);
+  box-shadow: 0 10px 30px rgba(155, 123, 92, 0.15);
+}
+
+/* Classical decorative flourish */
+.portrait-flourish {
+  color: #9B7B5C;
+  font-family: 'Playfair Display', serif;
+  opacity: 0.3;
+}
+
+/* Renaissance section divider */
+.portrait-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.portrait-divider::before,
+.portrait-divider::after {
+  content: '';
+  flex: 1;
+  max-width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(155, 123, 92, 0.3), transparent);
+}
+
+/* Classical typography */
+.portrait-heading {
+  font-family: 'Playfair Display', 'EB Garamond', Georgia, serif;
+  color: #F0EDE8;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+.portrait-text {
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #A89F93;
+  line-height: 1.8;
+}
+
+/* Cinzel font accent for labels */
+.portrait-label {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #9B7B5C;
+}
+
+/* ============================================
    HIDE VERCEL DEPLOYMENT BADGE
    ============================================ */
 

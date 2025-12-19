@@ -40,7 +40,7 @@ export interface AppTheme {
 
 export interface GenerationConfig {
   // Type of generation
-  type: 'pet-portrait' | 'child-portrait' | 'custom';
+  type: 'pet-portrait' | 'child-portrait' | 'human-portrait' | 'custom';
   
   // OpenAI Vision prompt for analyzing uploaded image
   visionPrompt: string;

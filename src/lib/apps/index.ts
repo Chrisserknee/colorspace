@@ -2,16 +2,19 @@
 import { AppConfig, AppRegistry } from './types';
 import { lumepetConfig } from './lumepet';
 import { childArtPortraitConfig } from './child-art-portrait';
+import { humanPortraitConfig } from './human-portrait';
 
 // Export all app configs
 export { lumepetConfig } from './lumepet';
 export { childArtPortraitConfig } from './child-art-portrait';
+export { humanPortraitConfig } from './human-portrait';
 export * from './types';
 
 // App Registry - all available apps
 export const apps: AppRegistry = {
   lumepet: lumepetConfig,
   'child-art-portrait': childArtPortraitConfig,
+  'human-portrait': humanPortraitConfig,
 };
 
 // Get app by slug
