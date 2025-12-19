@@ -565,93 +565,15 @@ Describe all observable features for the portrait artist.`,
 - Harmonious styling across all subjects`;
     }
 
-    // Step 4: Build the generation prompt for GPT-image-1.5
-    let identityInstruction: string;
-    if (numPeople === 1) {
-      identityInstruction = `- Must look EXACTLY like this person
-- Preserve exact face shape, features, expression
-- Maintain skin tone, hair color, eye color precisely
-- The person must INSTANTLY recognize themselves
-- All unique features preserved perfectly`;
-    } else if (numPeople <= 5) {
-      identityInstruction = `- Must look EXACTLY like the ${numPeople} people in the reference
-- Preserve EACH person's exact face shape, features, expression
-- Maintain EACH person's skin tone, hair color, eye color precisely
-- EVERYONE in the image must be INSTANTLY recognizable
-- ALL unique features preserved perfectly for EACH person
-- Keep the same relative positions as in the reference photo`;
-    } else {
-      // Large groups (6-15 people)
-      identityInstruction = `- Must include ALL ${numPeople} people from the reference photo
-- Preserve each person's distinctive facial features and characteristics
-- Maintain each person's skin tone, hair color, eye color
-- Each person should be recognizable by their unique features
-- Keep the same arrangement/positions as in the reference
-- Ensure every face is visible and distinguishable
-- No one should be cropped out or obscured`;
-    }
+    // Step 4: Build the generation prompt for GPT-image-1.5 (keeping it simple like ChatGPT)
+    const generationPrompt = `Transform this photo into a classical Renaissance oil painting portrait.
 
-    const generationPrompt = `Classical aristocratic oil portrait of ${subjectContext}.
+${numPeople > 1 ? `Include all ${numPeople} people exactly as shown.` : ''}
 
-THE SUBJECT(S) (MUST MATCH EXACTLY):
-${personDescription}
+Style: Elegant aristocratic portrait, rich colors, painterly brushstrokes, museum quality.
+Setting: ${location.name}
 
-SETTING: ${location.name}
-${location.description}
-Lighting: ${location.lighting}
-Mood: ${location.mood}
-
-STYLE: ${style.name}
-${style.background}
-Colors: ${style.colors}
-${style.lighting}
-
-${aestheticStyling}
-
-PORTRAIT STYLE:
-- Classical oil painting style like Rembrandt or John Singer Sargent
-- Visible brushstrokes on BACKGROUND and CLOTHING only
-- FACES must remain accurate and well-defined - smooth, careful brushwork on faces
-- Painterly texture on fabrics, backgrounds, and surroundings
-- Soft, flattering lighting on faces
-- Oil painting aesthetic with aged patina
-- Museum masterpiece quality
-- PRIORITY: Face accuracy over artistic effects
-
-WARDROBE:
-- Elegant period-appropriate attire for ${numPeople > 1 ? 'each person' : 'the subject'}
-- Rich velvet or silk fabrics in jewel tones
-- Tasteful jewelry appropriate to the era
-- Refined, aristocratic clothing
-
-COMPOSITION & FRAMING (CRITICAL):
-- ${numPeople === 1 ? 'Three-quarter or classical portrait pose' : numPeople <= 5 ? 'Classic group portrait composition' : 'Grand formal group portrait composition (like royal court paintings)'}
-- Natural, dignified expression${numPeople > 1 ? 's for all' : ''}
-- ${numPeople === 1 ? 'Elegant hand positioning if visible' : `All ${numPeople} people positioned together as in the reference`}
-- ${numPeople > 8 ? 'Multiple rows/levels to ensure everyone is visible' : 'Professional portrait framing'}
-- ${numPeople > 5 ? 'Every single face must be clearly visible and recognizable' : 'Professional portrait framing'}
-- FULL HEAD visible with SPACE ABOVE the head - never crop the top of the head
-- Classic portrait framing: head positioned in upper third with room above
-- Include from chest/shoulders up to well above the crown of the head
-- Generous headroom - like traditional painted portraits in museums
-
-IDENTITY PRESERVATION (CRITICAL):
-${identityInstruction}
-
-OUTPUT: Classical oil portrait with accurate, recognizable faces. ${numPeople === 1 ? 'Natural human pose.' : `All ${numPeople} people included together, each recognizable.`} Painterly background, precise faces. Museum masterpiece.
-
-DO NOT: 
-- Change or distort any facial features - faces must be ACCURATE
-- Alter skin tone, eye color, or hair color
-- ${numPeople > 1 ? `Omit ANY of the ${numPeople} people from the image` : 'Add extra people'}
-- Add text, words, or typography
-- Apply heavy texture or distortion to faces
-- Modern digital art style
-- Distort facial proportions or features
-- ${numPeople > 1 ? 'Crop out or obscure any person' : 'Add extra elements'}
-- CUT OFF or CROP the top of any head - full heads must be visible
-- Tight framing that clips hair or forehead
-- Make faces look weird, melted, or unnatural`;
+Keep faces accurate and recognizable. Full heads visible with space above.`;
 
     console.log("Generating human portrait with GPT-Image-1.5...");
     const generationStartTime = Date.now();
