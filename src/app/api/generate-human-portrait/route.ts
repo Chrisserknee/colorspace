@@ -623,12 +623,16 @@ WARDROBE:
 - Tasteful jewelry appropriate to the era
 - Refined, aristocratic clothing
 
-COMPOSITION:
+COMPOSITION & FRAMING (CRITICAL):
 - ${numPeople === 1 ? 'Three-quarter or classical portrait pose' : numPeople <= 5 ? 'Classic group portrait composition' : 'Grand formal group portrait composition (like royal court paintings)'}
 - Natural, dignified expression${numPeople > 1 ? 's for all' : ''}
 - ${numPeople === 1 ? 'Elegant hand positioning if visible' : `All ${numPeople} people positioned together as in the reference`}
 - ${numPeople > 8 ? 'Multiple rows/levels to ensure everyone is visible' : 'Professional portrait framing'}
 - ${numPeople > 5 ? 'Every single face must be clearly visible and recognizable' : 'Professional portrait framing'}
+- FULL HEAD visible with SPACE ABOVE the head - never crop the top of the head
+- Classic portrait framing: head positioned in upper third with room above
+- Include from chest/shoulders up to well above the crown of the head
+- Generous headroom - like traditional painted portraits in museums
 
 IDENTITY PRESERVATION (CRITICAL):
 ${identityInstruction}
@@ -644,7 +648,9 @@ DO NOT:
 - Modern digital art style
 - Smooth, airbrushed, or overly polished look
 - Distort proportions
-- ${numPeople > 1 ? 'Crop out or obscure any person' : 'Add extra elements'}`;
+- ${numPeople > 1 ? 'Crop out or obscure any person' : 'Add extra elements'}
+- CUT OFF or CROP the top of any head - full heads must be visible
+- Tight framing that clips hair or forehead`;
 
     console.log("Generating human portrait with GPT-Image-1.5...");
     const generationStartTime = Date.now();
