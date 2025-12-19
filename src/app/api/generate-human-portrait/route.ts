@@ -607,15 +607,15 @@ ${style.lighting}
 
 ${aestheticStyling}
 
-PORTRAIT STYLE (CRITICAL - MUST BE PAINTERLY):
-- Classical oil painting with THICK, VISIBLE BRUSHSTROKES throughout
-- Heavy impasto technique - textured paint application you can almost feel
-- Bold, expressive brushwork like Rembrandt or John Singer Sargent
-- NOT smooth or airbrushed - emphasize the hand-painted quality
-- Visible paint texture on canvas, rough edges on brushstrokes
-- Rich, layered paint with dimensional quality
-- Oil painting craquelure and aged patina
-- Museum masterpiece with authentic painted look
+PORTRAIT STYLE:
+- Classical oil painting style like Rembrandt or John Singer Sargent
+- Visible brushstrokes on BACKGROUND and CLOTHING only
+- FACES must remain accurate and well-defined - smooth, careful brushwork on faces
+- Painterly texture on fabrics, backgrounds, and surroundings
+- Soft, flattering lighting on faces
+- Oil painting aesthetic with aged patina
+- Museum masterpiece quality
+- PRIORITY: Face accuracy over artistic effects
 
 WARDROBE:
 - Elegant period-appropriate attire for ${numPeople > 1 ? 'each person' : 'the subject'}
@@ -637,20 +637,20 @@ COMPOSITION & FRAMING (CRITICAL):
 IDENTITY PRESERVATION (CRITICAL):
 ${identityInstruction}
 
-OUTPUT: Authentic hand-painted oil portrait with THICK VISIBLE BRUSHSTROKES. ${numPeople === 1 ? 'Natural human pose.' : `All ${numPeople} people included together, each recognizable.`} Textured, painterly museum masterpiece.
+OUTPUT: Classical oil portrait with accurate, recognizable faces. ${numPeople === 1 ? 'Natural human pose.' : `All ${numPeople} people included together, each recognizable.`} Painterly background, precise faces. Museum masterpiece.
 
 DO NOT: 
-- Change any facial features
+- Change or distort any facial features - faces must be ACCURATE
 - Alter skin tone, eye color, or hair color
 - ${numPeople > 1 ? `Omit ANY of the ${numPeople} people from the image` : 'Add extra people'}
 - Add text, words, or typography
-- Create photorealistic or smooth rendering
+- Apply heavy texture or distortion to faces
 - Modern digital art style
-- Smooth, airbrushed, or overly polished look
-- Distort proportions
+- Distort facial proportions or features
 - ${numPeople > 1 ? 'Crop out or obscure any person' : 'Add extra elements'}
 - CUT OFF or CROP the top of any head - full heads must be visible
-- Tight framing that clips hair or forehead`;
+- Tight framing that clips hair or forehead
+- Make faces look weird, melted, or unnatural`;
 
     console.log("Generating human portrait with GPT-Image-1.5...");
     const generationStartTime = Date.now();
