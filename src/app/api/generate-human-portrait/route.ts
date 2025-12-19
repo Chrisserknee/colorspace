@@ -436,12 +436,8 @@ export async function POST(request: NextRequest) {
     try {
       await saveMetadata(imageId, {
         app: "human-portrait",
-        style: style.name,
-        location: location.name,
-        numPeople,
-        hasMale,
-        hasFemale,
-        personDescription: personDescription.substring(0, 500),
+        style: "classical",
+        location: "studio",
         hdUrl,
         previewUrl,
         createdAt: new Date().toISOString(),
@@ -465,8 +461,8 @@ export async function POST(request: NextRequest) {
       imageId,
       previewUrl,
       hdUrl,
-      style: style.name,
-      location: location.name,
+      style: "classical",
+      location: "studio",
     });
 
   } catch (error) {
