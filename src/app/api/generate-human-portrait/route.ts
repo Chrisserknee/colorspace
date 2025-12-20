@@ -316,22 +316,89 @@ export async function POST(request: NextRequest) {
 
     const imageId = uuidv4();
 
-    // Skip vision analysis - just send image directly to gpt-image-1.5 (like ChatGPT does)
-    console.log("🎨 Skipping vision analysis - direct image generation like ChatGPT...");
+    // Convert to base64 for vision analysis
+    const base64Image = buffer.toString("base64");
+    const mimeType = imageFile.type;
 
-    // Generate with GPT-image-1.5 using images.edit
-    console.log("Generating human portrait with GPT-image-1.5...");
+    // ===== STEP 1: Vision Analysis with GPT-5.2 =====
+    console.log("🔍 Analyzing image with GPT-5.2 vision...");
+    const visionStartTime = Date.now();
+
+    const visionResponse = await openai.chat.completions.create({
+      model: "gpt-5.2" as "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Analyze this photo for a classical oil portrait. Describe:
+1. Number of people (1-15)
+2. For each person: apparent gender (male/female), approximate age range, hair color/style, skin tone, clothing color/style
+3. Facial expressions and poses
+4. Overall composition
+
+Be specific but concise. This will guide an oil painting portrait generation.`
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:${mimeType};base64,${base64Image}`,
+                detail: "high"
+              }
+            }
+          ]
+        }
+      ],
+      max_tokens: 500,
+      reasoning_effort: "high",
+    });
+
+    const analysisText = visionResponse.choices[0]?.message?.content || "";
+    console.log(`Vision analysis completed in ${Date.now() - visionStartTime}ms`);
+    console.log("Analysis:", analysisText.substring(0, 200) + "...");
+
+    // ===== STEP 2: Select style and location =====
+    const style = getRandomStyle();
+    const location = getRandomHumanPortraitLocation();
+    console.log(`Selected style: ${style.name}`);
+    console.log(`Selected location: ${location.name}`);
+
+    // ===== STEP 3: Generate with GPT-image-1.5 (img2img) =====
+    console.log("🎨 Generating portrait with GPT-image-1.5...");
     const generationStartTime = Date.now();
 
-    // Use original image directly
+    // Build the generation prompt based on vision analysis
+    const generationPrompt = `Transform this photo into a classical oil painting portrait in the style of the Old Masters.
+
+SUBJECT ANALYSIS:
+${analysisText}
+
+STYLE: ${style.name}
+- Background: ${style.background}
+- Mood: ${style.mood}
+- Colors: ${style.colors}
+- Lighting: ${style.lighting}
+
+LOCATION: ${location.name}
+${location.description}
+
+ARTISTIC REQUIREMENTS:
+- Paint in the style of Rembrandt, Vermeer, or Reynolds
+- Use visible, confident brushstrokes with impasto texture
+- Capture accurate likeness of all faces - this is critical
+- Natural skin tones and realistic proportions
+- Classical composition with elegant poses
+- Ensure full heads are visible with generous headroom
+- Rich, luminous color palette
+- Museum-quality fine art portrait`;
+
+    // Prepare image for OpenAI
     const uint8Array = new Uint8Array(buffer);
     const imageBlob = new Blob([uint8Array], { type: imageFile.type });
     const imageFileForOpenAI = new File([imageBlob], `photo.${imageFile.type.split('/')[1] || 'jpg'}`, { type: imageFile.type });
 
-    // Simple prompt like ChatGPT
-    const generationPrompt = `Turn this photo into a beautiful classical oil painting portrait in the style of the Old Masters.`;
-
-    // Generate with gpt-image-1.5 - add size back
+    // Generate with gpt-image-1.5 using images.edit (img2img)
     const imageResponse = await openai.images.edit({
       model: "gpt-image-1.5" as "gpt-image-1" | "dall-e-2",
       image: imageFileForOpenAI,
@@ -438,8 +505,8 @@ export async function POST(request: NextRequest) {
     try {
       await saveMetadata(imageId, {
         app: "human-portrait",
-        style: "classical",
-        location: "studio",
+        style: style.name,
+        location: location.name,
         hdUrl,
         previewUrl,
         createdAt: new Date().toISOString(),
@@ -463,8 +530,8 @@ export async function POST(request: NextRequest) {
       imageId,
       previewUrl,
       hdUrl,
-      style: "classical",
-      location: "studio",
+      style: style.name,
+      location: location.name,
     });
 
   } catch (error) {
